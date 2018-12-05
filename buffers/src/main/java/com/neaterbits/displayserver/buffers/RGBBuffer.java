@@ -1,0 +1,32 @@
+package com.neaterbits.displayserver.buffers;
+
+public final class RGBBuffer extends InMemoryBuffer {
+
+	public RGBBuffer(int width, int height) {
+		super(width, height, 3);
+	}
+
+	@Override
+	int getPixelRGBA(int pixelIdx) {
+		return buffer[pixelIdx + 0] << 24
+		     | buffer[pixelIdx + 1] << 16
+		     | buffer[pixelIdx + 2] << 8;
+	}
+
+	@Override
+	void setPixelRGBA(int pixelIdx, int rgba) {
+		
+		final int r = rgba >> 24;
+		final int g = (rgba >> 16) & 0xFF;
+		final int b = (rgba >> 8)  & 0xFF;
+	
+		buffer[pixelIdx + 0] = (byte)r;
+		buffer[pixelIdx + 1] = (byte)g;
+		buffer[pixelIdx + 2] = (byte)b;
+	}
+
+	@Override
+	public PixelFormat getPixelFormat() {
+		return PixelFormat.RGB24;
+	}
+}
