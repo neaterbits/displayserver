@@ -3,12 +3,19 @@ package com.neaterbits.displayserver.protocol;
 public class OpCodes {
 
 	public static final int CREATE_WINDOW = 1;
+	public static final int CHANGE_WINDOW_ATTRIBUTES = 2;
 
 	public static final int DESTROY_WINDOW = 4;
 	
 	public static final int MAP_WINDOW = 8;
 
+	public static final int INTERN_ATOM = 16;
+	
 	public static final int GET_PROPERTY = 20;
+	
+	public static final int GET_SELECTION_OWNER = 23;
+	
+	public static final int GRAB_SERVER = 36;
 	
 	public static final int CREATE_PIXMAP = 53;
     public static final int FREE_PIXMAP = 54;

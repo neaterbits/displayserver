@@ -33,14 +33,20 @@ import com.neaterbits.displayserver.protocol.messages.protocolsetup.ServerMessag
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.VISUALTYPE;
 import com.neaterbits.displayserver.protocol.messages.replies.AllocColorReply;
 import com.neaterbits.displayserver.protocol.messages.replies.GetPropertyReply;
+import com.neaterbits.displayserver.protocol.messages.replies.GetSelectionOwnerReply;
+import com.neaterbits.displayserver.protocol.messages.replies.InternAtomReply;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryResponseReply;
 import com.neaterbits.displayserver.protocol.messages.requests.AllocColor;
+import com.neaterbits.displayserver.protocol.messages.requests.ChangeWindowAttributes;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateGC;
 import com.neaterbits.displayserver.protocol.messages.requests.CreatePixmap;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.DestroyWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.FreePixmap;
 import com.neaterbits.displayserver.protocol.messages.requests.GetProperty;
+import com.neaterbits.displayserver.protocol.messages.requests.GetSelectionOwner;
+import com.neaterbits.displayserver.protocol.messages.requests.GrabServer;
+import com.neaterbits.displayserver.protocol.messages.requests.InternAtom;
 import com.neaterbits.displayserver.protocol.messages.requests.PutImage;
 import com.neaterbits.displayserver.protocol.messages.requests.QueryExtension;
 import com.neaterbits.displayserver.protocol.types.ATOM;
@@ -385,7 +391,13 @@ public class XWindowsProtocolServer implements AutoCloseable {
 				}
 				break;
 			}
-				
+			
+			case OpCodes.CHANGE_WINDOW_ATTRIBUTES: {
+			    ChangeWindowAttributes.decode(stream);
+			    
+			    break;
+			}
+			
 			case OpCodes.DESTROY_WINDOW: {
 				final DestroyWindow destroyWindow = DestroyWindow.decode(stream);
 				
@@ -397,6 +409,19 @@ public class XWindowsProtocolServer implements AutoCloseable {
 				break;
 			}
 			
+			
+			
+			case OpCodes.INTERN_ATOM: {
+			    
+			    final InternAtom internAtom = InternAtom.decode(stream);
+			    
+			    System.out.println("## internAtom: " + internAtom);
+			    
+			    connectionState.send(new InternAtomReply(sequenceNumber, ATOM.None));
+			    
+			    break;
+			}
+			
             case OpCodes.GET_PROPERTY: {
                 
                 GetProperty.decode(stream);
@@ -406,6 +431,23 @@ public class XWindowsProtocolServer implements AutoCloseable {
                         new CARD8((short)0),
                         ATOM.None,
                         new byte[0]));
+                break;
+            }
+            
+            case OpCodes.GET_SELECTION_OWNER: {
+                
+                final GetSelectionOwner getSelectionOwner = GetSelectionOwner.decode(stream);
+                
+                System.out.println("## GetSelectionOwner " + getSelectionOwner.getSelection());
+                
+                connectionState.send(new GetSelectionOwnerReply(sequenceNumber, WINDOW.None));
+                break;
+            }
+            
+            case OpCodes.GRAB_SERVER: {
+                
+                GrabServer.decode(stream);
+                
                 break;
             }
 			

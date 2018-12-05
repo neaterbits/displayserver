@@ -20,14 +20,16 @@ public class XWindowsProtocolUtil {
 	        
 	        if (byteBuffer.remaining() >= 4) {
 
-	            final int messageLength = (int)byteBuffer.asShortBuffer().get(1);
+	            final int messageLength32Bits = (int)byteBuffer.asShortBuffer().get(1);
 
+	            final int messageLengthBytes = messageLength32Bits * 4;
+	            
 	            System.out.println("## opCode: " + byteBuffer.get(byteBuffer.position()));
                 
-                System.out.println("## messageLength: " + messageLength);
+                System.out.println("## messageLength: " + messageLengthBytes);
 	            
-	            if (messageLength <= byteBuffer.remaining()) {
-    	            length = messageLength;
+	            if (messageLengthBytes <= byteBuffer.remaining()) {
+    	            length = messageLengthBytes;
 	            }
 	            else {
 	                length = null;

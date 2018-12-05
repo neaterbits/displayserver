@@ -96,11 +96,11 @@ public final class CreateWindow extends Request {
 	@Override
 	public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 
-	    stream.writeOpCode(OpCodes.CREATE_WINDOW);
+	    writeOpCode(stream, OpCodes.CREATE_WINDOW);
 	    
 		stream.writeCARD8(depth);
 		
-		stream.writeCARD16(new CARD16(8 + attributes.getCount()));
+		writeRequestLength(stream, 8 + attributes.getCount());
 		
 		stream.writeWINDOW(wid);
 		stream.writeWINDOW(parent);

@@ -35,4 +35,9 @@ public final class ATOM {
             return false;
         return true;
     }
+
+    @Override
+    public String toString() {
+        return "ATOM [value=" + value + "]";
+    }
 }
