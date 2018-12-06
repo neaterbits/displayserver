@@ -8,10 +8,8 @@ import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.neaterbits.displayserver.buffers.PixelFormat;
 import com.neaterbits.displayserver.events.common.EventSource;
 import com.neaterbits.displayserver.framebuffer.common.GraphicsDriver;
 import com.neaterbits.displayserver.framebuffer.common.GraphicsScreen;
@@ -31,11 +29,7 @@ import com.neaterbits.displayserver.protocol.messages.Error;
 import com.neaterbits.displayserver.protocol.messages.Reply;
 import com.neaterbits.displayserver.protocol.messages.Request;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ClientMessage;
-import com.neaterbits.displayserver.protocol.messages.protocolsetup.DEPTH;
-import com.neaterbits.displayserver.protocol.messages.protocolsetup.FORMAT;
-import com.neaterbits.displayserver.protocol.messages.protocolsetup.SCREEN;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ServerMessage;
-import com.neaterbits.displayserver.protocol.messages.protocolsetup.VISUALTYPE;
 import com.neaterbits.displayserver.protocol.messages.replies.AllocColorReply;
 import com.neaterbits.displayserver.protocol.messages.replies.GetGeometryReply;
 import com.neaterbits.displayserver.protocol.messages.replies.GetPropertyReply;
@@ -70,16 +64,13 @@ import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.COLORMAP;
 import com.neaterbits.displayserver.protocol.types.CURSOR;
 import com.neaterbits.displayserver.protocol.types.INT16;
-import com.neaterbits.displayserver.protocol.types.KEYCODE;
 import com.neaterbits.displayserver.protocol.types.PIXMAP;
-import com.neaterbits.displayserver.protocol.types.SET32;
 import com.neaterbits.displayserver.protocol.types.SETofDEVICEEVENT;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.protocol.types.WINGRAVITY;
 import com.neaterbits.displayserver.server.XWindowsConnectionState.State;
-import com.neaterbits.displayserver.types.Size;
 import com.neaterbits.displayserver.windows.Display;
 import com.neaterbits.displayserver.windows.Screen;
 import com.neaterbits.displayserver.windows.WindowEventListener;
@@ -291,7 +282,14 @@ public class XWindowsProtocolServer implements AutoCloseable {
         
         // System.out.println("## got client message " + clientMessage);
         
-        final ServerMessage serverMessage = constructServerMessage(connectionState.getConnectionNo());
+        final int connectionNo = connectionState.getConnectionNo();
+        
+        final ServerMessage serverMessage = InitialServerMessageHelper.constructServerMessage(
+                connectionNo,
+                state,
+                resourceIdAllocator.getResourceBase(connectionNo),
+                resourceIdAllocator.getResourceMask(connectionNo),
+                resourceIdAllocator::allocateVisualId);
         
         // System.out.println("## sending servermessage " + serverMessage);
         
@@ -309,121 +307,6 @@ public class XWindowsProtocolServer implements AutoCloseable {
         send(connectionState, serverMessage);
         
         return true;
-    }
-    
-    private ServerMessage constructServerMessage(int connectionNo) {
-        final String vendor = "Test";
-        
-
-        final Set<PixelFormat> distinctPixelFormats = state.getDistinctPixelFormats();
-        
-        final FORMAT [] formats = new FORMAT[distinctPixelFormats.size()];
-        
-        int dstIdx = 0;
-        
-        for (PixelFormat pixelFormat : distinctPixelFormats) {
-            final FORMAT format = new FORMAT(
-                    new CARD8((short)pixelFormat.getDepth()),
-                    new CARD8((short)pixelFormat.getBitsPerPixel()),
-                    new CARD8((short)0));
-            
-            formats[dstIdx ++] = format;
-        }
-        
-        final int numScreens = state.getNumberOfScreens();
-        
-        final SCREEN [] screens = new SCREEN[numScreens];
-        
-        for (int i = 0; i < numScreens; ++ i) {
-            final XWindowsScreen xWindowsScreen = state.getScreen(i);
-            final GraphicsScreen driverScreen = xWindowsScreen.getScreen().getDriverScreen();
-            
-            final Size size = driverScreen.getSize();
-            final Size sizeInMillimeters = driverScreen.getSizeInMillimeters();
-            
-            final PixelFormat pixelFormat = driverScreen.getPixelFormat();
-            
-            final VISUALID visualId = new VISUALID(resourceIdAllocator.allocateVisualId());
-            
-            final VISUALTYPE visual = new VISUALTYPE(
-                    visualId,
-                    new BYTE((byte)4), // TrueColor
-                    new CARD8((short)pixelFormat.getBitsPerColorComponent()),
-                    new CARD16(pixelFormat.getNumberOfDistinctColors()),
-                    new CARD32(pixelFormat.getRedMask()),
-                    new CARD32(pixelFormat.getGreenMask()),
-                    new CARD32(pixelFormat.getBlueMask()));
-            
-            final DEPTH depth = new DEPTH(
-                    new CARD8((short)pixelFormat.getDepth()),
-                    new CARD16(1),
-                    new VISUALTYPE[] { visual });
-            
-            final SCREEN screen = new SCREEN(
-                    xWindowsScreen.getRootWINDOW(),
-                    new COLORMAP(0),
-                    new CARD32(0x000000), new CARD32(0xFFFFFFF),
-                    new SET32(0),
-                    new CARD16(size.getWidth()), new CARD16(size.getHeight()),
-                    new CARD16(sizeInMillimeters.getWidth()), new CARD16(sizeInMillimeters.getHeight()),
-                    new CARD16(0), new CARD16(0),
-                    visualId,
-                    new BYTE((byte)0), new BOOL((byte)0),
-                    new CARD8((short)24), new CARD8((short)1), new DEPTH [] { depth });
-         
-            screens[i] = screen;
-        }
-        
-        final int vendorAndScreenBytes = 
-                vendor.length()
-              + XWindowsProtocolUtil.getPadding(vendor.length())
-              + length(screens);
-        
-        final int length = 
-                  8 
-                + 2 * formats.length
-                + (vendorAndScreenBytes / 4);
-        
-        final ServerMessage serverMessage = new ServerMessage(
-                new BYTE((byte)1),
-                new CARD16((short)11), new CARD16((short)0),
-                new CARD16(length),
-                new CARD32(1),
-                new CARD32(resourceIdAllocator.getResourceBase(connectionNo)),
-                new CARD32(resourceIdAllocator.getResourceMask(connectionNo)),
-                new CARD32(0),
-                new CARD16(vendor.length()), new CARD16((1 << 15) - 1),
-                new CARD8((short)screens.length), new CARD8((short)formats.length),
-                new BYTE((byte)0), new BYTE((byte)0), new CARD8((byte)32), new CARD8((byte)32),
-                new KEYCODE((short)8), new KEYCODE((short)105),
-                vendor,
-                formats,
-                screens);
-        
-
-        return serverMessage;
-    }
-    
-    private static int length(SCREEN [] screens) {
-        
-        int length = 0;
-        
-        for (SCREEN screen : screens) {
-            length += 40 + length(screen.getAllowedDepths());
-        }
-        
-        return length;
-    }
-    
-    private static int length(DEPTH [] depths) {
-
-        int length = 0;
-
-        for (DEPTH depth : depths) {
-            length += 8 + depth.getVisuals().length * 24;
-        }
-    
-        return length;
     }
     
     private <T extends Request> T log(int messageLength, int opcode, CARD16 sequenceNumber, T request) {
