@@ -26,7 +26,7 @@ import com.neaterbits.displayserver.windows.Display;
 import com.neaterbits.displayserver.windows.Window;
 import com.neaterbits.displayserver.windows.WindowParameters;
 
-public class XClient extends XWindowsConnectionState {
+public class XClient extends XConnection {
     
     private final XServer server;
     private final Set<Integer> utilizedResourceIds;

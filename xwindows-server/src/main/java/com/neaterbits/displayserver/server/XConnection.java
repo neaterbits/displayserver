@@ -17,7 +17,7 @@ import com.neaterbits.displayserver.protocol.messages.Encodeable;
 import com.neaterbits.displayserver.protocol.messages.Event;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 
-public class XWindowsConnectionState
+public class XConnection
     extends NonBlockingChannelWriter
     implements NonBlockingWritable, AutoCloseable {
 
@@ -39,7 +39,7 @@ public class XWindowsConnectionState
 	
 	private int sequenceNumber;
 	
-	XWindowsConnectionState(
+	XConnection(
 	        SocketChannel socketChannel,
 	        int connectionNo,
 	        NonBlockingChannelWriterLog log) {
