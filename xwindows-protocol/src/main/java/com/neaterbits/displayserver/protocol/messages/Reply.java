@@ -6,6 +6,7 @@ import java.util.Objects;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
+import com.neaterbits.displayserver.protocol.types.CARD32;
 
 public abstract class Reply extends Message {
 
@@ -28,5 +29,9 @@ public abstract class Reply extends Message {
     
     protected final void writeSequenceNumber(XWindowsProtocolOutputStream stream) throws IOException {
         stream.writeCARD16(sequenceNumber);
+    }
+
+    protected static void writeReplyLength(XWindowsProtocolOutputStream stream, long replyLength) throws IOException {
+        stream.writeCARD32(new CARD32(replyLength));
     }
 }

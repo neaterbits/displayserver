@@ -465,7 +465,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
                 
                 final GetSelectionOwner getSelectionOwner = log(messageLength, opcode, GetSelectionOwner.decode(stream));
                 
-                send(connectionState, new GetSelectionOwnerReply(sequenceNumber, screens.get(0).getRootWindow()));
+                send(connectionState, new GetSelectionOwnerReply(sequenceNumber, WINDOW.None));
                 break;
             }
             

@@ -33,6 +33,8 @@ public final class GetSelectionOwnerReply extends Reply {
         
         writeSequenceNumber(stream);
         
+        writeReplyLength(stream, 0);
+        
         stream.writeWINDOW(owner);
         
         stream.pad(20);
