@@ -25,6 +25,11 @@ public class GetPropertyReply extends Reply {
         this.type = type;
         this.data = data;
     }
+    
+    @Override
+    public Object[] getDebugParams() {
+        return wrap("format", format, "type", type, "dataLength", data.length);
+    }
 
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {

@@ -68,9 +68,6 @@ public abstract class Attributes {
     }
 
     void encode(XWindowsProtocolOutputStream stream) throws IOException {
-        
-        System.out.println("## write bitmask");
-        
         stream.writeBITMASK(valueMask);
     }
 }

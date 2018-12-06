@@ -15,6 +15,7 @@ import java.util.Set;
 
 import com.neaterbits.displayserver.io.common.MessageProcessor;
 import com.neaterbits.displayserver.io.common.NonBlockingChannelWriter;
+import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLog;
 import com.neaterbits.displayserver.io.common.Selectable;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolUtil;
 import com.neaterbits.displayserver.protocol.messages.Encodeable;
@@ -30,7 +31,9 @@ abstract class XWindowsChannelReaderWriter
 
 	protected abstract boolean receivedInitialMessage();
 	
-	XWindowsChannelReaderWriter(int port) {
+	XWindowsChannelReaderWriter(int port, NonBlockingChannelWriterLog log) {
+	    super(log);
+
         this.port = port;
     }
 
@@ -55,17 +58,14 @@ abstract class XWindowsChannelReaderWriter
 		
 		set.add(selectionKey);
 		
-		System.out.println("## channels: " + set + " to " + selector);
-		
 		return set;
 	}
 	
 	@Override
 	public int read(SelectionKey selectionKey, Selector selector, ByteBuffer buffer) throws IOException {
+
 	    final SocketChannel channel = getChannel(selectionKey, selector);
 		final int bytesRead = channel.read(buffer);
-		
-		System.out.println("bytesRead: " + bytesRead + "/" + channel.isOpen());
 		
 		return bytesRead;
 	}

@@ -19,12 +19,17 @@ import com.neaterbits.displayserver.events.common.EventSource;
 import com.neaterbits.displayserver.framebuffer.common.GraphicsDriver;
 import com.neaterbits.displayserver.framebuffer.common.GraphicsScreen;
 import com.neaterbits.displayserver.io.common.Client;
+import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLog;
 import com.neaterbits.displayserver.layers.Region;
 import com.neaterbits.displayserver.protocol.ByteBufferXWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.OpCodes;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolUtil;
 import com.neaterbits.displayserver.protocol.exception.ProtocolException;
+import com.neaterbits.displayserver.protocol.logging.XWindowsProtocolLog;
+import com.neaterbits.displayserver.protocol.messages.Encodeable;
+import com.neaterbits.displayserver.protocol.messages.Reply;
+import com.neaterbits.displayserver.protocol.messages.Request;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ClientMessage;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.DEPTH;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.FORMAT;
@@ -69,15 +74,25 @@ import com.neaterbits.displayserver.windows.WindowEventListener;
 
 public class XWindowsProtocolServer implements AutoCloseable {
 
+    private final XWindowsProtocolLog protocolLog;
+    private final NonBlockingChannelWriterLog connectionWriteLog;
+    
 	private final Display display;
 	private final ServerResourceIdAllocator resourceIdAllocator;
 	
 	private final List<XWindowsScreen> screens;
 	private final Map<Window, XWindowsConnectionState> connectionByWindow;
 	
-	public XWindowsProtocolServer(EventSource driverEventSource, GraphicsDriver graphicsDriver) throws IOException {
+	public XWindowsProtocolServer(
+	        EventSource driverEventSource,
+	        GraphicsDriver graphicsDriver,
+	        XWindowsProtocolLog protocolLog,
+	        NonBlockingChannelWriterLog connectionWriteLog) throws IOException {
 		
 		Objects.requireNonNull(graphicsDriver);
+		
+		this.protocolLog = protocolLog;
+		this.connectionWriteLog = connectionWriteLog;
 		
 		this.resourceIdAllocator = new ServerResourceIdAllocator();
 		
@@ -91,7 +106,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
 	}
 
 	public Client processConnection(SocketChannel socketChannel) {
-	    return new ConnectionState(XWindowsProtocolServer.this, socketChannel) {
+	    return new ConnectionState(XWindowsProtocolServer.this, socketChannel, connectionWriteLog) {
 
             @Override
             public Integer getLengthOfMessage(ByteBuffer byteBuffer) {
@@ -116,8 +131,6 @@ public class XWindowsProtocolServer implements AutoCloseable {
                         
                         final int totalLength = 12 + authNameLength + authDataLength;
                     
-                        System.out.println("## totalLength: " + totalLength + "/" + authProtocolNameLength + "/" + authProtocolDataLength + "/" + authNameLength + "/" + authDataLength);
-                        
                         if (totalLength <= byteBuffer.remaining()) {
                             length = totalLength;
                         }
@@ -172,10 +185,13 @@ public class XWindowsProtocolServer implements AutoCloseable {
 	
 	private abstract class ConnectionState extends XWindowsConnectionState implements Client {
 
-		public ConnectionState(XWindowsProtocolServer server, SocketChannel socketChannel) {
-			super(server, socketChannel, resourceIdAllocator.allocateConnection());
+		public ConnectionState(XWindowsProtocolServer server, SocketChannel socketChannel, NonBlockingChannelWriterLog connectionWriteLog) {
+			super(
+			        server,
+			        socketChannel,
+			        resourceIdAllocator.allocateConnection(),
+			        connectionWriteLog);
 		}
-		
 	}
 	
 	private void processMessage(XWindowsConnectionState connectionState, ByteBuffer byteBuffer, int messageLength) throws IOException {
@@ -183,14 +199,6 @@ public class XWindowsProtocolServer implements AutoCloseable {
 	    switch (connectionState.getState()) {
 	    
         case CREATED:
-            System.out.println("### Initial message " + byteBuffer.remaining() + "/" + byteBuffer.position() + "/" + byteBuffer.limit() + "/" + messageLength);
-            
-            for (int i = 0; i < messageLength; ++ i) {
-                final byte value = byteBuffer.get(i);
-                
-                System.out.format("%02x %3d %c\n", value, value, (char)value);
-            }
-
             if (processInitialMessage(connectionState, byteBuffer, messageLength)) {
                 
                 connectionState.setState(State.INITIAL_RECEIVED);
@@ -234,12 +242,13 @@ public class XWindowsProtocolServer implements AutoCloseable {
         
         connectionState.setByteOrder(byteOrder);
         
-        System.out.println("## got client message " + clientMessage);
+        // System.out.println("## got client message " + clientMessage);
         
         final ServerMessage serverMessage = constructServerMessage(connectionState.getConnectionNo());
         
-        System.out.println("## sending servermessage " + serverMessage);
+        // System.out.println("## sending servermessage " + serverMessage);
         
+        /*
         final byte [] encoded = serverMessage.writeToBuf(byteOrder);
         final ByteBuffer buffer = ByteBuffer.wrap(encoded);
         
@@ -248,8 +257,9 @@ public class XWindowsProtocolServer implements AutoCloseable {
         final ServerMessage decoded = ServerMessage.decode(new ByteBufferXWindowsProtocolInputStream(buffer));
         
         System.out.println("Decoded message: " + decoded);
+        */
         
-        connectionState.send(serverMessage);
+        send(connectionState, serverMessage);
         
         return true;
     }
@@ -327,9 +337,6 @@ public class XWindowsProtocolServer implements AutoCloseable {
                 + 2 * formats.length
                 + (vendorAndScreenBytes / 4);
         
-        System.out.println("-- vendor length " + (vendor.length() + XWindowsProtocolUtil.getPadding(vendor.length())));;
-        System.out.println("-- screens length " + length(screens));
-        
         final ServerMessage serverMessage = new ServerMessage(
                 new BYTE((byte)1),
                 new CARD16((short)11), new CARD16((short)0),
@@ -371,6 +378,15 @@ public class XWindowsProtocolServer implements AutoCloseable {
     
         return length;
     }
+    
+    private <T extends Request> T log(int messageLength, int opcode, T request) {
+        if (protocolLog != null) {
+            protocolLog.onReceivedRequest(messageLength, opcode, request);
+        }
+
+        return request;
+    }
+    
     private void processProtocolMessage(XWindowsConnectionState connectionState, ByteBuffer byteBuffer, int messageLength) throws IOException {
 		
 		final int opcode = byteBuffer.get();
@@ -382,7 +398,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
 		try {
 			switch (opcode) {
 			case OpCodes.CREATE_WINDOW: {
-				final CreateWindow createWindow = CreateWindow.decode(stream);
+				final CreateWindow createWindow = log(messageLength, opcode, CreateWindow.decode(stream));
 	
 				final Window window = connectionState.createWindow(display, createWindow);
 				
@@ -393,13 +409,13 @@ public class XWindowsProtocolServer implements AutoCloseable {
 			}
 			
 			case OpCodes.CHANGE_WINDOW_ATTRIBUTES: {
-			    ChangeWindowAttributes.decode(stream);
+			    log(messageLength, opcode, ChangeWindowAttributes.decode(stream));
 			    
 			    break;
 			}
 			
 			case OpCodes.DESTROY_WINDOW: {
-				final DestroyWindow destroyWindow = DestroyWindow.decode(stream);
+				final DestroyWindow destroyWindow = log(messageLength, opcode, DestroyWindow.decode(stream));
 				
 				final Window window = connectionState.destroyWindow(display, destroyWindow);
 				
@@ -413,20 +429,17 @@ public class XWindowsProtocolServer implements AutoCloseable {
 			
 			case OpCodes.INTERN_ATOM: {
 			    
-			    final InternAtom internAtom = InternAtom.decode(stream);
+			    final InternAtom internAtom = log(messageLength, opcode, InternAtom.decode(stream));
 			    
-			    System.out.println("## internAtom: " + internAtom);
-			    
-			    connectionState.send(new InternAtomReply(sequenceNumber, ATOM.None));
-			    
+			    send(connectionState, new InternAtomReply(sequenceNumber, ATOM.None));
 			    break;
 			}
 			
             case OpCodes.GET_PROPERTY: {
                 
-                GetProperty.decode(stream);
+                log(messageLength, opcode, GetProperty.decode(stream));
                 
-                connectionState.send(new GetPropertyReply(
+                send(connectionState, new GetPropertyReply(
                         sequenceNumber,
                         new CARD8((short)0),
                         ATOM.None,
@@ -436,30 +449,28 @@ public class XWindowsProtocolServer implements AutoCloseable {
             
             case OpCodes.GET_SELECTION_OWNER: {
                 
-                final GetSelectionOwner getSelectionOwner = GetSelectionOwner.decode(stream);
+                final GetSelectionOwner getSelectionOwner = log(messageLength, opcode, GetSelectionOwner.decode(stream));
                 
-                System.out.println("## GetSelectionOwner " + getSelectionOwner.getSelection());
-                
-                connectionState.send(new GetSelectionOwnerReply(sequenceNumber, WINDOW.None));
+                send(connectionState, new GetSelectionOwnerReply(sequenceNumber, WINDOW.None));
                 break;
             }
             
             case OpCodes.GRAB_SERVER: {
                 
-                GrabServer.decode(stream);
+                log(messageLength, opcode, GrabServer.decode(stream));
                 
                 break;
             }
 			
 			case OpCodes.CREATE_PIXMAP: {
-			    final CreatePixmap createPixmap = CreatePixmap.decode(stream);
+			    final CreatePixmap createPixmap = log(messageLength, opcode, CreatePixmap.decode(stream));
 			    
 			    connectionState.createPixmap(createPixmap);
 			    break;
 			}
 			
 			case OpCodes.FREE_PIXMAP: {
-			    final FreePixmap freePixmap = FreePixmap.decode(stream);
+			    final FreePixmap freePixmap = log(messageLength, opcode, FreePixmap.decode(stream));
 
 			    connectionState.freePixmap(freePixmap);
 			    break;
@@ -467,23 +478,23 @@ public class XWindowsProtocolServer implements AutoCloseable {
 			
 			case OpCodes.CREATE_GC: {
 			    
-			    final CreateGC createGC = CreateGC.decode(stream);
+			    final CreateGC createGC = log(messageLength, opcode, CreateGC.decode(stream));
 			    
 			    connectionState.createGC(createGC);
 			    break;
 			}
 			    
 			case OpCodes.PUT_IMAGE: {
-			    final PutImage putImage = PutImage.decode(stream);
+			    final PutImage putImage = log(messageLength, opcode, PutImage.decode(stream));
 
 			    connectionState.putImage(putImage);
 			    break;
 			}
 			
 			case OpCodes.QUERY_EXTENSION: {
-			    QueryExtension.decode(stream);
+			    log(messageLength, opcode, QueryExtension.decode(stream));
 			
-			    connectionState.send(
+			    send(connectionState, 
 			            new QueryResponseReply(
 			                    sequenceNumber,
 			                    new BOOL((byte)0),
@@ -495,9 +506,9 @@ public class XWindowsProtocolServer implements AutoCloseable {
 			
 			case OpCodes.ALLOC_COLOR: {
 			    
-			    final AllocColor allocColor = AllocColor.decode(stream);
+			    final AllocColor allocColor = log(messageLength, opcode, AllocColor.decode(stream));
 			    
-			    connectionState.send(new AllocColorReply(
+			    send(connectionState, new AllocColorReply(
 			            sequenceNumber,
 			            allocColor.getRed(),
 			            allocColor.getGreen(),
@@ -517,6 +528,19 @@ public class XWindowsProtocolServer implements AutoCloseable {
 			throw new IllegalStateException(ex);
 		}
 	}
+
+    private void send(XWindowsConnectionState connectionState, Encodeable message) {
+        connectionState.send(message);
+    }
+
+    private void send(XWindowsConnectionState connectionState, Reply reply) {
+        
+        if (protocolLog != null) {
+            protocolLog.onSendReply(reply);
+        }
+        
+        connectionState.send(reply);
+    }
 
     boolean isRootWindow(WINDOW window) {
         return resourceIdAllocator.isRootWindow(window.getValue());

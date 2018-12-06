@@ -26,6 +26,26 @@ public final class QueryResponseReply extends Reply {
         this.firstError = firstError;
     }
 
+    public boolean isPresent() {
+        return present.isSet();
+    }
+
+    public CARD8 getMajorOpCode() {
+        return majorOpCode;
+    }
+
+    public CARD8 getFirstEvent() {
+        return firstEvent;
+    }
+
+    public CARD8 getFirstError() {
+        return firstError;
+    }
+    
+    @Override
+    public Object[] getDebugParams() {
+        return wrap("present", isPresent(), "majorOpCode", majorOpCode, "firstEvent", firstEvent, "firstError", firstError);
+    }
 
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {

@@ -3,6 +3,7 @@ package com.neaterbits.displayserver.protocol.types;
 public final class ATOM {
 
     public static final ATOM None = new ATOM(0);
+    public static final ATOM AnyPropertyType = new ATOM(0);
     
     private final int value;
 
@@ -38,6 +39,6 @@ public final class ATOM {
 
     @Override
     public String toString() {
-        return "ATOM [value=" + value + "]";
+        return this.equals(None) ? "None" : String.valueOf(value);
     }
 }

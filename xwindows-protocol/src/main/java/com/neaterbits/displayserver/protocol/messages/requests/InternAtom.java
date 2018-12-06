@@ -24,14 +24,10 @@ public final class InternAtom extends Request {
         
         final CARD16 nameLength = stream.readCARD16();
         
-        System.out.println("## nameLength: " + nameLength);
-        
         stream.readCARD16();
         
         final String name = stream.readSTRING8(nameLength.getValue());
 
-        System.out.println("## name: " + name);
-        
         final int pad = XWindowsProtocolUtil.getPadding(nameLength.getValue());
         
         stream.readPad(pad);
@@ -49,13 +45,17 @@ public final class InternAtom extends Request {
     }
 
     public boolean getOnlyIfExists() {
-        return onlyIfExists.getValue() != 0;
+        return onlyIfExists.isSet();
     }
 
     public String getName() {
         return name;
     }
 
+    @Override
+    public Object[] getDebugParams() {
+        return wrap("onlyIfExists", getOnlyIfExists(), "name", name);
+    }
 
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {

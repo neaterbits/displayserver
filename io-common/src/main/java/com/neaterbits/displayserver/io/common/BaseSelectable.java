@@ -7,6 +7,7 @@ import java.nio.channels.Selector;
 
 abstract class BaseSelectable {
 
+    private final SelectableLog log;
 	private ByteBuffer readBuffer;
 
 	abstract MessageProcessor getMessageProcessor();
@@ -16,16 +17,20 @@ abstract class BaseSelectable {
 	abstract void onWriteable(SelectionKey selectionKey, Selector selector) throws IOException;
 
 	
-	BaseSelectable() {
+	BaseSelectable(SelectableLog log) {
+	    
+	    this.log = log;
+	    
 		this.readBuffer = ByteBuffer.allocate(500);
-		
 	}
 	
 	final void readAndProcess(SelectionKey selectionKey, Selector selector) throws IOException {
 		
 		for (;;) {
 
-		    System.out.println("## driver.readAndProcess() limit: " + readBuffer.limit() + " remaining: " + readBuffer.remaining() + " position: " + readBuffer.position());
+		    if (log != null) {
+		        log.onTryReadEnter(readBuffer.limit(), readBuffer.remaining(), readBuffer.position());
+		    }
 
 			final int bytesRead = read(selectionKey, selector, readBuffer);
 
@@ -33,16 +38,22 @@ abstract class BaseSelectable {
 			    
 			    readBuffer.flip();
 
-		        System.out.println("## driver.readAndProcess() after flip, before message processing limit: " + readBuffer.limit() + " remaining: " + readBuffer.remaining() + " position: " + readBuffer.position());
+	            if (log != null) {
+	                log.onAfterFlipBeforeProcessingOneMessage(bytesRead, readBuffer.limit(), readBuffer.remaining(), readBuffer.position());
+	            }
 
 				processAnyCompleteMessages(getMessageProcessor(), readBuffer);
 				
-                System.out.println("## driver.readAndProcess() after message processing limit: " + readBuffer.limit() + " remaining: " + readBuffer.remaining() + " position: " + readBuffer.position());
-
+				if (log != null) {
+				    log.onAfterProcessedOneMessage(readBuffer.limit(), readBuffer.remaining(), readBuffer.position());
+				}
+				
 				// buffer.flip();
 				readBuffer.compact();
-				
-                System.out.println("## driver.readAndProcess() after compact limit: " + readBuffer.limit() + " remaining: " + readBuffer.remaining() + " position: " + readBuffer.position());
+
+                if (log != null) {
+                    log.onAfterProcessedOneMessageFlip(readBuffer.limit(), readBuffer.remaining(), readBuffer.position());
+                }
 			}
 			else if (bytesRead == -1) {
 			    selectionKey.cancel();
@@ -60,7 +71,9 @@ abstract class BaseSelectable {
 				
 				// buffer.compact();
 				
-				System.out.println("## new buffer: " + readBuffer.remaining());
+				if (log != null) {
+				    log.onBufferReallocated(readBuffer.limit(), readBuffer.remaining(), readBuffer.position());
+				}
 				
 				readBuffer.compact();
 				
@@ -83,8 +96,10 @@ abstract class BaseSelectable {
     		    }
     		    
     			messageProcessor.onMessage(buffer, messageLength);
-
-                System.out.println("## driver.processAnyCompleteMessages() after message processing limit: " + readBuffer.limit() + " remaining: " + readBuffer.remaining() + " position: " + readBuffer.position());
+    			
+    			if (log != null) {
+    			    log.onProcessedCompleteMessage(messageLength, readBuffer.limit(), readBuffer.remaining(), readBuffer.position());
+    			}
     		}
     		else {
     		    break;

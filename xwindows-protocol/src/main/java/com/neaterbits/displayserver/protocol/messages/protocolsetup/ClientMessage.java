@@ -25,17 +25,11 @@ public final class ClientMessage implements Encodeable {
 		final CARD8 byteOrder = stream.readCARD8();
 		stream.readBYTE();
 
-		System.out.format("byte order 0x%02x\n", byteOrder.getValue());
-		
 		final CARD16 protocolMajorVersion = stream.readCARD16();
 		final CARD16 protocolMinorVersion = stream.readCARD16();
 	
-		System.out.println("## versions: " + protocolMajorVersion + "/" + protocolMinorVersion);
-		
 		final CARD16 authorizationProtocolNameLength = stream.readCARD16();
 		final CARD16 authorizationProtocolDataLength = stream.readCARD16();
-
-		System.out.println("## authorization name/data " + authorizationProtocolNameLength + "/" + authorizationProtocolDataLength);
 
 		stream.readCARD16();
 		

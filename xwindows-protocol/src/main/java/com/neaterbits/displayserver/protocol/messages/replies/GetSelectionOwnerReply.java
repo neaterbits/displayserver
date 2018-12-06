@@ -21,6 +21,11 @@ public final class GetSelectionOwnerReply extends Reply {
     }
 
     @Override
+    public Object[] getDebugParams() {
+        return wrap("owner", owner);
+    }
+
+    @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
         writeReplyHeader(stream);
         

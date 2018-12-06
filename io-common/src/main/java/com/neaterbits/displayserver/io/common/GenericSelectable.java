@@ -12,8 +12,10 @@ final class GenericSelectable extends BaseSelectable {
 	private final Selectable selectable;
 	private final MessageProcessor messageProcessor;
 	
-	public GenericSelectable(String name, Selectable selectable, MessageProcessor messageProcessor) {
+	public GenericSelectable(String name, Selectable selectable, MessageProcessor messageProcessor, SelectableLog log) {
 		
+	    super(log);
+	    
 		Objects.requireNonNull(selectable);
 		
 		this.name = name;

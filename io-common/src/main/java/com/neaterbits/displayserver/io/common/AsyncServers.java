@@ -16,16 +16,22 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 
-
 public class AsyncServers implements AutoCloseable {
 	
+    private final AsyncServersLog log;
+    private final SelectableLog connectionReadLog;
+    
 	private final List<AsyncServer> servers;
 	private final Map<SelectionKey, BaseSelectable> selectableBySelectorKey;
 	
 	private final SelectorProvider selectorProvider;
 	private final AbstractSelector selector;
 	
-	public AsyncServers() throws IOException {
+	public AsyncServers(AsyncServersLog log, SelectableLog connectionReadLog) throws IOException {
+	    
+	    this.log = log;
+	    this.connectionReadLog = connectionReadLog;
+	    
 		this.servers = new ArrayList<>();
 		this.selectableBySelectorKey = new HashMap<>();
 		
@@ -76,12 +82,14 @@ public class AsyncServers implements AutoCloseable {
 	public void addSelectable(
 			String name,
 			Selectable selectable,
-			MessageProcessor messageProcessor) throws IOException {
+			MessageProcessor messageProcessor,
+			SelectableLog log) throws IOException {
 		
 		final GenericSelectable genericSelectable = new GenericSelectable(
 				name,
 				selectable,
-				messageProcessor);
+				messageProcessor,
+				log);
 		
 		final Set<SelectionKey> selectionKeys = selectable.register(selectorProvider, selector);
 		
@@ -108,7 +116,9 @@ public class AsyncServers implements AutoCloseable {
         
         if (numUpdated > 0) {
         
-            System.out.println("## select updated " + numUpdated);
+            if (log != null) {
+                log.onSelectUpdated(numUpdated);
+            }
             
             final Iterator<SelectionKey> iter = selector.selectedKeys().iterator();
             
@@ -121,8 +131,10 @@ public class AsyncServers implements AutoCloseable {
                 }
                 
                 if (selectionKey.isAcceptable()) {
-                    
-                    System.out.println("## accept() on " + selectionKey.channel());
+
+                    if (log != null) {
+                        log.onAccept(selectionKey);
+                    }
                     
                     final ServerSocketChannel socketChannel = (ServerSocketChannel)selectionKey.channel();
                     
@@ -194,7 +206,7 @@ public class AsyncServers implements AutoCloseable {
 		
 		final Client client = server.onClientConnect.apply(socket);
 		
-		final ClientConnection clientConnection = new ClientConnection(socket, client, client);
+		final ClientConnection clientConnection = new ClientConnection(socket, client, client, connectionReadLog);
 
 		server.addClient(clientConnection);
 		

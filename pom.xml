@@ -36,6 +36,7 @@
 		<module>main</module>
 		<module>windows</module>
 		<module>buffers</module>
+		<module>util</module>
 		<module>driver-common</module>
 		<module>driver-framebuffer-common</module>
 		<module>driver-events-common</module>

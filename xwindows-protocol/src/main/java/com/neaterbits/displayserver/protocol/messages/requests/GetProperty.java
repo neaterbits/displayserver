@@ -70,6 +70,17 @@ public final class GetProperty extends Request {
     }
 
     @Override
+    public Object[] getDebugParams() {
+        return wrap(
+                "delete", delete.isSet(),
+                "window", window,
+                "property", property,
+                "type", type,
+                "longOffset", longOffset,
+                "longLength", longLength);
+    }
+
+    @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
         
         writeOpCode(stream, OpCodes.GET_PROPERTY);

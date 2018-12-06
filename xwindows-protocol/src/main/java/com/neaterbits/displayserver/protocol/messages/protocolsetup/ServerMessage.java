@@ -53,15 +53,11 @@ public final class ServerMessage implements Encodeable {
 
 	    final BYTE success = stream.readBYTE();
 	    
-	    System.out.println("## success " + success);
-	    
 	    stream.readBYTE();
 	    
 	    final CARD16 protocolMajorVersion = stream.readCARD16();
 	    final CARD16 protocolMinorVersion = stream.readCARD16();
 	    
-	    System.out.println("## versions: " + protocolMajorVersion + "/" + protocolMinorVersion);
-
 	    final CARD16 length = stream.readCARD16();
 	    
 	    final CARD32 releaseNumber = stream.readCARD32();
@@ -86,11 +82,7 @@ public final class ServerMessage implements Encodeable {
 	    final KEYCODE minKeyCode = stream.readKEYCODE();
 	    final KEYCODE maxKeyCode = stream.readKEYCODE();
 
-	    System.out.println("## keycodes: " + minKeyCode + "/" + maxKeyCode);
-
 	    stream.readCARD32();
-	    
-	    System.out.println("## vendor length: " + vendorLength.getValue());
 	    
 	    final String vendor = stream.readSTRING8(vendorLength.getValue());
 	    

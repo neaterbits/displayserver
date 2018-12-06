@@ -16,6 +16,7 @@ import com.neaterbits.displayserver.buffers.ImageBuffer;
 import com.neaterbits.displayserver.buffers.PixelFormat;
 import com.neaterbits.displayserver.framebuffer.common.GraphicsScreen;
 import com.neaterbits.displayserver.io.common.NonBlockingChannelWriter;
+import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLog;
 import com.neaterbits.displayserver.io.common.NonBlockingWritable;
 import com.neaterbits.displayserver.layers.Rectangle;
 import com.neaterbits.displayserver.layers.Region;
@@ -76,8 +77,9 @@ public class XWindowsConnectionState
 	
 	private int sequenceNumber;
 	
-	XWindowsConnectionState(XWindowsProtocolServer server, SocketChannel socketChannel, int connectionNo) {
-		
+	XWindowsConnectionState(XWindowsProtocolServer server, SocketChannel socketChannel, int connectionNo, NonBlockingChannelWriterLog log) {
+	    super(log);
+	    
 		Objects.requireNonNull(server);
 		Objects.requireNonNull(socketChannel);
 		

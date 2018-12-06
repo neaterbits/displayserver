@@ -13,7 +13,13 @@ final class ClientConnection extends BaseSelectable {
 	private final MessageProcessor messageProcessor;
 	private final NonBlockingWritable nonBlockingWritable;
 	
-	ClientConnection(SocketChannel socket, MessageProcessor messageProcessor, NonBlockingWritable nonBlockingWritable) {
+	ClientConnection(
+	        SocketChannel socket,
+	        MessageProcessor messageProcessor,
+	        NonBlockingWritable nonBlockingWritable,
+	        SelectableLog selectableLog) {
+	    
+	    super(selectableLog);
 		
 		Objects.requireNonNull(socket);
 		Objects.requireNonNull(messageProcessor);

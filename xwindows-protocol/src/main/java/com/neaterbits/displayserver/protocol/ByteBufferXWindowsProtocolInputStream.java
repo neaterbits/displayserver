@@ -57,7 +57,6 @@ public class ByteBufferXWindowsProtocolInputStream implements XWindowsProtocolIn
 
 	@Override
 	public CARD8 readCARD8() {
-		
 		final byte value = buffer.get();
 		
 		return new CARD8((short)Unsigned.byteToUnsigned(value));
@@ -68,8 +67,6 @@ public class ByteBufferXWindowsProtocolInputStream implements XWindowsProtocolIn
 	public CARD16 readCARD16() {
 		final short value = buffer.getShort();
 
-		System.out.println("## readCARD16 " + value);
-		
 		return new CARD16(Unsigned.shortToUnsigned(value));
 	}
 
@@ -96,9 +93,6 @@ public class ByteBufferXWindowsProtocolInputStream implements XWindowsProtocolIn
 		final StringBuilder sb = new StringBuilder(length);
 		
 		for (int i = 0; i < length; ++ i) {
-
-		    System.out.println("## readstring " + buffer.position());
-
 		    final byte value = buffer.get();
 
 			final int unsigned = Unsigned.byteToUnsigned(value);

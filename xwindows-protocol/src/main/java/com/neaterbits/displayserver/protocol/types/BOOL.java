@@ -12,6 +12,10 @@ public final class BOOL {
 		return value;
 	}
 
+	public boolean isSet() {
+	    return value != 0;
+	}
+	
     @Override
     public String toString() {
         return value != 0 ? "true" : "false";

@@ -29,8 +29,6 @@ public final class QueryExtension extends Request {
         
         final int padLength = XWindowsProtocolUtil.getPadding(nameLength.getValue());
         
-        System.out.println("## read namelength " + nameLength + "/" + padLength);
-        
         stream.readPad(padLength);
         
         return new QueryExtension(name);

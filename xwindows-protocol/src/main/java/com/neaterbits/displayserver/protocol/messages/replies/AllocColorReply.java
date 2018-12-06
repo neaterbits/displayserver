@@ -24,6 +24,11 @@ public final class AllocColorReply extends Reply {
         this.blue = blue;
         this.pixel = pixel;
     }
+    
+    @Override
+    public Object[] getDebugParams() {
+        return wrap("red", red, "green", green, "blue", blue, "pixel", String.format("%08x", pixel.getValue()));
+    }
 
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {

@@ -10,13 +10,13 @@ public class XWindowsProtocolUtil {
 	    
 	    if (byteBuffer.get(byteBuffer.position()) == 0) {
 	        
-	        System.out.println("## error message : " + byteBuffer.remaining());
+	        // System.out.println("## error message : " + byteBuffer.remaining());
 	        
 	        length = byteBuffer.remaining() >= 32 ? 32 : null;
 	    }
 	    else {
 	        
-	        System.out.println("## standard message " + byteBuffer.remaining() + "/" + byteBuffer.limit() + "/" + byteBuffer.position());
+	        // System.out.println("## standard message " + byteBuffer.remaining() + "/" + byteBuffer.limit() + "/" + byteBuffer.position());
 	        
 	        if (byteBuffer.remaining() >= 4) {
 
@@ -24,9 +24,7 @@ public class XWindowsProtocolUtil {
 
 	            final int messageLengthBytes = messageLength32Bits * 4;
 	            
-	            System.out.println("## opCode: " + byteBuffer.get(byteBuffer.position()));
-                
-                System.out.println("## messageLength: " + messageLengthBytes);
+                // System.out.println("## messageLength: " + messageLengthBytes);
 	            
 	            if (messageLengthBytes <= byteBuffer.remaining()) {
     	            length = messageLengthBytes;

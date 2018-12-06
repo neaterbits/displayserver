@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.neaterbits.displayserver.driver.common.Listeners;
 import com.neaterbits.displayserver.io.common.MessageProcessor;
+import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLog;
 import com.neaterbits.displayserver.io.common.Selectable;
 import com.neaterbits.displayserver.protocol.ByteBufferXWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
@@ -30,13 +31,11 @@ public final class XWindowsDriverConnection
 	
 	private final ByteOrder byteOrder;
 	
-	public XWindowsDriverConnection(int connectDisplay) throws IOException {
+	public XWindowsDriverConnection(int connectDisplay, NonBlockingChannelWriterLog writeLog) throws IOException {
 
 	    final int port = 6000 + connectDisplay;
 	    
-	    System.out.println("## connecting to " + port);
-	    
-		this.readerWriter = new XWindowsChannelReaderWriter(port) {
+		this.readerWriter = new XWindowsChannelReaderWriter(port, writeLog) {
 		    
 		    @Override
             protected boolean receivedInitialMessage() {
@@ -46,8 +45,6 @@ public final class XWindowsDriverConnection
             @Override
 		    public void onMessage(ByteBuffer byteBuffer, int messageLength) {
 		        
-                System.out.println("### onMessage");
-                
 		        if (byteBuffer.get(byteBuffer.position()) == 0) {
 		            
 		            if (receivedInitialMessage()) {
@@ -63,7 +60,7 @@ public final class XWindowsDriverConnection
         		        if (serverMessage == null) {
         		            serverMessage = processServerMessage(byteBuffer, messageLength);
         		            
-        		            System.out.println("## received servermessage " + serverMessage);
+        		            // System.out.println("## received servermessage " + serverMessage);
         		            
         		            clientResourceIdAllocator = new ClientResourceIdAllocator(
         		                    serverMessage.getResourceIdBase().getValue(),
@@ -97,13 +94,6 @@ public final class XWindowsDriverConnection
 		
 		if (xAuthForTCPConnection == null) {
 		    throw new IllegalStateException();
-		}
-		
-		final byte [] key = xAuthForTCPConnection.getAuthorizationData();
-		
-		System.out.println("## add key");
-		for (int i = 0; i < key.length; ++ i) {
-		    System.out.format("%02x\n", key[i]);
 		}
 		
 		final ClientMessage clientMessage = new ClientMessage(

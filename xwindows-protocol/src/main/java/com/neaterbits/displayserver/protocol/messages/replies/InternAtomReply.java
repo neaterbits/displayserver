@@ -20,6 +20,11 @@ public final class InternAtomReply extends Reply {
     }
 
     @Override
+    public Object[] getDebugParams() {
+        return wrap("atom", atom);
+    }
+
+    @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
         
         writeReplyHeader(stream);

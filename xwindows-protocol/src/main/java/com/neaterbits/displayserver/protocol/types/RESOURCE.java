@@ -2,6 +2,8 @@ package com.neaterbits.displayserver.protocol.types;
 
 public abstract class RESOURCE {
 
+    public static final WINDOW None = new WINDOW(0);
+
 	private final int value;
 
 	public RESOURCE(int value) {
@@ -36,6 +38,6 @@ public abstract class RESOURCE {
 
     @Override
     public String toString() {
-        return String.format("%08x", value);
+        return value == 0 ? "None" : String.format("%08x", value);
     }
 }

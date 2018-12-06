@@ -9,9 +9,14 @@ import java.nio.channels.SocketChannel;
 
 public abstract class NonBlockingChannelWriter implements NonBlockingWritable {
 
+    private final NonBlockingChannelWriterLog log;
+    
 	private ByteBuffer writeBuffer;
 	
-	protected NonBlockingChannelWriter() {
+	protected NonBlockingChannelWriter(NonBlockingChannelWriterLog log) {
+	    
+	    this.log = log;
+	    
 	    this.writeBuffer = ByteBuffer.allocate(10000);
     }
 	
@@ -26,19 +31,15 @@ public abstract class NonBlockingChannelWriter implements NonBlockingWritable {
 
 	
 	protected final void write(byte [] data, int offset, int length) {
+	    
+	    if (log != null) {
+	        log.onQueueWriteEnter(data.length, offset, length, writeBuffer.limit(), writeBuffer.remaining(), writeBuffer.position());
+	    }
 		
-	    System.out.println("## driver.write(" + data.length + "/" + length + ")");
-
-        System.out.println("## driver.write() limit: " + writeBuffer.limit() + " remaining: " + writeBuffer.remaining() + " position: " + writeBuffer.position());
-
 		final int spaceLeft = writeBuffer.remaining();
-		
-		System.out.println("length " + length + ", spaceLeft " + spaceLeft);
 		
 		if (length > spaceLeft) {
 			final byte [] bytes = new byte[(writeBuffer.capacity() + (length - spaceLeft)) * 3];
-			
-			System.out.println("## get bytes " + writeBuffer.limit());
 			
 			writeBuffer.get(bytes);
 			
@@ -47,7 +48,9 @@ public abstract class NonBlockingChannelWriter implements NonBlockingWritable {
 		
 		writeBuffer.put(data, offset, length);
 
-		System.out.println("## driver.write() exit limit: " + writeBuffer.limit() + " remaining: " + writeBuffer.remaining() + " position: " + writeBuffer.position());
+		if (log != null) {
+            log.onQueueWriteExit(writeBuffer.limit(), writeBuffer.remaining(), writeBuffer.position());
+		}
 	}
 
 	
@@ -61,12 +64,16 @@ public abstract class NonBlockingChannelWriter implements NonBlockingWritable {
 		}
 		
 		writeBuffer.flip();
-		
-		System.out.println("## write " + writeBuffer.limit());
-		
+
+		if (log != null) {
+            log.onChannelWriteEnter(writeBuffer.limit(), writeBuffer.remaining(), writeBuffer.position());
+        }
+
 		final int bytesWritten = channel.write(writeBuffer);
-		
-		System.out.println("## bytesWritten: " + bytesWritten);
+
+		if (log != null) {
+            log.onChannelWriteExit(bytesWritten, writeBuffer.limit(), writeBuffer.remaining(), writeBuffer.position());
+        }
 		
 		writeBuffer.compact();
 	}

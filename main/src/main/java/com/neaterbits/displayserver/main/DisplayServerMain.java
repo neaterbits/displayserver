@@ -7,6 +7,14 @@ import com.neaterbits.displayserver.driver.xwindows.common.XWindowsDriverConnect
 import com.neaterbits.displayserver.events.xwindows.XWindowsEventSource;
 import com.neaterbits.displayserver.framebuffer.xwindows.XWindowsGraphicsDriver;
 import com.neaterbits.displayserver.io.common.AsyncServers;
+import com.neaterbits.displayserver.io.common.AsyncServersLog;
+import com.neaterbits.displayserver.io.common.AsyncServersLogImpl;
+import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLog;
+import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLogImpl;
+import com.neaterbits.displayserver.io.common.SelectableLog;
+import com.neaterbits.displayserver.io.common.SelectableLogImpl;
+import com.neaterbits.displayserver.protocol.logging.XWindowsProtocolLog;
+import com.neaterbits.displayserver.protocol.logging.XWindowsProtocolLogImpl;
 import com.neaterbits.displayserver.server.XWindowsProtocolServer;
 
 public class DisplayServerMain {
@@ -22,14 +30,25 @@ public class DisplayServerMain {
 	        display = 0;
 	    }
 	    
-		try (AsyncServers asyncServers = new AsyncServers()) {
+	    final AsyncServersLog asyncServersLog = new AsyncServersLogImpl("Asyncservers", DebugLevels.ASYNC_SERVERS);
+	    
+	    final SelectableLog connectionReadLog = new SelectableLogImpl("Connectionread", DebugLevels.CONNECTION_READ);
+	    
+		try (AsyncServers asyncServers = new AsyncServers(asyncServersLog, connectionReadLog)) {
 		
-			try (XWindowsDriverConnection driverConnection = new XWindowsDriverConnection(display)) {
+		    final NonBlockingChannelWriterLog driverWriteLog = new NonBlockingChannelWriterLogImpl(
+		            "Driverwrite",
+		            DebugLevels.DRIVER_WRITE);
+		    
+			try (XWindowsDriverConnection driverConnection = new XWindowsDriverConnection(display, driverWriteLog)) {
 
+			    final String name = "Driverevents";
+			    
 	             asyncServers.addSelectable(
-	                        "XWindows events",
+	                        name,
 	                        driverConnection.getSelectable(),
-	                        driverConnection.getMessageProcessor());
+	                        driverConnection.getMessageProcessor(),
+	                        new SelectableLogImpl(name, DebugLevels.CONNECTION_READ));
 
 	             System.out.println("## start check for IO");
 
@@ -42,7 +61,17 @@ public class DisplayServerMain {
 				final XWindowsEventSource eventSource = new XWindowsEventSource(driverConnection);
 				final XWindowsGraphicsDriver graphicsDriver = new XWindowsGraphicsDriver(driverConnection);
 
-				try (XWindowsProtocolServer server = new XWindowsProtocolServer(eventSource, graphicsDriver)) {
+				final NonBlockingChannelWriterLog connectionWriteLog = new NonBlockingChannelWriterLogImpl(
+				        "Connectionwrite",
+				        DebugLevels.CONNECTION_WRITE);
+				
+				final XWindowsProtocolLog protocolLog = new XWindowsProtocolLogImpl("XWindowsProtocol", DebugLevels.XWINDOWS_PROTOCOL);
+				
+				try (XWindowsProtocolServer server = new XWindowsProtocolServer(
+				        eventSource,
+				        graphicsDriver,
+				        protocolLog,
+				        connectionWriteLog)) {
 				    
 			        asyncServers.addServer(
 			                ":1",
