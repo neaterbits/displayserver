@@ -6,10 +6,7 @@ import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,7 +17,6 @@ import com.neaterbits.displayserver.framebuffer.common.GraphicsDriver;
 import com.neaterbits.displayserver.framebuffer.common.GraphicsScreen;
 import com.neaterbits.displayserver.io.common.Client;
 import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLog;
-import com.neaterbits.displayserver.layers.Region;
 import com.neaterbits.displayserver.protocol.ByteBufferXWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.OpCodes;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
@@ -86,7 +82,6 @@ import com.neaterbits.displayserver.server.XWindowsConnectionState.State;
 import com.neaterbits.displayserver.types.Size;
 import com.neaterbits.displayserver.windows.Display;
 import com.neaterbits.displayserver.windows.Screen;
-import com.neaterbits.displayserver.windows.Window;
 import com.neaterbits.displayserver.windows.WindowEventListener;
 
 public class XWindowsProtocolServer implements AutoCloseable {
@@ -97,9 +92,8 @@ public class XWindowsProtocolServer implements AutoCloseable {
 	private final Display display;
 	private final ServerResourceIdAllocator resourceIdAllocator;
 	private final Atoms atoms;
-	
-	private final List<XWindowsScreen> screens;
-	private final Map<XWindowsWindow, XWindowsConnectionState> connectionByWindow;
+
+	private final XState state;
 	
 	public XWindowsProtocolServer(
 	        EventSource driverEventSource,
@@ -115,16 +109,24 @@ public class XWindowsProtocolServer implements AutoCloseable {
 		this.resourceIdAllocator = new ServerResourceIdAllocator();
 		
 		this.atoms = new Atoms();
-		
-		this.connectionByWindow = new HashMap<>();
 
-		this.screens = getScreens(graphicsDriver);
+		final List<XWindowsScreen> screens = getScreens(graphicsDriver);
+		
+		this.state = new XState(screens);
 		
 		this.display = new Display(screens.stream()
 		        .map(screen -> screen.getScreen())
 		        .collect(Collectors.toList()));
 	}
+	
+	XWindowsConstAccess getWindows() {
+	    return state;
+	}
 
+	XEventSubscriptionsConstAccess getEventSubscriptions() {
+	    return state;
+	}
+	
 	public Client processConnection(SocketChannel socketChannel) {
 	    return new ConnectionState(XWindowsProtocolServer.this, socketChannel, connectionWriteLog) {
 
@@ -204,14 +206,11 @@ public class XWindowsProtocolServer implements AutoCloseable {
 	    final List<GraphicsScreen> driverScreens = graphicsDriver.getScreens();
 	    final List<XWindowsScreen> screens = new ArrayList<>(driverScreens.size());
 
+	    final WindowEventListener windowEventListener = new XWindowsEventListener(this);
+	    
 	    for (GraphicsScreen driverScreen : driverScreens) {
             
-	        final Screen screen = new Screen(driverScreen, new WindowEventListener() {
-                @Override
-                public void onUpdate(Window window, Region region) {
-                    getConnection(window).onUpdate(window, region);
-                }
-            });
+	        final Screen screen = new Screen(driverScreen, windowEventListener);
 	        
 	        final int rootWindow = resourceIdAllocator.allocateRootWindowId();
 	        
@@ -219,8 +218,6 @@ public class XWindowsProtocolServer implements AutoCloseable {
 	        
 	        final XWindowsWindow window = new XWindowsWindow(
 	                screen.getRootWindow(),
-	                WINDOW.None,
-	                WINDOW.None,
 	                rootWindowResource,
 	                new CARD16(0),
 	                WindowClass.InputOnly,
@@ -317,10 +314,8 @@ public class XWindowsProtocolServer implements AutoCloseable {
     private ServerMessage constructServerMessage(int connectionNo) {
         final String vendor = "Test";
         
-        final Set<PixelFormat> distinctPixelFormats = this.screens.stream()
-                .map(screen -> screen.getScreen().getDriverScreen().getPixelFormat())
-                .collect(Collectors.toSet());
-                
+
+        final Set<PixelFormat> distinctPixelFormats = state.getDistinctPixelFormats();
         
         final FORMAT [] formats = new FORMAT[distinctPixelFormats.size()];
         
@@ -335,10 +330,12 @@ public class XWindowsProtocolServer implements AutoCloseable {
             formats[dstIdx ++] = format;
         }
         
-        final SCREEN [] screens = new SCREEN[this.screens.size()];
+        final int numScreens = state.getNumberOfScreens();
         
-        for (int i = 0; i < this.screens.size(); ++ i) {
-            final XWindowsScreen xWindowsScreen = this.screens.get(i);
+        final SCREEN [] screens = new SCREEN[numScreens];
+        
+        for (int i = 0; i < numScreens; ++ i) {
+            final XWindowsScreen xWindowsScreen = state.getScreen(i);
             final GraphicsScreen driverScreen = xWindowsScreen.getScreen().getDriverScreen();
             
             final Size size = driverScreen.getSize();
@@ -453,7 +450,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
 				final XWindowsWindow window = connectionState.createWindow(display, createWindow);
 				
 				if (window != null) {
-					connectionByWindow.put(window, connectionState);
+				    state.addWindow(window, connectionState);
 				}
 				break;
 			}
@@ -468,7 +465,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
 			    
 			    final GetWindowAttributes getWindowAttributes = log(messageLength, opcode, sequenceNumber, GetWindowAttributes.decode(stream));
 			    
-			    final XWindowsWindow window = connectionState.getWindow(getWindowAttributes.getWindow());
+			    final XWindowsWindow window = state.getClientWindow(getWindowAttributes.getWindow());
 
 			    if (window == null) {
 			        sendError(connectionState, Errors.Window, sequenceNumber, getWindowAttributes.getWindow().getValue(), opcode);
@@ -500,10 +497,10 @@ public class XWindowsProtocolServer implements AutoCloseable {
 			case OpCodes.DESTROY_WINDOW: {
 				final DestroyWindow destroyWindow = log(messageLength, opcode, sequenceNumber, DestroyWindow.decode(stream));
 				
-				final Window window = connectionState.destroyWindow(display, destroyWindow);
+				final XWindowsWindow window = connectionState.destroyWindow(display, destroyWindow);
 				
 				if (window != null) {
-					connectionByWindow.remove(window);
+				    state.removeClientWindow(window);
 				}
 				break;
 			}
@@ -514,7 +511,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
 			    
 			    final WINDOW windowResource = new WINDOW(getGeometry.getDrawable());
 			    
-                final XWindowsWindow window = connectionState.getWindow(windowResource);
+                final XWindowsWindow window = state.getClientWindow(windowResource);
 
                 if (window == null) {
                     sendError(connectionState, Errors.Window, sequenceNumber, windowResource.getValue(), opcode);
@@ -678,87 +675,14 @@ public class XWindowsProtocolServer implements AutoCloseable {
         connectionState.send(error);
     }
 
-    boolean isRootWindow(WINDOW window) {
-        return resourceIdAllocator.isRootWindow(window.getValue());
-    }
-    
-    XWindowsWindow getRootWindowCorrespondingTo(WINDOW windowResource) {
-
-        System.out.println("## getRootWindow " + windowResource);
-        
-        for (XWindowsScreen screen : screens) {
-            
-            if (windowResource.equals(screen.getRootWINDOW())) {
-                
-                return screen.getRootWindow();
-                
-            }
-        }
-
-        return null;
-    }
-    
-    WINDOW findRootWindowOf(WINDOW window) {
-        
-        Objects.requireNonNull(window);
-        
-        final WINDOW result;
-        
-        if (isRootWindow(window)) {
-            result = window;
-        }
-        else {
-            final WINDOW parentWindow = findParentWindowOf(window);
-            
-            if (parentWindow == null) {
-                result = null;
-            }
-            else {
-                result = findRootWindowOf(parentWindow);
-            }
-        }
-        
-        return result;
-    }
-    
-    WINDOW findParentWindowOf(WINDOW window) {
-        for (XWindowsWindow w : connectionByWindow.keySet()) {
-            if (w.getParentWINDOW().equals(window)) {
-                return w.getWINDOW();
-            }
-        }
-        
-        return null;
-    }
-    
 	private static XWindowsProtocolInputStream stream(ByteBuffer byteBuffer, int messageLength) {
 		return new ByteBufferXWindowsProtocolInputStream(byteBuffer);
-	}
-
-    private XWindowsConnectionState getConnection(Window window) {
-        Objects.requireNonNull(window);
-        
-        for (XWindowsWindow w : connectionByWindow.keySet()) {
-            if (w.getWindow().equals(window)) {
-                return connectionByWindow.get(w);
-            }
-        }
-        
-        return null;
-    }
-	
-	private XWindowsConnectionState getConnection(XWindowsWindow window) {
-		Objects.requireNonNull(window);
-
-		return connectionByWindow.get(window);
 	}
 
 	@Override
     public void close() throws Exception {
 
-	    final Set<XWindowsConnectionState> distinctConnections = new HashSet<>(connectionByWindow.values());
-	    
-	    for (XWindowsConnectionState connectionState : distinctConnections) {
+	    for (XWindowsConnectionState connectionState : state.getConnections()) {
 	        try {
 	            connectionState.close();
 	        }

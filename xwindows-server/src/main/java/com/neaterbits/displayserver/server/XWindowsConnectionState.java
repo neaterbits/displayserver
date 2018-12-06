@@ -18,16 +18,12 @@ import com.neaterbits.displayserver.framebuffer.common.GraphicsScreen;
 import com.neaterbits.displayserver.io.common.NonBlockingChannelWriter;
 import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLog;
 import com.neaterbits.displayserver.io.common.NonBlockingWritable;
-import com.neaterbits.displayserver.layers.Rectangle;
-import com.neaterbits.displayserver.layers.Region;
 import com.neaterbits.displayserver.protocol.DataOutputXWindowsProtocolOutputStream;
-import com.neaterbits.displayserver.protocol.OpCodes;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.exception.IDChoiceException;
 import com.neaterbits.displayserver.protocol.exception.ValueException;
 import com.neaterbits.displayserver.protocol.messages.Encodeable;
 import com.neaterbits.displayserver.protocol.messages.Event;
-import com.neaterbits.displayserver.protocol.messages.events.GraphicsExposure;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateGC;
 import com.neaterbits.displayserver.protocol.messages.requests.CreatePixmap;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateWindow;
@@ -35,19 +31,16 @@ import com.neaterbits.displayserver.protocol.messages.requests.DestroyWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.FreePixmap;
 import com.neaterbits.displayserver.protocol.messages.requests.PutImage;
 import com.neaterbits.displayserver.protocol.types.CARD16;
-import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.RESOURCE;
-import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.windows.Display;
 import com.neaterbits.displayserver.windows.Window;
 import com.neaterbits.displayserver.windows.WindowClass;
-import com.neaterbits.displayserver.windows.WindowEventListener;
 import com.neaterbits.displayserver.windows.WindowParameters;
 
 public class XWindowsConnectionState
     extends NonBlockingChannelWriter
-    implements WindowEventListener, NonBlockingWritable, AutoCloseable {
+    implements NonBlockingWritable, AutoCloseable {
 
 	enum State {
 		
@@ -66,18 +59,19 @@ public class XWindowsConnectionState
 	
 	private final Set<Integer> utilizedResourceIds;
 	
-	private final Map<DRAWABLE, XWindowsWindow> drawableToWindow;
-	private final Map<XWindowsWindow, DRAWABLE> windowToDrawable;
-	
 	private final Map<DRAWABLE, ImageBuffer> drawableToImageBuffer;
-
 	private final Map<DRAWABLE, DRAWABLE> pixmapToDrawable;
 	
 	private final List<Event> events;
 	
 	private int sequenceNumber;
 	
-	XWindowsConnectionState(XWindowsProtocolServer server, SocketChannel socketChannel, int connectionNo, NonBlockingChannelWriterLog log) {
+	XWindowsConnectionState(
+	        XWindowsProtocolServer server,
+	        SocketChannel socketChannel,
+	        int connectionNo,
+	        NonBlockingChannelWriterLog log) {
+	    
 	    super(log);
 	    
 		Objects.requireNonNull(server);
@@ -91,8 +85,6 @@ public class XWindowsConnectionState
 	
 		this.utilizedResourceIds = new HashSet<>();
 		
-		this.drawableToWindow = new HashMap<>();
-		this.windowToDrawable = new HashMap<>();
 	
 		this.drawableToImageBuffer = new HashMap<>();
 		
@@ -141,19 +133,6 @@ public class XWindowsConnectionState
         this.state = state;
     }
 
-	final XWindowsWindow getWindow(WINDOW window) {
-
-		final XWindowsWindow result;
-		
-		if (server.isRootWindow(window)) {
-			result = server.getRootWindowCorrespondingTo(window);
-		}
-		else {
-			result = drawableToWindow.get(window.toDrawable());
-		}
-		
-		return result;
-	}
 	
 	private void checkAndAddResourceId(RESOURCE resource) throws IDChoiceException {
 		if (utilizedResourceIds.contains(resource.getValue())) {
@@ -175,7 +154,7 @@ public class XWindowsConnectionState
 		
 		final WindowClass windowClass;
 
-		final XWindowsWindow parentWindow = getWindow(createWindow.getParent());
+		final XWindowsWindow parentWindow = server.getWindows().getClientWindow(createWindow.getParent());
 		
 		if (parentWindow == null) {
 			throw new ValueException("Unknown parent window");
@@ -215,40 +194,36 @@ public class XWindowsConnectionState
 			throw new IllegalStateException();
 		}
 		
-		final WINDOW rootWindow = server.findRootWindowOf(createWindow.getParent());
+		final XWindowsWindow rootWindow = server.getWindows().findRootWindowOf(createWindow.getParent());
 		
 		final XWindowsWindow xWindowsWindow = new XWindowsWindow(
 		        window,
 		        createWindow.getWid(),
-		        rootWindow,
+		        rootWindow.getWINDOW(),
 		        createWindow.getParent(),
 		        createWindow.getBorderWidth(),
 		        createWindow.getWindowClass(),
 		        createWindow.getAttributes());
 		
-		drawableToWindow.put(drawable, xWindowsWindow);
-		windowToDrawable.put(xWindowsWindow, drawable);
-		
 		return xWindowsWindow;
 	}
 	
-	final Window destroyWindow(Display display, DestroyWindow destroyWindow) {
+	
+	final XWindowsWindow destroyWindow(Display display, DestroyWindow destroyWindow) {
 		checkAndRemoveResourceId(destroyWindow.getWindow());
 	
-		final XWindowsWindow window = drawableToWindow.remove(destroyWindow.getWindow().toDrawable());
+		final XWindowsWindow window = server.getWindows().getClientWindow(destroyWindow.getWindow());
 		
 		if (window != null) {
-			windowToDrawable.remove(window);
-
 			display.disposeWindow(window.getWindow());
 		}
 		
-		return window.getWindow();
+		return window;
 	}
 	
 	private GraphicsScreen findGraphicsScreen(DRAWABLE drawable) {
 	    
-	    XWindowsWindow window = drawableToWindow.get(drawable);
+	    XWindowsWindow window = server.getWindows().getClientWindow(drawable);
 	    
 	    GraphicsScreen screen = null;
 	    
@@ -311,7 +286,7 @@ public class XWindowsConnectionState
 	
 	final void putImage(PutImage putImage) {
 	    
-	    final XWindowsWindow window = drawableToWindow.get(putImage.getDrawable());
+	    final XWindowsWindow window = server.getWindows().getClientWindow(putImage.getDrawable());
 	    
 	    if (window != null) {
 	        
@@ -339,36 +314,7 @@ public class XWindowsConnectionState
         return socketChannel;
     }
 
-    @Override
-	public final void onUpdate(Window window, Region region) {
-		
-		Objects.requireNonNull(window);
-		Objects.requireNonNull(region);
-		
-		final DRAWABLE drawable = windowToDrawable.get(window);
-		
-		if (drawable == null) {
-			throw new IllegalStateException();
-		}
-		
-		int count = region.getRectangles().size();
-		
-		for (Rectangle rectangle : region.getRectangles()) {
-			
-			-- count;
-			
-			final GraphicsExposure graphicsExposure = new GraphicsExposure(
-					drawable,
-					new CARD16(rectangle.getLeft()), new CARD16(rectangle.getTop()),
-					new CARD16(rectangle.getWidth()), new CARD16(rectangle.getHeight()),
-					new CARD16(count),
-					new CARD8((byte)OpCodes.COPY_AREA), new CARD16(0));
-			
-			addEvent(graphicsExposure);
-		}
-	}
-	
-	private void addEvent(Event event) {
+	void addEvent(Event event) {
 		Objects.requireNonNull(event);
 	
 		events.add(event);

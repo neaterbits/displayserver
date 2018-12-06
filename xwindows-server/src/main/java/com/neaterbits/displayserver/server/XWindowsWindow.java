@@ -19,13 +19,43 @@ final class XWindowsWindow {
     private final CARD16 windowClass;
     
     private WindowAttributes currentWindowAttributes;
-    
+
+    // Root window
+    XWindowsWindow(
+            Window window,
+            WINDOW windowResource,
+            CARD16 borderWidth,
+            CARD16 windowClass,
+            WindowAttributes currentWindowAttributes) {
+        
+        this(window, windowResource, WINDOW.None, WINDOW.None, borderWidth, windowClass, currentWindowAttributes, 0);
+    }
+
     XWindowsWindow(
             Window window,
             WINDOW windowResource, WINDOW rootWindow, WINDOW parentWindow,
             CARD16 borderWidth,
             CARD16 windowClass,
             WindowAttributes currentWindowAttributes) {
+        
+        this(window, windowResource, rootWindow, parentWindow, borderWidth, windowClass, currentWindowAttributes, 0);
+        
+        if (rootWindow.equals(WINDOW.None)) {
+            throw new IllegalArgumentException();
+        }
+        
+        if (parentWindow.equals(WINDOW.None)) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    XWindowsWindow(
+            Window window,
+            WINDOW windowResource, WINDOW rootWindow, WINDOW parentWindow,
+            CARD16 borderWidth,
+            CARD16 windowClass,
+            WindowAttributes currentWindowAttributes,
+            int disambiguate) {
         
         Objects.requireNonNull(window);
         Objects.requireNonNull(windowResource);
@@ -42,6 +72,10 @@ final class XWindowsWindow {
         this.borderWidth = borderWidth;
         this.windowClass = windowClass;
         this.currentWindowAttributes = currentWindowAttributes;
+    }
+    
+    boolean isRootWindow() {
+        return parentWindow.equals(WINDOW.None);
     }
 
     Window getWindow() {
