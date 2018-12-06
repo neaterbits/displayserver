@@ -8,11 +8,11 @@ import java.util.Objects;
 import com.neaterbits.displayserver.io.common.NonBlockingChannelWriter;
 import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLog;
 
-final class XWindowsConnectionWriter extends NonBlockingChannelWriter {
+final class XConnectionWriter extends NonBlockingChannelWriter {
 
     private final SocketChannel socketChannel;
 
-    XWindowsConnectionWriter(SocketChannel socketChannel, NonBlockingChannelWriterLog log) {
+    XConnectionWriter(SocketChannel socketChannel, NonBlockingChannelWriterLog log) {
         
         super(log);
         
