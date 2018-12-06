@@ -63,7 +63,7 @@ import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.server.XWindowsConnectionState.State;
 import com.neaterbits.displayserver.windows.Display;
 
-public class XWindowsProtocolServer implements AutoCloseable {
+public class XServer implements AutoCloseable {
 
     private final XWindowsProtocolLog protocolLog;
     private final NonBlockingChannelWriterLog connectionWriteLog;
@@ -74,7 +74,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
 
 	private final XState state;
 	
-	public XWindowsProtocolServer(
+	public XServer(
 	        EventSource driverEventSource,
 	        GraphicsDriver graphicsDriver,
 	        XWindowsProtocolLog protocolLog,
@@ -110,7 +110,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
 	}
 	
 	public Client processConnection(SocketChannel socketChannel) {
-	    return new ConnectionState(XWindowsProtocolServer.this, socketChannel, connectionWriteLog) {
+	    return new ConnectionState(XServer.this, socketChannel, connectionWriteLog) {
 
             @Override
             public Integer getLengthOfMessage(ByteBuffer byteBuffer) {
@@ -135,7 +135,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
             @Override
             public void onMessage(ByteBuffer byteBuffer, int messageLength) {
                 try {
-                    XWindowsProtocolServer.this.processMessage(this, byteBuffer, messageLength);
+                    XServer.this.processMessage(this, byteBuffer, messageLength);
                 } catch (IOException ex) {
                     throw new IllegalStateException(ex);
                 }
@@ -145,7 +145,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
 	
 	private abstract class ConnectionState extends XClient implements Client {
 
-		public ConnectionState(XWindowsProtocolServer server, SocketChannel socketChannel, NonBlockingChannelWriterLog connectionWriteLog) {
+		public ConnectionState(XServer server, SocketChannel socketChannel, NonBlockingChannelWriterLog connectionWriteLog) {
 			super(
 			        server,
 			        socketChannel,

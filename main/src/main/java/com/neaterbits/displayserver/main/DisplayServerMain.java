@@ -15,7 +15,7 @@ import com.neaterbits.displayserver.io.common.SelectableLog;
 import com.neaterbits.displayserver.io.common.SelectableLogImpl;
 import com.neaterbits.displayserver.protocol.logging.XWindowsProtocolLog;
 import com.neaterbits.displayserver.protocol.logging.XWindowsProtocolLogImpl;
-import com.neaterbits.displayserver.server.XWindowsProtocolServer;
+import com.neaterbits.displayserver.server.XServer;
 
 public class DisplayServerMain {
 
@@ -67,7 +67,7 @@ public class DisplayServerMain {
 				
 				final XWindowsProtocolLog protocolLog = new XWindowsProtocolLogImpl("XWindowsProtocol", DebugLevels.XWINDOWS_PROTOCOL);
 				
-				try (XWindowsProtocolServer server = new XWindowsProtocolServer(
+				try (XServer server = new XServer(
 				        eventSource,
 				        graphicsDriver,
 				        protocolLog,

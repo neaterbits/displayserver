@@ -28,12 +28,12 @@ import com.neaterbits.displayserver.windows.WindowParameters;
 
 public class XClient extends XWindowsConnectionState {
     
-    private final XWindowsProtocolServer server;
+    private final XServer server;
     private final Set<Integer> utilizedResourceIds;
     private final Map<DRAWABLE, ImageBuffer> drawableToImageBuffer;
     private final Map<DRAWABLE, DRAWABLE> pixmapToDrawable;
     
-    public XClient(XWindowsProtocolServer server, SocketChannel socketChannel, int connectionNo,
+    public XClient(XServer server, SocketChannel socketChannel, int connectionNo,
             NonBlockingChannelWriterLog log) {
         super(socketChannel, connectionNo, log);
 

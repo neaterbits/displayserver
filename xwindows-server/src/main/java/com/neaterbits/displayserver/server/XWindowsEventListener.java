@@ -15,9 +15,9 @@ import com.neaterbits.displayserver.windows.WindowEventListener;
 
 final class XWindowsEventListener implements WindowEventListener {
 
-    private final XWindowsProtocolServer server;
+    private final XServer server;
     
-    XWindowsEventListener(XWindowsProtocolServer server) {
+    XWindowsEventListener(XServer server) {
         
         Objects.requireNonNull(server);
         
