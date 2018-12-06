@@ -20,6 +20,7 @@ import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLog;
 import com.neaterbits.displayserver.io.common.NonBlockingWritable;
 import com.neaterbits.displayserver.protocol.DataOutputXWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
+import com.neaterbits.displayserver.protocol.enums.WindowClass;
 import com.neaterbits.displayserver.protocol.exception.IDChoiceException;
 import com.neaterbits.displayserver.protocol.exception.ValueException;
 import com.neaterbits.displayserver.protocol.messages.Encodeable;
@@ -35,7 +36,6 @@ import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.RESOURCE;
 import com.neaterbits.displayserver.windows.Display;
 import com.neaterbits.displayserver.windows.Window;
-import com.neaterbits.displayserver.windows.WindowClass;
 import com.neaterbits.displayserver.windows.WindowParameters;
 
 public class XWindowsConnectionState
@@ -152,7 +152,7 @@ public class XWindowsConnectionState
 		
 		checkAndAddResourceId(drawable);
 		
-		final WindowClass windowClass;
+		final com.neaterbits.displayserver.windows.WindowClass windowClass;
 
 		final XWindowsWindow parentWindow = server.getWindows().getClientWindow(createWindow.getParent());
 		
@@ -161,16 +161,17 @@ public class XWindowsConnectionState
 		}
 		
 		switch (createWindow.getWindowClass().getValue()) {
-		case 0:
+		
+		case WindowClass.COPY_FROM_PARENT:
 			windowClass = parentWindow.getWindow().getParameters().getWindowClass();
 			break;
 			
-		case 1:
-			windowClass = WindowClass.INPUT_OUTPUT;
+		case WindowClass.INPUT_OUTPUT:
+			windowClass = com.neaterbits.displayserver.windows.WindowClass.INPUT_OUTPUT;
 			break;
 			
-		case 2:
-			windowClass = WindowClass.INPUT_ONLY;
+		case WindowClass.INPUT_ONLY:
+			windowClass = com.neaterbits.displayserver.windows.WindowClass.INPUT_ONLY;
 			break;
 			
 		default:
