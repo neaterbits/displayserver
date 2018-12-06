@@ -11,4 +11,9 @@ public final class INT16 {
 	public short getValue() {
 		return value;
 	}
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
 }

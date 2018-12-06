@@ -34,6 +34,39 @@ public final class CreateWindow extends Request {
 	
 	private final WindowAttributes attributes;
 
+   public static CreateWindow decode(XWindowsProtocolInputStream stream) throws IOException {
+        
+        final CARD8 depth = stream.readCARD8();
+        
+        // message length
+        readRequestLength(stream);
+        
+        final WINDOW wid = stream.readWINDOW();
+        final WINDOW parent = stream.readWINDOW();
+        
+        final INT16 x = stream.readINT16();
+        final INT16 y = stream.readINT16();
+        
+        final CARD16 width = stream.readCARD16();
+        final CARD16 height = stream.readCARD16();
+        
+        final CARD16 borderWidth = stream.readCARD16();
+        final CARD16 windowClass = stream.readCARD16();
+        
+        final VISUALID visual = stream.readVISUALID();
+        
+        return new CreateWindow(
+                depth,
+                
+                wid, parent,
+                x, y,
+                width, height,
+                borderWidth,
+                windowClass,
+                visual,
+                WindowAttributes.decode(stream));
+   }
+
 	public CreateWindow(
 			CARD8 depth,
 			WINDOW wid, WINDOW parent,
@@ -59,40 +92,23 @@ public final class CreateWindow extends Request {
 		this.attributes = attributes;
 	}
 
-	public static CreateWindow decode(XWindowsProtocolInputStream stream) throws IOException {
-		
-		final CARD8 depth = stream.readCARD8();
-		
-		// message length
-		stream.readCARD16();
-		
-		final WINDOW wid = stream.readWINDOW();
-		final WINDOW parent = stream.readWINDOW();
-		
-		final INT16 x = stream.readINT16();
-		final INT16 y = stream.readINT16();
-		
-		final CARD16 width = stream.readCARD16();
-		final CARD16 height = stream.readCARD16();
-		
-		final CARD16 borderWidth = stream.readCARD16();
-		final CARD16 windowClass = stream.readCARD16();
-		
-		final VISUALID visual = stream.readVISUALID();
-		
-		return new CreateWindow(
-				depth,
-				
-				wid, parent,
-				x, y,
-				width, height,
-				borderWidth,
-				windowClass,
-				visual,
-				WindowAttributes.decode(stream));
-	}
-	
 	@Override
+    public Object[] getDebugParams() {
+        return wrap(
+                "depth", depth,
+                "wid", wid,
+                "parent", parent,
+                "x", x,
+                "y", y,
+                "width", width,
+                "height", height,
+                "borderWidth", borderWidth,
+                "windowClass", windowClass,
+                "visual", visual
+        );
+    }
+
+    @Override
 	public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 
 	    writeOpCode(stream, OpCodes.CREATE_WINDOW);
