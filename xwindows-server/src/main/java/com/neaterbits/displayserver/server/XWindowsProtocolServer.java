@@ -280,8 +280,6 @@ public class XWindowsProtocolServer implements AutoCloseable {
         
         connectionState.setByteOrder(byteOrder);
         
-        // System.out.println("## got client message " + clientMessage);
-        
         final int connectionNo = connectionState.getConnectionNo();
         
         final ServerMessage serverMessage = InitialServerMessageHelper.constructServerMessage(
@@ -290,20 +288,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
                 resourceIdAllocator.getResourceBase(connectionNo),
                 resourceIdAllocator.getResourceMask(connectionNo),
                 resourceIdAllocator::allocateVisualId);
-        
-        // System.out.println("## sending servermessage " + serverMessage);
-        
-        /*
-        final byte [] encoded = serverMessage.writeToBuf(byteOrder);
-        final ByteBuffer buffer = ByteBuffer.wrap(encoded);
-        
-        buffer.order(byteOrder);
-        
-        final ServerMessage decoded = ServerMessage.decode(new ByteBufferXWindowsProtocolInputStream(buffer));
-        
-        System.out.println("Decoded message: " + decoded);
-        */
-        
+
         send(connectionState, serverMessage);
         
         return true;
