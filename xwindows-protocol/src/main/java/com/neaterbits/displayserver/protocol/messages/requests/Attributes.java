@@ -6,9 +6,10 @@ import java.util.Objects;
 import com.neaterbits.displayserver.protocol.FieldReader;
 import com.neaterbits.displayserver.protocol.FieldWriter;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
+import com.neaterbits.displayserver.protocol.messages.Encodeable;
 import com.neaterbits.displayserver.protocol.types.BITMASK;
 
-public abstract class Attributes {
+public abstract class Attributes extends Encodeable {
 
     private final BITMASK valueMask;
 
@@ -67,7 +68,8 @@ public abstract class Attributes {
         return value;
     }
 
-    void encode(XWindowsProtocolOutputStream stream) throws IOException {
+    @Override
+    public void encode(XWindowsProtocolOutputStream stream) throws IOException {
         stream.writeBITMASK(valueMask);
     }
 }

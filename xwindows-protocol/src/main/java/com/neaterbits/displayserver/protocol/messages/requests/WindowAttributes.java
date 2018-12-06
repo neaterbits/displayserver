@@ -119,8 +119,9 @@ public final class WindowAttributes extends Attributes {
         
     }
 
+    
     @Override
-    void encode(XWindowsProtocolOutputStream stream) throws IOException {
+    public void encode(XWindowsProtocolOutputStream stream) throws IOException {
         
         super.encode(stream);
      
