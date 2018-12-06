@@ -99,7 +99,8 @@ public final class WindowAttributes extends Attributes {
                 readIfSet(bitmask, CURSOR,              padStream::readCURSOR));
         
     }
-    
+
+    @Override
     void encode(XWindowsProtocolOutputStream stream) throws IOException {
         
         super.encode(stream);

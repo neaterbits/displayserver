@@ -142,6 +142,7 @@ public final class GCAttributes extends Attributes {
                 readIfSet(bitmask, ARC_MODE,            padStream::readBYTE));
     }
 
+    @Override
 	void encode(XWindowsProtocolOutputStream stream) throws IOException {
 		
 	    super.encode(stream);
