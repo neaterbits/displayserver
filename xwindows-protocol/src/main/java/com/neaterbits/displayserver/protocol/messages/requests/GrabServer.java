@@ -2,9 +2,9 @@ package com.neaterbits.displayserver.protocol.messages.requests;
 
 import java.io.IOException;
 
-import com.neaterbits.displayserver.protocol.OpCodes;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
+import com.neaterbits.displayserver.protocol.enums.OpCodes;
 import com.neaterbits.displayserver.protocol.messages.Request;
 
 public final class GrabServer extends Request {

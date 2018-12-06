@@ -5,7 +5,7 @@ import java.util.Objects;
 import com.neaterbits.displayserver.layers.Rectangle;
 import com.neaterbits.displayserver.layers.Region;
 import com.neaterbits.displayserver.protocol.Events;
-import com.neaterbits.displayserver.protocol.OpCodes;
+import com.neaterbits.displayserver.protocol.enums.OpCodes;
 import com.neaterbits.displayserver.protocol.messages.Event;
 import com.neaterbits.displayserver.protocol.messages.events.GraphicsExposure;
 import com.neaterbits.displayserver.protocol.types.CARD16;

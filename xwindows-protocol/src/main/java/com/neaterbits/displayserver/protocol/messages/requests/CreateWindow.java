@@ -3,9 +3,9 @@ package com.neaterbits.displayserver.protocol.messages.requests;
 import java.io.IOException;
 import java.util.Objects;
 
-import com.neaterbits.displayserver.protocol.OpCodes;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
+import com.neaterbits.displayserver.protocol.enums.OpCodes;
 import com.neaterbits.displayserver.protocol.messages.Request;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD8;

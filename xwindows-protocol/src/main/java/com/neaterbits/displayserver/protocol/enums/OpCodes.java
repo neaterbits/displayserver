@@ -1,4 +1,4 @@
-package com.neaterbits.displayserver.protocol;
+package com.neaterbits.displayserver.protocol.enums;
 
 public class OpCodes {
 
