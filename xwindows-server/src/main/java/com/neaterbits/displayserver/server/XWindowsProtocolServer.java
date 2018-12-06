@@ -62,6 +62,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.GrabServer;
 import com.neaterbits.displayserver.protocol.messages.requests.InternAtom;
 import com.neaterbits.displayserver.protocol.messages.requests.PutImage;
 import com.neaterbits.displayserver.protocol.messages.requests.QueryExtension;
+import com.neaterbits.displayserver.protocol.messages.requests.UngrabServer;
 import com.neaterbits.displayserver.protocol.messages.requests.WindowAttributes;
 import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.protocol.types.BITGRAVITY;
@@ -579,7 +580,14 @@ public class XWindowsProtocolServer implements AutoCloseable {
                 
                 break;
             }
-			
+
+            case OpCodes.UNGRAB_SERVER: {
+                
+                log(messageLength, opcode, sequenceNumber, UngrabServer.decode(stream));
+                
+                break;
+            }
+
 			case OpCodes.CREATE_PIXMAP: {
 			    final CreatePixmap createPixmap = log(messageLength, opcode, sequenceNumber, CreatePixmap.decode(stream));
 			    
