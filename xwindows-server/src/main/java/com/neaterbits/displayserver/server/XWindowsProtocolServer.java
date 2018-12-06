@@ -3,16 +3,13 @@ package com.neaterbits.displayserver.server;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.ShortBuffer;
 import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.neaterbits.displayserver.events.common.EventSource;
 import com.neaterbits.displayserver.framebuffer.common.GraphicsDriver;
-import com.neaterbits.displayserver.framebuffer.common.GraphicsScreen;
 import com.neaterbits.displayserver.io.common.Client;
 import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLog;
 import com.neaterbits.displayserver.protocol.ByteBufferXWindowsProtocolInputStream;
@@ -21,7 +18,6 @@ import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolUtil;
 import com.neaterbits.displayserver.protocol.enums.Errors;
 import com.neaterbits.displayserver.protocol.enums.MapState;
-import com.neaterbits.displayserver.protocol.enums.WindowClass;
 import com.neaterbits.displayserver.protocol.exception.ProtocolException;
 import com.neaterbits.displayserver.protocol.logging.XWindowsProtocolLog;
 import com.neaterbits.displayserver.protocol.messages.Encodeable;
@@ -55,25 +51,17 @@ import com.neaterbits.displayserver.protocol.messages.requests.QueryExtension;
 import com.neaterbits.displayserver.protocol.messages.requests.UngrabServer;
 import com.neaterbits.displayserver.protocol.messages.requests.WindowAttributes;
 import com.neaterbits.displayserver.protocol.types.ATOM;
-import com.neaterbits.displayserver.protocol.types.BITGRAVITY;
 import com.neaterbits.displayserver.protocol.types.BOOL;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.CARD8;
-import com.neaterbits.displayserver.protocol.types.COLORMAP;
-import com.neaterbits.displayserver.protocol.types.CURSOR;
 import com.neaterbits.displayserver.protocol.types.INT16;
-import com.neaterbits.displayserver.protocol.types.PIXMAP;
-import com.neaterbits.displayserver.protocol.types.SETofDEVICEEVENT;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
-import com.neaterbits.displayserver.protocol.types.WINGRAVITY;
 import com.neaterbits.displayserver.server.XWindowsConnectionState.State;
 import com.neaterbits.displayserver.windows.Display;
-import com.neaterbits.displayserver.windows.Screen;
-import com.neaterbits.displayserver.windows.WindowEventListener;
 
 public class XWindowsProtocolServer implements AutoCloseable {
 
@@ -101,7 +89,10 @@ public class XWindowsProtocolServer implements AutoCloseable {
 		
 		this.atoms = new Atoms();
 
-		final List<XWindowsScreen> screens = getScreens(graphicsDriver);
+		final List<XWindowsScreen> screens = ScreensHelper.getScreens(
+		        graphicsDriver,
+		        new XWindowsEventListener(this),
+		        resourceIdAllocator);
 		
 		this.state = new XState(screens);
 		
@@ -131,29 +122,8 @@ public class XWindowsProtocolServer implements AutoCloseable {
                     if (byteBuffer.get(byteBuffer.position()) == 0x6C) {
                         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
                     }
-                    
-                    if (byteBuffer.remaining() >= 12) {
-                        
-                        final ShortBuffer shortBuffer = byteBuffer.asShortBuffer();
-                        
-                        final int authProtocolNameLength = shortBuffer.get(shortBuffer.position() + 3);
-                        final int authProtocolDataLength = shortBuffer.get(shortBuffer.position() + 4);
-                        
-                        final int authNameLength = authProtocolNameLength + XWindowsProtocolUtil.getPadding(authProtocolNameLength);
-                        final int authDataLength = authProtocolDataLength + XWindowsProtocolUtil.getPadding(authProtocolDataLength);
-                        
-                        final int totalLength = 12 + authNameLength + authDataLength;
-                    
-                        if (totalLength <= byteBuffer.remaining()) {
-                            length = totalLength;
-                        }
-                        else {
-                            length = null;
-                        }
-                    }
-                    else {
-                        length = null;
-                    }
+
+                    length = XWindowsProtocolUtil.getInitialMessageLength(byteBuffer);
                 }
                 else {
                     length = XWindowsProtocolUtil.getMessageLength(byteBuffer);
@@ -172,54 +142,6 @@ public class XWindowsProtocolServer implements AutoCloseable {
             }
         };
 	}
-	
-	private static WindowAttributes getRootWindowAttributes(Screen screen) {
-	    
-	    return new WindowAttributes(
-	            WindowAttributes.ALL,
-	            PIXMAP.None,
-	            new CARD32(0),
-	            PIXMAP.None, new CARD32(0),
-	            BITGRAVITY.Forget, WINGRAVITY.NorthWest,
-	            new BYTE((byte)0),
-	            new CARD32(0xFFFFFFFFL), new CARD32(0),
-	            new BOOL(false),
-	            new BOOL(false),
-	            new SETofEVENT(0),
-	            new SETofDEVICEEVENT(0),
-	            COLORMAP.None,
-	            CURSOR.None);
-	    
-	}
-	
-	private List<XWindowsScreen> getScreens(GraphicsDriver graphicsDriver) {
-	    
-	    final List<GraphicsScreen> driverScreens = graphicsDriver.getScreens();
-	    final List<XWindowsScreen> screens = new ArrayList<>(driverScreens.size());
-
-	    final WindowEventListener windowEventListener = new XWindowsEventListener(this);
-	    
-	    for (GraphicsScreen driverScreen : driverScreens) {
-            
-	        final Screen screen = new Screen(driverScreen, windowEventListener);
-	        
-	        final int rootWindow = resourceIdAllocator.allocateRootWindowId();
-	        
-	        final WINDOW rootWindowResource = new WINDOW(rootWindow);
-	        
-	        final XWindowsWindow window = new XWindowsWindow(
-	                screen.getRootWindow(),
-	                rootWindowResource,
-	                new CARD16(0),
-	                WindowClass.InputOnly,
-	                getRootWindowAttributes(screen));
-	        
-	        screens.add(new XWindowsScreen(screen, rootWindowResource, window));
-	    }
-	    
-	    return screens;
-	}
-	
 	
 	private abstract class ConnectionState extends XWindowsConnectionState implements Client {
 
@@ -294,13 +216,6 @@ public class XWindowsProtocolServer implements AutoCloseable {
         return true;
     }
     
-    private <T extends Request> T log(int messageLength, int opcode, CARD16 sequenceNumber, T request) {
-        if (protocolLog != null) {
-            protocolLog.onReceivedRequest(messageLength, opcode, sequenceNumber, request);
-        }
-
-        return request;
-    }
     
     private void processProtocolMessage(XWindowsConnectionState connectionState, ByteBuffer byteBuffer, int messageLength) throws IOException {
 		
@@ -541,6 +456,14 @@ public class XWindowsProtocolServer implements AutoCloseable {
         }
         
         connectionState.send(error);
+    }
+
+    private <T extends Request> T log(int messageLength, int opcode, CARD16 sequenceNumber, T request) {
+        if (protocolLog != null) {
+            protocolLog.onReceivedRequest(messageLength, opcode, sequenceNumber, request);
+        }
+
+        return request;
     }
 
 	private static XWindowsProtocolInputStream stream(ByteBuffer byteBuffer, int messageLength) {

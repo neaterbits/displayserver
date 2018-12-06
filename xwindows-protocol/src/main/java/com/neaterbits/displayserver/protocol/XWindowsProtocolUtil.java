@@ -1,9 +1,40 @@
 package com.neaterbits.displayserver.protocol;
 
 import java.nio.ByteBuffer;
+import java.nio.ShortBuffer;
 
 public class XWindowsProtocolUtil {
 
+    public static Integer getInitialMessageLength(ByteBuffer byteBuffer) {
+
+        final Integer length;
+        
+        if (byteBuffer.remaining() >= 12) {
+            
+            final ShortBuffer shortBuffer = byteBuffer.asShortBuffer();
+            
+            final int authProtocolNameLength = shortBuffer.get(shortBuffer.position() + 3);
+            final int authProtocolDataLength = shortBuffer.get(shortBuffer.position() + 4);
+            
+            final int authNameLength = authProtocolNameLength + XWindowsProtocolUtil.getPadding(authProtocolNameLength);
+            final int authDataLength = authProtocolDataLength + XWindowsProtocolUtil.getPadding(authProtocolDataLength);
+            
+            final int totalLength = 12 + authNameLength + authDataLength;
+        
+            if (totalLength <= byteBuffer.remaining()) {
+                length = totalLength;
+            }
+            else {
+                length = null;
+            }
+        }
+        else {
+            length = null;
+        }
+    
+        return length;
+    }
+    
 	public static Integer getMessageLength(ByteBuffer byteBuffer) {
 	    
 	    final Integer length;
