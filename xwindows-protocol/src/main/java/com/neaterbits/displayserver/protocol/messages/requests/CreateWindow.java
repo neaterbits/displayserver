@@ -12,6 +12,7 @@ import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.INT16;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
+import com.neaterbits.displayserver.util.logging.LogUtil;
 
 public final class CreateWindow extends Request {
 
@@ -104,7 +105,9 @@ public final class CreateWindow extends Request {
                 "height", height,
                 "borderWidth", borderWidth,
                 "windowClass", windowClass,
-                "visual", visual
+                "visual", visual,
+                "bitmask", attributes.getValueMask(),
+                "attributes", LogUtil.outputParametersInBrackets(attributes.getDebugParams())
         );
     }
 

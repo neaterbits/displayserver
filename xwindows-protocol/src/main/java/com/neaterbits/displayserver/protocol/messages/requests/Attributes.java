@@ -1,6 +1,7 @@
 package com.neaterbits.displayserver.protocol.messages.requests;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.protocol.FieldReader;
@@ -51,6 +52,14 @@ public abstract class Attributes extends Encodeable {
             System.out.println("## writeIfSet");
             
             writer.write(value);
+        }
+    }
+
+    protected final <T> void addIfSet(List<Object> params, String name, Object value, int flag) {
+        
+        if (isSet(flag)) {
+            params.add(name);
+            params.add(value);
         }
     }
 

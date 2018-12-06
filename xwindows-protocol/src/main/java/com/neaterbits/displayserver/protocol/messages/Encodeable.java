@@ -47,11 +47,9 @@ public abstract class Encodeable {
        final Object [] debugParams = getDebugParams();
        
        if (debugParams != null) {
-           sb.append(" [");
+           sb.append(" ");
            
-           LogUtil.outputParameters(sb::append, debugParams);
-           
-           sb.append(']');
+           LogUtil.outputParametersInBrackets(sb::append, debugParams);
        }
        
        return sb.toString();

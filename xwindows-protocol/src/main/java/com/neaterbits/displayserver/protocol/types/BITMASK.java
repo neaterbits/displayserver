@@ -11,4 +11,9 @@ public final class BITMASK {
 	public int getValue() {
 		return value;
 	}
+
+    @Override
+    public String toString() {
+        return String.format("%08x", value);
+    }
 }

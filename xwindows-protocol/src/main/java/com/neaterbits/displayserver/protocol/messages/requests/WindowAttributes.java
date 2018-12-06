@@ -1,6 +1,8 @@
 package com.neaterbits.displayserver.protocol.messages.requests;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.neaterbits.displayserver.protocol.IntPadXWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.IntPadXWindowsProtocolOutputStream;
@@ -119,7 +121,30 @@ public final class WindowAttributes extends Attributes {
         
     }
 
-    
+    @Override
+    public Object[] getDebugParams() {
+        
+        final List<Object> params = new ArrayList<>();
+        
+        addIfSet(params, "bgPixmap",        backgroundPixmap,    BACKGROUND_PIXMAP);
+        addIfSet(params, "bgPixel",         backgroundPixel,     BACKGROUND_PIXEL);
+        addIfSet(params, "borderPixmap",    borderPixmap,        BORDER_PIXMAP);
+        addIfSet(params, "borderPixel",     borderPixel,         BORDER_PIXEL);
+        addIfSet(params, "bitGravity",      bitGravity,          BIT_GRAVITY);
+        addIfSet(params, "winGravity",      winGravity,          WIN_GRAVITY);
+        addIfSet(params, "backingStore",    backingStore,        BACKING_STORE);
+        addIfSet(params, "backingPlanes",   backingPlanes,       BACKING_PLANES);
+        addIfSet(params, "backingPixel",    backingPixel,        BACKING_PIXEL);
+        addIfSet(params, "overrideRedirect", overrideRedirect,    OVERRIDE_REDIRECT);
+        addIfSet(params, "saveUnder",       saveUnder,           SAVE_UNDER);
+        addIfSet(params, "eventMask",       eventMask,           EVENT_MASK);
+        addIfSet(params, "doNotPropagateMask", doNotPropagateMask,  DO_NOT_PROPAGATE_MASK);
+        addIfSet(params, "colorMap",        colormap,            COLOR_MAP);
+        addIfSet(params, "cursor",          cursor,              CURSOR);
+        
+        return params.toArray(new Object[params.size()]);
+    }
+
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
         
