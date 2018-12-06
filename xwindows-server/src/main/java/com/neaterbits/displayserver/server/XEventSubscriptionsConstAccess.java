@@ -2,6 +2,6 @@ package com.neaterbits.displayserver.server;
 
 interface XEventSubscriptionsConstAccess {
 
-    Iterable<XWindowsConnectionState> getConnectionsInterestedInEvent(XWindow window, int event);
+    Iterable<XClient> getClientsInterestedInEvent(XWindow window, int event);
     
 }

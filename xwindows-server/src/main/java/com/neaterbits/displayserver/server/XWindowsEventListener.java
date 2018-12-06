@@ -58,7 +58,7 @@ final class XWindowsEventListener implements WindowEventListener {
     }
     
     private void sendEventToSubscribing(XWindow xWindow, Event event, int eventCode) {
-        for (XWindowsConnectionState connection : server.getEventSubscriptions().getConnectionsInterestedInEvent(xWindow, eventCode)) {
+        for (XWindowsConnectionState connection : server.getEventSubscriptions().getClientsInterestedInEvent(xWindow, eventCode)) {
             connection.addEvent(event);
         }
     }

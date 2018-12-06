@@ -13,7 +13,7 @@ final class XWindows implements XWindowsConstAccess {
     private final WindowMap rootWindows;
     private final WindowMap clientWindows;
     
-    private final Map<XWindow, XWindowsConnectionState> connectionByWindow;
+    private final Map<XWindow, XClient> creatingClientByWindow;
 
 
     XWindows() {
@@ -21,7 +21,7 @@ final class XWindows implements XWindowsConstAccess {
         this.rootWindows = new WindowMap();
         this.clientWindows = new WindowMap();
         
-        this.connectionByWindow = new HashMap<>();
+        this.creatingClientByWindow = new HashMap<>();
     }
     
     void addRootWindow(XWindow window) {
@@ -36,16 +36,16 @@ final class XWindows implements XWindowsConstAccess {
     }
 
     
-    void addWindow(XWindow window, XWindowsConnectionState creatingConnection) {
+    void addWindow(XWindow window, XClient creatingClient) {
 
         Objects.requireNonNull(window);
-        Objects.requireNonNull(creatingConnection);
+        Objects.requireNonNull(creatingClient);
         
         if (window.isRootWindow()) {
             throw new IllegalArgumentException();
         }
         
-        connectionByWindow.put(window, creatingConnection);
+        creatingClientByWindow.put(window, creatingClient);
 
         clientWindows.addToMaps(window);
     }
@@ -59,12 +59,12 @@ final class XWindows implements XWindowsConstAccess {
         }
 
         if (clientWindows.remove(window)) {
-            if (connectionByWindow.remove(window) == null) {
+            if (creatingClientByWindow.remove(window) == null) {
                 throw new IllegalStateException();
             }
         }
         else {
-            if (connectionByWindow.remove(window) != null) {
+            if (creatingClientByWindow.remove(window) != null) {
                 throw new IllegalStateException();
             }
         }

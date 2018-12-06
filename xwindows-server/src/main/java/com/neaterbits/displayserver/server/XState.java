@@ -10,12 +10,12 @@ import com.neaterbits.displayserver.windows.Window;
 
 final class XState implements
     XScreensConstAccess,
-    XConnectionsConstAccess,
+    XClientsConstAccess,
     XWindowsConstAccess,
     XEventSubscriptionsConstAccess {
 
     private final XScreens screens;
-    private final XConnections connections;
+    private final XClients clients;
     private final XWindows windows;
     private final XEventSubscriptions eventSubscriptions;
     
@@ -23,7 +23,7 @@ final class XState implements
 
         this.screens = new XScreens(screens);
         
-        this.connections = new XConnections();
+        this.clients = new XClients();
         
         this.windows = new XWindows();
         
@@ -46,12 +46,12 @@ final class XState implements
     }
 
     @Override
-    public Iterable<XWindowsConnectionState> getConnections() {
-        return connections.getConnections();
+    public Iterable<XClient> getClients() {
+        return clients.getClients();
     }
     
-    void addWindow(XWindow window, XWindowsConnectionState creatingConnection) {
-        windows.addWindow(window, creatingConnection);
+    void addWindow(XWindow window, XClient creatingClient) {
+        windows.addWindow(window, creatingClient);
     }
 
     void removeClientWindow(XWindow window) {
@@ -79,7 +79,7 @@ final class XState implements
     }
 
     @Override
-    public Iterable<XWindowsConnectionState> getConnectionsInterestedInEvent(XWindow window, int event) {
-        return eventSubscriptions.getConnectionsInterestedInEvent(window, event);
+    public Iterable<XClient> getClientsInterestedInEvent(XWindow window, int event) {
+        return eventSubscriptions.getClientsInterestedInEvent(window, event);
     }
 }

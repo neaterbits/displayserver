@@ -143,7 +143,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
         };
 	}
 	
-	private abstract class ConnectionState extends XWindowsConnectionState implements Client {
+	private abstract class ConnectionState extends XClient implements Client {
 
 		public ConnectionState(XWindowsProtocolServer server, SocketChannel socketChannel, NonBlockingChannelWriterLog connectionWriteLog) {
 			super(
@@ -154,25 +154,25 @@ public class XWindowsProtocolServer implements AutoCloseable {
 		}
 	}
 	
-	private void processMessage(XWindowsConnectionState connectionState, ByteBuffer byteBuffer, int messageLength) throws IOException {
+	private void processMessage(XClient client, ByteBuffer byteBuffer, int messageLength) throws IOException {
 
-	    switch (connectionState.getState()) {
+	    switch (client.getState()) {
 	    
         case CREATED:
-            if (processInitialMessage(connectionState, byteBuffer, messageLength)) {
+            if (processInitialMessage(client, byteBuffer, messageLength)) {
                 
-                connectionState.setState(State.INITIAL_RECEIVED);
+                client.setState(State.INITIAL_RECEIVED);
             }
             else {
-                connectionState.setState(State.INITIAL_ERROR);
+                client.setState(State.INITIAL_ERROR);
             }
             break;
             
         case INITIAL_RECEIVED:
-            connectionState.setState(State.CONNECTED);
+            client.setState(State.CONNECTED);
 
         case CONNECTED:
-            processProtocolMessage(connectionState, byteBuffer, messageLength);
+            processProtocolMessage(client, byteBuffer, messageLength);
             break;
             
         default:
@@ -181,7 +181,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
 	}
 
 	
-    private boolean processInitialMessage(XWindowsConnectionState connectionState, ByteBuffer byteBuffer, int messageLength) throws IOException {
+    private boolean processInitialMessage(XClient client, ByteBuffer byteBuffer, int messageLength) throws IOException {
         
         final ClientMessage clientMessage = ClientMessage.decode(new ByteBufferXWindowsProtocolInputStream(byteBuffer));
         
@@ -200,9 +200,9 @@ public class XWindowsProtocolServer implements AutoCloseable {
             throw new UnsupportedOperationException();
         }
         
-        connectionState.setByteOrder(byteOrder);
+        client.setByteOrder(byteOrder);
         
-        final int connectionNo = connectionState.getConnectionNo();
+        final int connectionNo = client.getConnectionNo();
         
         final ServerMessage serverMessage = InitialServerMessageHelper.constructServerMessage(
                 connectionNo,
@@ -211,29 +211,29 @@ public class XWindowsProtocolServer implements AutoCloseable {
                 resourceIdAllocator.getResourceMask(connectionNo),
                 resourceIdAllocator::allocateVisualId);
 
-        send(connectionState, serverMessage);
+        send(client, serverMessage);
         
         return true;
     }
     
     
-    private void processProtocolMessage(XWindowsConnectionState connectionState, ByteBuffer byteBuffer, int messageLength) throws IOException {
+    private void processProtocolMessage(XClient client, ByteBuffer byteBuffer, int messageLength) throws IOException {
 		
 		final int opcode = byteBuffer.get();
 		
 		final XWindowsProtocolInputStream stream = stream(byteBuffer, messageLength);
 		
-		final CARD16 sequenceNumber = connectionState.increaseSequenceNumber();
+		final CARD16 sequenceNumber = client.increaseSequenceNumber();
 		
 		try {
 			switch (opcode) {
 			case OpCodes.CREATE_WINDOW: {
 				final CreateWindow createWindow = log(messageLength, opcode, sequenceNumber, CreateWindow.decode(stream));
 	
-				final XWindow window = connectionState.createWindow(display, createWindow);
+				final XWindow window = client.createWindow(display, createWindow);
 				
 				if (window != null) {
-				    state.addWindow(window, connectionState);
+				    state.addWindow(window, client);
 				}
 				break;
 			}
@@ -251,7 +251,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
 			    final XWindow window = state.getClientWindow(getWindowAttributes.getWindow());
 
 			    if (window == null) {
-			        sendError(connectionState, Errors.Window, sequenceNumber, getWindowAttributes.getWindow().getValue(), opcode);
+			        sendError(client, Errors.Window, sequenceNumber, getWindowAttributes.getWindow().getValue(), opcode);
 			    }
 			    else {
     			    final WindowAttributes curAttributes = window.getCurrentWindowAttributes();
@@ -272,7 +272,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
     			            new SETofEVENT(0), // TODO
     			            curAttributes.getDoNotPropagateMask());
     			    
-    			    sendReply(connectionState, reply);
+    			    sendReply(client, reply);
 			    }
 			    break;
 			}
@@ -280,7 +280,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
 			case OpCodes.DESTROY_WINDOW: {
 				final DestroyWindow destroyWindow = log(messageLength, opcode, sequenceNumber, DestroyWindow.decode(stream));
 				
-				final XWindow window = connectionState.destroyWindow(display, destroyWindow);
+				final XWindow window = client.destroyWindow(display, destroyWindow);
 				
 				if (window != null) {
 				    state.removeClientWindow(window);
@@ -297,7 +297,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
                 final XWindow window = state.getClientWindow(windowResource);
 
                 if (window == null) {
-                    sendError(connectionState, Errors.Window, sequenceNumber, windowResource.getValue(), opcode);
+                    sendError(client, Errors.Window, sequenceNumber, windowResource.getValue(), opcode);
                 }
                 else {
                     
@@ -310,7 +310,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
                             new CARD16(window.getWidth()), new CARD16(window.getHeight()),
                             window.getBorderWidth());
                     
-                    sendReply(connectionState, reply);
+                    sendReply(client, reply);
                 }
 			    break;
 			}
@@ -330,7 +330,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
 			        atom = atoms.addIfNotExists(internAtom.getName());
 			    }
 			    
-			    sendReply(connectionState, new InternAtomReply(sequenceNumber, atom));
+			    sendReply(client, new InternAtomReply(sequenceNumber, atom));
 			    break;
 			}
 			
@@ -338,7 +338,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
                 
                 log(messageLength, opcode, sequenceNumber, GetProperty.decode(stream));
                 
-                sendReply(connectionState, new GetPropertyReply(
+                sendReply(client, new GetPropertyReply(
                         sequenceNumber,
                         new CARD8((short)0),
                         ATOM.None,
@@ -350,7 +350,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
                 
                 final GetSelectionOwner getSelectionOwner = log(messageLength, opcode, sequenceNumber, GetSelectionOwner.decode(stream));
                 
-                sendReply(connectionState, new GetSelectionOwnerReply(sequenceNumber, WINDOW.None));
+                sendReply(client, new GetSelectionOwnerReply(sequenceNumber, WINDOW.None));
                 break;
             }
             
@@ -371,14 +371,14 @@ public class XWindowsProtocolServer implements AutoCloseable {
 			case OpCodes.CREATE_PIXMAP: {
 			    final CreatePixmap createPixmap = log(messageLength, opcode, sequenceNumber, CreatePixmap.decode(stream));
 			    
-			    connectionState.createPixmap(createPixmap);
+			    client.createPixmap(createPixmap);
 			    break;
 			}
 			
 			case OpCodes.FREE_PIXMAP: {
 			    final FreePixmap freePixmap = log(messageLength, opcode, sequenceNumber, FreePixmap.decode(stream));
 
-			    connectionState.freePixmap(freePixmap);
+			    client.freePixmap(freePixmap);
 			    break;
 			}
 			
@@ -386,21 +386,21 @@ public class XWindowsProtocolServer implements AutoCloseable {
 			    
 			    final CreateGC createGC = log(messageLength, opcode, sequenceNumber, CreateGC.decode(stream));
 			    
-			    connectionState.createGC(createGC);
+			    client.createGC(createGC);
 			    break;
 			}
 			    
 			case OpCodes.PUT_IMAGE: {
 			    final PutImage putImage = log(messageLength, opcode, sequenceNumber, PutImage.decode(stream));
 
-			    connectionState.putImage(putImage);
+			    client.putImage(putImage);
 			    break;
 			}
 			
 			case OpCodes.QUERY_EXTENSION: {
 			    log(messageLength, opcode, sequenceNumber, QueryExtension.decode(stream));
 			
-			    sendReply(connectionState, 
+			    sendReply(client, 
 			            new QueryResponseReply(
 			                    sequenceNumber,
 			                    new BOOL((byte)0),
@@ -414,7 +414,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
 			    
 			    final AllocColor allocColor = log(messageLength, opcode, sequenceNumber, AllocColor.decode(stream));
 			    
-			    sendReply(connectionState, new AllocColorReply(
+			    sendReply(client, new AllocColorReply(
 			            sequenceNumber,
 			            allocColor.getRed(),
 			            allocColor.getGreen(),
@@ -434,20 +434,20 @@ public class XWindowsProtocolServer implements AutoCloseable {
 		}
 	}
 
-    private void send(XWindowsConnectionState connectionState, Encodeable message) {
-        connectionState.send(message);
+    private void send(XClient client, Encodeable message) {
+        client.send(message);
     }
 
-    private void sendReply(XWindowsConnectionState connectionState, Reply reply) {
+    private void sendReply(XClient client, Reply reply) {
         
         if (protocolLog != null) {
             protocolLog.onSendReply(reply);
         }
         
-        connectionState.send(reply);
+        client.send(reply);
     }
 
-    private void sendError(XWindowsConnectionState connectionState, BYTE errorCode, CARD16 sequenceNumber, long value, int opcode) {
+    private void sendError(XClient client, BYTE errorCode, CARD16 sequenceNumber, long value, int opcode) {
         
         final Error error = new Error(errorCode, sequenceNumber, new CARD32(value), new CARD8((short)opcode));
         
@@ -455,7 +455,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
             protocolLog.onSendError(error);
         }
         
-        connectionState.send(error);
+        client.send(error);
     }
 
     private <T extends Request> T log(int messageLength, int opcode, CARD16 sequenceNumber, T request) {
@@ -473,9 +473,9 @@ public class XWindowsProtocolServer implements AutoCloseable {
 	@Override
     public void close() throws Exception {
 
-	    for (XWindowsConnectionState connectionState : state.getConnections()) {
+	    for (XClient client : state.getClients()) {
 	        try {
-	            connectionState.close();
+	            client.close();
 	        }
 	        catch (Exception ex) {
 	            ex.printStackTrace();
