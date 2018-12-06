@@ -79,6 +79,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
     
 	private final Display display;
 	private final ServerResourceIdAllocator resourceIdAllocator;
+	private final Atoms atoms;
 	
 	private final List<XWindowsScreen> screens;
 	private final Map<Window, XWindowsConnectionState> connectionByWindow;
@@ -95,6 +96,8 @@ public class XWindowsProtocolServer implements AutoCloseable {
 		this.connectionWriteLog = connectionWriteLog;
 		
 		this.resourceIdAllocator = new ServerResourceIdAllocator();
+		
+		this.atoms = new Atoms();
 		
 		this.connectionByWindow = new HashMap<>();
 
@@ -431,7 +434,18 @@ public class XWindowsProtocolServer implements AutoCloseable {
 			    
 			    final InternAtom internAtom = log(messageLength, opcode, InternAtom.decode(stream));
 			    
-			    send(connectionState, new InternAtomReply(sequenceNumber, ATOM.None));
+			    final ATOM atom;
+			    
+			    if (internAtom.getOnlyIfExists()) {
+			        final ATOM existing = atoms.getAtom(internAtom.getName());
+			        
+			        atom = existing != null ? existing : ATOM.None;
+			    }
+			    else {
+			        atom = atoms.addIfNotExists(internAtom.getName());
+			    }
+			    
+			    send(connectionState, new InternAtomReply(sequenceNumber, atom));
 			    break;
 			}
 			
@@ -451,7 +465,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
                 
                 final GetSelectionOwner getSelectionOwner = log(messageLength, opcode, GetSelectionOwner.decode(stream));
                 
-                send(connectionState, new GetSelectionOwnerReply(sequenceNumber, WINDOW.None));
+                send(connectionState, new GetSelectionOwnerReply(sequenceNumber, screens.get(0).getRootWindow()));
                 break;
             }
             
@@ -519,9 +533,8 @@ public class XWindowsProtocolServer implements AutoCloseable {
 			    break;
 			}
 			
-			    
 			default:
-				throw new UnsupportedOperationException();
+				throw new UnsupportedOperationException("Unknown opcode " + opcode);
 			}
 		}
 		catch (ProtocolException ex) {

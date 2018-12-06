@@ -32,6 +32,11 @@ public final class GetSelectionOwner extends Request {
     public ATOM getSelection() {
         return selection;
     }
+    
+    @Override
+    public Object[] getDebugParams() {
+        return wrap("selection", selection);
+    }
 
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
