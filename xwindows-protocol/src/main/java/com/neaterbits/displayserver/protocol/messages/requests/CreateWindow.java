@@ -89,8 +89,7 @@ public final class CreateWindow extends Request {
 				borderWidth,
 				windowClass,
 				visual,
-				null);
-		
+				WindowAttributes.decode(stream));
 	}
 	
 	@Override
