@@ -56,7 +56,7 @@ class ScreensHelper {
             
             final WINDOW rootWindowResource = new WINDOW(rootWindow);
             
-            final XWindowsWindow window = new XWindowsWindow(
+            final XWindow window = new XWindow(
                     screen.getRootWindow(),
                     rootWindowResource,
                     new CARD16(0),

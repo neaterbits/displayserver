@@ -6,11 +6,11 @@ import com.neaterbits.displayserver.windows.Window;
 
 interface XWindowsConstAccess {
 
-    XWindowsWindow getClientWindow(WINDOW windowResource);
+    XWindow getClientWindow(WINDOW windowResource);
 
-    XWindowsWindow getClientWindow(DRAWABLE windowResource);
+    XWindow getClientWindow(DRAWABLE windowResource);
 
-    XWindowsWindow findRootWindowOf(WINDOW windowResource);
+    XWindow findRootWindowOf(WINDOW windowResource);
     
-    XWindowsWindow getClientWindow(Window window);
+    XWindow getClientWindow(Window window);
 }

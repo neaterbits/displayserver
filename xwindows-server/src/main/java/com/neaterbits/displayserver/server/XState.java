@@ -50,36 +50,36 @@ final class XState implements
         return connections.getConnections();
     }
     
-    void addWindow(XWindowsWindow window, XWindowsConnectionState creatingConnection) {
+    void addWindow(XWindow window, XWindowsConnectionState creatingConnection) {
         windows.addWindow(window, creatingConnection);
     }
 
-    void removeClientWindow(XWindowsWindow window) {
+    void removeClientWindow(XWindow window) {
         windows.removeClientWindow(window);
     }
     
     @Override
-    public XWindowsWindow getClientWindow(DRAWABLE windowResource) {
+    public XWindow getClientWindow(DRAWABLE windowResource) {
         return windows.getClientWindow(windowResource);
     }
 
     @Override
-    public XWindowsWindow getClientWindow(WINDOW windowResource) {
+    public XWindow getClientWindow(WINDOW windowResource) {
         return windows.getClientWindow(windowResource);
     }
 
     @Override
-    public XWindowsWindow findRootWindowOf(WINDOW windowResource) {
+    public XWindow findRootWindowOf(WINDOW windowResource) {
         return windows.findRootWindowOf(windowResource);
     }
 
     @Override
-    public XWindowsWindow getClientWindow(Window window) {
+    public XWindow getClientWindow(Window window) {
         return windows.getClientWindow(window);
     }
 
     @Override
-    public Iterable<XWindowsConnectionState> getConnectionsInterestedInEvent(XWindowsWindow window, int event) {
+    public Iterable<XWindowsConnectionState> getConnectionsInterestedInEvent(XWindow window, int event) {
         return eventSubscriptions.getConnectionsInterestedInEvent(window, event);
     }
 }

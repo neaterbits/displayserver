@@ -13,7 +13,7 @@ final class XWindows implements XWindowsConstAccess {
     private final WindowMap rootWindows;
     private final WindowMap clientWindows;
     
-    private final Map<XWindowsWindow, XWindowsConnectionState> connectionByWindow;
+    private final Map<XWindow, XWindowsConnectionState> connectionByWindow;
 
 
     XWindows() {
@@ -24,7 +24,7 @@ final class XWindows implements XWindowsConstAccess {
         this.connectionByWindow = new HashMap<>();
     }
     
-    void addRootWindow(XWindowsWindow window) {
+    void addRootWindow(XWindow window) {
         
         Objects.requireNonNull(window);
         
@@ -36,7 +36,7 @@ final class XWindows implements XWindowsConstAccess {
     }
 
     
-    void addWindow(XWindowsWindow window, XWindowsConnectionState creatingConnection) {
+    void addWindow(XWindow window, XWindowsConnectionState creatingConnection) {
 
         Objects.requireNonNull(window);
         Objects.requireNonNull(creatingConnection);
@@ -50,7 +50,7 @@ final class XWindows implements XWindowsConstAccess {
         clientWindows.addToMaps(window);
     }
 
-    void removeClientWindow(XWindowsWindow window) {
+    void removeClientWindow(XWindow window) {
         
         Objects.requireNonNull(window);
         
@@ -71,34 +71,34 @@ final class XWindows implements XWindowsConstAccess {
     }
 
     @Override
-    public XWindowsWindow getClientWindow(DRAWABLE windowResource) {
+    public XWindow getClientWindow(DRAWABLE windowResource) {
         return clientWindows.getWindow(windowResource);
     }
     @Override
-    public XWindowsWindow getClientWindow(WINDOW windowResource) {
+    public XWindow getClientWindow(WINDOW windowResource) {
         return clientWindows.getWindow(windowResource.toDrawable());
     }
 
     @Override
-    public XWindowsWindow getClientWindow(Window window) {
+    public XWindow getClientWindow(Window window) {
         throw new UnsupportedOperationException("TODO");
     }
 
     @Override
-    public XWindowsWindow findRootWindowOf(WINDOW window) {
+    public XWindow findRootWindowOf(WINDOW window) {
         
         Objects.requireNonNull(window);
         
-        final XWindowsWindow result;
+        final XWindow result;
         
-        final XWindowsWindow rootWindow = rootWindows.getWindow(window);
+        final XWindow rootWindow = rootWindows.getWindow(window);
         
         if (rootWindow != null) {
             result = rootWindow;
         }
         else {
             
-            final XWindowsWindow xWindow = clientWindows.getWindow(window);
+            final XWindow xWindow = clientWindows.getWindow(window);
             
             if (xWindow == null) {
                 result = null;
@@ -112,36 +112,36 @@ final class XWindows implements XWindowsConstAccess {
     }
     
     private static class WindowMap {
-        private final Map<DRAWABLE, XWindowsWindow> drawableToWindow;
-        private final Map<XWindowsWindow, DRAWABLE> windowToDrawable;
+        private final Map<DRAWABLE, XWindow> drawableToWindow;
+        private final Map<XWindow, DRAWABLE> windowToDrawable;
 
         public WindowMap() {
             this.drawableToWindow = new HashMap<>();
             this.windowToDrawable = new HashMap<>();
         }
 
-        XWindowsWindow getWindow(WINDOW windowResource) {
+        XWindow getWindow(WINDOW windowResource) {
             return getWindow(windowResource.toDrawable());
         }
 
-        XWindowsWindow getWindow(DRAWABLE windowResource) {
+        XWindow getWindow(DRAWABLE windowResource) {
             
             Objects.requireNonNull(windowResource);
             
             return drawableToWindow.get(windowResource);
         }
         
-        void addToMaps(XWindowsWindow window) {
+        void addToMaps(XWindow window) {
             final DRAWABLE drawable = window.getWINDOW().toDrawable();
             
             drawableToWindow.put(drawable, window);
             windowToDrawable.put(window, drawable);
         }
         
-        boolean remove(XWindowsWindow window) {
+        boolean remove(XWindow window) {
             
             final DRAWABLE drawable = window.getWINDOW().toDrawable();
-            final XWindowsWindow removedWindow = drawableToWindow.remove(drawable);
+            final XWindow removedWindow = drawableToWindow.remove(drawable);
 
             final boolean removed;
             

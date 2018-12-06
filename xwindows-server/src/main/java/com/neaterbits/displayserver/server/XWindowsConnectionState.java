@@ -146,7 +146,7 @@ public class XWindowsConnectionState
 		utilizedResourceIds.remove(resource.getValue());
 	}
 	
-	final XWindowsWindow createWindow(Display display, CreateWindow createWindow) throws ValueException, IDChoiceException {
+	final XWindow createWindow(Display display, CreateWindow createWindow) throws ValueException, IDChoiceException {
 		
 		final DRAWABLE drawable = createWindow.getWid().toDrawable();
 		
@@ -154,7 +154,7 @@ public class XWindowsConnectionState
 		
 		final com.neaterbits.displayserver.windows.WindowClass windowClass;
 
-		final XWindowsWindow parentWindow = server.getWindows().getClientWindow(createWindow.getParent());
+		final XWindow parentWindow = server.getWindows().getClientWindow(createWindow.getParent());
 		
 		if (parentWindow == null) {
 			throw new ValueException("Unknown parent window");
@@ -195,9 +195,9 @@ public class XWindowsConnectionState
 			throw new IllegalStateException();
 		}
 		
-		final XWindowsWindow rootWindow = server.getWindows().findRootWindowOf(createWindow.getParent());
+		final XWindow rootWindow = server.getWindows().findRootWindowOf(createWindow.getParent());
 		
-		final XWindowsWindow xWindowsWindow = new XWindowsWindow(
+		final XWindow xWindowsWindow = new XWindow(
 		        window,
 		        createWindow.getWid(),
 		        rootWindow.getWINDOW(),
@@ -210,10 +210,10 @@ public class XWindowsConnectionState
 	}
 	
 	
-	final XWindowsWindow destroyWindow(Display display, DestroyWindow destroyWindow) {
+	final XWindow destroyWindow(Display display, DestroyWindow destroyWindow) {
 		checkAndRemoveResourceId(destroyWindow.getWindow());
 	
-		final XWindowsWindow window = server.getWindows().getClientWindow(destroyWindow.getWindow());
+		final XWindow window = server.getWindows().getClientWindow(destroyWindow.getWindow());
 		
 		if (window != null) {
 			display.disposeWindow(window.getWindow());
@@ -224,7 +224,7 @@ public class XWindowsConnectionState
 	
 	private GraphicsScreen findGraphicsScreen(DRAWABLE drawable) {
 	    
-	    XWindowsWindow window = server.getWindows().getClientWindow(drawable);
+	    XWindow window = server.getWindows().getClientWindow(drawable);
 	    
 	    GraphicsScreen screen = null;
 	    
@@ -287,7 +287,7 @@ public class XWindowsConnectionState
 	
 	final void putImage(PutImage putImage) {
 	    
-	    final XWindowsWindow window = server.getWindows().getClientWindow(putImage.getDrawable());
+	    final XWindow window = server.getWindows().getClientWindow(putImage.getDrawable());
 	    
 	    if (window != null) {
 	        

@@ -230,7 +230,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
 			case OpCodes.CREATE_WINDOW: {
 				final CreateWindow createWindow = log(messageLength, opcode, sequenceNumber, CreateWindow.decode(stream));
 	
-				final XWindowsWindow window = connectionState.createWindow(display, createWindow);
+				final XWindow window = connectionState.createWindow(display, createWindow);
 				
 				if (window != null) {
 				    state.addWindow(window, connectionState);
@@ -248,7 +248,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
 			    
 			    final GetWindowAttributes getWindowAttributes = log(messageLength, opcode, sequenceNumber, GetWindowAttributes.decode(stream));
 			    
-			    final XWindowsWindow window = state.getClientWindow(getWindowAttributes.getWindow());
+			    final XWindow window = state.getClientWindow(getWindowAttributes.getWindow());
 
 			    if (window == null) {
 			        sendError(connectionState, Errors.Window, sequenceNumber, getWindowAttributes.getWindow().getValue(), opcode);
@@ -280,7 +280,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
 			case OpCodes.DESTROY_WINDOW: {
 				final DestroyWindow destroyWindow = log(messageLength, opcode, sequenceNumber, DestroyWindow.decode(stream));
 				
-				final XWindowsWindow window = connectionState.destroyWindow(display, destroyWindow);
+				final XWindow window = connectionState.destroyWindow(display, destroyWindow);
 				
 				if (window != null) {
 				    state.removeClientWindow(window);
@@ -294,7 +294,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
 			    
 			    final WINDOW windowResource = new WINDOW(getGeometry.getDrawable());
 			    
-                final XWindowsWindow window = state.getClientWindow(windowResource);
+                final XWindow window = state.getClientWindow(windowResource);
 
                 if (window == null) {
                     sendError(connectionState, Errors.Window, sequenceNumber, windowResource.getValue(), opcode);

@@ -33,7 +33,7 @@ final class XWindowsEventListener implements WindowEventListener {
         Objects.requireNonNull(region);
         
         // TODO might be root window too?
-        final XWindowsWindow xWindow = server.getWindows().getClientWindow(window);
+        final XWindow xWindow = server.getWindows().getClientWindow(window);
         
         if (xWindow == null) {
             throw new IllegalStateException();
@@ -57,7 +57,7 @@ final class XWindowsEventListener implements WindowEventListener {
         }
     }
     
-    private void sendEventToSubscribing(XWindowsWindow xWindow, Event event, int eventCode) {
+    private void sendEventToSubscribing(XWindow xWindow, Event event, int eventCode) {
         for (XWindowsConnectionState connection : server.getEventSubscriptions().getConnectionsInterestedInEvent(xWindow, eventCode)) {
             connection.addEvent(event);
         }

@@ -7,7 +7,7 @@ import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.windows.Window;
 
-final class XWindowsWindow {
+final class XWindow {
 
     private final Window window;
     
@@ -21,7 +21,7 @@ final class XWindowsWindow {
     private WindowAttributes currentWindowAttributes;
 
     // Root window
-    XWindowsWindow(
+    XWindow(
             Window window,
             WINDOW windowResource,
             CARD16 borderWidth,
@@ -31,7 +31,7 @@ final class XWindowsWindow {
         this(window, windowResource, WINDOW.None, WINDOW.None, borderWidth, windowClass, currentWindowAttributes, 0);
     }
 
-    XWindowsWindow(
+    XWindow(
             Window window,
             WINDOW windowResource, WINDOW rootWindow, WINDOW parentWindow,
             CARD16 borderWidth,
@@ -49,7 +49,7 @@ final class XWindowsWindow {
         }
     }
 
-    XWindowsWindow(
+    XWindow(
             Window window,
             WINDOW windowResource, WINDOW rootWindow, WINDOW parentWindow,
             CARD16 borderWidth,
@@ -146,7 +146,7 @@ final class XWindowsWindow {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        XWindowsWindow other = (XWindowsWindow) obj;
+        XWindow other = (XWindow) obj;
         if (window == null) {
             if (other.window != null)
                 return false;

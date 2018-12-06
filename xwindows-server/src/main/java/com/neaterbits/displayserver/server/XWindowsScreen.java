@@ -9,9 +9,9 @@ final class XWindowsScreen {
 
     private final Screen screen;
     private final WINDOW rootWINDOW;
-    private final XWindowsWindow rootWindow;
+    private final XWindow rootWindow;
 
-    XWindowsScreen(Screen screen, WINDOW rootWINDOW, XWindowsWindow rootWindow) {
+    XWindowsScreen(Screen screen, WINDOW rootWINDOW, XWindow rootWindow) {
 
         Objects.requireNonNull(screen);
         Objects.requireNonNull(rootWINDOW);
@@ -30,7 +30,7 @@ final class XWindowsScreen {
         return rootWINDOW;
     }
 
-    XWindowsWindow getRootWindow() {
+    XWindow getRootWindow() {
         return rootWindow;
     }
 }
