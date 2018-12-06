@@ -6,36 +6,8 @@ import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
-import com.neaterbits.displayserver.util.logging.LogUtil;
 
 public abstract class Message extends Encodeable {
-    
-    public Object [] getDebugParams() {
-        return null;
-    }
-    
-    protected final Object [] wrap(Object ... objects) {
-        return LogUtil.wrap(objects);
-    }
-    
-    public final String toDebugString() {
-        
-        final StringBuilder sb = new StringBuilder();
-        
-        sb.append(getClass().getSimpleName());
-        
-        final Object [] debugParams = getDebugParams();
-        
-        if (debugParams != null) {
-            sb.append(" [");
-            
-            LogUtil.outputParameters(sb::append, debugParams);
-            
-            sb.append(']');
-        }
-        
-        return sb.toString();
-    }
     
     protected static void writeUnusedByte(XWindowsProtocolOutputStream stream) throws IOException {
         stream.writeBYTE(new BYTE((byte)0));
