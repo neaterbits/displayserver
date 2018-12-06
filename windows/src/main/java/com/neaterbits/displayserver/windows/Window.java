@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.layers.Layer;
+import com.neaterbits.displayserver.layers.Position;
+import com.neaterbits.displayserver.types.Size;
 
 public final class Window {
 
@@ -41,6 +43,18 @@ public final class Window {
 
 	public WindowParameters getParameters() {
 		return parameters;
+	}
+	
+	public int getDepth() {
+	    return screen.getDriverScreen().getDepth();
+	}
+	
+	public Position getPosition() {
+	    return layer.getPosition();
+	}
+	
+	public Size getSize() {
+	    return layer.getSize();
 	}
 
 	WindowAttributes getAttributes() {

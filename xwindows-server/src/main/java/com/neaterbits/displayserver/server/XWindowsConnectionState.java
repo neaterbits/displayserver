@@ -146,7 +146,7 @@ public class XWindowsConnectionState
 		final XWindowsWindow result;
 		
 		if (server.isRootWindow(window)) {
-			result = server.getRootWindow(window);
+			result = server.getRootWindowCorrespondingTo(window);
 		}
 		else {
 			result = drawableToWindow.get(window.toDrawable());
@@ -215,7 +215,16 @@ public class XWindowsConnectionState
 			throw new IllegalStateException();
 		}
 		
-		final XWindowsWindow xWindowsWindow = new XWindowsWindow(window, createWindow.getWindowClass(), createWindow.getAttributes());
+		final WINDOW rootWindow = server.findRootWindowOf(createWindow.getParent());
+		
+		final XWindowsWindow xWindowsWindow = new XWindowsWindow(
+		        window,
+		        createWindow.getWid(),
+		        rootWindow,
+		        createWindow.getParent(),
+		        createWindow.getBorderWidth(),
+		        createWindow.getWindowClass(),
+		        createWindow.getAttributes());
 		
 		drawableToWindow.put(drawable, xWindowsWindow);
 		windowToDrawable.put(xWindowsWindow, drawable);
