@@ -10,7 +10,7 @@ public class DebugLevels {
     public static final DebugLevel DRIVER_WRITE = DebugLevel.DEBUG;
     
     public static final DebugLevel CONNECTION_READ = DebugLevel.DEBUG;
-    public static final DebugLevel CONNECTION_WRITE = DebugLevel.DEBUG;
+    public static final DebugLevel CONNECTION_WRITE = DebugLevel.TRACE;
 
     public static final DebugLevel XWINDOWS_PROTOCOL = DebugLevel.DEBUG;
 }

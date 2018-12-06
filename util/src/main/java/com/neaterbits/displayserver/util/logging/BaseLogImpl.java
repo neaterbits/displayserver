@@ -15,7 +15,7 @@ public abstract class BaseLogImpl {
     
     protected final void log(DebugLevel debugLevel, String event, Object ... parameters) {
         
-        if (this.debugLevel == debugLevel) {
+        if (this.debugLevel.ordinal() >=  debugLevel.ordinal()) {
             System.out.print(prefix + '.' + event + '(');
             
             LogUtil.outputParameters(System.out::append, parameters);
@@ -24,6 +24,10 @@ public abstract class BaseLogImpl {
         }
     }
     
+    protected final void info(String event, Object ... parameters) {
+        log(DebugLevel.INFO, event, parameters);
+    }
+
     protected final void debug(String event, Object ... parameters) {
         log(DebugLevel.DEBUG, event, parameters);
     }

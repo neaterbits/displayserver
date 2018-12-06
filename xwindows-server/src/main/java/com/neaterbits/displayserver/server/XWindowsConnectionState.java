@@ -66,8 +66,8 @@ public class XWindowsConnectionState
 	
 	private final Set<Integer> utilizedResourceIds;
 	
-	private final Map<DRAWABLE, Window> drawableToWindow;
-	private final Map<Window, DRAWABLE> windowToDrawable;
+	private final Map<DRAWABLE, XWindowsWindow> drawableToWindow;
+	private final Map<XWindowsWindow, DRAWABLE> windowToDrawable;
 	
 	private final Map<DRAWABLE, ImageBuffer> drawableToImageBuffer;
 
@@ -141,9 +141,9 @@ public class XWindowsConnectionState
         this.state = state;
     }
 
-	private Window getWindow(WINDOW window) {
+	final XWindowsWindow getWindow(WINDOW window) {
 
-		final Window result;
+		final XWindowsWindow result;
 		
 		if (server.isRootWindow(window)) {
 			result = server.getRootWindow(window);
@@ -167,7 +167,7 @@ public class XWindowsConnectionState
 		utilizedResourceIds.remove(resource.getValue());
 	}
 	
-	final Window createWindow(Display display, CreateWindow createWindow) throws ValueException, IDChoiceException {
+	final XWindowsWindow createWindow(Display display, CreateWindow createWindow) throws ValueException, IDChoiceException {
 		
 		final DRAWABLE drawable = createWindow.getWid().toDrawable();
 		
@@ -175,7 +175,7 @@ public class XWindowsConnectionState
 		
 		final WindowClass windowClass;
 
-		final Window parentWindow = getWindow(createWindow.getParent());
+		final XWindowsWindow parentWindow = getWindow(createWindow.getParent());
 		
 		if (parentWindow == null) {
 			throw new ValueException("Unknown parent window");
@@ -183,7 +183,7 @@ public class XWindowsConnectionState
 		
 		switch (createWindow.getWindowClass().getValue()) {
 		case 0:
-			windowClass = parentWindow.getParameters().getWindowClass();
+			windowClass = parentWindow.getWindow().getParameters().getWindowClass();
 			break;
 			
 		case 1:
@@ -209,40 +209,42 @@ public class XWindowsConnectionState
 				createWindow.getBorderWidth().getValue());
 		
 
-		final Window window = display.createWindow(parentWindow, windowParameters, null);
+		final Window window = display.createWindow(parentWindow.getWindow(), windowParameters, null);
 		
 		if (window == null) {
 			throw new IllegalStateException();
 		}
 		
-		drawableToWindow.put(drawable, window);
-		windowToDrawable.put(window, drawable);
+		final XWindowsWindow xWindowsWindow = new XWindowsWindow(window, createWindow.getWindowClass(), createWindow.getAttributes());
 		
-		return window;
+		drawableToWindow.put(drawable, xWindowsWindow);
+		windowToDrawable.put(xWindowsWindow, drawable);
+		
+		return xWindowsWindow;
 	}
 	
 	final Window destroyWindow(Display display, DestroyWindow destroyWindow) {
 		checkAndRemoveResourceId(destroyWindow.getWindow());
 	
-		final Window window = drawableToWindow.remove(destroyWindow.getWindow().toDrawable());
+		final XWindowsWindow window = drawableToWindow.remove(destroyWindow.getWindow().toDrawable());
 		
 		if (window != null) {
 			windowToDrawable.remove(window);
 
-			display.disposeWindow(window);
+			display.disposeWindow(window.getWindow());
 		}
 		
-		return window;
+		return window.getWindow();
 	}
 	
 	private GraphicsScreen findGraphicsScreen(DRAWABLE drawable) {
 	    
-	    Window window = drawableToWindow.get(drawable);
+	    XWindowsWindow window = drawableToWindow.get(drawable);
 	    
 	    GraphicsScreen screen = null;
 	    
 	    if (window != null) {
-	        screen = window.getScreen().getDriverScreen();
+	        screen = window.getWindow().getScreen().getDriverScreen();
 	    }
 	    else {
 	        DRAWABLE pixmapDrawable = pixmapToDrawable.get(drawable);
@@ -300,7 +302,7 @@ public class XWindowsConnectionState
 	
 	final void putImage(PutImage putImage) {
 	    
-	    final Window window = drawableToWindow.get(putImage.getDrawable());
+	    final XWindowsWindow window = drawableToWindow.get(putImage.getDrawable());
 	    
 	    if (window != null) {
 	        

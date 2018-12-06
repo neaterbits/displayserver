@@ -2,6 +2,7 @@ package com.neaterbits.displayserver.protocol.logging;
 
 import com.neaterbits.displayserver.protocol.messages.Reply;
 import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.util.logging.BaseLogImpl;
 import com.neaterbits.displayserver.util.logging.DebugLevel;
 
@@ -12,12 +13,21 @@ public class XWindowsProtocolLogImpl extends BaseLogImpl implements XWindowsProt
     }
 
     @Override
-    public final void onReceivedRequest(int messageLength, int opcode, Request request) {
-        debug("onReceivedRequest", "messageLength", messageLength, "opcode", opcode, "request", request.toDebugString());
+    public final void onReceivedRequest(int messageLength, int opcode, CARD16 sequenceNumber, Request request) {
+        debug("onReceivedRequest",
+                "messageLength", messageLength,
+                "opcode", opcode,
+                "seq", sequenceNumber,
+                "request", request.toDebugString());
     }
 
     @Override
     public void onSendReply(Reply reply) {
         debug("sendReply", "reply", reply.toDebugString());
+    }
+
+    @Override
+    public void onSendError(com.neaterbits.displayserver.protocol.messages.Error error) {
+        info("sendError", "error", error.toDebugString());
     }
 }

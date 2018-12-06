@@ -177,7 +177,7 @@ public final class DataOutputXWindowsProtocolOutputStream implements XWindowsPro
 
     @Override
     public void writeSETofDEVICEEVENT(SETofDEVICEEVENT value) throws IOException {
-        dataOutput.writeInt(value.getValue());
+        dataOutput.writeShort(value.getValue());
     }
 
     @Override

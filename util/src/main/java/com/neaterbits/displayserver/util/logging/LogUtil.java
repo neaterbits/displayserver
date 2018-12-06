@@ -4,6 +4,10 @@ import java.util.function.Consumer;
 
 public class LogUtil {
 
+    public static Object [] wrap(Object ... objects) {
+        return objects;
+    }
+    
     public static void outputParameters(Consumer<String> append, Object ... parameters) {
         
         if (parameters.length % 2 != 0) {

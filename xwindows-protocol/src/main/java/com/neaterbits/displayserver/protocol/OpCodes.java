@@ -4,11 +4,14 @@ public class OpCodes {
 
 	public static final int CREATE_WINDOW = 1;
 	public static final int CHANGE_WINDOW_ATTRIBUTES = 2;
+	public static final int GET_WINDOW_ATTRIBUTES = 3;
 
 	public static final int DESTROY_WINDOW = 4;
 	
 	public static final int MAP_WINDOW = 8;
 
+	public static final int GET_GEOMETRY = 14;
+	
 	public static final int INTERN_ATOM = 16;
 	
 	public static final int GET_PROPERTY = 20;

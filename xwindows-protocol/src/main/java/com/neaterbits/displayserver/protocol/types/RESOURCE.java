@@ -2,8 +2,6 @@ package com.neaterbits.displayserver.protocol.types;
 
 public abstract class RESOURCE {
 
-    public static final WINDOW None = new WINDOW(0);
-
 	private final int value;
 
 	public RESOURCE(int value) {

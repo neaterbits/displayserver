@@ -8,14 +8,17 @@ import com.neaterbits.displayserver.windows.Screen;
 final class XWindowsScreen {
 
     private final Screen screen;
-    private final WINDOW rootWindow;
+    private final WINDOW rootWINDOW;
+    private final XWindowsWindow rootWindow;
 
-    XWindowsScreen(Screen screen, WINDOW rootWindow) {
+    XWindowsScreen(Screen screen, WINDOW rootWINDOW, XWindowsWindow rootWindow) {
 
         Objects.requireNonNull(screen);
+        Objects.requireNonNull(rootWINDOW);
         Objects.requireNonNull(rootWindow);
         
         this.screen = screen;
+        this.rootWINDOW = rootWINDOW;
         this.rootWindow = rootWindow;
     }
 
@@ -23,7 +26,11 @@ final class XWindowsScreen {
         return screen;
     }
 
-    WINDOW getRootWindow() {
+    WINDOW getRootWINDOW() {
+        return rootWINDOW;
+    }
+
+    XWindowsWindow getRootWindow() {
         return rootWindow;
     }
 }

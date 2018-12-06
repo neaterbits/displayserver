@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.types.BYTE;
+import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.util.logging.LogUtil;
 
 public abstract class Message implements Encodeable {
@@ -14,7 +15,7 @@ public abstract class Message implements Encodeable {
     }
     
     protected final Object [] wrap(Object ... objects) {
-        return objects;
+        return LogUtil.wrap(objects);
     }
     
     public final String toDebugString() {
@@ -42,5 +43,9 @@ public abstract class Message implements Encodeable {
 
     protected static void readUnusedByte(XWindowsProtocolInputStream stream) throws IOException {
         stream.readBYTE();
+    }
+
+    protected static void writeUnusedCARD16(XWindowsProtocolOutputStream stream) throws IOException {
+        stream.writeCARD16(new CARD16(0));
     }
 }

@@ -12,6 +12,7 @@ import com.neaterbits.displayserver.protocol.types.BOOL;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.COLORMAP;
+import com.neaterbits.displayserver.protocol.types.CURSOR;
 import com.neaterbits.displayserver.protocol.types.PIXMAP;
 import com.neaterbits.displayserver.protocol.types.SETofDEVICEEVENT;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
@@ -35,6 +36,24 @@ public final class WindowAttributes extends Attributes {
     public static final int COLOR_MAP           = 0x00002000;
     public static final int CURSOR              = 0x00004000;
 
+    public static final BITMASK ALL = new BITMASK(
+              BACKGROUND_PIXMAP
+            | BACKGROUND_PIXEL
+            | BORDER_PIXMAP
+            | BORDER_PIXEL
+            | BIT_GRAVITY
+            | WIN_GRAVITY
+            | BACKING_STORE
+            | BACKING_PLANES
+            | BACKING_PIXEL
+            | OVERRIDE_REDIRECT
+            | SAVE_UNDER
+            | EVENT_MASK
+            | DO_NOT_PROPAGATE_MASK
+            | COLOR_MAP
+            | CURSOR
+    );
+    
     private final PIXMAP backgroundPixmap;
     private final CARD32 backgroundPixel;
     private final PIXMAP borderPixmap;
@@ -49,12 +68,12 @@ public final class WindowAttributes extends Attributes {
     private final SETofEVENT eventMask;
     private final SETofDEVICEEVENT doNotPropagateMask;
     private final COLORMAP colormap;
-    private final com.neaterbits.displayserver.protocol.types.CURSOR cursor;
+    private final CURSOR cursor;
     
     public WindowAttributes(BITMASK valueMask, PIXMAP backgroundPixmap, CARD32 backgroundPixel, PIXMAP borderPixmap,
             CARD32 borderPixel, BITGRAVITY bitGravity, WINGRAVITY winGravity, BYTE backingStore, CARD32 backingPlanes,
             CARD32 backingPixel, BOOL overrideRedirect, BOOL saveUnder, SETofEVENT eventMask,
-            SETofDEVICEEVENT doNotPropagateMask, COLORMAP colormap, com.neaterbits.displayserver.protocol.types.CURSOR cursor) {
+            SETofDEVICEEVENT doNotPropagateMask, COLORMAP colormap, CURSOR cursor) {
         super(valueMask);
 
         this.backgroundPixmap = backgroundPixmap;

@@ -4,6 +4,10 @@ public final class BOOL {
 
 	private final byte value;
 
+	public BOOL(boolean value) {
+	    this.value = value ? (byte)1 : (byte)0;
+	}
+
 	public BOOL(byte value) {
 		this.value = value;
 	}
