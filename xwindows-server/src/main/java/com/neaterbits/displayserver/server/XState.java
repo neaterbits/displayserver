@@ -50,14 +50,23 @@ final class XState implements
         return clients.getClients();
     }
     
-    void addWindow(XWindow window, XClient creatingClient) {
-        windows.addWindow(window, creatingClient);
+    void addRootWindow(XWindow window) {
+        windows.addRootWindow(window);
+    }
+
+    void addClientWindow(XWindow window, XClient creatingClient) {
+        windows.addClientWindow(window, creatingClient);
     }
 
     void removeClientWindow(XWindow window) {
         windows.removeClientWindow(window);
     }
     
+    @Override
+    public XWindow getClientOrRootWindow(WINDOW windowResource) {
+        return windows.getClientOrRootWindow(windowResource);
+    }
+
     @Override
     public XWindow getClientWindow(DRAWABLE windowResource) {
         return windows.getClientWindow(windowResource);

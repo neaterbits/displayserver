@@ -2,6 +2,7 @@ package com.neaterbits.displayserver.server;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.neaterbits.displayserver.framebuffer.common.GraphicsDriver;
 import com.neaterbits.displayserver.framebuffer.common.GraphicsScreen;
@@ -43,7 +44,11 @@ class ScreensHelper {
         
     }
 
-    static List<XScreen> getScreens(GraphicsDriver graphicsDriver, WindowEventListener windowEventListener, ServerResourceIdAllocator resourceIdAllocator) {
+    static List<XScreen> getScreens(
+            GraphicsDriver graphicsDriver,
+            WindowEventListener windowEventListener,
+            ServerResourceIdAllocator resourceIdAllocator,
+            Consumer<XWindow> addRootWindow) {
         
         final List<GraphicsScreen> driverScreens = graphicsDriver.getScreens();
         final List<XScreen> screens = new ArrayList<>(driverScreens.size());
@@ -56,14 +61,16 @@ class ScreensHelper {
             
             final WINDOW rootWindowResource = new WINDOW(rootWindow);
             
-            final XWindow window = new XWindow(
+            final XWindow xWindow = new XWindow(
                     screen.getRootWindow(),
                     rootWindowResource,
                     new CARD16(0),
                     WindowClass.InputOnly,
                     getRootWindowAttributes(screen));
             
-            screens.add(new XScreen(screen, window));
+            addRootWindow.accept(xWindow);
+            
+            screens.add(new XScreen(screen, xWindow));
         }
         
         return screens;

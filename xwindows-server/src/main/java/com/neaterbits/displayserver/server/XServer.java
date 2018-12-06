@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.SocketChannel;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -89,12 +90,17 @@ public class XServer implements AutoCloseable {
 		
 		this.atoms = new Atoms();
 
+		final List<XWindow> rootWindows = new ArrayList<>();
+		
 		final List<XScreen> screens = ScreensHelper.getScreens(
 		        graphicsDriver,
 		        new XWindowsEventListener(this),
-		        resourceIdAllocator);
+		        resourceIdAllocator,
+		        rootWindows::add);
 		
 		this.state = new XState(screens);
+		
+		rootWindows.forEach(state::addRootWindow);
 		
 		this.display = new Display(screens.stream()
 		        .map(screen -> screen.getScreen())
@@ -229,11 +235,19 @@ public class XServer implements AutoCloseable {
 			switch (opcode) {
 			case OpCodes.CREATE_WINDOW: {
 				final CreateWindow createWindow = log(messageLength, opcode, sequenceNumber, CreateWindow.decode(stream));
-	
-				final XWindow window = client.createWindow(display, createWindow);
+
+				final XWindow parentWindow = state.getClientOrRootWindow(createWindow.getParent());
 				
-				if (window != null) {
-				    state.addWindow(window, client);
+				if (parentWindow == null) {
+				    sendError(client, Errors.Window, sequenceNumber, createWindow.getParent().getValue(), opcode);
+				}
+				else {
+				
+    				final XWindow window = client.createWindow(display, createWindow, parentWindow);
+    				
+    				if (window != null) {
+    				    state.addClientWindow(window, client);
+    				}
 				}
 				break;
 			}

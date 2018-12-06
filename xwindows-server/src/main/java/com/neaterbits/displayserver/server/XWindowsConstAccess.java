@@ -8,6 +8,8 @@ interface XWindowsConstAccess {
 
     XWindow getClientWindow(WINDOW windowResource);
 
+    XWindow getClientOrRootWindow(WINDOW windowResource);
+
     XWindow getClientWindow(DRAWABLE windowResource);
 
     XWindow findRootWindowOf(WINDOW windowResource);

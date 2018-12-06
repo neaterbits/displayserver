@@ -36,7 +36,7 @@ final class XWindows implements XWindowsConstAccess {
     }
 
     
-    void addWindow(XWindow window, XClient creatingClient) {
+    void addClientWindow(XWindow window, XClient creatingClient) {
 
         Objects.requireNonNull(window);
         Objects.requireNonNull(creatingClient);
@@ -68,6 +68,19 @@ final class XWindows implements XWindowsConstAccess {
                 throw new IllegalStateException();
             }
         }
+    }
+
+    
+    @Override
+    public XWindow getClientOrRootWindow(WINDOW windowResource) {
+        
+        XWindow result = clientWindows.getWindow(windowResource);
+        
+        if (result == null) {
+            result = rootWindows.getWindow(windowResource);
+        }
+        
+        return result;
     }
 
     @Override

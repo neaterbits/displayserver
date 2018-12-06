@@ -49,7 +49,11 @@ public class XClient extends XConnection {
     }
 
 
-    final XWindow createWindow(Display display, CreateWindow createWindow) throws ValueException, IDChoiceException {
+    final XWindow createWindow(Display display, CreateWindow createWindow, XWindow parentWindow) throws ValueException, IDChoiceException {
+
+        Objects.requireNonNull(display);
+        Objects.requireNonNull(createWindow);
+        Objects.requireNonNull(parentWindow);
         
         final DRAWABLE drawable = createWindow.getWid().toDrawable();
         
@@ -57,12 +61,6 @@ public class XClient extends XConnection {
         
         final com.neaterbits.displayserver.windows.WindowClass windowClass;
 
-        final XWindow parentWindow = server.getWindows().getClientWindow(createWindow.getParent());
-        
-        if (parentWindow == null) {
-            throw new ValueException("Unknown parent window");
-        }
-        
         switch (createWindow.getWindowClass().getValue()) {
         
         case WindowClass.COPY_FROM_PARENT:
