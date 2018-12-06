@@ -86,9 +86,11 @@ public class Layers {
 
 		final List<Rectangle> stillVisibleRectangles = new ArrayList<>();
 
+		/*
 		recomputeOneLayer(rootLayer, regions, stack, stillVisibleRectangles);
 		
 		recomputeSubLayers(rootLayer, regions, stack, stillVisibleRectangles);
+		*/
 		
 		return new LayerRegions(regions);
 	}
