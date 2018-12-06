@@ -10,13 +10,13 @@ import com.neaterbits.displayserver.buffers.PixelFormat;
 
 final class XScreens implements XScreensConstAccess {
 
-    private final List<XWindowsScreen> screens;
+    private final List<XScreen> screens;
 
-    XScreens(List<XWindowsScreen> screens) {
+    XScreens(List<XScreen> screens) {
         this.screens = new ArrayList<>(screens);
     }
 
-    List<XWindowsScreen> getScreens() {
+    List<XScreen> getScreens() {
         return Collections.unmodifiableList(screens);
     }
     
@@ -26,7 +26,7 @@ final class XScreens implements XScreensConstAccess {
     }
 
     @Override
-    public XWindowsScreen getScreen(int screenNo) {
+    public XScreen getScreen(int screenNo) {
         return screens.get(screenNo);
     }
 

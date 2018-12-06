@@ -89,7 +89,7 @@ public class XWindowsProtocolServer implements AutoCloseable {
 		
 		this.atoms = new Atoms();
 
-		final List<XWindowsScreen> screens = ScreensHelper.getScreens(
+		final List<XScreen> screens = ScreensHelper.getScreens(
 		        graphicsDriver,
 		        new XWindowsEventListener(this),
 		        resourceIdAllocator);

@@ -52,7 +52,7 @@ class InitialServerMessageHelper {
         final SCREEN [] screens = new SCREEN[numScreens];
         
         for (int i = 0; i < numScreens; ++ i) {
-            final XWindowsScreen xWindowsScreen = screensAccess.getScreen(i);
+            final XScreen xWindowsScreen = screensAccess.getScreen(i);
             final GraphicsScreen driverScreen = xWindowsScreen.getScreen().getDriverScreen();
             
             final Size size = driverScreen.getSize();

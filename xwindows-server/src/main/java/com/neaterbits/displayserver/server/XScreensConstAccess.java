@@ -8,7 +8,7 @@ interface XScreensConstAccess {
 
     int getNumberOfScreens();
     
-    XWindowsScreen getScreen(int screenNo);
+    XScreen getScreen(int screenNo);
     
     Set<PixelFormat> getDistinctPixelFormats();
     

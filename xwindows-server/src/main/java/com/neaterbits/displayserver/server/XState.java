@@ -19,7 +19,7 @@ final class XState implements
     private final XWindows windows;
     private final XEventSubscriptions eventSubscriptions;
     
-    XState(List<XWindowsScreen> screens) {
+    XState(List<XScreen> screens) {
 
         this.screens = new XScreens(screens);
         
@@ -36,7 +36,7 @@ final class XState implements
     }
 
     @Override
-    public XWindowsScreen getScreen(int screenNo) {
+    public XScreen getScreen(int screenNo) {
         return screens.getScreen(screenNo);
     }
 

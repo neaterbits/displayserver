@@ -43,10 +43,10 @@ class ScreensHelper {
         
     }
 
-    static List<XWindowsScreen> getScreens(GraphicsDriver graphicsDriver, WindowEventListener windowEventListener, ServerResourceIdAllocator resourceIdAllocator) {
+    static List<XScreen> getScreens(GraphicsDriver graphicsDriver, WindowEventListener windowEventListener, ServerResourceIdAllocator resourceIdAllocator) {
         
         final List<GraphicsScreen> driverScreens = graphicsDriver.getScreens();
-        final List<XWindowsScreen> screens = new ArrayList<>(driverScreens.size());
+        final List<XScreen> screens = new ArrayList<>(driverScreens.size());
 
         for (GraphicsScreen driverScreen : driverScreens) {
             
@@ -63,7 +63,7 @@ class ScreensHelper {
                     WindowClass.InputOnly,
                     getRootWindowAttributes(screen));
             
-            screens.add(new XWindowsScreen(screen, rootWindowResource, window));
+            screens.add(new XScreen(screen, window));
         }
         
         return screens;
