@@ -9,7 +9,7 @@ import com.neaterbits.displayserver.protocol.messages.Encodeable;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 
-public class ClientConnectionError implements Encodeable {
+public class ClientConnectionError extends Encodeable {
 
     private final CARD16 protocolMajorVersion;
     private final CARD16 protocolMinorVersion;

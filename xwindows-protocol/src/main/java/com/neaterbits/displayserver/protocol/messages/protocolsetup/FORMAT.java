@@ -7,7 +7,7 @@ import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.messages.Encodeable;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 
-public final class FORMAT implements Encodeable {
+public final class FORMAT extends Encodeable {
 
     private final CARD8 depth;
     private final CARD8 bitsPerPixel;

@@ -8,7 +8,7 @@ import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.util.logging.LogUtil;
 
-public abstract class Message implements Encodeable {
+public abstract class Message extends Encodeable {
     
     public Object [] getDebugParams() {
         return null;

@@ -13,7 +13,7 @@ import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.KEYCODE;
 
-public final class ServerMessage implements Encodeable {
+public final class ServerMessage extends Encodeable {
 	
 	private final BYTE success;
 	

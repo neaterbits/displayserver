@@ -10,7 +10,7 @@ import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 
-public final class ClientMessage implements Encodeable {
+public final class ClientMessage extends Encodeable {
 
 	private final CARD8 byteOrder;
 	

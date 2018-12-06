@@ -11,7 +11,7 @@ import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 
-public final class VISUALTYPE implements Encodeable {
+public final class VISUALTYPE extends Encodeable {
     
     private final VISUALID visualId;
     private final BYTE _class;

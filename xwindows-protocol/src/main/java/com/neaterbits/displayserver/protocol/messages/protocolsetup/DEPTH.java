@@ -10,7 +10,7 @@ import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 
-public final class DEPTH implements Encodeable {
+public final class DEPTH extends Encodeable {
 
     private final CARD8 depth;
     private final CARD16 numberOfVisualTypes;

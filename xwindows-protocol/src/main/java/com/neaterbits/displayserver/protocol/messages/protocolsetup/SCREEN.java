@@ -16,7 +16,7 @@ import com.neaterbits.displayserver.protocol.types.SET32;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 
-public final class SCREEN implements Encodeable {
+public final class SCREEN extends Encodeable {
 
     private final WINDOW root;
     private final COLORMAP defaultColorMap;

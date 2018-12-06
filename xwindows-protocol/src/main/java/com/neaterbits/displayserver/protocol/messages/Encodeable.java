@@ -7,11 +7,11 @@ import com.neaterbits.displayserver.io.common.DataWriter;
 import com.neaterbits.displayserver.protocol.DataOutputXWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 
-public interface Encodeable {
+public abstract class Encodeable {
 
-	void encode(XWindowsProtocolOutputStream stream) throws IOException;
+	public abstract void encode(XWindowsProtocolOutputStream stream) throws IOException;
 	
-	default <T extends Encodeable> void encodeArray(T [] array, XWindowsProtocolOutputStream stream) throws IOException {
+	protected final <T extends Encodeable> void encodeArray(T [] array, XWindowsProtocolOutputStream stream) throws IOException {
 		for (T element : array) {
 			element.encode(stream);
 		}
@@ -25,7 +25,7 @@ public interface Encodeable {
         };
     }
 
-   public default byte [] writeToBuf(ByteOrder byteOrder) {
+   protected final byte [] writeToBuf(ByteOrder byteOrder) {
        return DataWriter.writeToBuf(byteOrder, makeDataWriter(this));
    }
 }
