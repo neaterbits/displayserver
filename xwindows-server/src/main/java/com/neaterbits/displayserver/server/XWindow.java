@@ -168,29 +168,26 @@ final class XWindow {
         
         final Property property = properties.get(propertyAtom);
         
-        if (property == null) {
-            throw new AtomException("No such property " + propertyAtom);
-        }
-        
-        switch (mode.getValue()) {
-        case Mode.REPLACE:
+        if (mode.getValue() == Mode.REPLACE || property == null) {
             properties.put(propertyAtom, new Property(propertyAtom, type, format, data));
-            break;
-            
-        case Mode.PREPEND:
-            checkMatch(property, type, format);
-            
-            properties.put(propertyAtom, new Property(propertyAtom, type, format, merge(data, property.getData())));
-            break;
-            
-        case Mode.APPEND:
-            checkMatch(property, type, format);
+        }
+        else {
+            switch (mode.getValue()) {
+            case Mode.PREPEND:
+                checkMatch(property, type, format);
 
-            properties.put(propertyAtom, new Property(propertyAtom, type, format, merge(property.getData(), data)));
-            break;
-            
-        default:
-            throw new ValueException("Unknown mode type " + mode.getValue(), mode.getValue());
+                properties.put(propertyAtom, new Property(propertyAtom, type, format, merge(data, property.getData())));
+                break;
+                
+            case Mode.APPEND:
+                checkMatch(property, type, format);
+    
+                properties.put(propertyAtom, new Property(propertyAtom, type, format, merge(property.getData(), data)));
+                break;
+                
+            default:
+                throw new ValueException("Unknown mode type " + mode.getValue(), mode.getValue());
+            }
         }
     }
     

@@ -22,6 +22,21 @@ public final class PropertyNotify extends Event {
     private final TIMESTAMP time;
     private final BYTE state;
     
+    private static String stateName(BYTE state) {
+        
+        final String name;
+        
+        switch (state.getValue()) {
+        case 0: name = "NewValue"; break;
+        case 1: name = "Deleted"; break;
+        
+        default:
+            throw new UnsupportedOperationException();
+        }
+
+        return name;
+    }
+    
     public PropertyNotify(CARD16 sequenceNumber, WINDOW window, ATOM atom, TIMESTAMP time, BYTE state) {
         super(sequenceNumber);
         
@@ -37,9 +52,21 @@ public final class PropertyNotify extends Event {
     }
 
     @Override
+    public Object[] getDebugParams() {
+        return wrap(
+                "window", window,
+                "atom", atom,
+                "time", time,
+                "state", stateName(state)
+        );
+    }
+
+
+
+    @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 
-        writeEventCode(stream, Events.GRAPHICS_EXPOSURE);
+        writeEventCode(stream, Events.PROPERTY_NOTIFY);
         writeUnusedByte(stream);
         writeSequenceNumber(stream);
 
