@@ -155,12 +155,12 @@ public class IntPadXWindowsProtocolInputStream implements XWindowsProtocolInputS
 
     @Override
     public BITGRAVITY readBITGRAVITY() throws IOException {
-        return delegate.readBITGRAVITY();
+        return readWithPadding(1, delegate::readBITGRAVITY);
     }
 
     @Override
     public WINGRAVITY readWINGRAVITY() throws IOException {
-        return delegate.readWINGRAVITY();
+        return readWithPadding(1, delegate::readWINGRAVITY);
     }
 
     @Override
