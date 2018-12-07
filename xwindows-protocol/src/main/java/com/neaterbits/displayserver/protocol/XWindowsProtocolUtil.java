@@ -53,12 +53,12 @@ public class XWindowsProtocolUtil {
 	        
 	        if (byteBuffer.remaining() >= 4) {
 
-	            final int messageLength32Bits = (int)byteBuffer.asShortBuffer().get(1);
+	            final int messageLength32Bits = (int)byteBuffer.getShort(byteBuffer.position() + 2);
 
 	            final int messageLengthBytes = messageLength32Bits * 4;
-	            
+
                 // System.out.println("## messageLength: " + messageLengthBytes);
-	            
+                
 	            if (messageLengthBytes <= byteBuffer.remaining()) {
     	            length = messageLengthBytes;
 	            }
@@ -81,7 +81,7 @@ public class XWindowsProtocolUtil {
 		return pad;
 	}
 
-	public static int getPropertyDataFormatLength(CARD8 format, int dataLength) {
+	public static int getPropertyEncodeDataLength(CARD8 format, int dataLength) {
 	    
 	    final int lengthValue;
 	    
@@ -110,7 +110,7 @@ public class XWindowsProtocolUtil {
         return lengthValue;
 	}
 
-    public static int getPropertyDataLength(CARD8 format, int dataLength) {
+    public static int getPropertyDecodeDataLength(CARD8 format, int dataLength) {
         
         final int lengthValue;
         
@@ -130,7 +130,6 @@ public class XWindowsProtocolUtil {
         case 32:
             lengthValue = dataLength * 4;
             break;
-            
         
         default:
             throw new UnsupportedOperationException();

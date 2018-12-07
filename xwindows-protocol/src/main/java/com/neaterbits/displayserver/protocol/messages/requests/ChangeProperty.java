@@ -39,7 +39,7 @@ public final class ChangeProperty extends Request {
         
         final CARD32 length = stream.readCARD32();
         
-        final int dataLength = XWindowsProtocolUtil.getPropertyDataLength(format, (int)length.getValue());
+        final int dataLength = XWindowsProtocolUtil.getPropertyDecodeDataLength(format, (int)length.getValue());
     
         final byte [] data = stream.readData(dataLength);
         
@@ -112,7 +112,7 @@ public final class ChangeProperty extends Request {
         
         stream.pad(3);
         
-        final int lengthValue = XWindowsProtocolUtil.getPropertyDataFormatLength(format, data.length);
+        final int lengthValue = XWindowsProtocolUtil.getPropertyEncodeDataLength(format, data.length);
         stream.writeCARD32(new CARD32(lengthValue));
 
         stream.writeData(data);
