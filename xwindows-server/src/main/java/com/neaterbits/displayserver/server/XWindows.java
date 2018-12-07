@@ -86,7 +86,13 @@ final class XWindows implements XWindowsConstAccess {
 
     @Override
     public XWindow getClientOrRootWindow(WINDOW windowResource) {
-        
+
+        return getClientOrRootWindow(windowResource.toDrawable());
+    }
+    
+    @Override
+    public XWindow getClientOrRootWindow(DRAWABLE windowResource) {
+
         XWindow result = clientWindows.getWindow(windowResource);
         
         if (result == null) {
@@ -97,12 +103,13 @@ final class XWindows implements XWindowsConstAccess {
     }
 
     @Override
-    public XWindow getClientWindow(DRAWABLE windowResource) {
-        return clientWindows.getWindow(windowResource);
-    }
-    @Override
     public XWindow getClientWindow(WINDOW windowResource) {
         return clientWindows.getWindow(windowResource.toDrawable());
+    }
+
+    @Override
+    public XWindow getClientWindow(DRAWABLE windowResource) {
+        return clientWindows.getWindow(windowResource);
     }
 
     @Override

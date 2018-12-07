@@ -41,6 +41,16 @@ public final class CreatePixmap extends Request {
         return new CreatePixmap(depth, pid, drawable, width, height);
     }
 
+    @Override
+    public Object[] getDebugParams() {
+        return wrap(
+                "depth", depth,
+                "pid", pid,
+                "drawable", drawable,
+                "width", width,
+                "height", height
+        );
+    }
 
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {

@@ -127,7 +127,7 @@ public class XClient extends XConnection {
     
     private GraphicsScreen findGraphicsScreen(DRAWABLE drawable) {
         
-        XWindow window = server.getWindows().getClientWindow(drawable);
+        XWindow window = server.getWindows().getClientOrRootWindow(drawable);
         
         GraphicsScreen screen = null;
         

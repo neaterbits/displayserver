@@ -66,6 +66,11 @@ final class XState implements
     public XWindow getClientOrRootWindow(WINDOW windowResource) {
         return windows.getClientOrRootWindow(windowResource);
     }
+    
+    @Override
+    public XWindow getClientOrRootWindow(DRAWABLE windowResource) {
+        return windows.getClientOrRootWindow(windowResource);
+    }
 
     @Override
     public XWindow getClientWindow(DRAWABLE windowResource) {
