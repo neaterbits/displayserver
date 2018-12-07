@@ -13,4 +13,9 @@ public final class SETofDEVICEEVENT {
     public int getValue() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return String.format("%08x", value);
+    }
 }

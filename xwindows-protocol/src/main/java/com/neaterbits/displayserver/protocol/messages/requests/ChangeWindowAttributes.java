@@ -8,6 +8,7 @@ import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
 import com.neaterbits.displayserver.protocol.messages.Request;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
+import com.neaterbits.displayserver.util.logging.LogUtil;
 
 public final class ChangeWindowAttributes extends Request {
 
@@ -38,6 +39,11 @@ public final class ChangeWindowAttributes extends Request {
 
     public WindowAttributes getAttributes() {
         return attributes;
+    }
+    
+    @Override
+    public Object[] getDebugParams() {
+        return wrap("window", window, "attributes", LogUtil.outputParametersInBrackets(attributes.getDebugParams()));
     }
 
     @Override
