@@ -204,7 +204,7 @@ public class XClient extends XConnection {
     
     private void checkAndAddResourceId(RESOURCE resource) throws IDChoiceException {
         if (utilizedResourceIds.contains(resource.getValue())) {
-            throw new IDChoiceException("Already utilized");
+            throw new IDChoiceException("Already utilized", resource);
         }
         
         utilizedResourceIds.add(resource.getValue());

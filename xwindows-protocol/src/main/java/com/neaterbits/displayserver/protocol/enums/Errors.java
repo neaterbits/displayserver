@@ -12,9 +12,11 @@ public class Errors {
     public static final int WINDOW = 3;
     public static final int ATOM = 5;
     public static final int MATCH = 8;
+    public static final int IDCHOICE = 14;
 
     public static final BYTE Value = make(VALUE);
     public static final BYTE Window = make(WINDOW);
     public static final BYTE Atom = make(ATOM);
     public static final BYTE Match = make(MATCH);
+    public static final BYTE IDChoice = make(IDCHOICE);
 }

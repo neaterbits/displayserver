@@ -18,7 +18,8 @@ import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolUtil;
 import com.neaterbits.displayserver.protocol.enums.Errors;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
-import com.neaterbits.displayserver.protocol.exception.ProtocolException;
+import com.neaterbits.displayserver.protocol.exception.IDChoiceException;
+import com.neaterbits.displayserver.protocol.exception.ValueException;
 import com.neaterbits.displayserver.protocol.logging.XWindowsProtocolLog;
 import com.neaterbits.displayserver.protocol.messages.Encodeable;
 import com.neaterbits.displayserver.protocol.messages.Error;
@@ -260,198 +261,203 @@ public class XServer implements AutoCloseable {
 		
 		final CARD16 sequenceNumber = client.increaseSequenceNumber();
 		
-		try {
-			switch (opcode) {
-			case OpCodes.CREATE_WINDOW: {
-				final CreateWindow createWindow = log(messageLength, opcode, sequenceNumber, CreateWindow.decode(stream));
+		switch (opcode) {
+		case OpCodes.CREATE_WINDOW: {
+			final CreateWindow createWindow = log(messageLength, opcode, sequenceNumber, CreateWindow.decode(stream));
 
-				final XWindow parentWindow = state.getClientOrRootWindow(createWindow.getParent());
-				
-				if (parentWindow == null) {
-				    sendError(client, Errors.Window, sequenceNumber, createWindow.getParent().getValue(), opcode);
-				}
-				else {
-				
-    				final XWindow window = client.createWindow(display, createWindow, parentWindow);
-    				
-    				if (window != null) {
-    				    state.addClientWindow(window, client);
-    				}
-				}
-				break;
-			}
+			final XWindow parentWindow = state.getClientOrRootWindow(createWindow.getParent());
 			
-			case OpCodes.CHANGE_WINDOW_ATTRIBUTES: {
-			    log(messageLength, opcode, sequenceNumber, ChangeWindowAttributes.decode(stream));
-			    
-			    break;
+			if (parentWindow == null) {
+			    sendError(client, Errors.Window, sequenceNumber, createWindow.getParent().getValue(), opcode);
 			}
+			else {
 			
-			case OpCodes.GET_WINDOW_ATTRIBUTES: {
-			    
-			    final GetWindowAttributes getWindowAttributes = log(messageLength, opcode, sequenceNumber, GetWindowAttributes.decode(stream));
+                try {
+                    final XWindow window = client.createWindow(display, createWindow, parentWindow);
 
-			    MessageProcessorWindows.getWindowAttributes(getWindowAttributes, opcode, sequenceNumber, client, state, serverToClient);
-			    break;
-			}
-			
-			case OpCodes.DESTROY_WINDOW: {
-				final DestroyWindow destroyWindow = log(messageLength, opcode, sequenceNumber, DestroyWindow.decode(stream));
-				
-				final XWindow window = client.destroyWindow(display, destroyWindow);
-				
-				if (window != null) {
-				    state.removeClientWindow(window);
-				}
-				break;
-			}
-			
-			case OpCodes.GET_GEOMETRY: {
-			    
-			    final GetGeometry getGeometry = log(messageLength, opcode, sequenceNumber, GetGeometry.decode(stream));
-			    
-			    final WINDOW windowResource = new WINDOW(getGeometry.getDrawable());
-			    
-                final XWindow window = state.getClientWindow(windowResource);
-
-                if (window == null) {
-                    sendError(client, Errors.Window, sequenceNumber, windowResource.getValue(), opcode);
+                    if (window != null) {
+                        state.addClientWindow(window, client);
+                    }
+                } catch (ValueException ex) {
+                    sendError(client, Errors.Value, sequenceNumber, ex.getValue(), opcode);
+                } catch (IDChoiceException ex) {
+                    sendError(client, Errors.IDChoice, sequenceNumber, ex.getResource().getValue(), opcode);
                 }
-                else {
-                    
-                    // TODO
-                    final GetGeometryReply reply = new GetGeometryReply(
-                            sequenceNumber,
-                            new CARD8(window.getDepth()),
-                            window.getRootWINDOW(),
-                            new INT16(window.getX()), new INT16(window.getY()),
-                            new CARD16(window.getWidth()), new CARD16(window.getHeight()),
-                            window.getBorderWidth());
-                    
-                    sendReply(client, reply);
-                }
-			    break;
 			}
-			
-			case OpCodes.INTERN_ATOM: {
-			    
-			    final InternAtom internAtom = log(messageLength, opcode, sequenceNumber, InternAtom.decode(stream));
-			    
-			    final ATOM atom;
-			    
-			    if (internAtom.getOnlyIfExists()) {
-			        final ATOM existing = atoms.getAtom(internAtom.getName());
-			        
-			        atom = existing != null ? existing : ATOM.None;
-			    }
-			    else {
-			        atom = atoms.addIfNotExists(internAtom.getName());
-			    }
-			    
-			    sendReply(client, new InternAtomReply(sequenceNumber, atom));
-			    break;
-			}
-			
-			case OpCodes.CHANGE_PROPERTY: {
-			    final ChangeProperty changeProperty = log(messageLength, opcode, sequenceNumber, ChangeProperty.decode(stream));
-
-			    MessageProcessorProperties.changeProperty(changeProperty, opcode, sequenceNumber, getTimestamp(), client, state, serverToClient);
-			    break;
-			}
-			
-            case OpCodes.GET_PROPERTY: {
-                
-                final GetProperty getProperty = log(messageLength, opcode, sequenceNumber, GetProperty.decode(stream));
-                
-                MessageProcessorProperties.getProperty(getProperty, opcode, sequenceNumber, getTimestamp(), client, state, serverToClient);
-                break;
-            }
-            
-            case OpCodes.GET_SELECTION_OWNER: {
-                
-                final GetSelectionOwner getSelectionOwner = log(messageLength, opcode, sequenceNumber, GetSelectionOwner.decode(stream));
-                
-                sendReply(client, new GetSelectionOwnerReply(sequenceNumber, WINDOW.None));
-                break;
-            }
-            
-            case OpCodes.GRAB_SERVER: {
-                
-                log(messageLength, opcode, sequenceNumber, GrabServer.decode(stream));
-                
-                break;
-            }
-
-            case OpCodes.UNGRAB_SERVER: {
-                
-                log(messageLength, opcode, sequenceNumber, UngrabServer.decode(stream));
-                
-                break;
-            }
-
-			case OpCodes.CREATE_PIXMAP: {
-			    final CreatePixmap createPixmap = log(messageLength, opcode, sequenceNumber, CreatePixmap.decode(stream));
-			    
-			    client.createPixmap(createPixmap);
-			    break;
-			}
-			
-			case OpCodes.FREE_PIXMAP: {
-			    final FreePixmap freePixmap = log(messageLength, opcode, sequenceNumber, FreePixmap.decode(stream));
-
-			    client.freePixmap(freePixmap);
-			    break;
-			}
-			
-			case OpCodes.CREATE_GC: {
-			    
-			    final CreateGC createGC = log(messageLength, opcode, sequenceNumber, CreateGC.decode(stream));
-			    
-			    client.createGC(createGC);
-			    break;
-			}
-			    
-			case OpCodes.PUT_IMAGE: {
-			    final PutImage putImage = log(messageLength, opcode, sequenceNumber, PutImage.decode(stream));
-
-			    client.putImage(putImage);
-			    break;
-			}
-			
-			case OpCodes.QUERY_EXTENSION: {
-			    log(messageLength, opcode, sequenceNumber, QueryExtension.decode(stream));
-			
-			    sendReply(client, 
-			            new QueryResponseReply(
-			                    sequenceNumber,
-			                    new BOOL((byte)0),
-			                    new CARD8((byte)0),
-			                    new CARD8((byte)0),
-			                    new CARD8((byte)0)));
-			    break;
-			}
-			
-			case OpCodes.ALLOC_COLOR: {
-			    
-			    final AllocColor allocColor = log(messageLength, opcode, sequenceNumber, AllocColor.decode(stream));
-			    
-			    sendReply(client, new AllocColorReply(
-			            sequenceNumber,
-			            allocColor.getRed(),
-			            allocColor.getGreen(),
-			            allocColor.getBlue(),
-			            new CARD32(0)));
-			    
-			    
-			    break;
-			}
-			
-			default:
-				throw new UnsupportedOperationException("Unknown opcode " + opcode);
-			}
+			break;
 		}
-		catch (ProtocolException ex) {
-			throw new IllegalStateException(ex);
+		
+		case OpCodes.CHANGE_WINDOW_ATTRIBUTES: {
+		    log(messageLength, opcode, sequenceNumber, ChangeWindowAttributes.decode(stream));
+		    
+		    break;
+		}
+		
+		case OpCodes.GET_WINDOW_ATTRIBUTES: {
+		    
+		    final GetWindowAttributes getWindowAttributes = log(messageLength, opcode, sequenceNumber, GetWindowAttributes.decode(stream));
+
+		    MessageProcessorWindows.getWindowAttributes(getWindowAttributes, opcode, sequenceNumber, client, state, serverToClient);
+		    break;
+		}
+		
+		case OpCodes.DESTROY_WINDOW: {
+			final DestroyWindow destroyWindow = log(messageLength, opcode, sequenceNumber, DestroyWindow.decode(stream));
+			
+			final XWindow window = client.destroyWindow(display, destroyWindow);
+			
+			if (window != null) {
+			    state.removeClientWindow(window);
+			}
+			break;
+		}
+		
+		case OpCodes.GET_GEOMETRY: {
+		    
+		    final GetGeometry getGeometry = log(messageLength, opcode, sequenceNumber, GetGeometry.decode(stream));
+		    
+		    final WINDOW windowResource = new WINDOW(getGeometry.getDrawable());
+		    
+            final XWindow window = state.getClientWindow(windowResource);
+
+            if (window == null) {
+                sendError(client, Errors.Window, sequenceNumber, windowResource.getValue(), opcode);
+            }
+            else {
+                
+                // TODO
+                final GetGeometryReply reply = new GetGeometryReply(
+                        sequenceNumber,
+                        new CARD8(window.getDepth()),
+                        window.getRootWINDOW(),
+                        new INT16(window.getX()), new INT16(window.getY()),
+                        new CARD16(window.getWidth()), new CARD16(window.getHeight()),
+                        window.getBorderWidth());
+                
+                sendReply(client, reply);
+            }
+		    break;
+		}
+		
+		case OpCodes.INTERN_ATOM: {
+		    
+		    final InternAtom internAtom = log(messageLength, opcode, sequenceNumber, InternAtom.decode(stream));
+		    
+		    final ATOM atom;
+		    
+		    if (internAtom.getOnlyIfExists()) {
+		        final ATOM existing = atoms.getAtom(internAtom.getName());
+		        
+		        atom = existing != null ? existing : ATOM.None;
+		    }
+		    else {
+		        atom = atoms.addIfNotExists(internAtom.getName());
+		    }
+		    
+		    sendReply(client, new InternAtomReply(sequenceNumber, atom));
+		    break;
+		}
+		
+		case OpCodes.CHANGE_PROPERTY: {
+		    final ChangeProperty changeProperty = log(messageLength, opcode, sequenceNumber, ChangeProperty.decode(stream));
+
+		    MessageProcessorProperties.changeProperty(changeProperty, opcode, sequenceNumber, getTimestamp(), client, state, serverToClient);
+		    break;
+		}
+		
+        case OpCodes.GET_PROPERTY: {
+            
+            final GetProperty getProperty = log(messageLength, opcode, sequenceNumber, GetProperty.decode(stream));
+            
+            MessageProcessorProperties.getProperty(getProperty, opcode, sequenceNumber, getTimestamp(), client, state, serverToClient);
+            break;
+        }
+        
+        case OpCodes.GET_SELECTION_OWNER: {
+            
+            final GetSelectionOwner getSelectionOwner = log(messageLength, opcode, sequenceNumber, GetSelectionOwner.decode(stream));
+            
+            sendReply(client, new GetSelectionOwnerReply(sequenceNumber, WINDOW.None));
+            break;
+        }
+        
+        case OpCodes.GRAB_SERVER: {
+            
+            log(messageLength, opcode, sequenceNumber, GrabServer.decode(stream));
+            
+            break;
+        }
+
+        case OpCodes.UNGRAB_SERVER: {
+            
+            log(messageLength, opcode, sequenceNumber, UngrabServer.decode(stream));
+            
+            break;
+        }
+
+		case OpCodes.CREATE_PIXMAP: {
+		    final CreatePixmap createPixmap = log(messageLength, opcode, sequenceNumber, CreatePixmap.decode(stream));
+		    
+		    try {
+                client.createPixmap(createPixmap);
+            } catch (IDChoiceException ex) {
+                sendError(client, Errors.IDChoice, sequenceNumber, ex.getResource().getValue(), opcode);
+            }
+		    break;
+		}
+		
+		case OpCodes.FREE_PIXMAP: {
+		    final FreePixmap freePixmap = log(messageLength, opcode, sequenceNumber, FreePixmap.decode(stream));
+
+		    client.freePixmap(freePixmap);
+		    break;
+		}
+		
+		case OpCodes.CREATE_GC: {
+		    
+		    final CreateGC createGC = log(messageLength, opcode, sequenceNumber, CreateGC.decode(stream));
+		    
+		    client.createGC(createGC);
+		    break;
+		}
+		    
+		case OpCodes.PUT_IMAGE: {
+		    final PutImage putImage = log(messageLength, opcode, sequenceNumber, PutImage.decode(stream));
+
+		    client.putImage(putImage);
+		    break;
+		}
+		
+		case OpCodes.QUERY_EXTENSION: {
+		    log(messageLength, opcode, sequenceNumber, QueryExtension.decode(stream));
+		
+		    sendReply(client, 
+		            new QueryResponseReply(
+		                    sequenceNumber,
+		                    new BOOL((byte)0),
+		                    new CARD8((byte)0),
+		                    new CARD8((byte)0),
+		                    new CARD8((byte)0)));
+		    break;
+		}
+		
+		case OpCodes.ALLOC_COLOR: {
+		    
+		    final AllocColor allocColor = log(messageLength, opcode, sequenceNumber, AllocColor.decode(stream));
+		    
+		    sendReply(client, new AllocColorReply(
+		            sequenceNumber,
+		            allocColor.getRed(),
+		            allocColor.getGreen(),
+		            allocColor.getBlue(),
+		            new CARD32(0)));
+		    
+		    
+		    break;
+		}
+		
+		default:
+			throw new UnsupportedOperationException("Unknown opcode " + opcode);
 		}
 	}
 

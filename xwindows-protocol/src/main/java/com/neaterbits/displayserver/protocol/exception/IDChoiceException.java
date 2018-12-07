@@ -1,10 +1,20 @@
 package com.neaterbits.displayserver.protocol.exception;
 
-public class IDChoiceException extends ProtocolException {
+import com.neaterbits.displayserver.protocol.types.RESOURCE;
+
+public final class IDChoiceException extends ProtocolException {
 
 	private static final long serialVersionUID = 1L;
 
-	public IDChoiceException(String message) {
+	private final RESOURCE resource;
+	
+	public IDChoiceException(String message, RESOURCE resource) {
 		super(message);
+		
+		this.resource = resource;
 	}
+
+    public RESOURCE getResource() {
+        return resource;
+    }
 }
