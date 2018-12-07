@@ -25,6 +25,7 @@ import com.neaterbits.displayserver.protocol.types.PIXMAP;
 import com.neaterbits.displayserver.protocol.types.SET32;
 import com.neaterbits.displayserver.protocol.types.SETofDEVICEEVENT;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
+import com.neaterbits.displayserver.protocol.types.TIMESTAMP;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.protocol.types.WINGRAVITY;
@@ -61,7 +62,6 @@ public class ByteBufferXWindowsProtocolInputStream implements XWindowsProtocolIn
 		
 		return new CARD8((short)Unsigned.byteToUnsigned(value));
 	}
-	
 
 	@Override
 	public CARD16 readCARD16() {
@@ -112,7 +112,12 @@ public class ByteBufferXWindowsProtocolInputStream implements XWindowsProtocolIn
 		return sb.toString();
 	}
 
-	@Override
+    @Override
+    public TIMESTAMP readTIMESTAMP() throws IOException {
+        return new TIMESTAMP(buffer.getInt());
+    }
+
+    @Override
 	public KEYCODE readKEYCODE() throws IOException {
 		return new KEYCODE(readCARD8());
 	}

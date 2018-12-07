@@ -76,7 +76,7 @@ public class XClient extends XConnection {
             break;
             
         default:
-            throw new ValueException("Unknown window class");
+            throw new ValueException("Unknown window class", createWindow.getWindowClass().getValue());
         }
         
         final WindowParameters windowParameters = new WindowParameters(
@@ -99,6 +99,7 @@ public class XClient extends XConnection {
         final XWindow rootWindow = server.getWindows().findRootWindowOf(createWindow.getParent());
         
         final XWindow xWindowsWindow = new XWindow(
+                this,
                 window,
                 createWindow.getWid(),
                 rootWindow.getWINDOW(),

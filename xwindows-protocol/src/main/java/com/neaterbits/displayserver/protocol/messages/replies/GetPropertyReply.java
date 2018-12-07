@@ -14,21 +14,27 @@ public class GetPropertyReply extends Reply {
 
     private final CARD8 format;
     private final ATOM type;
+    private final int bytesAfter;
     private final byte [] data;
 
     public GetPropertyReply(CARD16 sequenceNumber, CARD8 format, ATOM type,
-            byte[] data) {
+            int bytesAfter, byte[] data) {
         
         super(sequenceNumber);
     
         this.format = format;
         this.type = type;
+        this.bytesAfter = bytesAfter;
         this.data = data;
     }
     
     @Override
     public Object[] getDebugParams() {
-        return wrap("format", format, "type", type, "dataLength", data.length);
+        return wrap(
+                "format", format,
+                "type", type,
+                "bytesAfter", bytesAfter,
+                "dataLength", data.length);
     }
 
     @Override
@@ -48,31 +54,7 @@ public class GetPropertyReply extends Reply {
 
         stream.writeCARD32(new CARD32(data.length));
         
-        final int lengthValue;
-        
-        switch (format.getValue()) {
-        case 0:
-            lengthValue = 0;
-            break;
-            
-        case 8:
-            lengthValue = data.length;
-            break;
-            
-        case 16:
-            lengthValue = data.length / 2;
-            break;
-            
-        case 32:
-            lengthValue = data.length / 4;
-            break;
-            
-        
-        default:
-            throw new UnsupportedOperationException();
-        }
-        
-        stream.writeCARD32(new CARD32(lengthValue));
+        stream.writeCARD32(new CARD32(bytesAfter));
         
         stream.pad(12);
         

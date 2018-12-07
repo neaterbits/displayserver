@@ -23,6 +23,7 @@ import com.neaterbits.displayserver.protocol.types.PIXMAP;
 import com.neaterbits.displayserver.protocol.types.SET32;
 import com.neaterbits.displayserver.protocol.types.SETofDEVICEEVENT;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
+import com.neaterbits.displayserver.protocol.types.TIMESTAMP;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.protocol.types.WINGRAVITY;
@@ -42,6 +43,8 @@ public interface XWindowsProtocolInputStream {
 	
 	String readSTRING8(int length) throws IOException;
 
+	TIMESTAMP readTIMESTAMP() throws IOException;
+	
 	KEYCODE readKEYCODE() throws IOException;
 	
 	WINDOW readWINDOW() throws IOException;

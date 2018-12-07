@@ -69,6 +69,10 @@ public class XConnection
 	    return new CARD16(sequenceNumber);
 	}
 	
+	final CARD16 getSequenceNumber() {
+	    return new CARD16(sequenceNumber);
+	}
+	
 	final int getConnectionNo() {
         return connectionNo;
     }

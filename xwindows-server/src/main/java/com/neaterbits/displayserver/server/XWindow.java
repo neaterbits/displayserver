@@ -1,14 +1,25 @@
 package com.neaterbits.displayserver.server;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
+import com.neaterbits.displayserver.protocol.enums.Mode;
+import com.neaterbits.displayserver.protocol.exception.AtomException;
+import com.neaterbits.displayserver.protocol.exception.MatchException;
+import com.neaterbits.displayserver.protocol.exception.ValueException;
 import com.neaterbits.displayserver.protocol.messages.requests.WindowAttributes;
+import com.neaterbits.displayserver.protocol.types.ATOM;
+import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
+import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.windows.Window;
 
 final class XWindow {
 
+    private final XClient createdBy;
     private final Window window;
     
     private final WINDOW windowResource;
@@ -19,6 +30,8 @@ final class XWindow {
     private final CARD16 windowClass;
     
     private WindowAttributes currentWindowAttributes;
+    
+    private final Map<ATOM, Property> properties;
 
     // Root window
     XWindow(
@@ -28,17 +41,20 @@ final class XWindow {
             CARD16 windowClass,
             WindowAttributes currentWindowAttributes) {
         
-        this(window, windowResource, WINDOW.None, WINDOW.None, borderWidth, windowClass, currentWindowAttributes, 0);
+        this(null, window, windowResource, WINDOW.None, WINDOW.None, borderWidth, windowClass, currentWindowAttributes, 0);
     }
 
     XWindow(
+            XClient createdBy,
             Window window,
             WINDOW windowResource, WINDOW rootWindow, WINDOW parentWindow,
             CARD16 borderWidth,
             CARD16 windowClass,
             WindowAttributes currentWindowAttributes) {
         
-        this(window, windowResource, rootWindow, parentWindow, borderWidth, windowClass, currentWindowAttributes, 0);
+        this(createdBy, window, windowResource, rootWindow, parentWindow, borderWidth, windowClass, currentWindowAttributes, 0);
+        
+        Objects.requireNonNull(createdBy);
         
         if (rootWindow.equals(WINDOW.None)) {
             throw new IllegalArgumentException();
@@ -50,6 +66,7 @@ final class XWindow {
     }
 
     XWindow(
+            XClient createdBy,
             Window window,
             WINDOW windowResource, WINDOW rootWindow, WINDOW parentWindow,
             CARD16 borderWidth,
@@ -65,6 +82,7 @@ final class XWindow {
         Objects.requireNonNull(windowClass);
         Objects.requireNonNull(currentWindowAttributes);
         
+        this.createdBy = createdBy;
         this.window = window;
         this.windowResource = windowResource;
         this.rootWindow = rootWindow;
@@ -72,10 +90,19 @@ final class XWindow {
         this.borderWidth = borderWidth;
         this.windowClass = windowClass;
         this.currentWindowAttributes = currentWindowAttributes;
+        
+        this.properties = new HashMap<>();
     }
     
     boolean isRootWindow() {
         return parentWindow.equals(WINDOW.None);
+    }
+    
+    boolean isCreatedBy(XClient client) {
+
+        Objects.requireNonNull(client);
+
+        return createdBy == client;
     }
 
     Window getWindow() {
@@ -130,6 +157,69 @@ final class XWindow {
         this.currentWindowAttributes = currentWindowAttributes;
     }
 
+    Property getProperty(ATOM property) {
+        
+        Objects.requireNonNull(property);
+        
+        return properties.get(property);
+    }
+    
+    void changeProperty(BYTE mode, ATOM propertyAtom, ATOM type, CARD8 format, byte[] data) throws MatchException, AtomException, ValueException {
+        
+        final Property property = properties.get(propertyAtom);
+        
+        if (property == null) {
+            throw new AtomException("No such property " + propertyAtom);
+        }
+        
+        switch (mode.getValue()) {
+        case Mode.REPLACE:
+            properties.put(propertyAtom, new Property(propertyAtom, type, format, data));
+            break;
+            
+        case Mode.PREPEND:
+            checkMatch(property, type, format);
+            
+            properties.put(propertyAtom, new Property(propertyAtom, type, format, merge(data, property.getData())));
+            break;
+            
+        case Mode.APPEND:
+            checkMatch(property, type, format);
+
+            properties.put(propertyAtom, new Property(propertyAtom, type, format, merge(property.getData(), data)));
+            break;
+            
+        default:
+            throw new ValueException("Unknown mode type " + mode.getValue(), mode.getValue());
+        }
+    }
+    
+    private static byte [] merge(byte [] array1, byte [] array2) {
+        final byte [] result = Arrays.copyOf(array1, array1.length + array2.length);
+        
+        System.arraycopy(array2, 0, result, array1.length, array2.length);
+    
+        return result;
+    }
+    
+    private void checkMatch(Property property, ATOM type, CARD8 format) throws MatchException {
+        
+        if (!property.getType().equals(type)) {
+            throw new MatchException("Types do not match: " + property.getType() + "/" + type);
+        }
+        
+        if (!property.getFormat().equals(format)) {
+            throw new MatchException("Formats do not match: " + property.getFormat() + "/" + format);
+        }
+    }
+    
+    void deleteProperty(ATOM property) {
+        
+        Objects.requireNonNull(property);
+        
+        properties.remove(property);
+    }
+    
     @Override
     public int hashCode() {
         final int prime = 31;

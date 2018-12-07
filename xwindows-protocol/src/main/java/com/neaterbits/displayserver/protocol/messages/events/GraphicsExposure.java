@@ -2,6 +2,7 @@ package com.neaterbits.displayserver.protocol.messages.events;
 
 import java.io.IOException;
 
+import com.neaterbits.displayserver.protocol.Events;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.messages.Event;
 import com.neaterbits.displayserver.protocol.types.CARD16;
@@ -22,12 +23,15 @@ public final class GraphicsExposure extends Event {
 	private final CARD16 minorOpcode;
 
 	public GraphicsExposure(
+	        CARD16 sequenceNumber,
 			DRAWABLE drawable,
 			CARD16 x, CARD16 y,
 			CARD16 width, CARD16 height,
 			CARD16 count,
 			CARD8 majorOpcode, CARD16 minorOpcode) {
 
+	    super(sequenceNumber);
+	    
 		this.drawable = drawable;
 		this.x = x;
 		this.y = y;
@@ -41,14 +45,20 @@ public final class GraphicsExposure extends Event {
 	@Override
 	public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 		
+	    writeEventCode(stream, Events.GRAPHICS_EXPOSURE);
+	    writeUnusedByte(stream);
+	    writeSequenceNumber(stream);
+	    
 		stream.writeDRAWABLE(drawable);
 		stream.writeCARD16(x);
 		stream.writeCARD16(y);
 		stream.writeCARD16(width);
 		stream.writeCARD16(height);
-		stream.writeCARD16(count);
-		stream.writeCARD8(majorOpcode);
 		stream.writeCARD16(minorOpcode);
+        stream.writeCARD16(count);
+        stream.writeCARD8(majorOpcode);
+        
+        stream.pad(11);
 	}
 
 	public DRAWABLE getDrawable() {

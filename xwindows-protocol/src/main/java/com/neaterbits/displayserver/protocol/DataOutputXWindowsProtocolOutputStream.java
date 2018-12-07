@@ -26,6 +26,7 @@ import com.neaterbits.displayserver.protocol.types.RESOURCE;
 import com.neaterbits.displayserver.protocol.types.SET32;
 import com.neaterbits.displayserver.protocol.types.SETofDEVICEEVENT;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
+import com.neaterbits.displayserver.protocol.types.TIMESTAMP;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.protocol.types.WINGRAVITY;
@@ -96,7 +97,12 @@ public final class DataOutputXWindowsProtocolOutputStream implements XWindowsPro
 		*/
 	}
 
-	private void writeRESOURCE(RESOURCE resource) throws IOException {
+	@Override
+    public void writeTIMESTAMP(TIMESTAMP value) throws IOException {
+	    dataOutput.writeInt((int)value.getValue());
+    }
+
+    private void writeRESOURCE(RESOURCE resource) throws IOException {
 		dataOutput.writeInt(resource.getValue());
 	}
 	

@@ -1,6 +1,7 @@
 package com.neaterbits.displayserver.server;
 
 import java.util.Objects;
+import java.util.function.Function;
 
 import com.neaterbits.displayserver.layers.Rectangle;
 import com.neaterbits.displayserver.layers.Region;
@@ -45,21 +46,29 @@ final class XWindowsEventListener implements WindowEventListener {
             
             -- count;
             
-            final GraphicsExposure graphicsExposure = new GraphicsExposure(
+            final int c = count;
+            
+            sendEventToSubscribing(xWindow, Events.GRAPHICS_EXPOSURE, client ->
+            
+                new GraphicsExposure(
+                    client.getSequenceNumber(),
                     xWindow.getWINDOW().toDrawable(),
                     new CARD16(rectangle.getLeft()), new CARD16(rectangle.getTop()),
                     new CARD16(rectangle.getWidth()), new CARD16(rectangle.getHeight()),
-                    new CARD16(count),
-                    new CARD8((byte)OpCodes.COPY_AREA), new CARD16(0));
+                    new CARD16(c),
+                    new CARD8((byte)OpCodes.COPY_AREA), new CARD16(0))
+                );
 
             
-            sendEventToSubscribing(xWindow, graphicsExposure, Events.GRAPHICS_EXPOSURE);
         }
     }
     
-    private void sendEventToSubscribing(XWindow xWindow, Event event, int eventCode) {
-        for (XConnection connection : server.getEventSubscriptions().getClientsInterestedInEvent(xWindow, eventCode)) {
-            connection.addEvent(event);
+    private void sendEventToSubscribing(XWindow xWindow, int eventCode, Function<XClient, Event> makeEvent) {
+        for (XClient client : server.getEventSubscriptions().getClientsInterestedInEvent(xWindow, eventCode)) {
+            
+            final Event event = makeEvent.apply(client);
+            
+            client.addEvent(event);
         }
     }
 }

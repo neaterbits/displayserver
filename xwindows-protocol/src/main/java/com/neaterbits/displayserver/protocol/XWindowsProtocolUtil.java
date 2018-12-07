@@ -3,6 +3,8 @@ package com.neaterbits.displayserver.protocol;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 
+import com.neaterbits.displayserver.protocol.types.CARD8;
+
 public class XWindowsProtocolUtil {
 
     public static Integer getInitialMessageLength(ByteBuffer byteBuffer) {
@@ -78,4 +80,62 @@ public class XWindowsProtocolUtil {
 
 		return pad;
 	}
+
+	public static int getPropertyDataFormatLength(CARD8 format, int dataLength) {
+	    
+	    final int lengthValue;
+	    
+        switch (format.getValue()) {
+        case 0:
+            lengthValue = 0;
+            break;
+            
+        case 8:
+            lengthValue = dataLength;
+            break;
+            
+        case 16:
+            lengthValue = dataLength / 2;
+            break;
+            
+        case 32:
+            lengthValue = dataLength / 4;
+            break;
+            
+        
+        default:
+            throw new UnsupportedOperationException();
+        }
+
+        return lengthValue;
+	}
+
+    public static int getPropertyDataLength(CARD8 format, int dataLength) {
+        
+        final int lengthValue;
+        
+        switch (format.getValue()) {
+        case 0:
+            lengthValue = 0;
+            break;
+            
+        case 8:
+            lengthValue = dataLength;
+            break;
+            
+        case 16:
+            lengthValue = dataLength * 2;
+            break;
+            
+        case 32:
+            lengthValue = dataLength * 4;
+            break;
+            
+        
+        default:
+            throw new UnsupportedOperationException();
+        }
+
+        return lengthValue;
+    }
 }

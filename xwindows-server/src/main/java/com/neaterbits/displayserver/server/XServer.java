@@ -19,12 +19,17 @@ import com.neaterbits.displayserver.protocol.XWindowsProtocolUtil;
 import com.neaterbits.displayserver.protocol.enums.Errors;
 import com.neaterbits.displayserver.protocol.enums.MapState;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
+import com.neaterbits.displayserver.protocol.exception.AtomException;
+import com.neaterbits.displayserver.protocol.exception.MatchException;
 import com.neaterbits.displayserver.protocol.exception.ProtocolException;
+import com.neaterbits.displayserver.protocol.exception.ValueException;
 import com.neaterbits.displayserver.protocol.logging.XWindowsProtocolLog;
 import com.neaterbits.displayserver.protocol.messages.Encodeable;
 import com.neaterbits.displayserver.protocol.messages.Error;
+import com.neaterbits.displayserver.protocol.messages.Event;
 import com.neaterbits.displayserver.protocol.messages.Reply;
 import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.messages.events.PropertyNotify;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ClientMessage;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ServerMessage;
 import com.neaterbits.displayserver.protocol.messages.replies.AllocColorReply;
@@ -35,6 +40,7 @@ import com.neaterbits.displayserver.protocol.messages.replies.GetWindowAttribute
 import com.neaterbits.displayserver.protocol.messages.replies.InternAtomReply;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryResponseReply;
 import com.neaterbits.displayserver.protocol.messages.requests.AllocColor;
+import com.neaterbits.displayserver.protocol.messages.requests.ChangeProperty;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeWindowAttributes;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateGC;
 import com.neaterbits.displayserver.protocol.messages.requests.CreatePixmap;
@@ -59,6 +65,7 @@ import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.INT16;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
+import com.neaterbits.displayserver.protocol.types.TIMESTAMP;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.server.XConnection.State;
@@ -74,6 +81,8 @@ public class XServer implements AutoCloseable {
 	private final Atoms atoms;
 
 	private final XState state;
+	
+	private final long timeServerStarted;
 	
 	public XServer(
 	        EventSource driverEventSource,
@@ -105,6 +114,8 @@ public class XServer implements AutoCloseable {
 		this.display = new Display(screens.stream()
 		        .map(screen -> screen.getScreen())
 		        .collect(Collectors.toList()));
+		
+		this.timeServerStarted = System.currentTimeMillis();
 	}
 	
 	XWindowsConstAccess getWindows() {
@@ -113,6 +124,14 @@ public class XServer implements AutoCloseable {
 
 	XEventSubscriptionsConstAccess getEventSubscriptions() {
 	    return state;
+	}
+	
+	TIMESTAMP getTimestamp() {
+	    
+	    final long diff = System.currentTimeMillis() - timeServerStarted;
+	    
+	    // + 1 to make sure never returns CurrentTime ( == 0 )
+	    return new TIMESTAMP(diff + 1);
 	}
 	
 	public Client processConnection(SocketChannel socketChannel) {
@@ -348,15 +367,113 @@ public class XServer implements AutoCloseable {
 			    break;
 			}
 			
+			case OpCodes.CHANGE_PROPERTY: {
+			    final ChangeProperty changeProperty = log(messageLength, opcode, sequenceNumber, ChangeProperty.decode(stream));
+
+                final XWindow xWindow = state.getClientWindow(changeProperty.getWindow());
+                
+                if (xWindow == null) {
+                    sendError(client, Errors.Window, sequenceNumber, changeProperty.getWindow().getValue(), opcode);
+                }
+                else {
+                    try {
+                        xWindow.changeProperty(
+                                changeProperty.getMode(),
+                                changeProperty.getProperty(),
+                                changeProperty.getType(),
+                                changeProperty.getFormat(),
+                                changeProperty.getData());
+                        
+                        final PropertyNotify propertyNotify = new PropertyNotify(
+                                sequenceNumber,
+                                changeProperty.getWindow(),
+                                changeProperty.getProperty(),
+                                getTimestamp(),
+                                PropertyNotify.NewValue);
+                        
+                        sendEvent(client, propertyNotify);
+                    }
+                    catch (MatchException ex) {
+                        sendError(client, Errors.Match, sequenceNumber, 0, opcode);
+                    }
+                    catch (AtomException ex) {
+                        sendError(client, Errors.Atom, sequenceNumber, changeProperty.getProperty().getValue(), opcode);
+                    }
+                    catch (ValueException ex) {
+                        sendError(client, Errors.Value, sequenceNumber, ex.getValue(), opcode);
+                    }
+                }
+			    break;
+			}
+			
             case OpCodes.GET_PROPERTY: {
                 
-                log(messageLength, opcode, sequenceNumber, GetProperty.decode(stream));
+                final GetProperty getProperty = log(messageLength, opcode, sequenceNumber, GetProperty.decode(stream));
                 
-                sendReply(client, new GetPropertyReply(
-                        sequenceNumber,
-                        new CARD8((short)0),
-                        ATOM.None,
-                        new byte[0]));
+                final XWindow xWindow = state.getClientOrRootWindow(getProperty.getWindow());
+                
+                if (xWindow == null) {
+                    sendError(client, Errors.Window, sequenceNumber, getProperty.getWindow().getValue(), opcode);
+                }
+                else {
+                    final Property property = xWindow.getProperty(getProperty.getProperty());
+                
+                    if (property == null) {
+                        sendReply(client, new GetPropertyReply(
+                                sequenceNumber,
+                                new CARD8((short)0),
+                                ATOM.None,
+                                0,
+                                new byte[0]));
+                    }
+                    else if (!getProperty.getType().equals(property.getType()) && !ATOM.AnyPropertyType.equals(property.getType())) {
+                        sendReply(client, new GetPropertyReply(
+                                sequenceNumber,
+                                property.getFormat(),
+                                property.getType(),
+                                property.getData().length,
+                                new byte[0]));
+                    }
+                    else {
+                        final long N = property.getData().length;
+                        final long I = 4 * getProperty.getLongOffset().getValue();
+                        final long T = N - I;
+                        final long L = Math.min(T, 4 * getProperty.getLongLength().getValue());
+                        final long A = N - (I + L);
+
+                        if (L < 0) {
+                            sendError(client, Errors.Value, sequenceNumber, getProperty.getLongOffset().getValue(), opcode);
+                        }
+                        else {
+                            final long bytesAfter = A;
+                            
+                            final byte [] data = new byte[(int)L];
+                            
+                            System.arraycopy(property.getData(), (int)I, data, 0, (int)L);
+                            
+                            sendReply(client, new GetPropertyReply(
+                                    sequenceNumber,
+                                    property.getFormat(),
+                                    property.getType(),
+                                    (int)bytesAfter,
+                                    data));
+                            
+                            if (xWindow.isCreatedBy(client) && bytesAfter == 0 && getProperty.getDelete().isSet()) {
+
+                                xWindow.deleteProperty(property.getProperty());
+                                
+                                final PropertyNotify propertyNotify = new PropertyNotify(
+                                        sequenceNumber,
+                                        getProperty.getWindow(),
+                                        property.getProperty(),
+                                        getTimestamp(),
+                                        PropertyNotify.Deleted);
+                                
+                                sendEvent(client, propertyNotify);
+                            }
+                        }
+                    }
+                }
                 break;
             }
             
@@ -450,6 +567,15 @@ public class XServer implements AutoCloseable {
 
     private void send(XClient client, Encodeable message) {
         client.send(message);
+    }
+
+    private void sendEvent(XClient client, Event event) {
+        
+        if (protocolLog != null) {
+            protocolLog.onSendEvent(event);
+        }
+        
+        client.send(event);
     }
 
     private void sendReply(XClient client, Reply reply) {

@@ -23,6 +23,7 @@ import com.neaterbits.displayserver.protocol.types.PIXMAP;
 import com.neaterbits.displayserver.protocol.types.SET32;
 import com.neaterbits.displayserver.protocol.types.SETofDEVICEEVENT;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
+import com.neaterbits.displayserver.protocol.types.TIMESTAMP;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.protocol.types.WINGRAVITY;
@@ -48,6 +49,7 @@ public interface XWindowsProtocolOutputStream {
 	
 	void writeSTRING8(String value) throws IOException;
 
+	void writeTIMESTAMP(TIMESTAMP value) throws IOException;
 	
 	void writeKEYCODE(KEYCODE value) throws IOException;
 	
