@@ -42,6 +42,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.CreateGC;
 import com.neaterbits.displayserver.protocol.messages.requests.CreatePixmap;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.DestroyWindow;
+import com.neaterbits.displayserver.protocol.messages.requests.FreeGC;
 import com.neaterbits.displayserver.protocol.messages.requests.FreePixmap;
 import com.neaterbits.displayserver.protocol.messages.requests.GetGeometry;
 import com.neaterbits.displayserver.protocol.messages.requests.GetProperty;
@@ -475,6 +476,14 @@ public class XServer implements AutoCloseable {
 		    final CreateGC createGC = log(messageLength, opcode, sequenceNumber, CreateGC.decode(stream));
 		    
 		    client.createGC(createGC);
+		    break;
+		}
+		
+		case OpCodes.FREE_GC: {
+		    
+		    final FreeGC freeGC = log(messageLength, opcode, sequenceNumber, FreeGC.decode(stream));
+
+		    client.freeGC(freeGC);
 		    break;
 		}
 		    

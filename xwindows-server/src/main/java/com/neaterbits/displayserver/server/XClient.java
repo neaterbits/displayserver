@@ -18,6 +18,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.CreateGC;
 import com.neaterbits.displayserver.protocol.messages.requests.CreatePixmap;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.DestroyWindow;
+import com.neaterbits.displayserver.protocol.messages.requests.FreeGC;
 import com.neaterbits.displayserver.protocol.messages.requests.FreePixmap;
 import com.neaterbits.displayserver.protocol.messages.requests.PutImage;
 import com.neaterbits.displayserver.protocol.messages.requests.WindowAttributes;
@@ -184,6 +185,10 @@ public class XClient extends XConnection {
     }
     
     final void createGC(CreateGC createGC) {
+        
+    }
+    
+    final void freeGC(FreeGC freeGC) {
         
     }
     

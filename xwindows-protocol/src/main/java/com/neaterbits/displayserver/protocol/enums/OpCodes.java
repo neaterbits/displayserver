@@ -28,6 +28,8 @@ public class OpCodes {
 	public static final int CREATE_PIXMAP = 53;
     public static final int FREE_PIXMAP = 54;
     public static final int CREATE_GC = 55;
+    
+    public static final int FREE_GC = 60;
 	
 	public static final int COPY_AREA = 62;
 	
