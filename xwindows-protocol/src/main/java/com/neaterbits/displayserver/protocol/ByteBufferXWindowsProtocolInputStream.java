@@ -211,7 +211,7 @@ public class ByteBufferXWindowsProtocolInputStream implements XWindowsProtocolIn
     public byte[] readData(int length) throws IOException {
         
         if (length > buffer.remaining()) {
-            throw new IOException();
+            throw new IOException("length > buffer.remaining() : " + length + "/" + buffer.remaining());
         }
         
         final byte [] data = new byte[length];

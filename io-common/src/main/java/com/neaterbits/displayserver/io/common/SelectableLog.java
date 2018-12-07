@@ -4,6 +4,8 @@ public interface SelectableLog {
 
     void onTryReadEnter(int readBufferLimit, int readBufferRemaining, int readBufferPosition);
 
+    void onBeforeFlipBeforeProcessingOneMessage(int bytesRead, int readBufferLimit, int readBufferRemaining, int readBufferPosition);
+
     void onAfterFlipBeforeProcessingOneMessage(int bytesRead, int readBufferLimit, int readBufferRemaining, int readBufferPosition);
 
     void onAfterProcessedOneMessage(int readBufferLimit, int readBufferRemaining, int readBufferPosition);

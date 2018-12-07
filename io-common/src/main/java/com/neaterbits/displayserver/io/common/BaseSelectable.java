@@ -2,6 +2,7 @@ package com.neaterbits.displayserver.io.common;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 
@@ -35,7 +36,11 @@ abstract class BaseSelectable {
 			final int bytesRead = read(selectionKey, selector, readBuffer);
 
 			if (bytesRead > 0) {
-			    
+
+			    if (log != null) {
+		            log.onBeforeFlipBeforeProcessingOneMessage(bytesRead, readBuffer.limit(), readBuffer.remaining(), readBuffer.position());
+                }
+
 			    readBuffer.flip();
 
 	            if (log != null) {
@@ -65,9 +70,15 @@ abstract class BaseSelectable {
 				
 				readBuffer.flip();
 				
-				readBuffer.get(bytes, readBuffer.position(), readBuffer.remaining());
+				final int toCopy = readBuffer.remaining();
 				
-				readBuffer = ByteBuffer.wrap(bytes, 0, readBuffer.capacity());
+				final ByteOrder byteOrder = readBuffer.order();
+				
+				readBuffer.get(bytes, readBuffer.position(), toCopy);
+
+				readBuffer = ByteBuffer.wrap(bytes, 0, toCopy);
+
+				readBuffer.order(byteOrder);
 				
 				// buffer.compact();
 				
@@ -76,7 +87,6 @@ abstract class BaseSelectable {
 				}
 				
 				readBuffer.compact();
-				
 			}
 			else {
 			    break;

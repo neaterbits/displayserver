@@ -17,7 +17,18 @@ public final class SelectableLogImpl extends BaseLogImpl implements SelectableLo
                     "remaining", readBufferRemaining,
                     "position", readBufferPosition);
     }
-    
+
+    @Override
+    public void onBeforeFlipBeforeProcessingOneMessage(int bytesRead, int readBufferLimit, int readBufferRemaining,
+            int readBufferPosition) {
+
+        trace("beforeFlipBeforeProcessingOneMessage",
+                    "bytesRead", bytesRead,
+                    "limit", readBufferLimit,
+                    "remaining", readBufferRemaining,
+                    "position", readBufferPosition);
+    }
+
     
     @Override
     public void onAfterFlipBeforeProcessingOneMessage(int bytesRead, int readBufferLimit, int readBufferRemaining,
