@@ -26,7 +26,7 @@ public final class SelectableLogImpl extends BaseLogImpl implements SelectableLo
         trace("afterFlipBeforeProcessingOneMessage",
                     "bytesRead", bytesRead,
                     "limit", readBufferLimit,
-                    "remaining=", readBufferRemaining,
+                    "remaining", readBufferRemaining,
                     "position", readBufferPosition);
     }
 
@@ -70,7 +70,7 @@ public final class SelectableLogImpl extends BaseLogImpl implements SelectableLo
     public void onProcessedCompleteMessage(int messageLength, int readBufferLimit, int readBufferRemaining,
             int readBufferPosition) {
 
-        trace("proecssedCompleteMessage",
+        trace("processedCompleteMessage",
                     "messageLength", messageLength,
                     "limit", readBufferLimit,
                     "remaining",  readBufferRemaining,
