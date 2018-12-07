@@ -13,6 +13,8 @@ final class XWindows implements XWindowsConstAccess {
     private final WindowMap rootWindows;
     private final WindowMap clientWindows;
     
+    private final Map<Window, XWindow> xWindowByWindow;
+    
     private final Map<XWindow, XClient> creatingClientByWindow;
 
 
@@ -21,56 +23,67 @@ final class XWindows implements XWindowsConstAccess {
         this.rootWindows = new WindowMap();
         this.clientWindows = new WindowMap();
         
+        this.xWindowByWindow = new HashMap<>();
+        
         this.creatingClientByWindow = new HashMap<>();
     }
     
-    void addRootWindow(XWindow window) {
+    void addRootWindow(XWindow xWindow) {
         
-        Objects.requireNonNull(window);
+        Objects.requireNonNull(xWindow);
         
-        if (!window.isRootWindow()) {
+        if (!xWindow.isRootWindow()) {
             throw new IllegalArgumentException();
         }
         
-        rootWindows.addToMaps(window);
+        rootWindows.addToMaps(xWindow);
+
+        addWindowToXWindowMapping(xWindow);
     }
 
     
-    void addClientWindow(XWindow window, XClient creatingClient) {
+    void addClientWindow(XWindow xWindow, XClient creatingClient) {
 
-        Objects.requireNonNull(window);
+        Objects.requireNonNull(xWindow);
         Objects.requireNonNull(creatingClient);
         
-        if (window.isRootWindow()) {
+        if (xWindow.isRootWindow()) {
             throw new IllegalArgumentException();
         }
         
-        creatingClientByWindow.put(window, creatingClient);
+        creatingClientByWindow.put(xWindow, creatingClient);
 
-        clientWindows.addToMaps(window);
+        clientWindows.addToMaps(xWindow);
+        
+        addWindowToXWindowMapping(xWindow);
+    }
+    
+    private void addWindowToXWindowMapping(XWindow xWindow) {
+        xWindowByWindow.put(xWindow.getWindow(), xWindow);
     }
 
-    void removeClientWindow(XWindow window) {
+    void removeClientWindow(XWindow xWindow) {
         
-        Objects.requireNonNull(window);
+        Objects.requireNonNull(xWindow);
         
-        if (window.isRootWindow()) {
+        if (xWindow.isRootWindow()) {
             throw new IllegalArgumentException();
         }
 
-        if (clientWindows.remove(window)) {
-            if (creatingClientByWindow.remove(window) == null) {
+        if (clientWindows.remove(xWindow)) {
+            if (creatingClientByWindow.remove(xWindow) == null) {
                 throw new IllegalStateException();
             }
         }
         else {
-            if (creatingClientByWindow.remove(window) != null) {
+            if (creatingClientByWindow.remove(xWindow) != null) {
                 throw new IllegalStateException();
             }
         }
+        
+        xWindowByWindow.remove(xWindow.getWindow());
     }
 
-    
     @Override
     public XWindow getClientOrRootWindow(WINDOW windowResource) {
         
@@ -94,7 +107,10 @@ final class XWindows implements XWindowsConstAccess {
 
     @Override
     public XWindow getClientWindow(Window window) {
-        throw new UnsupportedOperationException("TODO");
+        
+        Objects.requireNonNull(window);
+        
+        return xWindowByWindow.get(window);
     }
 
     @Override

@@ -54,7 +54,6 @@ public final class QueryPointerReply extends Reply {
         
         super(sequenceNumber);
         
-        Objects.requireNonNull(sequenceNumber);
         Objects.requireNonNull(sameScreen);
         Objects.requireNonNull(root);
         Objects.requireNonNull(child);

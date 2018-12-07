@@ -12,6 +12,7 @@ public class OpCodes {
 
 	public static final int GET_GEOMETRY = 14;
 	
+	public static final int QUERY_TREE = 15;
 	public static final int INTERN_ATOM = 16;
 	
 	public static final int CHANGE_PROPERTY = 18;

@@ -34,6 +34,7 @@ import com.neaterbits.displayserver.protocol.messages.replies.GetSelectionOwnerR
 import com.neaterbits.displayserver.protocol.messages.replies.InternAtomReply;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryPointerReply;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryResponseReply;
+import com.neaterbits.displayserver.protocol.messages.replies.QueryTreeReply;
 import com.neaterbits.displayserver.protocol.messages.requests.AllocColor;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeProperty;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeWindowAttributes;
@@ -51,6 +52,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.InternAtom;
 import com.neaterbits.displayserver.protocol.messages.requests.PutImage;
 import com.neaterbits.displayserver.protocol.messages.requests.QueryExtension;
 import com.neaterbits.displayserver.protocol.messages.requests.QueryPointer;
+import com.neaterbits.displayserver.protocol.messages.requests.QueryTree;
 import com.neaterbits.displayserver.protocol.messages.requests.UngrabServer;
 import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.protocol.types.BOOL;
@@ -64,6 +66,7 @@ import com.neaterbits.displayserver.protocol.types.TIMESTAMP;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.server.XConnection.State;
 import com.neaterbits.displayserver.windows.Display;
+import com.neaterbits.displayserver.windows.Window;
 
 public class XServer implements AutoCloseable {
 
@@ -339,6 +342,33 @@ public class XServer implements AutoCloseable {
                 
                 sendReply(client, reply);
             }
+		    break;
+		}
+		
+		case OpCodes.QUERY_TREE: {
+		    final QueryTree queryTree = log(messageLength, opcode, sequenceNumber, QueryTree.decode(stream));
+		    
+		    final XWindow xWindow = state.getClientOrRootWindow(queryTree.getWindow());
+		    
+		    if (xWindow == null) {
+		        sendError(client, Errors.Window, sequenceNumber, queryTree.getWindow().getValue(), opcode);
+		    }
+		    else {
+
+		        final List<Window> children = display.getSubWindowsInOrder(xWindow.getWindow());
+		        
+		        final QueryTreeReply reply = new QueryTreeReply(
+		                sequenceNumber,
+		                xWindow.isRootWindow() ? xWindow.getWINDOW() : xWindow.getRootWINDOW(),
+		                xWindow.isRootWindow() ? WINDOW.None : xWindow.getParentWINDOW(),
+		                children.stream()
+		                    .map(w -> state.getClientWindow(w))
+		                    .map(xw -> xw.getWINDOW())
+		                    .collect(Collectors.toList()));
+		
+		        sendReply(client, reply);
+		    }
+		    
 		    break;
 		}
 		

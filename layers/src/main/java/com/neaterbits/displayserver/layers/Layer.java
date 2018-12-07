@@ -3,6 +3,7 @@ package com.neaterbits.displayserver.layers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import com.neaterbits.displayserver.types.Size;
 
@@ -73,6 +74,7 @@ public final class Layer {
 	}
 	
 	void addSubLayer(Layer subLayer) {
+	    
 		Objects.requireNonNull(subLayer);
 		
 		if (subLayers == null) {
@@ -85,6 +87,8 @@ public final class Layer {
 				newArray[i + 1] = subLayers[i];
 			}
 
+			newArray[0] = subLayer;
+			
 			this.subLayers = newArray;
 		}
 	}
@@ -107,6 +111,14 @@ public final class Layer {
 		}
 		
 		this.subLayers = newArray;
+	}
+	
+	public void forEachSubLayerBackToFront(Consumer<Layer> onEach) {
+	    if (subLayers != null) {
+	        for (int i = subLayers.length - 1; i >= 0; --i) {
+	            onEach.accept(subLayers[i]);
+	        }
+	    }
 	}
 	
 	Rectangle getRectangle() {

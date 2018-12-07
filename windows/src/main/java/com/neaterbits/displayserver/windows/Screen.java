@@ -1,5 +1,7 @@
 package com.neaterbits.displayserver.windows;
 
+import java.util.List;
+
 import com.neaterbits.displayserver.framebuffer.common.GraphicsScreen;
 
 public final class Screen {
@@ -24,5 +26,9 @@ public final class Screen {
     
     public void disposeWindow(Window window) {
         windows.disposeWindow(window);
+    }
+    
+    public List<Window> getSubWindowsInOrder(Window window) {
+        return windows.getSubWindowsInOrder(window);
     }
 }

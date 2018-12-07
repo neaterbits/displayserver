@@ -1,6 +1,7 @@
 package com.neaterbits.displayserver.windows;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,6 +110,40 @@ public class Windows {
 		sendUpdateEvents(toUpdate);
 	}
 	
+    List<Window> getSubWindowsInOrder(Window window) {
+        
+        Objects.requireNonNull(window);
+        
+        final List<Window> subWindowsBackToFront;
+        
+        if (window.getSubWindows() == null || window.getSubWindows().isEmpty()) {
+            subWindowsBackToFront = Collections.emptyList();
+        }
+        else {
+            subWindowsBackToFront = new ArrayList<>(window.getSubWindows().size());
+            
+            window.getLayer().forEachSubLayerBackToFront(layer -> {
+                
+                Window found = null;
+                
+                for (Window subWindow : window.getSubWindows()) {
+                    if (subWindow.getLayer() == layer) {
+                        found = subWindow;
+                        break;
+                    }
+                }
+                
+                if (found == null) {
+                    throw new IllegalStateException();
+                }
+                
+                subWindowsBackToFront.add(found);
+            });
+        }
+
+        return subWindowsBackToFront;
+    }
+
 	private void sendUpdateEvents(LayerRegions regions) {
 		
 		Objects.requireNonNull(regions);

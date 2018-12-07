@@ -32,4 +32,10 @@ public class Display {
         
         window.getScreen().disposeWindow(window);
     }
+    
+    public List<Window> getSubWindowsInOrder(Window window) {
+        Objects.requireNonNull(window);
+        
+        return window.getScreen().getSubWindowsInOrder(window);
+    }
 }
