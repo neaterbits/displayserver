@@ -11,4 +11,9 @@ public final class TIMESTAMP {
     public long getValue() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
 }

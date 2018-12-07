@@ -40,6 +40,7 @@ import com.neaterbits.displayserver.protocol.messages.replies.QueryTreeReply;
 import com.neaterbits.displayserver.protocol.messages.requests.AllocColor;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeProperty;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeWindowAttributes;
+import com.neaterbits.displayserver.protocol.messages.requests.ConvertSelection;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateColorMap;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateGC;
 import com.neaterbits.displayserver.protocol.messages.requests.CreatePixmap;
@@ -416,6 +417,13 @@ public class XServer implements AutoCloseable {
             final GetSelectionOwner getSelectionOwner = log(messageLength, opcode, sequenceNumber, GetSelectionOwner.decode(stream));
             
             sendReply(client, new GetSelectionOwnerReply(sequenceNumber, WINDOW.None));
+            break;
+        }
+        
+        case OpCodes.CONVERT_SELECTION: {
+            
+            log(messageLength, opcode, sequenceNumber, ConvertSelection.decode(stream));
+            
             break;
         }
         
