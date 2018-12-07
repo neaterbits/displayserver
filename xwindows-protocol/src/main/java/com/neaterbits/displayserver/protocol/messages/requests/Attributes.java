@@ -39,13 +39,9 @@ public abstract class Attributes extends Encodeable {
     }
     
     public final boolean isSet(int flag) {
-        return isSet(valueMask, flag);
+        return valueMask.isSet(flag);
     }
     
-    private static boolean isSet(BITMASK valueMask, int flag) {
-        return (valueMask.getValue() & flag) != 0;
-    }
-
     protected final <T> void writeIfSet(T value, int flag, FieldWriter<T> writer) throws IOException {
         if (isSet(flag)) {
             
@@ -67,7 +63,7 @@ public abstract class Attributes extends Encodeable {
         
         final T value;
         
-        if (isSet(bitmask, flag)) {
+        if (bitmask.isSet(flag)) {
             value = reader.read();
         }
         else {

@@ -2,12 +2,8 @@ package com.neaterbits.displayserver.protocol.enums;
 
 import com.neaterbits.displayserver.protocol.types.BYTE;
 
-public class MapState {
+public class MapState extends ByteEnum {
 
-    private static BYTE make(int value) {
-        return new BYTE((byte)value);
-    }
-    
     public static final int UNMAPPED    = 0;
     public static final int UNVIEWABLE  = 1;
     public static final int VIEWABLE    = 2;

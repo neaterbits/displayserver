@@ -20,6 +20,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.CreateWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.DestroyWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.FreePixmap;
 import com.neaterbits.displayserver.protocol.messages.requests.PutImage;
+import com.neaterbits.displayserver.protocol.messages.requests.WindowAttributes;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.RESOURCE;
 import com.neaterbits.displayserver.windows.Display;
@@ -106,7 +107,7 @@ public class XClient extends XConnection {
                 createWindow.getParent(),
                 createWindow.getBorderWidth(),
                 createWindow.getWindowClass(),
-                createWindow.getAttributes());
+                WindowAttributes.DEFAULT_ATTRIBUTES.applyImmutably(createWindow.getAttributes()));
         
         return xWindowsWindow;
     }

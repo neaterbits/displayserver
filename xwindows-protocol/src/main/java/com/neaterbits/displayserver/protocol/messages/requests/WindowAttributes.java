@@ -8,6 +8,7 @@ import com.neaterbits.displayserver.protocol.IntPadXWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.IntPadXWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
+import com.neaterbits.displayserver.protocol.enums.BackingStore;
 import com.neaterbits.displayserver.protocol.types.BITGRAVITY;
 import com.neaterbits.displayserver.protocol.types.BITMASK;
 import com.neaterbits.displayserver.protocol.types.BOOL;
@@ -71,6 +72,65 @@ public final class WindowAttributes extends Attributes {
     private final SETofDEVICEEVENT doNotPropagateMask;
     private final COLORMAP colormap;
     private final CURSOR cursor;
+    
+    public static WindowAttributes DEFAULT_ATTRIBUTES = new WindowAttributes(
+            new BITMASK(ALL.getValue() & ~(BACKGROUND_PIXEL|BORDER_PIXEL)),
+            PIXMAP.None, null,
+            PIXMAP.None, new CARD32(0),
+            BITGRAVITY.Forget, WINGRAVITY.NorthWest,
+            BackingStore.NotUseful,
+            new CARD32(0xFFFFFFFFL), null,
+            new BOOL(false),
+            new BOOL(false),
+            new SETofEVENT(0),
+            new SETofDEVICEEVENT(0),
+            COLORMAP.CopyFromParent,
+            com.neaterbits.displayserver.protocol.types.CURSOR.None);
+    
+    public WindowAttributes applyImmutably(WindowAttributes other) {
+        return new WindowAttributes(this, other);
+    }
+    
+    private WindowAttributes(WindowAttributes existing, WindowAttributes toApply) {
+        
+        super(existing.getValueMask().bitwiseOr(toApply.getValueMask()));
+        
+        final BITMASK e = existing.getValueMask();
+        final BITMASK a = toApply.getValueMask();
+        
+        this.backgroundPixmap   = returnIfSet(e, a, BACKGROUND_PIXMAP,   existing.backgroundPixmap,   toApply.backgroundPixmap);
+        this.backgroundPixel    = returnIfSet(e, a, BACKGROUND_PIXEL,    existing.backgroundPixel,    toApply.backgroundPixel);
+        this.borderPixmap       = returnIfSet(e, a, BORDER_PIXMAP,       existing.borderPixmap,       toApply.borderPixmap);
+        this.borderPixel        = returnIfSet(e, a, BORDER_PIXEL,        existing.borderPixel,        toApply.borderPixel);
+        this.bitGravity         = returnIfSet(e, a, BIT_GRAVITY,         existing.bitGravity,         toApply.bitGravity);
+        this.winGravity         = returnIfSet(e, a, WIN_GRAVITY,         existing.winGravity,         toApply.winGravity);
+        this.backingStore       = returnIfSet(e, a, BACKING_STORE,       existing.backingStore,       toApply.backingStore);
+        this.backingPlanes      = returnIfSet(e, a, BACKING_PLANES,      existing.backingPlanes,      toApply.backingPlanes);
+        this.backingPixel       = returnIfSet(e, a, BACKING_PIXEL,       existing.backingPixel,       toApply.backingPixel);
+        this.overrideRedirect   = returnIfSet(e, a, OVERRIDE_REDIRECT,   existing.overrideRedirect,   toApply.overrideRedirect);
+        this.saveUnder          = returnIfSet(e, a, SAVE_UNDER,          existing.saveUnder,          toApply.saveUnder);
+        this.eventMask          = returnIfSet(e, a, EVENT_MASK,          existing.eventMask,          toApply.eventMask);
+        this.doNotPropagateMask = returnIfSet(e, a, DO_NOT_PROPAGATE_MASK, existing.doNotPropagateMask, toApply.doNotPropagateMask);
+        this.colormap           = returnIfSet(e, a, COLOR_MAP,           existing.colormap,           toApply.colormap);
+        this.cursor             = returnIfSet(e, a, CURSOR,              existing.cursor,             toApply.cursor);
+    }
+    
+    private static <T> T returnIfSet(BITMASK existingBitmask, BITMASK applyBitmask, int flag, T existing, T toApply) {
+        
+        final T result;
+
+        if (applyBitmask.isSet(flag)) {
+            result = toApply;
+        }
+        else if (existingBitmask.isSet(flag)) {
+            result = existing;
+        }
+        else {
+            result = null;
+        }
+        
+        return result;
+    }
     
     public WindowAttributes(BITMASK valueMask, PIXMAP backgroundPixmap, CARD32 backgroundPixel, PIXMAP borderPixmap,
             CARD32 borderPixel, BITGRAVITY bitGravity, WINGRAVITY winGravity, BYTE backingStore, CARD32 backingPlanes,
