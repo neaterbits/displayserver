@@ -39,4 +39,9 @@ public final class WINGRAVITY {
     public byte getValue() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return String.format("%02x", value);
+    }
 }

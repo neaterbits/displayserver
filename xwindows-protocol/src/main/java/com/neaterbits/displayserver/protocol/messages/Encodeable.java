@@ -6,6 +6,7 @@ import java.nio.ByteOrder;
 import com.neaterbits.displayserver.io.common.DataWriter;
 import com.neaterbits.displayserver.protocol.DataOutputXWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
+import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.util.logging.LogUtil;
 
 public abstract class Encodeable {
@@ -54,4 +55,9 @@ public abstract class Encodeable {
        
        return sb.toString();
    }
+   
+   protected static String hex32(CARD32 value) {
+       return value != null ? String.format("%08x", value.getValue()) : null;
+   }
+
 }

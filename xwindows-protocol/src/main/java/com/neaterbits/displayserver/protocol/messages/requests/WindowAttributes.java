@@ -187,15 +187,15 @@ public final class WindowAttributes extends Attributes {
         final List<Object> params = new ArrayList<>();
         
         addIfSet(params, "bgPixmap",        backgroundPixmap,    BACKGROUND_PIXMAP);
-        addIfSet(params, "bgPixel",         backgroundPixel,     BACKGROUND_PIXEL);
+        addIfSet(params, "bgPixel",         hex32(backgroundPixel), BACKGROUND_PIXEL);
         addIfSet(params, "borderPixmap",    borderPixmap,        BORDER_PIXMAP);
-        addIfSet(params, "borderPixel",     borderPixel,         BORDER_PIXEL);
+        addIfSet(params, "borderPixel",     hex32(borderPixel),  BORDER_PIXEL);
         addIfSet(params, "bitGravity",      bitGravity,          BIT_GRAVITY);
         addIfSet(params, "winGravity",      winGravity,          WIN_GRAVITY);
         addIfSet(params, "backingStore",    backingStore,        BACKING_STORE);
         addIfSet(params, "backingPlanes",   backingPlanes,       BACKING_PLANES);
-        addIfSet(params, "backingPixel",    backingPixel,        BACKING_PIXEL);
-        addIfSet(params, "overrideRedirect", overrideRedirect,    OVERRIDE_REDIRECT);
+        addIfSet(params, "backingPixel",    hex32(backingPixel), BACKING_PIXEL);
+        addIfSet(params, "overrideRedirect", overrideRedirect,   OVERRIDE_REDIRECT);
         addIfSet(params, "saveUnder",       saveUnder,           SAVE_UNDER);
         addIfSet(params, "eventMask",       eventMask,           EVENT_MASK);
         addIfSet(params, "doNotPropagateMask", doNotPropagateMask,  DO_NOT_PROPAGATE_MASK);
