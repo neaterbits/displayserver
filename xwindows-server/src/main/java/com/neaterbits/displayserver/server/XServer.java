@@ -18,6 +18,7 @@ import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolUtil;
 import com.neaterbits.displayserver.protocol.enums.Errors;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
+import com.neaterbits.displayserver.protocol.enums.RevertTo;
 import com.neaterbits.displayserver.protocol.exception.IDChoiceException;
 import com.neaterbits.displayserver.protocol.exception.ValueException;
 import com.neaterbits.displayserver.protocol.logging.XWindowsProtocolLog;
@@ -30,6 +31,7 @@ import com.neaterbits.displayserver.protocol.messages.protocolsetup.ClientMessag
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ServerMessage;
 import com.neaterbits.displayserver.protocol.messages.replies.AllocColorReply;
 import com.neaterbits.displayserver.protocol.messages.replies.GetGeometryReply;
+import com.neaterbits.displayserver.protocol.messages.replies.GetInputFocusReply;
 import com.neaterbits.displayserver.protocol.messages.replies.GetSelectionOwnerReply;
 import com.neaterbits.displayserver.protocol.messages.replies.InternAtomReply;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryPointerReply;
@@ -45,6 +47,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.DestroyWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.FreeGC;
 import com.neaterbits.displayserver.protocol.messages.requests.FreePixmap;
 import com.neaterbits.displayserver.protocol.messages.requests.GetGeometry;
+import com.neaterbits.displayserver.protocol.messages.requests.GetInputFocus;
 import com.neaterbits.displayserver.protocol.messages.requests.GetProperty;
 import com.neaterbits.displayserver.protocol.messages.requests.GetSelectionOwner;
 import com.neaterbits.displayserver.protocol.messages.requests.GetWindowAttributes;
@@ -453,6 +456,15 @@ public class XServer implements AutoCloseable {
             break;
         }
 
+        case OpCodes.GET_INPUT_FOCUS: {
+            
+            log(messageLength, opcode, sequenceNumber, GetInputFocus.decode(stream));
+            
+            sendReply(client, new GetInputFocusReply(sequenceNumber, RevertTo.None, WINDOW.None));
+            
+            break;
+        }
+        
 		case OpCodes.CREATE_PIXMAP: {
 		    final CreatePixmap createPixmap = log(messageLength, opcode, sequenceNumber, CreatePixmap.decode(stream));
 		    
