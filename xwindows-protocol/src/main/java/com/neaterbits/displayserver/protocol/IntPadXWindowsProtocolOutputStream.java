@@ -24,6 +24,7 @@ import com.neaterbits.displayserver.protocol.types.PIXMAP;
 import com.neaterbits.displayserver.protocol.types.SET32;
 import com.neaterbits.displayserver.protocol.types.SETofDEVICEEVENT;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
+import com.neaterbits.displayserver.protocol.types.SETofKEYBUTMASK;
 import com.neaterbits.displayserver.protocol.types.TIMESTAMP;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
@@ -183,6 +184,11 @@ public class IntPadXWindowsProtocolOutputStream implements XWindowsProtocolOutpu
     @Override
     public void writeSETofDEVICEEVENT(SETofDEVICEEVENT value) throws IOException {
         delegate.writeSETofDEVICEEVENT(value);
+    }
+    
+    @Override
+    public void writeSETofKEYBUTMASK(SETofKEYBUTMASK value) throws IOException {
+        writeWithPadding(value, 2, delegate::writeSETofKEYBUTMASK);
     }
 
     @Override

@@ -23,6 +23,7 @@ import com.neaterbits.displayserver.protocol.types.PIXMAP;
 import com.neaterbits.displayserver.protocol.types.SET32;
 import com.neaterbits.displayserver.protocol.types.SETofDEVICEEVENT;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
+import com.neaterbits.displayserver.protocol.types.SETofKEYBUTMASK;
 import com.neaterbits.displayserver.protocol.types.TIMESTAMP;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
@@ -76,6 +77,7 @@ public interface XWindowsProtocolOutputStream {
 	void writeSET32(SET32 value) throws IOException;
 	void writeSETofEVENT(SETofEVENT value) throws IOException;
 	void writeSETofDEVICEEVENT(SETofDEVICEEVENT value) throws IOException;
+	void writeSETofKEYBUTMASK(SETofKEYBUTMASK value) throws IOException;
 
 	void writeData(byte [] data) throws IOException;
 

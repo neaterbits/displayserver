@@ -32,6 +32,7 @@ import com.neaterbits.displayserver.protocol.messages.replies.AllocColorReply;
 import com.neaterbits.displayserver.protocol.messages.replies.GetGeometryReply;
 import com.neaterbits.displayserver.protocol.messages.replies.GetSelectionOwnerReply;
 import com.neaterbits.displayserver.protocol.messages.replies.InternAtomReply;
+import com.neaterbits.displayserver.protocol.messages.replies.QueryPointerReply;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryResponseReply;
 import com.neaterbits.displayserver.protocol.messages.requests.AllocColor;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeProperty;
@@ -49,6 +50,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.GrabServer;
 import com.neaterbits.displayserver.protocol.messages.requests.InternAtom;
 import com.neaterbits.displayserver.protocol.messages.requests.PutImage;
 import com.neaterbits.displayserver.protocol.messages.requests.QueryExtension;
+import com.neaterbits.displayserver.protocol.messages.requests.QueryPointer;
 import com.neaterbits.displayserver.protocol.messages.requests.UngrabServer;
 import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.protocol.types.BOOL;
@@ -57,6 +59,7 @@ import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.INT16;
+import com.neaterbits.displayserver.protocol.types.SETofKEYBUTMASK;
 import com.neaterbits.displayserver.protocol.types.TIMESTAMP;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.server.XConnection.State;
@@ -392,6 +395,30 @@ public class XServer implements AutoCloseable {
             
             log(messageLength, opcode, sequenceNumber, UngrabServer.decode(stream));
             
+            break;
+        }
+        
+        case OpCodes.QUERY_POINTER: {
+            
+            final QueryPointer queryPointer = log(messageLength, opcode, sequenceNumber, QueryPointer.decode(stream));
+            
+            final XWindow window = state.getClientOrRootWindow(queryPointer.getWindow());
+            
+            if (window == null) {
+                sendError(client, Errors.Window, sequenceNumber, queryPointer.getWindow().getValue(), opcode);
+            }
+            else {
+                final QueryPointerReply reply = new QueryPointerReply(
+                        sequenceNumber,
+                        new BOOL(true),
+                        window.isRootWindow() ? window.getWINDOW() : window.getRootWINDOW(),
+                        WINDOW.None,
+                        new INT16((short)0), new INT16((short)0),
+                        new INT16((short)0), new INT16((short)0),
+                        new SETofKEYBUTMASK((short)0));
+                
+                sendReply(client, reply);
+            }
             break;
         }
 

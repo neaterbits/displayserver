@@ -26,6 +26,7 @@ import com.neaterbits.displayserver.protocol.types.RESOURCE;
 import com.neaterbits.displayserver.protocol.types.SET32;
 import com.neaterbits.displayserver.protocol.types.SETofDEVICEEVENT;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
+import com.neaterbits.displayserver.protocol.types.SETofKEYBUTMASK;
 import com.neaterbits.displayserver.protocol.types.TIMESTAMP;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
@@ -183,6 +184,11 @@ public final class DataOutputXWindowsProtocolOutputStream implements XWindowsPro
 
     @Override
     public void writeSETofDEVICEEVENT(SETofDEVICEEVENT value) throws IOException {
+        dataOutput.writeShort(value.getValue());
+    }
+    
+    @Override
+    public void writeSETofKEYBUTMASK(SETofKEYBUTMASK value) throws IOException {
         dataOutput.writeShort(value.getValue());
     }
 
