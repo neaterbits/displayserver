@@ -23,6 +23,11 @@ public final class FreePixmap extends Request {
     }
 
     @Override
+    public Object[] getDebugParams() {
+        return wrap("pixmap", pixmap);
+    }
+
+    @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
         stream.writePIXMAP(pixmap);
     }

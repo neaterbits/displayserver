@@ -73,6 +73,23 @@ public abstract class Attributes extends Encodeable {
         return value;
     }
 
+    protected static <T> T returnIfSet(BITMASK existingBitmask, BITMASK applyBitmask, int flag, T existing, T toApply) {
+        
+        final T result;
+
+        if (applyBitmask.isSet(flag)) {
+            result = toApply;
+        }
+        else if (existingBitmask.isSet(flag)) {
+            result = existing;
+        }
+        else {
+            result = null;
+        }
+        
+        return result;
+    }
+
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
         stream.writeBITMASK(valueMask);

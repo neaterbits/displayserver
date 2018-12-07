@@ -115,22 +115,6 @@ public final class WindowAttributes extends Attributes {
         this.cursor             = returnIfSet(e, a, CURSOR,              existing.cursor,             toApply.cursor);
     }
     
-    private static <T> T returnIfSet(BITMASK existingBitmask, BITMASK applyBitmask, int flag, T existing, T toApply) {
-        
-        final T result;
-
-        if (applyBitmask.isSet(flag)) {
-            result = toApply;
-        }
-        else if (existingBitmask.isSet(flag)) {
-            result = existing;
-        }
-        else {
-            result = null;
-        }
-        
-        return result;
-    }
     
     public WindowAttributes(BITMASK valueMask, PIXMAP backgroundPixmap, CARD32 backgroundPixel, PIXMAP borderPixmap,
             CARD32 borderPixel, BITGRAVITY bitGravity, WINGRAVITY winGravity, BYTE backingStore, CARD32 backingPlanes,

@@ -35,6 +35,7 @@ public final class PutImage extends Request {
 
     public PutImage(BYTE format, DRAWABLE drawable, GCONTEXT gc, CARD16 width, CARD16 height, INT16 dstX, INT16 dstY,
             CARD8 leftPad, CARD8 depth, byte[] data, int dataOffset, int dataLength) {
+        
         this.format = format;
         this.drawable = drawable;
         this.gc = gc;
@@ -71,7 +72,24 @@ public final class PutImage extends Request {
         return new PutImage(format, drawable, gc, width, height, dstX, dstY, leftPad, depth, data, 0, data.length);
     }
 
-    
+    @Override
+    public Object[] getDebugParams() {
+        return wrap(
+                "format", format,
+                "drawable", drawable,
+                "gc", gc,
+                "width", width,
+                "height", height,
+                "dstX", dstX,
+                "dstY", dstY,
+                "leftPad", leftPad,
+                "depth", depth,
+                "data", data,
+                "dataOffset", dataOffset,
+                "dataLength", dataLength
+        );
+    }
+
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 

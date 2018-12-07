@@ -1,12 +1,14 @@
 package com.neaterbits.displayserver.protocol.messages.requests;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.messages.Request;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.GCONTEXT;
+import com.neaterbits.displayserver.util.logging.LogUtil;
 
 public final class CreateGC extends Request {
 
@@ -17,10 +19,9 @@ public final class CreateGC extends Request {
 
 	public static CreateGC decode(XWindowsProtocolInputStream stream) throws IOException {
 	    
-	    stream.readBYTE();
+	    readUnusedByte(stream);
 	    
-	    stream.readCARD16();
-	    
+	    readRequestLength(stream);
 	    
 	    final GCONTEXT cid = stream.readGCONTEXT();
 	    final DRAWABLE drawable = stream.readDRAWABLE();
@@ -31,6 +32,11 @@ public final class CreateGC extends Request {
 	}
 	
 	public CreateGC(GCONTEXT cid, DRAWABLE drawable, GCAttributes attributes) {
+	    
+	    Objects.requireNonNull(cid);
+	    Objects.requireNonNull(drawable);
+	    Objects.requireNonNull(attributes);
+	    
 		this.cid = cid;
 		this.drawable = drawable;
 		this.attributes = attributes;
@@ -49,6 +55,15 @@ public final class CreateGC extends Request {
 	}
 
 	@Override
+    public Object[] getDebugParams() {
+        return wrap(
+                "cid", cid,
+                "drawable", drawable,
+                "attributes", LogUtil.outputParametersInBrackets(attributes.getDebugParams())
+        );
+    }
+
+    @Override
 	public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 		stream.writeGCONTEXT(cid);
 		stream.writeDRAWABLE(drawable);

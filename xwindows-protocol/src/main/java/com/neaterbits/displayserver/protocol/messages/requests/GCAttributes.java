@@ -1,6 +1,8 @@
 package com.neaterbits.displayserver.protocol.messages.requests;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.neaterbits.displayserver.protocol.IntPadXWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.IntPadXWindowsProtocolOutputStream;
@@ -140,6 +142,38 @@ public final class GCAttributes extends Attributes {
                 readIfSet(bitmask, DASH_OFFSET,         padStream::readCARD16),
                 readIfSet(bitmask, DASHES,              padStream::readCARD8),
                 readIfSet(bitmask, ARC_MODE,            padStream::readBYTE));
+    }
+
+    
+    @Override
+    public Object[] getDebugParams() {
+        
+        final List<Object> params = new ArrayList<>();
+
+        addIfSet(params, "function",    function,       FUNCTION);
+        addIfSet(params, "planeMask",   planeMask,      PLANE_MASK);
+        addIfSet(params, "fg",          foreground,     FOREGROUND);
+        addIfSet(params, "bg",          background,     BACKGROUND);
+        addIfSet(params, "linewidth",   lineWidth,      LINE_WIDTH);
+        addIfSet(params, "lineStyle",   lineStyle,      LINE_STYLE);
+        addIfSet(params, "joinStyle",   joinStyle,      JOIN_STYLE);
+        addIfSet(params, "fillStyle",   fillStyle,      FILL_STYLE);
+        addIfSet(params, "fillRule",    fillRule,       FILL_RULE);
+        addIfSet(params, "tile",        tile,           TILE);
+        addIfSet(params, "stipple",     stipple,        STIPPLE);
+        addIfSet(params, "tileStippleXOrigin", tileStippleXOrigin, TILE_STIPPLE_X_ORIGIN);
+        addIfSet(params, "tileStippleYOrigin", tileStippleYOrigin, TILE_STIPPLE_Y_ORIGIN);
+        addIfSet(params, "font",        font,           FONT);
+        addIfSet(params, "subwindowMode", subwindowMode,  SUBWINDOW_MODE);
+        addIfSet(params, "graphicsExposures", graphicsExposures, GRAPHICS_EXPOSURES);
+        addIfSet(params, "clipXOrigin", clipXOrigin,    CLIP_X_ORIGIN);
+        addIfSet(params, "clipYOrigin", clipYOrigin,    CLIP_Y_ORIGIN);
+        addIfSet(params, "clipMask",    clipMask,       CLIP_MASK);
+        addIfSet(params, "dashOffset",  dashOffset,     DASH_OFFSET);
+        addIfSet(params, "dashes",      dashes,         DASHES);
+        addIfSet(params, "arcMod",      arcMode,        ARC_MODE);
+        
+        return params.toArray(new Object[params.size()]);
     }
 
     @Override

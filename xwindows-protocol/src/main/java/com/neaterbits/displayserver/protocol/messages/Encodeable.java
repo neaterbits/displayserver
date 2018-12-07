@@ -59,5 +59,4 @@ public abstract class Encodeable {
    protected static String hex32(CARD32 value) {
        return value != null ? String.format("%08x", value.getValue()) : null;
    }
-
 }
