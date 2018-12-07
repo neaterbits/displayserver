@@ -40,6 +40,7 @@ import com.neaterbits.displayserver.protocol.messages.replies.QueryTreeReply;
 import com.neaterbits.displayserver.protocol.messages.requests.AllocColor;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeProperty;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeWindowAttributes;
+import com.neaterbits.displayserver.protocol.messages.requests.CreateColorMap;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateGC;
 import com.neaterbits.displayserver.protocol.messages.requests.CreatePixmap;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateWindow;
@@ -519,6 +520,13 @@ public class XServer implements AutoCloseable {
 		    break;
 		}
 		
+		case OpCodes.CREATE_COLOR_MAP: {
+		    
+		    log(messageLength, opcode, sequenceNumber, CreateColorMap.decode(stream));
+		    
+		    break;
+		}
+		
 		case OpCodes.ALLOC_COLOR: {
 		    
 		    final AllocColor allocColor = log(messageLength, opcode, sequenceNumber, AllocColor.decode(stream));
@@ -529,8 +537,6 @@ public class XServer implements AutoCloseable {
 		            allocColor.getGreen(),
 		            allocColor.getBlue(),
 		            new CARD32(0)));
-		    
-		    
 		    break;
 		}
 		

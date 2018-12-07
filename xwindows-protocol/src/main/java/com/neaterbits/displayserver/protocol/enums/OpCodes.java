@@ -37,6 +37,8 @@ public class OpCodes {
 	
 	public static final int PUT_IMAGE = 72;
 	
+	public static final int CREATE_COLOR_MAP = 78;
+	
 	public static final int ALLOC_COLOR = 84;
 	
 	public static final int QUERY_EXTENSION = 98;
