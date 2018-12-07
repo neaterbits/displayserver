@@ -8,6 +8,14 @@ import com.neaterbits.displayserver.protocol.IntPadXWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.IntPadXWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
+import com.neaterbits.displayserver.protocol.enums.gc.ArcMode;
+import com.neaterbits.displayserver.protocol.enums.gc.CapStyle;
+import com.neaterbits.displayserver.protocol.enums.gc.FillRule;
+import com.neaterbits.displayserver.protocol.enums.gc.FillStyle;
+import com.neaterbits.displayserver.protocol.enums.gc.Function;
+import com.neaterbits.displayserver.protocol.enums.gc.JoinStyle;
+import com.neaterbits.displayserver.protocol.enums.gc.LineStyle;
+import com.neaterbits.displayserver.protocol.enums.gc.SubwindowMode;
 import com.neaterbits.displayserver.protocol.types.BITMASK;
 import com.neaterbits.displayserver.protocol.types.BOOL;
 import com.neaterbits.displayserver.protocol.types.BYTE;
@@ -44,6 +52,33 @@ public final class GCAttributes extends Attributes {
     public static final int DASHES      = 0x00200000;
     public static final int ARC_MODE    = 0x00400000;
 	
+    public static final BITMASK ALL = new BITMASK(
+              FUNCTION
+            | PLANE_MASK 
+            | FOREGROUND
+            | BACKGROUND
+            | LINE_WIDTH
+            | LINE_STYLE
+            | CAP_STYLE
+            | JOIN_STYLE
+            | FILL_STYLE
+            | FILL_RULE
+            | TILE
+            | STIPPLE
+            | TILE_STIPPLE_X_ORIGIN
+            | TILE_STIPPLE_Y_ORIGIN
+            | FONT
+            | SUBWINDOW_MODE
+            | GRAPHICS_EXPOSURES
+            | CLIP_X_ORIGIN
+            | CLIP_Y_ORIGIN
+            | CLIP_MASK
+            | DASH_OFFSET
+            | DASHES
+            | ARC_MODE
+    );
+
+    
 	private final BYTE function;
 	
 	private final CARD32 planeMask;
@@ -53,6 +88,7 @@ public final class GCAttributes extends Attributes {
 	private final CARD16 lineWidth;
 	
 	private final BYTE lineStyle;
+	private final BYTE capStyle;
 	private final BYTE joinStyle;
 	private final BYTE fillStyle;
 	private final BYTE fillRule;
@@ -80,8 +116,61 @@ public final class GCAttributes extends Attributes {
 	
 	private final BYTE arcMode;
 
+	public static final GCAttributes DEFAULT_ATTRIBUTES = new GCAttributes(
+	        new BITMASK(ALL.getValue() & ~FONT),
+	        Function.Copy,
+	        new CARD32(0xFFFFFFFFL),
+	        new CARD32(0), new CARD32(1),
+	        new CARD16(0),
+	        LineStyle.Solid, CapStyle.Butt, JoinStyle.Miter,
+	        FillStyle.Solid, FillRule.EvenOdd,
+	        PIXMAP.None,
+	        PIXMAP.None, new INT16((short)0), new INT16((short)0),
+	        null,
+	        SubwindowMode.ClipByChildren,
+	        new BOOL(true),
+	        new INT16((short)0), new INT16((short)0), PIXMAP.None,
+	        new CARD16(0), new CARD8((short)(4 << 4 | 4)),
+	        ArcMode.PieSlice);
+	
+    public GCAttributes applyImmutably(GCAttributes other) {
+        return new GCAttributes(this, other);
+    }
+    
+    private GCAttributes(GCAttributes existing, GCAttributes toApply) {
+        super(existing.getValueMask().bitwiseOr(toApply.getValueMask()));
+        
+        final BITMASK e = existing.getValueMask();
+        final BITMASK a = toApply.getValueMask();
+        
+        this.function       = returnIfSet(e, a, FUNCTION,           existing.function,      toApply.function);
+        this.planeMask      = returnIfSet(e, a, PLANE_MASK,         existing.planeMask,     toApply.planeMask);
+        this.foreground     = returnIfSet(e, a, FOREGROUND,         existing.foreground,    toApply.foreground);
+        this.background     = returnIfSet(e, a, BACKGROUND,         existing.background,    toApply.background);
+        this.lineWidth      = returnIfSet(e, a, LINE_WIDTH,         existing.lineWidth,     toApply.lineWidth);
+        this.lineStyle      = returnIfSet(e, a, LINE_STYLE,         existing.lineStyle,     toApply.lineStyle);
+        this.capStyle       = returnIfSet(e, a, CAP_STYLE,          existing.capStyle,      toApply.capStyle);
+        this.joinStyle      = returnIfSet(e, a, JOIN_STYLE,         existing.joinStyle,     toApply.joinStyle);
+        this.fillStyle      = returnIfSet(e, a, FILL_STYLE,         existing.fillStyle,     toApply.fillStyle);
+        this.fillRule       = returnIfSet(e, a, FILL_RULE,          existing.fillRule,      toApply.fillRule);
+        this.tile           = returnIfSet(e, a, TILE,               existing.tile,          toApply.tile);
+        this.stipple        = returnIfSet(e, a, STIPPLE,            existing.stipple,       toApply.stipple);
+        this.tileStippleXOrigin = returnIfSet(e, a, TILE_STIPPLE_X_ORIGIN, existing.tileStippleXOrigin, toApply.tileStippleXOrigin);
+        this.tileStippleYOrigin = returnIfSet(e, a, TILE_STIPPLE_Y_ORIGIN, existing.tileStippleYOrigin, toApply.tileStippleYOrigin);
+        this.font           = returnIfSet(e, a, FONT,               existing.font,          toApply.font);
+        this.subwindowMode  = returnIfSet(e, a, SUBWINDOW_MODE, existing.subwindowMode, toApply.subwindowMode);
+        this.graphicsExposures = returnIfSet(e, a, GRAPHICS_EXPOSURES, existing.graphicsExposures, toApply.graphicsExposures);
+        this.clipXOrigin    = returnIfSet(e, a, CLIP_X_ORIGIN,      existing.clipXOrigin,   toApply.clipXOrigin);
+        this.clipYOrigin    = returnIfSet(e, a, CLIP_Y_ORIGIN,      existing.clipYOrigin,   toApply.clipYOrigin);
+        this.clipMask       = returnIfSet(e, a, CLIP_MASK,          existing.clipMask,      toApply.clipMask);
+        this.dashOffset     = returnIfSet(e, a, DASH_OFFSET,        existing.dashOffset,    toApply.dashOffset);
+        this.dashes         = returnIfSet(e, a, DASHES,             existing.dashes,        toApply.dashes);
+        this.arcMode        = returnIfSet(e, a, ARC_MODE,           existing.arcMode,       toApply.arcMode);
+    }
+
+	
 	public GCAttributes(BITMASK valueMask, BYTE function, CARD32 planeMask, CARD32 foreground, CARD32 background,
-			CARD16 lineWidth, BYTE lineStyle, BYTE joinStyle, BYTE fillStyle, BYTE fillRule, PIXMAP tile,
+			CARD16 lineWidth, BYTE lineStyle, BYTE capStyle, BYTE joinStyle, BYTE fillStyle, BYTE fillRule, PIXMAP tile,
 			PIXMAP stipple, INT16 tileStippleXOrigin, INT16 tileStippleYOrigin, FONT font, BYTE subwindowMode,
 			BOOL graphicsExposures, INT16 clipXOrigin, INT16 clipYOrigin, PIXMAP clipMask, CARD16 dashOffset,
 			CARD8 dashes, BYTE arcMode) {
@@ -94,6 +183,7 @@ public final class GCAttributes extends Attributes {
 		this.background = background;
 		this.lineWidth = lineWidth;
 		this.lineStyle = lineStyle;
+		this.capStyle = capStyle;
 		this.joinStyle = joinStyle;
 		this.fillStyle = fillStyle;
 		this.fillRule = fillRule;
@@ -126,6 +216,7 @@ public final class GCAttributes extends Attributes {
                 readIfSet(bitmask, BACKGROUND,          padStream::readCARD32),
                 readIfSet(bitmask, LINE_WIDTH,          padStream::readCARD16),
                 readIfSet(bitmask, LINE_STYLE,          padStream::readBYTE),
+                readIfSet(bitmask, CAP_STYLE,           padStream::readBYTE),
                 readIfSet(bitmask, JOIN_STYLE,          padStream::readBYTE),
                 readIfSet(bitmask, FILL_STYLE,          padStream::readBYTE),
                 readIfSet(bitmask, FILL_RULE,           padStream::readBYTE),
@@ -156,6 +247,7 @@ public final class GCAttributes extends Attributes {
         addIfSet(params, "bg",          background,     BACKGROUND);
         addIfSet(params, "linewidth",   lineWidth,      LINE_WIDTH);
         addIfSet(params, "lineStyle",   lineStyle,      LINE_STYLE);
+        addIfSet(params, "capStyle",    capStyle,       CAP_STYLE);
         addIfSet(params, "joinStyle",   joinStyle,      JOIN_STYLE);
         addIfSet(params, "fillStyle",   fillStyle,      FILL_STYLE);
         addIfSet(params, "fillRule",    fillRule,       FILL_RULE);
@@ -189,6 +281,7 @@ public final class GCAttributes extends Attributes {
 	    writeIfSet(background,     BACKGROUND,         padStream::writeCARD32);
 	    writeIfSet(lineWidth,      LINE_WIDTH,         padStream::writeCARD16);
 	    writeIfSet(lineStyle,      LINE_STYLE,         padStream::writeBYTE);
+        writeIfSet(capStyle,       CAP_STYLE,          padStream::writeBYTE);
 	    writeIfSet(joinStyle,      JOIN_STYLE,         padStream::writeBYTE);
 	    writeIfSet(fillStyle,      FILL_STYLE,         padStream::writeBYTE);
 	    writeIfSet(fillRule,       FILL_RULE,          padStream::writeBYTE);
@@ -231,7 +324,11 @@ public final class GCAttributes extends Attributes {
 		return lineStyle;
 	}
 
-	public BYTE getJoinStyle() {
+	public BYTE getCapStyle() {
+        return capStyle;
+    }
+
+    public BYTE getJoinStyle() {
 		return joinStyle;
 	}
 

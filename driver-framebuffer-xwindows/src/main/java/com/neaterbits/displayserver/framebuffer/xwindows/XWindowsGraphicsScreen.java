@@ -79,7 +79,6 @@ final class XWindowsGraphicsScreen extends BaseGraphicsScreen {
         return PixelFormat.RGB24;
     }
     
-    
     private XWindowsFrameBuffer initFrameBuffer() {
         try {
             final WINDOW window = new WINDOW(driverConnection.allocateResourceId());
@@ -129,6 +128,7 @@ final class XWindowsGraphicsScreen extends BaseGraphicsScreen {
                     window.toDrawable(),
                     new GCAttributes(
                             new BITMASK(0),
+                            null,
                             null,
                             null,
                             null,

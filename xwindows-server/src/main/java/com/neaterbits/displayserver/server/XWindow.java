@@ -17,7 +17,7 @@ import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.windows.Window;
 
-final class XWindow {
+final class XWindow extends XDrawable {
 
     private final XClient createdBy;
     private final Window window;

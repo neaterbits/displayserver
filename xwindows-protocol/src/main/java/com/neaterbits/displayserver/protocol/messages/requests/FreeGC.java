@@ -42,7 +42,7 @@ public final class FreeGC extends Request {
         stream.writeGCONTEXT(gc);
     }
 
-    public GCONTEXT getGc() {
+    public GCONTEXT getGContext() {
         return gc;
     }
 }

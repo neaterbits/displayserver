@@ -19,6 +19,8 @@ import com.neaterbits.displayserver.protocol.XWindowsProtocolUtil;
 import com.neaterbits.displayserver.protocol.enums.Errors;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
 import com.neaterbits.displayserver.protocol.enums.RevertTo;
+import com.neaterbits.displayserver.protocol.exception.DrawableException;
+import com.neaterbits.displayserver.protocol.exception.GContextException;
 import com.neaterbits.displayserver.protocol.exception.IDChoiceException;
 import com.neaterbits.displayserver.protocol.exception.ValueException;
 import com.neaterbits.displayserver.protocol.logging.XWindowsProtocolLog;
@@ -504,7 +506,14 @@ public class XServer implements AutoCloseable {
 		    
 		    final CreateGC createGC = log(messageLength, opcode, sequenceNumber, CreateGC.decode(stream));
 		    
-		    client.createGC(createGC);
+		    try {
+                client.createGC(createGC);
+            } catch (DrawableException ex) {
+                sendError(client, Errors.Drawable, sequenceNumber, ex.getDrawable().getValue(), opcode);
+            }
+		    catch (IDChoiceException ex) {
+		        sendError(client, Errors.IDChoice, sequenceNumber, ex.getResource().getValue(), opcode);
+		    }
 		    break;
 		}
 		
@@ -512,7 +521,11 @@ public class XServer implements AutoCloseable {
 		    
 		    final FreeGC freeGC = log(messageLength, opcode, sequenceNumber, FreeGC.decode(stream));
 
-		    client.freeGC(freeGC);
+		    try {
+                client.freeGC(freeGC);
+            } catch (GContextException ex) {
+                sendError(client, Errors.GContext, sequenceNumber, ex.getGContext().getValue(), opcode);
+            }
 		    break;
 		}
 		    

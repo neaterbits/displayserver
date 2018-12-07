@@ -12,6 +12,8 @@ import com.neaterbits.displayserver.buffers.PixelFormat;
 import com.neaterbits.displayserver.framebuffer.common.GraphicsScreen;
 import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLog;
 import com.neaterbits.displayserver.protocol.enums.WindowClass;
+import com.neaterbits.displayserver.protocol.exception.DrawableException;
+import com.neaterbits.displayserver.protocol.exception.GContextException;
 import com.neaterbits.displayserver.protocol.exception.IDChoiceException;
 import com.neaterbits.displayserver.protocol.exception.ValueException;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateGC;
@@ -20,9 +22,11 @@ import com.neaterbits.displayserver.protocol.messages.requests.CreateWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.DestroyWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.FreeGC;
 import com.neaterbits.displayserver.protocol.messages.requests.FreePixmap;
+import com.neaterbits.displayserver.protocol.messages.requests.GCAttributes;
 import com.neaterbits.displayserver.protocol.messages.requests.PutImage;
 import com.neaterbits.displayserver.protocol.messages.requests.WindowAttributes;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
+import com.neaterbits.displayserver.protocol.types.GCONTEXT;
 import com.neaterbits.displayserver.protocol.types.RESOURCE;
 import com.neaterbits.displayserver.windows.Display;
 import com.neaterbits.displayserver.windows.Window;
@@ -32,8 +36,9 @@ public class XClient extends XConnection {
     
     private final XServer server;
     private final Set<Integer> utilizedResourceIds;
-    private final Map<DRAWABLE, ImageBuffer> drawableToImageBuffer;
-    private final Map<DRAWABLE, DRAWABLE> pixmapToDrawable;
+    private final Map<DRAWABLE, XPixmap> drawableToXPixmap;
+    private final Map<DRAWABLE, DRAWABLE> pixmapToOwnerDrawable;
+    private final Map<GCONTEXT, XDrawable> gcToDrawable;
     
     public XClient(XServer server, SocketChannel socketChannel, int connectionNo,
             NonBlockingChannelWriterLog log) {
@@ -45,9 +50,9 @@ public class XClient extends XConnection {
 
         this.utilizedResourceIds = new HashSet<>();
         
-        this.drawableToImageBuffer = new HashMap<>();
-        
-        this.pixmapToDrawable = new HashMap<>();
+        this.drawableToXPixmap = new HashMap<>();
+        this.pixmapToOwnerDrawable = new HashMap<>();
+        this.gcToDrawable = new HashMap<>();
     }
 
 
@@ -135,7 +140,7 @@ public class XClient extends XConnection {
             screen = window.getWindow().getScreen().getDriverScreen();
         }
         else {
-            DRAWABLE pixmapDrawable = pixmapToDrawable.get(drawable);
+            DRAWABLE pixmapDrawable = pixmapToOwnerDrawable.get(drawable);
             
             if (pixmapDrawable == null) {
                 throw new IllegalStateException();
@@ -148,7 +153,7 @@ public class XClient extends XConnection {
     }
     
 
-    final ImageBuffer createPixmap(CreatePixmap createPixmap) throws IDChoiceException {
+    final XPixmap createPixmap(CreatePixmap createPixmap) throws IDChoiceException {
         
         final GraphicsScreen graphicsScreen = findGraphicsScreen(createPixmap.getDrawable());
         
@@ -161,11 +166,13 @@ public class XClient extends XConnection {
         
         final DRAWABLE pixmapDrawable = createPixmap.getPid().toDrawable();
         
-        drawableToImageBuffer.put(pixmapDrawable, imageBuffer);
+        final XPixmap xPixmap = new XPixmap(imageBuffer);
         
-        pixmapToDrawable.put(pixmapDrawable, createPixmap.getDrawable());
+        drawableToXPixmap.put(pixmapDrawable, xPixmap);
         
-        return imageBuffer;
+        pixmapToOwnerDrawable.put(pixmapDrawable, createPixmap.getDrawable());
+        
+        return xPixmap;
     }
     
     final void freePixmap(FreePixmap freePixmap) {
@@ -175,21 +182,55 @@ public class XClient extends XConnection {
         
         final GraphicsScreen graphicsScreen = findGraphicsScreen(pixmapDrawable);
 
-        final ImageBuffer imageBuffer = drawableToImageBuffer.remove(freePixmap.getPixmap().toDrawable());
+        final XPixmap xPixmap = drawableToXPixmap.remove(freePixmap.getPixmap().toDrawable());
         
-        if (imageBuffer != null) {
-            graphicsScreen.freeBuffer(imageBuffer);
+        if (xPixmap != null) {
+            if (xPixmap.getImageBuffer() != null) {
+                graphicsScreen.freeBuffer(xPixmap.getImageBuffer());
+            }
         }
         
-        pixmapToDrawable.remove(pixmapDrawable);
+        pixmapToOwnerDrawable.remove(pixmapDrawable);
     }
     
-    final void createGC(CreateGC createGC) {
+    final void createGC(CreateGC createGC) throws DrawableException, IDChoiceException {
         
+        if (gcToDrawable.containsKey(createGC.getCid())) {
+            throw new IDChoiceException("ID already added", createGC.getCid());
+        }
+        
+        final GCAttributes attributes = GCAttributes.DEFAULT_ATTRIBUTES.applyImmutably(createGC.getAttributes());
+        
+        final DRAWABLE drawable = createGC.getDrawable();
+        
+        final XPixmap xPixmap = drawableToXPixmap.get(drawable);
+        final XDrawable xDrawable;
+        
+        if (xPixmap != null) {
+            xDrawable = xPixmap;
+        }
+        else {
+            xDrawable = server.getWindows().getClientOrRootWindow(drawable);
+        }
+
+        if (xDrawable == null) {
+            throw new DrawableException("No such drawable", drawable);
+        }
+
+        xDrawable.addGC(createGC.getCid(), attributes);
+        
+        gcToDrawable.put(createGC.getCid(), xDrawable);
     }
     
-    final void freeGC(FreeGC freeGC) {
+    final void freeGC(FreeGC freeGC) throws GContextException {
         
+        final XDrawable xDrawable = gcToDrawable.remove(freeGC.getGContext());
+        
+        if (xDrawable == null) {
+            throw new GContextException("No such GContext", freeGC.getGContext());
+        }
+        
+        xDrawable.removeGC(freeGC.getGContext());
     }
     
     final void putImage(PutImage putImage) {
@@ -200,9 +241,9 @@ public class XClient extends XConnection {
             
         }
         else {
-            final ImageBuffer imageBuffer = drawableToImageBuffer.get(putImage.getDrawable());
+            final XPixmap xPixmap = drawableToXPixmap.get(putImage.getDrawable());
             
-            if (imageBuffer != null) {
+            if (xPixmap != null) {
                 
             }
         }
