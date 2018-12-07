@@ -17,26 +17,19 @@ import com.neaterbits.displayserver.protocol.ByteBufferXWindowsProtocolInputStre
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolUtil;
 import com.neaterbits.displayserver.protocol.enums.Errors;
-import com.neaterbits.displayserver.protocol.enums.MapState;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
-import com.neaterbits.displayserver.protocol.exception.AtomException;
-import com.neaterbits.displayserver.protocol.exception.MatchException;
 import com.neaterbits.displayserver.protocol.exception.ProtocolException;
-import com.neaterbits.displayserver.protocol.exception.ValueException;
 import com.neaterbits.displayserver.protocol.logging.XWindowsProtocolLog;
 import com.neaterbits.displayserver.protocol.messages.Encodeable;
 import com.neaterbits.displayserver.protocol.messages.Error;
 import com.neaterbits.displayserver.protocol.messages.Event;
 import com.neaterbits.displayserver.protocol.messages.Reply;
 import com.neaterbits.displayserver.protocol.messages.Request;
-import com.neaterbits.displayserver.protocol.messages.events.PropertyNotify;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ClientMessage;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ServerMessage;
 import com.neaterbits.displayserver.protocol.messages.replies.AllocColorReply;
 import com.neaterbits.displayserver.protocol.messages.replies.GetGeometryReply;
-import com.neaterbits.displayserver.protocol.messages.replies.GetPropertyReply;
 import com.neaterbits.displayserver.protocol.messages.replies.GetSelectionOwnerReply;
-import com.neaterbits.displayserver.protocol.messages.replies.GetWindowAttributesReply;
 import com.neaterbits.displayserver.protocol.messages.replies.InternAtomReply;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryResponseReply;
 import com.neaterbits.displayserver.protocol.messages.requests.AllocColor;
@@ -56,7 +49,6 @@ import com.neaterbits.displayserver.protocol.messages.requests.InternAtom;
 import com.neaterbits.displayserver.protocol.messages.requests.PutImage;
 import com.neaterbits.displayserver.protocol.messages.requests.QueryExtension;
 import com.neaterbits.displayserver.protocol.messages.requests.UngrabServer;
-import com.neaterbits.displayserver.protocol.messages.requests.WindowAttributes;
 import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.protocol.types.BOOL;
 import com.neaterbits.displayserver.protocol.types.BYTE;
@@ -64,9 +56,7 @@ import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.INT16;
-import com.neaterbits.displayserver.protocol.types.SETofEVENT;
 import com.neaterbits.displayserver.protocol.types.TIMESTAMP;
-import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.server.XConnection.State;
 import com.neaterbits.displayserver.windows.Display;
@@ -83,6 +73,8 @@ public class XServer implements AutoCloseable {
 	private final XState state;
 	
 	private final long timeServerStarted;
+	
+	private final ServerToClient serverToClient;
 	
 	public XServer(
 	        EventSource driverEventSource,
@@ -116,6 +108,24 @@ public class XServer implements AutoCloseable {
 		        .collect(Collectors.toList()));
 		
 		this.timeServerStarted = System.currentTimeMillis();
+		
+		this.serverToClient = new ServerToClient() {
+            
+            @Override
+            public void sendReply(XClient client, Reply reply) {
+                XServer.this.sendReply(client, reply);
+            }
+            
+            @Override
+            public void sendEvent(XClient client, Event event) {
+                XServer.this.sendEvent(client, event);
+            }
+            
+            @Override
+            public void sendError(XClient client, BYTE errorCode, CARD16 sequenceNumber, long value, int opcode) {
+                XServer.this.sendError(client, errorCode, sequenceNumber, value, opcode);
+            }
+        };
 	}
 	
 	XWindowsConstAccess getWindows() {
@@ -280,33 +290,8 @@ public class XServer implements AutoCloseable {
 			case OpCodes.GET_WINDOW_ATTRIBUTES: {
 			    
 			    final GetWindowAttributes getWindowAttributes = log(messageLength, opcode, sequenceNumber, GetWindowAttributes.decode(stream));
-			    
-			    final XWindow window = state.getClientWindow(getWindowAttributes.getWindow());
 
-			    if (window == null) {
-			        sendError(client, Errors.Window, sequenceNumber, getWindowAttributes.getWindow().getValue(), opcode);
-			    }
-			    else {
-    			    final WindowAttributes curAttributes = window.getCurrentWindowAttributes();
-    			    
-    			    final GetWindowAttributesReply reply = new GetWindowAttributesReply(
-    			            sequenceNumber,
-    			            curAttributes.getBackingStore(),
-    			            new VISUALID(0),
-    			            window.getWindowClass(),
-    			            curAttributes.getBitGravity(), curAttributes.getWinGravity(),
-    			            curAttributes.getBackingPlanes(), curAttributes.getBackingPixel(),
-    			            curAttributes.getSaveUnder(),
-    			            new BOOL(true),
-    			            MapState.Viewable,
-    			            curAttributes.getOverrideRedirect(),
-    			            curAttributes.getColormap(),
-    			            new SETofEVENT(0), // TODO
-    			            new SETofEVENT(0), // TODO
-    			            curAttributes.getDoNotPropagateMask());
-    			    
-    			    sendReply(client, reply);
-			    }
+			    MessageProcessorWindows.getWindowAttributes(getWindowAttributes, opcode, sequenceNumber, client, state, serverToClient);
 			    break;
 			}
 			
@@ -370,39 +355,7 @@ public class XServer implements AutoCloseable {
 			case OpCodes.CHANGE_PROPERTY: {
 			    final ChangeProperty changeProperty = log(messageLength, opcode, sequenceNumber, ChangeProperty.decode(stream));
 
-                final XWindow xWindow = state.getClientWindow(changeProperty.getWindow());
-                
-                if (xWindow == null) {
-                    sendError(client, Errors.Window, sequenceNumber, changeProperty.getWindow().getValue(), opcode);
-                }
-                else {
-                    try {
-                        xWindow.changeProperty(
-                                changeProperty.getMode(),
-                                changeProperty.getProperty(),
-                                changeProperty.getType(),
-                                changeProperty.getFormat(),
-                                changeProperty.getData());
-                        
-                        final PropertyNotify propertyNotify = new PropertyNotify(
-                                sequenceNumber,
-                                changeProperty.getWindow(),
-                                changeProperty.getProperty(),
-                                getTimestamp(),
-                                PropertyNotify.NewValue);
-                        
-                        sendEvent(client, propertyNotify);
-                    }
-                    catch (MatchException ex) {
-                        sendError(client, Errors.Match, sequenceNumber, 0, opcode);
-                    }
-                    catch (AtomException ex) {
-                        sendError(client, Errors.Atom, sequenceNumber, changeProperty.getProperty().getValue(), opcode);
-                    }
-                    catch (ValueException ex) {
-                        sendError(client, Errors.Value, sequenceNumber, ex.getValue(), opcode);
-                    }
-                }
+			    MessageProcessorProperties.changeProperty(changeProperty, opcode, sequenceNumber, getTimestamp(), client, state, serverToClient);
 			    break;
 			}
 			
@@ -410,70 +363,7 @@ public class XServer implements AutoCloseable {
                 
                 final GetProperty getProperty = log(messageLength, opcode, sequenceNumber, GetProperty.decode(stream));
                 
-                final XWindow xWindow = state.getClientOrRootWindow(getProperty.getWindow());
-                
-                if (xWindow == null) {
-                    sendError(client, Errors.Window, sequenceNumber, getProperty.getWindow().getValue(), opcode);
-                }
-                else {
-                    final Property property = xWindow.getProperty(getProperty.getProperty());
-                
-                    if (property == null) {
-                        sendReply(client, new GetPropertyReply(
-                                sequenceNumber,
-                                new CARD8((short)0),
-                                ATOM.None,
-                                0,
-                                new byte[0]));
-                    }
-                    else if (!getProperty.getType().equals(property.getType()) && !ATOM.AnyPropertyType.equals(property.getType())) {
-                        sendReply(client, new GetPropertyReply(
-                                sequenceNumber,
-                                property.getFormat(),
-                                property.getType(),
-                                property.getData().length,
-                                new byte[0]));
-                    }
-                    else {
-                        final long N = property.getData().length;
-                        final long I = 4 * getProperty.getLongOffset().getValue();
-                        final long T = N - I;
-                        final long L = Math.min(T, 4 * getProperty.getLongLength().getValue());
-                        final long A = N - (I + L);
-
-                        if (L < 0) {
-                            sendError(client, Errors.Value, sequenceNumber, getProperty.getLongOffset().getValue(), opcode);
-                        }
-                        else {
-                            final long bytesAfter = A;
-                            
-                            final byte [] data = new byte[(int)L];
-                            
-                            System.arraycopy(property.getData(), (int)I, data, 0, (int)L);
-                            
-                            sendReply(client, new GetPropertyReply(
-                                    sequenceNumber,
-                                    property.getFormat(),
-                                    property.getType(),
-                                    (int)bytesAfter,
-                                    data));
-                            
-                            if (xWindow.isCreatedBy(client) && bytesAfter == 0 && getProperty.getDelete().isSet()) {
-
-                                xWindow.deleteProperty(property.getProperty());
-                                
-                                final PropertyNotify propertyNotify = new PropertyNotify(
-                                        sequenceNumber,
-                                        getProperty.getWindow(),
-                                        property.getProperty(),
-                                        getTimestamp(),
-                                        PropertyNotify.Deleted);
-                                
-                                sendEvent(client, propertyNotify);
-                            }
-                        }
-                    }
-                }
+                MessageProcessorProperties.getProperty(getProperty, opcode, sequenceNumber, getTimestamp(), client, state, serverToClient);
                 break;
             }
             
