@@ -7,9 +7,9 @@ import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.util.logging.BaseLogImpl;
 import com.neaterbits.displayserver.util.logging.DebugLevel;
 
-public final class XWindowsProtocolLogImpl extends BaseLogImpl implements XWindowsProtocolLog {
+public final class XWindowsServerProtocolLogImpl extends BaseLogImpl implements XWindowsServerProtocolLog {
 
-    public XWindowsProtocolLogImpl(String prefix, DebugLevel debugLevel) {
+    public XWindowsServerProtocolLogImpl(String prefix, DebugLevel debugLevel) {
         super(prefix, debugLevel);
     }
 

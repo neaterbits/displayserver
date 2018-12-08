@@ -41,12 +41,17 @@ public final class QueryPointer extends Request {
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
         
-        writeOpCode(stream, OpCodes.QUERY_POINTER);
+        writeOpCode(stream);
         
         writeUnusedByte(stream);
         
         writeRequestLength(stream, 2);
 
         stream.writeWINDOW(window);
+    }
+
+    @Override
+    public int getOpCode() {
+        return OpCodes.QUERY_POINTER;
     }
 }

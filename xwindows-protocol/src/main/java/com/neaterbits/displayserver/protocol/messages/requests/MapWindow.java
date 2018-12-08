@@ -36,8 +36,8 @@ public final class MapWindow extends Request {
 
     @Override
 	public void encode(XWindowsProtocolOutputStream stream) throws IOException {
-	    
-	    stream.writeOpCode(OpCodes.MAP_WINDOW);
+
+        writeOpCode(stream);
 
 	    writeUnusedByte(stream);
 	    
@@ -45,4 +45,9 @@ public final class MapWindow extends Request {
 	    
 		stream.writeWINDOW(window);
 	}
+
+    @Override
+    public int getOpCode() {
+        return OpCodes.MAP_WINDOW;
+    }
 }

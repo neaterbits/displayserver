@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
+import com.neaterbits.displayserver.protocol.enums.OpCodes;
 import com.neaterbits.displayserver.protocol.messages.Request;
 import com.neaterbits.displayserver.protocol.types.PIXMAP;
 
@@ -29,7 +30,19 @@ public final class FreePixmap extends Request {
 
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
+        
+        writeOpCode(stream);
+        
+        writeUnusedByte(stream);
+        
+        writeRequestLength(stream, 2);
+        
         stream.writePIXMAP(pixmap);
+    }
+    
+    @Override
+    public int getOpCode() {
+        return OpCodes.FREE_PIXMAP;
     }
 
     public PIXMAP getPixmap() {

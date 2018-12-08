@@ -13,9 +13,12 @@ import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLog;
 import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLogImpl;
 import com.neaterbits.displayserver.io.common.SelectableLog;
 import com.neaterbits.displayserver.io.common.SelectableLogImpl;
-import com.neaterbits.displayserver.protocol.logging.XWindowsProtocolLog;
-import com.neaterbits.displayserver.protocol.logging.XWindowsProtocolLogImpl;
+import com.neaterbits.displayserver.protocol.logging.XWindowsClientProtocolLog;
+import com.neaterbits.displayserver.protocol.logging.XWindowsClientProtocolLogImpl;
+import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLog;
+import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLogImpl;
 import com.neaterbits.displayserver.server.XServer;
+import com.neaterbits.displayserver.util.logging.DebugLevel;
 
 public class DisplayServerMain {
 
@@ -40,7 +43,9 @@ public class DisplayServerMain {
 		            "Driverwrite",
 		            DebugLevels.DRIVER_WRITE);
 		    
-			try (XWindowsDriverConnection driverConnection = new XWindowsDriverConnection(display, driverWriteLog)) {
+		    final XWindowsClientProtocolLog driverProtocolLog = new XWindowsClientProtocolLogImpl("driver", DebugLevel.DEBUG);
+		    
+			try (XWindowsDriverConnection driverConnection = new XWindowsDriverConnection(display, driverWriteLog, driverProtocolLog)) {
 
 			    final String name = "Driverevents";
 			    
@@ -65,7 +70,7 @@ public class DisplayServerMain {
 				        "Connectionwrite",
 				        DebugLevels.CONNECTION_WRITE);
 				
-				final XWindowsProtocolLog protocolLog = new XWindowsProtocolLogImpl("XWindowsProtocol", DebugLevels.XWINDOWS_PROTOCOL);
+				final XWindowsServerProtocolLog protocolLog = new XWindowsServerProtocolLogImpl("XWindowsProtocol", DebugLevels.XWINDOWS_PROTOCOL);
 				
 				try (XServer server = new XServer(
 				        eventSource,

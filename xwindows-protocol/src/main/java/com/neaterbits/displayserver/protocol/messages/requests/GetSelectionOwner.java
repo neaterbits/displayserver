@@ -41,12 +41,17 @@ public final class GetSelectionOwner extends Request {
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 
-        writeOpCode(stream, OpCodes.GET_SELECTION_OWNER);
+        writeOpCode(stream);
         
         writeUnusedByte(stream);
         
         writeRequestLength(stream, 2);
         
         stream.writeATOM(selection);
+    }
+
+    @Override
+    public int getOpCode() {
+        return OpCodes.GET_SELECTION_OWNER;
     }
 }

@@ -142,15 +142,15 @@ abstract class XWindowsChannelReaderWriter
 		socketChannel.close();
 	}
 	
-	void writeRequest(Request request, ByteOrder byteOrder) throws IOException {
-	    writeEncodeable(request, byteOrder);
+	int writeRequest(Request request, ByteOrder byteOrder) throws IOException {
+	    return writeEncodeable(request, byteOrder);
 	}
 	
 	
-	void writeEncodeable(Encodeable encodeable, ByteOrder byteOrder) throws IOException {
+	int writeEncodeable(Encodeable encodeable, ByteOrder byteOrder) throws IOException {
 		
 		Objects.requireNonNull(encodeable);
 		
-		write(byteOrder, Encodeable.makeDataWriter(encodeable));
+		return write(byteOrder, Encodeable.makeDataWriter(encodeable));
 	}
 }

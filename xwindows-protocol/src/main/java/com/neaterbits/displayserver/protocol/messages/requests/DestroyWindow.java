@@ -5,6 +5,7 @@ import java.util.Objects;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
+import com.neaterbits.displayserver.protocol.enums.OpCodes;
 import com.neaterbits.displayserver.protocol.messages.Request;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 
@@ -31,4 +32,9 @@ public final class DestroyWindow extends Request {
 	public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 		stream.writeWINDOW(window);
 	}
+
+    @Override
+    public int getOpCode() {
+        return OpCodes.DESTROY_WINDOW;
+    }
 }

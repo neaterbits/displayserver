@@ -83,7 +83,7 @@ public final class GetProperty extends Request {
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
         
-        writeOpCode(stream, OpCodes.GET_PROPERTY);
+        writeOpCode(stream);
 
         stream.writeBOOL(delete);
         stream.writeCARD16(new CARD16(6));
@@ -93,5 +93,10 @@ public final class GetProperty extends Request {
         stream.writeATOM(type);
         stream.writeCARD32(longOffset);
         stream.writeCARD32(longLength);
+    }
+
+    @Override
+    public int getOpCode() {
+        return OpCodes.GET_PROPERTY;
     }
 }

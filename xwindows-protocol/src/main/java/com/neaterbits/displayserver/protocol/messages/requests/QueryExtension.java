@@ -8,7 +8,6 @@ import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolUtil;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
 import com.neaterbits.displayserver.protocol.messages.Request;
-import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 
 public final class QueryExtension extends Request {
@@ -48,9 +47,9 @@ public final class QueryExtension extends Request {
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 
-        stream.writeOpCode(OpCodes.QUERY_EXTENSION);
+        writeOpCode(stream);
         
-        stream.writeBYTE(new BYTE(((byte)0)));
+        writeUnusedByte(stream);
         
         final int padLength = XWindowsProtocolUtil.getPadding(name.length());
         
@@ -60,5 +59,10 @@ public final class QueryExtension extends Request {
         
         stream.writeSTRING8(name);
         stream.pad(padLength);
+    }
+
+    @Override
+    public int getOpCode() {
+        return OpCodes.QUERY_EXTENSION;
     }
 }

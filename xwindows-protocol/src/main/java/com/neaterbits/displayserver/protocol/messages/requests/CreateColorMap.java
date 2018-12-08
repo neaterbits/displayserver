@@ -54,7 +54,7 @@ public final class CreateColorMap extends Request {
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
         
-        writeOpCode(stream, OpCodes.CREATE_COLOR_MAP);
+        writeOpCode(stream);
         
         stream.writeBYTE(alloc);
         
@@ -63,5 +63,10 @@ public final class CreateColorMap extends Request {
         stream.writeCOLORMAP(mid);
         stream.writeWINDOW(window);
         stream.writeVISUALID(visual);
+    }
+
+    @Override
+    public int getOpCode() {
+        return OpCodes.CREATE_COLOR_MAP;
     }
 }

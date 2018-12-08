@@ -23,7 +23,7 @@ import com.neaterbits.displayserver.protocol.exception.DrawableException;
 import com.neaterbits.displayserver.protocol.exception.GContextException;
 import com.neaterbits.displayserver.protocol.exception.IDChoiceException;
 import com.neaterbits.displayserver.protocol.exception.ValueException;
-import com.neaterbits.displayserver.protocol.logging.XWindowsProtocolLog;
+import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLog;
 import com.neaterbits.displayserver.protocol.messages.Encodeable;
 import com.neaterbits.displayserver.protocol.messages.Error;
 import com.neaterbits.displayserver.protocol.messages.Event;
@@ -79,7 +79,7 @@ import com.neaterbits.displayserver.windows.Window;
 
 public class XServer implements AutoCloseable {
 
-    private final XWindowsProtocolLog protocolLog;
+    private final XWindowsServerProtocolLog protocolLog;
     private final NonBlockingChannelWriterLog connectionWriteLog;
     
 	private final Display display;
@@ -95,7 +95,7 @@ public class XServer implements AutoCloseable {
 	public XServer(
 	        EventSource driverEventSource,
 	        GraphicsDriver graphicsDriver,
-	        XWindowsProtocolLog protocolLog,
+	        XWindowsServerProtocolLog protocolLog,
 	        NonBlockingChannelWriterLog connectionWriteLog) throws IOException {
 		
 		Objects.requireNonNull(graphicsDriver);

@@ -41,7 +41,7 @@ public final class QueryTree extends Request {
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
         
-        writeOpCode(stream, OpCodes.QUERY_POINTER);
+        writeOpCode(stream);
         
         writeUnusedByte(stream);
         
@@ -50,4 +50,8 @@ public final class QueryTree extends Request {
         stream.writeWINDOW(window);
     }
 
+    @Override
+    public int getOpCode() {
+        return OpCodes.QUERY_TREE;
+    }
 }

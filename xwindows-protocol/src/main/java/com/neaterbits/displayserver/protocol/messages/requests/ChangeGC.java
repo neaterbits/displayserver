@@ -3,6 +3,7 @@ package com.neaterbits.displayserver.protocol.messages.requests;
 import java.io.IOException;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
+import com.neaterbits.displayserver.protocol.enums.OpCodes;
 import com.neaterbits.displayserver.protocol.messages.Request;
 import com.neaterbits.displayserver.protocol.types.GCONTEXT;
 
@@ -18,8 +19,21 @@ public final class ChangeGC extends Request {
 
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
+        
+        writeOpCode(stream);
+        
+        writeUnusedByte(stream);
+        
+        writeRequestLength(stream, 3 + attributes.getCount());
+        
         stream.writeGCONTEXT(gc);
+     
         attributes.encode(stream);
+    }
+
+    @Override
+    public int getOpCode() {
+        return OpCodes.CHANGE_GC;
     }
 
     public GCONTEXT getGc() {

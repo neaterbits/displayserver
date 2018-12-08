@@ -5,6 +5,7 @@ import java.util.Objects;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
+import com.neaterbits.displayserver.protocol.enums.OpCodes;
 import com.neaterbits.displayserver.protocol.messages.Request;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.GCONTEXT;
@@ -65,9 +66,21 @@ public final class CreateGC extends Request {
 
     @Override
 	public void encode(XWindowsProtocolOutputStream stream) throws IOException {
-		stream.writeGCONTEXT(cid);
+
+        writeOpCode(stream);
+        
+        writeUnusedByte(stream);
+        
+        writeRequestLength(stream, 4 + attributes.getCount());
+        
+        stream.writeGCONTEXT(cid);
 		stream.writeDRAWABLE(drawable);
 		
 		attributes.encode(stream);
 	}
+
+    @Override
+    public int getOpCode() {
+        return OpCodes.CREATE_GC;
+    }
 }

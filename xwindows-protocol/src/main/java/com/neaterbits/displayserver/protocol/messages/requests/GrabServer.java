@@ -21,10 +21,15 @@ public final class GrabServer extends Request {
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 
-        writeOpCode(stream, OpCodes.GRAB_SERVER);
+        writeOpCode(stream);
         
         writeUnusedByte(stream);
         
         writeRequestLength(stream, 1);
+    }
+
+    @Override
+    public int getOpCode() {
+        return OpCodes.GRAB_SERVER;
     }
 }

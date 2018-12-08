@@ -114,7 +114,7 @@ public final class CreateWindow extends Request {
     @Override
 	public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 
-	    writeOpCode(stream, OpCodes.CREATE_WINDOW);
+	    writeOpCode(stream);
 	    
 		stream.writeCARD8(depth);
 		
@@ -138,8 +138,13 @@ public final class CreateWindow extends Request {
 		    attributes.encode(stream);
 		}
 	}
+    
+	@Override
+    public int getOpCode() {
+        return OpCodes.CREATE_WINDOW;
+    }
 
-	public CARD8 getDepth() {
+    public CARD8 getDepth() {
 		return depth;
 	}
 

@@ -82,7 +82,7 @@ public final class ConvertSelection extends Request {
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 
-        writeOpCode(stream, OpCodes.CONVERT_SELECTION);
+        writeOpCode(stream);
         
         writeUnusedByte(stream);
         
@@ -93,5 +93,10 @@ public final class ConvertSelection extends Request {
         stream.writeATOM(target);
         stream.writeATOM(property);
         stream.writeTIMESTAMP(currentTime);
+    }
+
+    @Override
+    public int getOpCode() {
+        return OpCodes.CONVERT_SELECTION;
     }
 }

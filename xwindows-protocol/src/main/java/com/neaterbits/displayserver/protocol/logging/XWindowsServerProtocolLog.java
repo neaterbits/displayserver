@@ -5,7 +5,7 @@ import com.neaterbits.displayserver.protocol.messages.Reply;
 import com.neaterbits.displayserver.protocol.messages.Request;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 
-public interface XWindowsProtocolLog {
+public interface XWindowsServerProtocolLog {
 
     void onReceivedRequest(int messageLength, int opcode, CARD16 sequenceNumber, Request request);
     

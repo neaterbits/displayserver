@@ -61,7 +61,7 @@ public final class AllocColor extends Request {
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
         
-        stream.writeOpCode(OpCodes.ALLOC_COLOR);
+        writeOpCode(stream);
         
         stream.writeBYTE(new BYTE((byte)0));
         
@@ -73,5 +73,10 @@ public final class AllocColor extends Request {
         stream.writeCARD16(blue);
         
         stream.writeCARD16(new CARD16(0));
+    }
+
+    @Override
+    public int getOpCode() {
+        return OpCodes.ALLOC_COLOR;
     }
 }

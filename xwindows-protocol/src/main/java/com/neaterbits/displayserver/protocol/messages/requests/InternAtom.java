@@ -60,7 +60,7 @@ public final class InternAtom extends Request {
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 
-        writeOpCode(stream, OpCodes.INTERN_ATOM);
+        writeOpCode(stream);
         
         stream.writeBOOL(onlyIfExists);
         
@@ -75,5 +75,10 @@ public final class InternAtom extends Request {
         stream.writeSTRING8(name);
         
         stream.pad(pad);
+    }
+
+    @Override
+    public int getOpCode() {
+        return OpCodes.INTERN_ATOM;
     }
 }

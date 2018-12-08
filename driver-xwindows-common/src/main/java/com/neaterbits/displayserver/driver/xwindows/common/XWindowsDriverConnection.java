@@ -11,6 +11,7 @@ import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLog;
 import com.neaterbits.displayserver.io.common.Selectable;
 import com.neaterbits.displayserver.protocol.ByteBufferXWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
+import com.neaterbits.displayserver.protocol.logging.XWindowsClientProtocolLog;
 import com.neaterbits.displayserver.protocol.messages.Request;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ClientConnectionError;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ClientMessage;
@@ -21,6 +22,7 @@ import com.neaterbits.displayserver.protocol.types.CARD8;
 public final class XWindowsDriverConnection
 		implements AutoCloseable, XWindowsRequestSender {
 
+    private final XWindowsClientProtocolLog protocolLog;
 	private final XWindowsChannelReaderWriter readerWriter;
 	
 	private final Listeners<XWindowsReplyListener> replyListeners;
@@ -31,8 +33,10 @@ public final class XWindowsDriverConnection
 	
 	private final ByteOrder byteOrder;
 	
-	public XWindowsDriverConnection(int connectDisplay, NonBlockingChannelWriterLog writeLog) throws IOException {
+	public XWindowsDriverConnection(int connectDisplay, NonBlockingChannelWriterLog writeLog, XWindowsClientProtocolLog protocolLog) throws IOException {
 
+	    this.protocolLog = protocolLog;
+	    
 	    final int port = 6000 + connectDisplay;
 	    
 		this.readerWriter = new XWindowsChannelReaderWriter(port, writeLog) {
@@ -202,6 +206,12 @@ public final class XWindowsDriverConnection
 
 	@Override
 	public void sendRequest(Request request) throws IOException {
-		readerWriter.writeRequest(request, byteOrder);
+	    
+	    
+		final int messageLength = readerWriter.writeRequest(request, byteOrder);
+
+		if (protocolLog != null) {
+            protocolLog.onSendRequest(messageLength, request);
+        }
 	}
 }

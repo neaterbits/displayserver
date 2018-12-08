@@ -49,12 +49,17 @@ public final class ChangeWindowAttributes extends Request {
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 
-        writeOpCode(stream, OpCodes.CHANGE_WINDOW_ATTRIBUTES);
+        writeOpCode(stream);
         
         writeUnusedByte(stream);
         
         writeRequestLength(stream, 3 + attributes.getCount());
         
         attributes.encode(stream);
+    }
+
+    @Override
+    public int getOpCode() {
+        return OpCodes.CHANGE_WINDOW_ATTRIBUTES;
     }
 }

@@ -37,12 +37,17 @@ public final class GetGeometry extends Request {
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
         
-        writeOpCode(stream, OpCodes.GET_GEOMETRY);
+        writeOpCode(stream);
         
         writeUnusedByte(stream);
         
         writeRequestLength(stream, 2);
         
         stream.writeDRAWABLE(drawable);
+    }
+
+    @Override
+    public int getOpCode() {
+        return OpCodes.GET_GEOMETRY;
     }
 }

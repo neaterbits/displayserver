@@ -22,11 +22,13 @@ public abstract class NonBlockingChannelWriter implements NonBlockingWritable {
 	
 	protected abstract SocketChannel getChannel(SelectionKey selectionKey, Selector selector);
 	
-	protected final void write(ByteOrder byteOrder, DataWriter writeData) {
+	protected final int write(ByteOrder byteOrder, DataWriter writeData) {
         
         final byte [] data = DataWriter.writeToBuf(byteOrder, writeData);
         
         write(data, 0, data.length);
+        
+        return data.length;
     }
 
 	

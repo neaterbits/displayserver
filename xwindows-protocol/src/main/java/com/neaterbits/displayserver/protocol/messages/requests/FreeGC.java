@@ -33,13 +33,18 @@ public final class FreeGC extends Request {
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
         
-        writeOpCode(stream, OpCodes.FREE_GC);
+        writeOpCode(stream);
         
         writeUnusedByte(stream);
         
         writeRequestLength(stream, 2);
         
         stream.writeGCONTEXT(gc);
+    }
+
+    @Override
+    public int getOpCode() {
+        return OpCodes.FREE_GC;
     }
 
     public GCONTEXT getGContext() {

@@ -93,7 +93,7 @@ public final class PutImage extends Request {
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 
-        writeOpCode(stream, OpCodes.PUT_IMAGE);
+        writeOpCode(stream);
         
         stream.writeBYTE(format);
         
@@ -118,6 +118,11 @@ public final class PutImage extends Request {
         stream.writeData(data, dataOffset, dataLength);
         
         stream.pad(pad);
+    }
+
+    @Override
+    public int getOpCode() {
+        return OpCodes.PUT_IMAGE;
     }
 
     public BYTE getFormat() {

@@ -96,7 +96,7 @@ public final class ChangeProperty extends Request {
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 
-        writeOpCode(stream, OpCodes.CHANGE_PROPERTY);
+        writeOpCode(stream);
 
         stream.writeBYTE(mode);
         
@@ -119,6 +119,8 @@ public final class ChangeProperty extends Request {
         stream.pad(pad);
     }
 
-    
-    
+    @Override
+    public int getOpCode() {
+        return OpCodes.CHANGE_PROPERTY;
+    }
 }

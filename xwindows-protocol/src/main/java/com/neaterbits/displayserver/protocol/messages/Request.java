@@ -9,8 +9,10 @@ import com.neaterbits.displayserver.protocol.types.CARD16;
 
 public abstract class Request extends Message {
 
-    protected final void writeOpCode(XWindowsProtocolOutputStream stream, int opCode) throws IOException {
-        stream.writeBYTE(new BYTE((byte)opCode));
+    public abstract int getOpCode();
+    
+    protected final void writeOpCode(XWindowsProtocolOutputStream stream) throws IOException {
+        stream.writeBYTE(new BYTE((byte)getOpCode()));
     }
     
     protected static void writeRequestLength(XWindowsProtocolOutputStream stream, int requestLength) throws IOException {

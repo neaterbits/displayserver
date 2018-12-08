@@ -41,12 +41,17 @@ public final class GetWindowAttributes extends Request {
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
         
-        writeOpCode(stream, OpCodes.GET_WINDOW_ATTRIBUTES);
+        writeOpCode(stream);
         
         writeUnusedByte(stream);
         
         writeRequestLength(stream, 2);
         
         stream.writeWINDOW(window);
+    }
+
+    @Override
+    public int getOpCode() {
+        return OpCodes.GET_WINDOW_ATTRIBUTES;
     }
 }
