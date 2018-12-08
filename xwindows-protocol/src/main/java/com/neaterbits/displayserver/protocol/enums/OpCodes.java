@@ -16,6 +16,7 @@ public class OpCodes {
 	public static final int INTERN_ATOM = 16;
 	
 	public static final int CHANGE_PROPERTY = 18;
+	public static final int DELETE_PROPERTY = 19;
 	public static final int GET_PROPERTY = 20;
 	
 	public static final int GET_SELECTION_OWNER = 23;

@@ -191,6 +191,19 @@ final class XWindow extends XDrawable {
         }
     }
     
+    void deleteProperty(ATOM propertyAtom) throws AtomException {
+
+        final Property property = removeProperty(propertyAtom);
+        
+        if (property == null) {
+            throw new AtomException("No such property", propertyAtom);
+        }
+    }
+
+    Property removeProperty(ATOM propertyAtom) {
+        return properties.remove(propertyAtom);
+    }
+
     private static byte [] merge(byte [] array1, byte [] array2) {
         final byte [] result = Arrays.copyOf(array1, array1.length + array2.length);
         
@@ -208,13 +221,6 @@ final class XWindow extends XDrawable {
         if (!property.getFormat().equals(format)) {
             throw new MatchException("Formats do not match: " + property.getFormat() + "/" + format);
         }
-    }
-    
-    void deleteProperty(ATOM property) {
-        
-        Objects.requireNonNull(property);
-        
-        properties.remove(property);
     }
     
     @Override

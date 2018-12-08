@@ -48,6 +48,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.CreateCursor;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateGC;
 import com.neaterbits.displayserver.protocol.messages.requests.CreatePixmap;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateWindow;
+import com.neaterbits.displayserver.protocol.messages.requests.DeleteProperty;
 import com.neaterbits.displayserver.protocol.messages.requests.DestroyWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.FreeGC;
 import com.neaterbits.displayserver.protocol.messages.requests.FreePixmap;
@@ -409,9 +410,18 @@ public class XServer implements AutoCloseable {
 		}
 		
 		case OpCodes.CHANGE_PROPERTY: {
+		    
 		    final ChangeProperty changeProperty = log(messageLength, opcode, sequenceNumber, ChangeProperty.decode(stream));
 
 		    MessageProcessorProperties.changeProperty(changeProperty, opcode, sequenceNumber, getTimestamp(), client, state, serverToClient);
+		    break;
+		}
+		
+		case OpCodes.DELETE_PROPERTY: {
+		
+		    final DeleteProperty deleteProperty = log(messageLength, opcode, sequenceNumber, DeleteProperty.decode(stream));
+		    
+		    MessageProcessorProperties.deleteProperty(deleteProperty, opcode, sequenceNumber, getTimestamp(), client, state, serverToClient);
 		    break;
 		}
 		

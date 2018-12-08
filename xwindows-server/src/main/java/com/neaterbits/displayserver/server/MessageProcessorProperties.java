@@ -7,6 +7,7 @@ import com.neaterbits.displayserver.protocol.exception.ValueException;
 import com.neaterbits.displayserver.protocol.messages.events.PropertyNotify;
 import com.neaterbits.displayserver.protocol.messages.replies.GetPropertyReply;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeProperty;
+import com.neaterbits.displayserver.protocol.messages.requests.DeleteProperty;
 import com.neaterbits.displayserver.protocol.messages.requests.GetProperty;
 import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.protocol.types.CARD16;
@@ -43,7 +44,7 @@ final class MessageProcessorProperties {
                 serverToClient.sendError(client, Errors.Match, sequenceNumber, 0, opcode);
             }
             catch (AtomException ex) {
-                serverToClient.sendError(client, Errors.Atom, sequenceNumber, changeProperty.getProperty().getValue(), opcode);
+                serverToClient.sendError(client, Errors.Atom, sequenceNumber, ex.getAtom().getValue(), opcode);
             }
             catch (ValueException ex) {
                 serverToClient.sendError(client, Errors.Value, sequenceNumber, ex.getValue(), opcode);
@@ -51,6 +52,34 @@ final class MessageProcessorProperties {
         }
     }
     
+    static void deleteProperty(DeleteProperty deleteProperty, int opcode, CARD16 sequenceNumber, TIMESTAMP timestamp, XClient client, XWindowsConstAccess xWindows, ServerToClient serverToClient) {
+        final XWindow xWindow = xWindows.getClientWindow(deleteProperty.getWindow());
+        
+        if (xWindow == null) {
+            serverToClient.sendError(client, Errors.Window, sequenceNumber, deleteProperty.getWindow().getValue(), opcode);
+        }
+        else {
+            
+            try {
+                xWindow.deleteProperty(deleteProperty.getProperty());
+                
+                final PropertyNotify propertyNotify = new PropertyNotify(
+                        sequenceNumber,
+                        deleteProperty.getWindow(),
+                        deleteProperty.getProperty(),
+                        timestamp,
+                        PropertyNotify.NewValue);
+                
+                serverToClient.sendEvent(client, propertyNotify);
+            }
+            catch (AtomException ex) {
+                
+                // gnome-text-editor does not handle this error
+                
+                // serverToClient.sendError(client, Errors.Atom, sequenceNumber, ex.getAtom().getValue(), opcode);
+            }
+        }
+    }
     
     static void getProperty(GetProperty getProperty, int opcode, CARD16 sequenceNumber, TIMESTAMP timestamp, XClient client, XWindowsConstAccess xWindows, ServerToClient serverToClient) {
         final XWindow xWindow = xWindows.getClientOrRootWindow(getProperty.getWindow());
@@ -103,7 +132,7 @@ final class MessageProcessorProperties {
                     
                     if (xWindow.isCreatedBy(client) && bytesAfter == 0 && getProperty.getDelete().isSet()) {
 
-                        xWindow.deleteProperty(property.getProperty());
+                        xWindow.removeProperty(property.getProperty());
                         
                         final PropertyNotify propertyNotify = new PropertyNotify(
                                 sequenceNumber,
