@@ -65,7 +65,11 @@ public final class PutImage extends Request {
         final CARD8 leftPad = stream.readCARD8();
         final CARD8 depth = stream.readCARD8();
      
+        readUnusedCARD16(stream);
+        
         final int dataLength = (requestLength.getValue() - 6) * 4;
+        
+        System.out.println("## dataLength: " + dataLength);
         
         final byte [] data = stream.readData(dataLength);
         

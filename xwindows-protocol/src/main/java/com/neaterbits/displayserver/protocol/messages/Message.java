@@ -17,6 +17,10 @@ public abstract class Message extends Encodeable {
         stream.readBYTE();
     }
 
+    protected static void readUnusedCARD16(XWindowsProtocolInputStream stream) throws IOException {
+        stream.readCARD16();
+    }
+
     protected static void readReplyLength(XWindowsProtocolInputStream stream) throws IOException {
         stream.readCARD16();
     }
