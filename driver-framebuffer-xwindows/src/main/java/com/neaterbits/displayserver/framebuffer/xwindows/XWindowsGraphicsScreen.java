@@ -82,7 +82,6 @@ final class XWindowsGraphicsScreen extends BaseGraphicsScreen {
     private XWindowsFrameBuffer initFrameBuffer() {
         try {
             final WINDOW window = new WINDOW(driverConnection.allocateResourceId());
-            final GCONTEXT gc = new GCONTEXT(driverConnection.allocateResourceId());
     
             final CreateWindow createWindow = new CreateWindow(
                     new CARD8((short)depth),
@@ -114,51 +113,60 @@ final class XWindowsGraphicsScreen extends BaseGraphicsScreen {
             System.out.println("## send createwindow");
 
             driverConnection.sendRequest(createWindow);
-            
+
+            System.out.println("## send creategc");
+            final GCONTEXT gc = createGC(window);
+
             final MapWindow mapWindow = new MapWindow(window);
             
             System.out.println("## send mapwindow");
             
             driverConnection.sendRequest(mapWindow);
 
-            System.out.println("## send creategc");
-
-            final CreateGC createGC = new CreateGC(
-                    gc,
-                    window.toDrawable(),
-                    new GCAttributes(
-                            new BITMASK(0),
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null));
-            
-            driverConnection.sendRequest(createGC);
             
             return new XWindowsFrameBuffer(driverConnection, window, gc, size, depth);
         }
         catch (IOException ex) {
             throw new IllegalStateException(ex);
         }
+    }
+    
+    private GCONTEXT createGC(WINDOW window) throws IOException {
+        
+        final GCONTEXT gc = new GCONTEXT(driverConnection.allocateResourceId());
+
+        final CreateGC createGC = new CreateGC(
+                gc,
+                window.toDrawable(),
+                new GCAttributes(
+                        new BITMASK(0),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null));
+        
+        driverConnection.sendRequest(createGC);
+        
+        return gc;
     }
     
 

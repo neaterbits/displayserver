@@ -52,7 +52,12 @@ public final class XWindowsDriverConnection
 		        if (byteBuffer.get(byteBuffer.position()) == 0) {
 		            
 		            if (receivedInitialMessage()) {
-		                readError(byteBuffer);
+		                try {
+                            readError(byteBuffer);
+                        } catch (IOException ex) {
+                            // TODO Auto-generated catch block
+                            ex.printStackTrace();
+                        }
 		            }
 		            else {
 		                readInitialMessageError(byteBuffer);
@@ -115,30 +120,32 @@ public final class XWindowsDriverConnection
 	    final XWindowsProtocolInputStream stream = new ByteBufferXWindowsProtocolInputStream(byteBuffer);
 	    
 	    try {
-    	    System.out.println("Error: " + byteBuffer.get(byteBuffer.position() + 1));
-    	    System.out.println("Sequence number " + byteBuffer.asShortBuffer().get(byteBuffer.position() + 3));
-    	    
-    	    for (int i = 0; i < 32; ++ i) {
-    	        System.out.format("%02x\n", byteBuffer.get(byteBuffer.position() + i));
-    	    }
-    	    
+	        
+	        final byte errorCode = byteBuffer.get(byteBuffer.position() + 1);
+	        final int sequenceNumber = byteBuffer.getShort(byteBuffer.position() + 3);
+	        
             final ClientConnectionError clientError = ClientConnectionError.decode(stream);
-            
-            System.out.println("Error reason: " + clientError.getReason());
 
+            final String reason = clientError.getReason();
+            
+            if (protocolLog != null) {
+                protocolLog.onInitialMessageError(errorCode, sequenceNumber, reason);
+            }
 	    }
 	    catch (IOException ex) {
 	        throw new IllegalStateException(ex);
 	    }
 	}
 	
-	private void readError(ByteBuffer byteBuffer) {
+	private void readError(ByteBuffer byteBuffer) throws IOException {
 
-	    // final XWindowsProtocolInputStream stream = new ByteBufferXWindowsProtocolInputStream(byteBuffer);
+	    final XWindowsProtocolInputStream stream = new ByteBufferXWindowsProtocolInputStream(byteBuffer);
 	    
-        System.out.println("Error: " + byteBuffer.get(byteBuffer.position() + 1));
-        
-        byteBuffer.position(byteBuffer.position() + 32);
+	    final com.neaterbits.displayserver.protocol.messages.Error error = com.neaterbits.displayserver.protocol.messages.Error.decode(stream);
+
+	    if (protocolLog != null) {
+	        protocolLog.onReceivedError(error);
+	    }
 	}
 	
 	

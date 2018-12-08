@@ -2,7 +2,9 @@ package com.neaterbits.displayserver.protocol.messages;
 
 import java.io.IOException;
 
+import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
+import com.neaterbits.displayserver.protocol.enums.Errors;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD32;
@@ -22,9 +24,35 @@ public final class Error extends Message {
         this.opcode = opcode;
     }
 
+    public static Error decode(XWindowsProtocolInputStream stream) throws IOException {
+        
+        final BYTE errorMarker = stream.readBYTE();
+        
+        if (errorMarker.getValue() != 0) {
+            throw new IllegalStateException();
+        }
+        
+        final BYTE code = stream.readBYTE();
+        final CARD16 sequenceNumber = stream.readCARD16();
+        final CARD32 value = stream.readCARD32();
+        
+        stream.readCARD16();
+        
+        final CARD8 opcode = stream.readCARD8();
+        
+        stream.readPad(21);
+        
+        return new Error(code, sequenceNumber, value, opcode);
+    }
+    
     @Override
     public Object[] getDebugParams() {
-        return wrap("code", code, "sequenceNumber", sequenceNumber, "value", value, "opcode", opcode);
+        
+        return wrap(
+                "code", Errors.name(code),
+                "sequenceNumber", sequenceNumber,
+                "value", String.format("0x%08x", value.getValue()),
+                "opcode", opcode);
     }
 
     @Override

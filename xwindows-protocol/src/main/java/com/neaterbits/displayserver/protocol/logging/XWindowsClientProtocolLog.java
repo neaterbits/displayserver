@@ -6,6 +6,8 @@ import com.neaterbits.displayserver.protocol.messages.Request;
 
 public interface XWindowsClientProtocolLog {
 
+    void onInitialMessageError(byte errorCode, int sequenceNumber, String reason);
+
     void onSendRequest(int messageLength, Request request);
     
     void onRecivedEvent(Event event);
