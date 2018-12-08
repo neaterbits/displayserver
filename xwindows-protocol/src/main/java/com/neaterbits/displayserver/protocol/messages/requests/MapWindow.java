@@ -41,7 +41,7 @@ public final class MapWindow extends Request {
 
 	    writeUnusedByte(stream);
 	    
-	    writeRequestLength(stream, 8);
+	    writeRequestLength(stream, 2);
 	    
 		stream.writeWINDOW(window);
 	}
