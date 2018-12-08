@@ -55,6 +55,8 @@ public final class ChangeWindowAttributes extends Request {
         
         writeRequestLength(stream, 3 + attributes.getCount());
         
+        stream.writeWINDOW(window);
+        
         attributes.encode(stream);
     }
 
