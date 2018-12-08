@@ -38,6 +38,7 @@ public class OpCodes {
 	public static final int COPY_AREA = 62;
 	
 	public static final int PUT_IMAGE = 72;
+	public static final int GET_IMAGE = 73;
 	
 	public static final int CREATE_COLOR_MAP = 78;
 	

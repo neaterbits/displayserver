@@ -53,6 +53,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.DestroyWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.FreeGC;
 import com.neaterbits.displayserver.protocol.messages.requests.FreePixmap;
 import com.neaterbits.displayserver.protocol.messages.requests.GetGeometry;
+import com.neaterbits.displayserver.protocol.messages.requests.GetImage;
 import com.neaterbits.displayserver.protocol.messages.requests.GetInputFocus;
 import com.neaterbits.displayserver.protocol.messages.requests.GetProperty;
 import com.neaterbits.displayserver.protocol.messages.requests.GetSelectionOwner;
@@ -547,7 +548,14 @@ public class XServer implements AutoCloseable {
 		    break;
 		}
 		
-		case OpCodes.CREATE_COLOR_MAP: {
+        case OpCodes.GET_IMAGE: {
+            final GetImage getImage = log(messageLength, opcode, sequenceNumber, GetImage.decode(stream));
+
+            client.getImage(getImage, serverToClient);
+            break;
+        }
+
+        case OpCodes.CREATE_COLOR_MAP: {
 		    
 		    log(messageLength, opcode, sequenceNumber, CreateColorMap.decode(stream));
 		    

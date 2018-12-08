@@ -24,6 +24,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.DestroyWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.FreeGC;
 import com.neaterbits.displayserver.protocol.messages.requests.FreePixmap;
 import com.neaterbits.displayserver.protocol.messages.requests.GCAttributes;
+import com.neaterbits.displayserver.protocol.messages.requests.GetImage;
 import com.neaterbits.displayserver.protocol.messages.requests.PutImage;
 import com.neaterbits.displayserver.protocol.messages.requests.WindowAttributes;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
@@ -248,6 +249,10 @@ public class XClient extends XConnection {
                 
             }
         }
+    }
+    
+    final void getImage(GetImage getImage, ServerToClient serverToClient) {
+        
     }
     
     final void createCursor(CreateCursor createCursor) throws IDChoiceException {
