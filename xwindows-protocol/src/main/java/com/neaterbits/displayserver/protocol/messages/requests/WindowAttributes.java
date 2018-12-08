@@ -170,6 +170,9 @@ public final class WindowAttributes extends Attributes {
         
         final List<Object> params = new ArrayList<>();
         
+        params.add("bitmask");
+        params.add(super.getValueMask());
+
         addIfSet(params, "bgPixmap",        backgroundPixmap,    BACKGROUND_PIXMAP);
         addIfSet(params, "bgPixel",         hex32(backgroundPixel), BACKGROUND_PIXEL);
         addIfSet(params, "borderPixmap",    borderPixmap,        BORDER_PIXMAP);

@@ -106,7 +106,6 @@ public final class CreateWindow extends Request {
                 "borderWidth", borderWidth,
                 "windowClass", windowClass,
                 "visual", visual,
-                "bitmask", attributes.getValueMask(),
                 "attributes", LogUtil.outputParametersInBrackets(attributes.getDebugParams())
         );
     }
