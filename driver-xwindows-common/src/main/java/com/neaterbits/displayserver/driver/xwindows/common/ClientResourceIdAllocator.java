@@ -48,7 +48,12 @@ public final class ClientResourceIdAllocator {
     }
     
     public int allocateResourceId() {
-        return (int)(allocatedResources.nextClearBit(0) << resourceShift | resourceBase);
+        final int bit = allocatedResources.nextClearBit(0);
+        
+        allocatedResources.set(bit);
+        
+        return (int)(bit << resourceShift | resourceBase);
+        
     }
     
     public void freeResourceId(long resourceId) {
