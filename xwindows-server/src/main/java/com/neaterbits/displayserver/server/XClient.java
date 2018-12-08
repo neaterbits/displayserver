@@ -16,6 +16,7 @@ import com.neaterbits.displayserver.protocol.exception.DrawableException;
 import com.neaterbits.displayserver.protocol.exception.GContextException;
 import com.neaterbits.displayserver.protocol.exception.IDChoiceException;
 import com.neaterbits.displayserver.protocol.exception.ValueException;
+import com.neaterbits.displayserver.protocol.messages.requests.CreateCursor;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateGC;
 import com.neaterbits.displayserver.protocol.messages.requests.CreatePixmap;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateWindow;
@@ -248,6 +249,13 @@ public class XClient extends XConnection {
             }
         }
     }
+    
+    final void createCursor(CreateCursor createCursor) throws IDChoiceException {
+        
+        checkAndAddResourceId(createCursor.getCID());
+        
+    }
+    
     
     private void checkAndAddResourceId(RESOURCE resource) throws IDChoiceException {
         if (utilizedResourceIds.contains(resource.getValue())) {

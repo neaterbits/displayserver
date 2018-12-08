@@ -44,6 +44,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.ChangeProperty;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeWindowAttributes;
 import com.neaterbits.displayserver.protocol.messages.requests.ConvertSelection;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateColorMap;
+import com.neaterbits.displayserver.protocol.messages.requests.CreateCursor;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateGC;
 import com.neaterbits.displayserver.protocol.messages.requests.CreatePixmap;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateWindow;
@@ -536,19 +537,6 @@ public class XServer implements AutoCloseable {
 		    break;
 		}
 		
-		case OpCodes.QUERY_EXTENSION: {
-		    log(messageLength, opcode, sequenceNumber, QueryExtension.decode(stream));
-		
-		    sendReply(client, 
-		            new QueryResponseReply(
-		                    sequenceNumber,
-		                    new BOOL((byte)0),
-		                    new CARD8((byte)0),
-		                    new CARD8((byte)0),
-		                    new CARD8((byte)0)));
-		    break;
-		}
-		
 		case OpCodes.CREATE_COLOR_MAP: {
 		    
 		    log(messageLength, opcode, sequenceNumber, CreateColorMap.decode(stream));
@@ -569,6 +557,31 @@ public class XServer implements AutoCloseable {
 		    break;
 		}
 		
+		case OpCodes.CREATE_CURSOR: {
+		    
+		    final CreateCursor createCursor = log(messageLength, opcode, sequenceNumber, CreateCursor.decode(stream));
+		    
+		    try {
+                client.createCursor(createCursor);
+            } catch (IDChoiceException ex) {
+                sendError(client, Errors.IDChoice, sequenceNumber, createCursor.getCID().getValue(), opcode);
+            }
+		    break;
+		}
+		
+        case OpCodes.QUERY_EXTENSION: {
+            log(messageLength, opcode, sequenceNumber, QueryExtension.decode(stream));
+        
+            sendReply(client, 
+                    new QueryResponseReply(
+                            sequenceNumber,
+                            new BOOL((byte)0),
+                            new CARD8((byte)0),
+                            new CARD8((byte)0),
+                            new CARD8((byte)0)));
+            break;
+        }
+        
 		default:
 			throw new UnsupportedOperationException("Unknown opcode " + opcode);
 		}
