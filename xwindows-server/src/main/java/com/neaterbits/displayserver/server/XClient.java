@@ -7,9 +7,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import com.neaterbits.displayserver.buffers.ImageBuffer;
+import com.neaterbits.displayserver.buffers.OffscreenBuffer;
 import com.neaterbits.displayserver.buffers.PixelFormat;
-import com.neaterbits.displayserver.framebuffer.common.GraphicsScreen;
 import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLog;
 import com.neaterbits.displayserver.protocol.enums.WindowClass;
 import com.neaterbits.displayserver.protocol.exception.DrawableException;
@@ -30,7 +29,10 @@ import com.neaterbits.displayserver.protocol.messages.requests.WindowAttributes;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.GCONTEXT;
 import com.neaterbits.displayserver.protocol.types.RESOURCE;
+import com.neaterbits.displayserver.types.Size;
 import com.neaterbits.displayserver.windows.Display;
+import com.neaterbits.displayserver.windows.DisplayArea;
+import com.neaterbits.displayserver.windows.DisplayAreaWindows;
 import com.neaterbits.displayserver.windows.Window;
 import com.neaterbits.displayserver.windows.WindowParameters;
 
@@ -132,14 +134,14 @@ public class XClient extends XConnection {
         return window;
     }
     
-    private GraphicsScreen findGraphicsScreen(DRAWABLE drawable) {
+    private DisplayAreaWindows findDisplayArea(DRAWABLE drawable) {
         
         XWindow window = server.getWindows().getClientOrRootWindow(drawable);
         
-        GraphicsScreen screen = null;
+        DisplayAreaWindows displayArea = null;
         
         if (window != null) {
-            screen = window.getWindow().getScreen().getDriverScreen();
+            displayArea = window.getWindow().getDisplayArea();
         }
         else {
             DRAWABLE pixmapDrawable = pixmapToOwnerDrawable.get(drawable);
@@ -148,22 +150,25 @@ public class XClient extends XConnection {
                 throw new IllegalStateException();
             }
             
-            screen = findGraphicsScreen(pixmapDrawable);
+            displayArea = findDisplayArea(pixmapDrawable);
         }
         
-        return screen;
+        return displayArea;
     }
     
 
     final XPixmap createPixmap(CreatePixmap createPixmap) throws IDChoiceException {
         
-        final GraphicsScreen graphicsScreen = findGraphicsScreen(createPixmap.getDrawable());
+        final DisplayAreaWindows displayArea = findDisplayArea(createPixmap.getDrawable());
         
         checkAndAddResourceId(createPixmap.getPid());
         
-        final ImageBuffer imageBuffer = graphicsScreen.allocateBuffer(
+        final Size size = new Size(
                 createPixmap.getWidth().getValue(),
-                createPixmap.getHeight().getValue(),
+                createPixmap.getHeight().getValue());
+        
+        final OffscreenBuffer imageBuffer = displayArea.getOffscreenBufferProvider().allocateOffscreenBuffer(
+                size,
                 PixelFormat.RGB24);
         
         final DRAWABLE pixmapDrawable = createPixmap.getPid().toDrawable();
@@ -182,13 +187,13 @@ public class XClient extends XConnection {
         
         final DRAWABLE pixmapDrawable = freePixmap.getPixmap().toDrawable();
         
-        final GraphicsScreen graphicsScreen = findGraphicsScreen(pixmapDrawable);
+        final DisplayArea graphicsScreen = findDisplayArea(pixmapDrawable);
 
         final XPixmap xPixmap = drawableToXPixmap.remove(freePixmap.getPixmap().toDrawable());
         
         if (xPixmap != null) {
             if (xPixmap.getImageBuffer() != null) {
-                graphicsScreen.freeBuffer(xPixmap.getImageBuffer());
+                graphicsScreen.getOffscreenBufferProvider().freeOffscreenBuffer(xPixmap.getImageBuffer());
             }
         }
         

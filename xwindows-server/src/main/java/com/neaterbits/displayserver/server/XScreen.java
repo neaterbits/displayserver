@@ -3,24 +3,24 @@ package com.neaterbits.displayserver.server;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.protocol.types.WINDOW;
-import com.neaterbits.displayserver.windows.Screen;
+import com.neaterbits.displayserver.windows.DisplayArea;
 
 final class XScreen {
 
-    private final Screen screen;
+    private final DisplayArea displayArea;
     private final XWindow rootWindow;
 
-    XScreen(Screen screen, XWindow rootWindow) {
+    XScreen(DisplayArea displayArea, XWindow rootWindow) {
 
-        Objects.requireNonNull(screen);
+        Objects.requireNonNull(displayArea);
         Objects.requireNonNull(rootWindow);
         
-        this.screen = screen;
+        this.displayArea = displayArea;
         this.rootWindow = rootWindow;
     }
 
-    Screen getScreen() {
-        return screen;
+    DisplayArea getDisplayArea() {
+        return displayArea;
     }
 
     WINDOW getRootWINDOW() {

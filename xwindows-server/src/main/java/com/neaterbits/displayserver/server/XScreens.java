@@ -34,7 +34,7 @@ final class XScreens implements XScreensConstAccess {
     public Set<PixelFormat> getDistinctPixelFormats() {
 
         final Set<PixelFormat> distinctPixelFormats = this.screens.stream()
-                .map(screen -> screen.getScreen().getDriverScreen().getPixelFormat())
+                .map(screen -> screen.getDisplayArea().getPixelFormat())
                 .collect(Collectors.toSet());
 
         return distinctPixelFormats;

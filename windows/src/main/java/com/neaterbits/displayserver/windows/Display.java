@@ -7,35 +7,35 @@ import java.util.Objects;
 
 public class Display {
 
-    private final List<Screen> screens;
+    private final List<DisplayAreaWindows> displayAreas;
     
-    public Display(Collection<Screen> screens) {
+    public Display(Collection<DisplayAreaWindows> displayAreas) {
         
-        Objects.requireNonNull(screens);
+        Objects.requireNonNull(displayAreas);
         
-        this.screens = new ArrayList<>(screens);
+        this.displayAreas = new ArrayList<>(displayAreas);
     }
     
     public Window createWindow(Window parentWindow, WindowParameters windowParameters, WindowAttributes windowAttributes) {
 
-        final Screen screen = parentWindow.getScreen();
+        final DisplayAreaWindows displayArea = parentWindow.getDisplayArea();
         
-        if (!screens.contains(screen)) {
+        if (!displayAreas.contains(displayArea)) {
             throw new IllegalArgumentException();
         }
         
-        return screen.createWindow(parentWindow, windowParameters, windowAttributes);
+        return displayArea.createWindow(parentWindow, windowParameters, windowAttributes);
     }
     
     public void disposeWindow(Window window) {
         Objects.requireNonNull(window);
         
-        window.getScreen().disposeWindow(window);
+        window.getDisplayArea().disposeWindow(window);
     }
     
     public List<Window> getSubWindowsInOrder(Window window) {
         Objects.requireNonNull(window);
         
-        return window.getScreen().getSubWindowsInOrder(window);
+        return window.getDisplayArea().getSubWindowsInOrder(window);
     }
 }

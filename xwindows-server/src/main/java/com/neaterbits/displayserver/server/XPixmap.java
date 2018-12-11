@@ -1,16 +1,16 @@
 package com.neaterbits.displayserver.server;
 
-import com.neaterbits.displayserver.buffers.ImageBuffer;
+import com.neaterbits.displayserver.buffers.OffscreenBuffer;
 
 final class XPixmap extends XDrawable {
 
-    private final ImageBuffer imageBuffer;
+    private final OffscreenBuffer imageBuffer;
 
-    XPixmap(ImageBuffer imageBuffer) {
+    XPixmap(OffscreenBuffer imageBuffer) {
         this.imageBuffer = imageBuffer;
     }
 
-    ImageBuffer getImageBuffer() {
+    OffscreenBuffer getImageBuffer() {
         return imageBuffer;
     }
 }

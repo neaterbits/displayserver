@@ -3,6 +3,7 @@ package com.neaterbits.displayserver.layers;
 import java.util.List;
 import java.util.Objects;
 
+import com.neaterbits.displayserver.types.Position;
 import com.neaterbits.displayserver.types.Size;
 
 public final class Rectangle {

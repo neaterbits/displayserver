@@ -1,19 +1,21 @@
 package com.neaterbits.displayserver.framebuffer.common;
 
 import com.neaterbits.displayserver.buffers.ImageBuffer;
+import com.neaterbits.displayserver.buffers.OffscreenBuffer;
 import com.neaterbits.displayserver.buffers.PixelFormat;
 import com.neaterbits.displayserver.buffers.RGBBuffer;
+import com.neaterbits.displayserver.types.Size;
 
-public abstract class BaseGraphicsScreen implements GraphicsScreen {
+abstract class BaseOffscreenBufferProvider implements OffscreenBufferProvider {
 
     @Override
-    public ImageBuffer allocateBuffer(int width, int height, PixelFormat pixelFormat) {
+    public OffscreenBuffer allocateOffscreenBuffer(Size size, PixelFormat pixelFormat) {
 
         final ImageBuffer buffer;
         
         switch (pixelFormat) {
         case RGB24:
-            buffer = new RGBBuffer(width, height);
+            buffer = new RGBBuffer(size.getWidth(), size.getHeight());
             break;
             
         default:
@@ -24,7 +26,8 @@ public abstract class BaseGraphicsScreen implements GraphicsScreen {
     }
 
     @Override
-    public void freeBuffer(ImageBuffer buffer) {
+    public void freeOffscreenBuffer(OffscreenBuffer buffer) {
         
     }
+
 }

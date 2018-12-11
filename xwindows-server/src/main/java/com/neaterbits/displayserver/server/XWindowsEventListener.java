@@ -24,8 +24,6 @@ final class XWindowsEventListener implements WindowEventListener {
         
         this.server = server;
     }
-
-    
     
     @Override
     public final void onUpdate(Window window, Region region) {

@@ -7,20 +7,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import com.neaterbits.displayserver.framebuffer.common.FrameBuffer;
-import com.neaterbits.displayserver.framebuffer.common.GraphicsScreen;
 import com.neaterbits.displayserver.layers.Layer;
 import com.neaterbits.displayserver.layers.LayerRegions;
 import com.neaterbits.displayserver.layers.Layers;
-import com.neaterbits.displayserver.layers.Position;
+import com.neaterbits.displayserver.types.Position;
 import com.neaterbits.displayserver.types.Size;
 
 public class Windows {
 
 	private final WindowEventListener windowEventListener;
 	
-	private final Screen screen;
-	private final GraphicsScreen driverScreen;
+	private final DisplayAreaWindows displayArea;
 	
 	private final Layers layers;
 	
@@ -28,27 +25,25 @@ public class Windows {
 	
 	private final Map<Layer, Window> layerToWindow;
 	
-	Windows(Screen screen, GraphicsScreen driverScreen, WindowEventListener windowEventListener) {
+	Windows(DisplayAreaWindows displayArea, WindowEventListener windowEventListener) {
 		
-	    Objects.requireNonNull(screen);
-	    Objects.requireNonNull(driverScreen);
+	    Objects.requireNonNull(displayArea);
 	    Objects.requireNonNull(windowEventListener);
 
-	    this.screen = screen;
-	    this.driverScreen = driverScreen;
+	    this.displayArea = displayArea;
 		this.windowEventListener = windowEventListener;
 		
-		this.layers = new Layers(driverScreen.getSize());
+		this.layers = new Layers(displayArea.getSize());
 		
 		this.rootWindow = new Window(
-		        screen,
+		        displayArea,
 				null,
 				new WindowParameters(
 						WindowClass.INPUT_OUTPUT,
-						driverScreen.getDepth(),
+						displayArea.getDepth(),
 						null,
 						0, 0,
-						driverScreen.getSize().getWidth(), driverScreen.getSize().getHeight(),
+						displayArea.getSize().getWidth(), displayArea.getSize().getHeight(),
 						0),
 				null,
 				layers.getRootLayer());
@@ -59,13 +54,9 @@ public class Windows {
 	Window getRootWindow() {
 		return rootWindow;
 	}
-	
-	FrameBuffer getFrameBuffer() {
-	    return driverScreen.getFrameBuffer();
-	}
-	
-	GraphicsScreen getDriverScreen() {
-        return driverScreen;
+
+	DisplayArea getDisplayArea() {
+        return displayArea;
     }
 
     Window createWindow(Window parentWindow, WindowParameters parameters, WindowAttributes attributes) {
@@ -80,7 +71,7 @@ public class Windows {
 		
 		final LayerRegions toUpdate = layers.addLayer(parentLayer, layer);
 		
-		final Window window = new Window(screen, parentWindow, parameters, attributes, layer);
+		final Window window = new Window(displayArea, parentWindow, parameters, attributes, layer);
 		
 		layerToWindow.put(layer, window);
 		

@@ -1,30 +1,39 @@
 package com.neaterbits.displayserver.framebuffer.xwindows;
 
+import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.driver.xwindows.common.XWindowsDriverConnection;
 import com.neaterbits.displayserver.framebuffer.common.BaseGraphicsDriver;
+import com.neaterbits.displayserver.framebuffer.common.DisplayDeviceId;
 import com.neaterbits.displayserver.framebuffer.common.GraphicsDriver;
-import com.neaterbits.displayserver.framebuffer.common.GraphicsScreen;
+import com.neaterbits.displayserver.types.Position;
 import com.neaterbits.displayserver.types.Size;
 
 public final class XWindowsGraphicsDriver extends BaseGraphicsDriver implements GraphicsDriver {
 
-	private final List<GraphicsScreen> screens;
 	
-	public XWindowsGraphicsDriver(XWindowsDriverConnection driverConnection) {
+	public XWindowsGraphicsDriver(XWindowsDriverConnection driverConnection, DisplayDeviceId displayDeviceId) throws IOException {
 		
+	    final List<XTestDisplay> testDisplays = Arrays.asList(
+	            new XTestDisplay(new Position(250, 250), new Size(1024, 768))
+        );
+	    
 		Objects.requireNonNull(driverConnection);
 		
-		this.screens = Arrays.asList(new XWindowsGraphicsScreen(driverConnection, new Size(1280, 1024), 24));
-	}
 
-	
-	@Override
-    public List<GraphicsScreen> getScreens() {
-        return Collections.unmodifiableList(screens);
-    }
+		for (XTestDisplay xTestDisplay : testDisplays) {
+		    
+		    final XWindowsDisplayer displayer = new XWindowsDisplayer(
+		            driverConnection,
+		            xTestDisplay.getPosition(),
+		            xTestDisplay.getSize(),
+		            displayDeviceId);
+		    
+		    addRenderingProvider(displayer);
+		    addDisplayDevice(displayer.getDisplayDevice());
+		}
+	}
 }

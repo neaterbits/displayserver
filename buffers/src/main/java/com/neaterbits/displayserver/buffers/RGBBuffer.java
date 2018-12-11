@@ -29,4 +29,14 @@ public final class RGBBuffer extends InMemoryBuffer {
 	public PixelFormat getPixelFormat() {
 		return PixelFormat.RGB24;
 	}
+
+    @Override
+    public void putImage(int x, int y, int width, int height, PixelFormat format, byte[] data) {
+        throw new UnsupportedOperationException("TODO");
+    }
+
+    @Override
+    public byte[] getImage(int x, int y, int width, int height, PixelFormat format) {
+        throw new UnsupportedOperationException("TODO");
+    }
 }

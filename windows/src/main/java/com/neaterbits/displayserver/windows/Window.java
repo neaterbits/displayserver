@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.layers.Layer;
-import com.neaterbits.displayserver.layers.Position;
+import com.neaterbits.displayserver.types.Position;
 import com.neaterbits.displayserver.types.Size;
 
 public final class Window {
 
-    private final Screen screen;
+    private final DisplayAreaWindows displayArea;
 	private final Window parentWindow;
 	
 	private final WindowParameters parameters;
@@ -21,14 +21,19 @@ public final class Window {
 	
 	private final List<Window> subWindows;
 	
-	Window(Screen screen, Window parentWindow, WindowParameters parameters, WindowAttributes attributes, Layer layer) {
+	Window(
+	        DisplayAreaWindows displayArea,
+	        Window parentWindow,
+	        WindowParameters parameters,
+	        WindowAttributes attributes,
+	        Layer layer) {
 		
 	    // Objects.requireNonNull(screen);
 		Objects.requireNonNull(parameters);
 		// Objects.requireNonNull(attributes);
 		Objects.requireNonNull(layer);
 		
-		this.screen = screen;
+		this.displayArea = displayArea;
 		this.parentWindow = parentWindow;
 		this.parameters = parameters;
 		this.attributes = attributes;
@@ -46,7 +51,7 @@ public final class Window {
 	}
 	
 	public int getDepth() {
-	    return screen.getDriverScreen().getDepth();
+	    return displayArea.getDepth();
 	}
 	
 	public Position getPosition() {
@@ -61,8 +66,8 @@ public final class Window {
         return attributes;
     }
 
-    public Screen getScreen() {
-	    return screen;
+    public DisplayAreaWindows getDisplayArea() {
+	    return displayArea;
 	}
 	
 	Window getParentWindow() {

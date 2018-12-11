@@ -1,6 +1,6 @@
 package com.neaterbits.displayserver.buffers;
 
-public abstract class ImageBuffer implements BufferInfo {
+public abstract class ImageBuffer implements BufferInfo, OffscreenBuffer {
 
 	private final int width;
 	private final int height;

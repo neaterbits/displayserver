@@ -5,6 +5,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -78,7 +79,10 @@ import com.neaterbits.displayserver.protocol.types.TIMESTAMP;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.server.XConnection.State;
 import com.neaterbits.displayserver.windows.Display;
+import com.neaterbits.displayserver.windows.DisplayAreaFinder;
+import com.neaterbits.displayserver.windows.DisplayAreaWindows;
 import com.neaterbits.displayserver.windows.Window;
+import com.neaterbits.displayserver.windows.config.DisplayAreaConfig;
 
 public class XServer implements AutoCloseable {
 
@@ -98,6 +102,7 @@ public class XServer implements AutoCloseable {
 	public XServer(
 	        EventSource driverEventSource,
 	        GraphicsDriver graphicsDriver,
+	        DisplayAreaConfig displayAreaConfig,
 	        XWindowsServerProtocolLog protocolLog,
 	        NonBlockingChannelWriterLog connectionWriteLog) throws IOException {
 		
@@ -111,10 +116,25 @@ public class XServer implements AutoCloseable {
 		this.atoms = new Atoms();
 
 		final List<XWindow> rootWindows = new ArrayList<>();
+
+		final XWindowsEventListener eventListener = new XWindowsEventListener(this);
 		
+		final DisplayAreaWindows displayArea = DisplayAreaFinder.makeDisplayArea(
+		        displayAreaConfig,
+		        graphicsDriver,
+		        eventListener);
+		
+		if (displayArea == null) {
+		    throw new IllegalStateException();
+		}
+		
+		final List<DisplayAreaWindows> displayAreas = Arrays.asList(
+                displayArea
+        );
+
 		final List<XScreen> screens = ScreensHelper.getScreens(
 		        graphicsDriver,
-		        new XWindowsEventListener(this),
+		        displayAreas,
 		        resourceIdAllocator,
 		        rootWindows::add);
 		
@@ -122,9 +142,7 @@ public class XServer implements AutoCloseable {
 		
 		rootWindows.forEach(state::addRootWindow);
 		
-		this.display = new Display(screens.stream()
-		        .map(screen -> screen.getScreen())
-		        .collect(Collectors.toList()));
+		this.display = new Display(displayAreas);
 		
 		this.timeServerStarted = System.currentTimeMillis();
 		

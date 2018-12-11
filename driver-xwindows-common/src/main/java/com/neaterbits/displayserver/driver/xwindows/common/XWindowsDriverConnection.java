@@ -69,7 +69,7 @@ public final class XWindowsDriverConnection
         		        if (serverMessage == null) {
         		            serverMessage = processServerMessage(byteBuffer, messageLength);
         		            
-        		            // System.out.println("## received servermessage " + serverMessage);
+        		            System.out.println("## received servermessage " + serverMessage);
         		            
         		            clientResourceIdAllocator = new ClientResourceIdAllocator(
         		                    serverMessage.getResourceIdBase().getValue(),
@@ -77,7 +77,7 @@ public final class XWindowsDriverConnection
         		        }
         		        else {
         		        
-        		            processMessage(byteBuffer, messageLength);
+        		            processEvent(byteBuffer, messageLength);
         		        }
     		        }
     		        catch (IOException ex) {
@@ -100,17 +100,19 @@ public final class XWindowsDriverConnection
 		        .filter(xAuth -> xAuth.getDisplay() == connectDisplay)
 		        .findFirst()
 		        .orElse(null);
-		
+
+		/*
 		if (xAuthForTCPConnection == null) {
 		    throw new IllegalStateException();
 		}
+		*/
 		
 		final ClientMessage clientMessage = new ClientMessage(
 		        new CARD8((short)'B'),
 		        new CARD16(11),
 		        new CARD16(0),
-		        xAuthForTCPConnection.getAuthorizationProtocol(),
-		        xAuthForTCPConnection.getAuthorizationData());
+		        xAuthForTCPConnection != null ? xAuthForTCPConnection.getAuthorizationProtocol() : "",
+		        xAuthForTCPConnection != null ? xAuthForTCPConnection.getAuthorizationData() : "".getBytes());
 		
 		readerWriter.writeEncodeable(clientMessage, byteOrder);
 	}
@@ -156,7 +158,8 @@ public final class XWindowsDriverConnection
 	    return ServerMessage.decode(stream);
 	}
 
-	private void processMessage(ByteBuffer byteBuffer, int messageLength) {
+	private void processEvent(ByteBuffer byteBuffer, int messageLength) {
+	    
         final int opcode = byteBuffer.get();
         
         switch (opcode) {
@@ -212,13 +215,17 @@ public final class XWindowsDriverConnection
 	}
 
 	@Override
-	public void sendRequest(Request request) throws IOException {
-	    
-	    
-		final int messageLength = readerWriter.writeRequest(request, byteOrder);
+	public void sendRequest(Request request) {
 
-		if (protocolLog != null) {
-            protocolLog.onSendRequest(messageLength, request);
-        }
+	    try {
+    		final int messageLength = readerWriter.writeRequest(request, byteOrder);
+    
+    		if (protocolLog != null) {
+                protocolLog.onSendRequest(messageLength, request);
+            }
+	    }
+	    catch (IOException ex) {
+	        throw new IllegalStateException(ex);
+	    }
 	}
 }

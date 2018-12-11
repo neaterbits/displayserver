@@ -4,7 +4,6 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import com.neaterbits.displayserver.buffers.PixelFormat;
-import com.neaterbits.displayserver.framebuffer.common.GraphicsScreen;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolUtil;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.DEPTH;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.FORMAT;
@@ -21,6 +20,7 @@ import com.neaterbits.displayserver.protocol.types.KEYCODE;
 import com.neaterbits.displayserver.protocol.types.SET32;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.types.Size;
+import com.neaterbits.displayserver.windows.DisplayArea;
 
 class InitialServerMessageHelper {
 
@@ -53,7 +53,7 @@ class InitialServerMessageHelper {
         
         for (int i = 0; i < numScreens; ++ i) {
             final XScreen xWindowsScreen = screensAccess.getScreen(i);
-            final GraphicsScreen driverScreen = xWindowsScreen.getScreen().getDriverScreen();
+            final DisplayArea driverScreen = xWindowsScreen.getDisplayArea();
             
             final Size size = driverScreen.getSize();
             final Size sizeInMillimeters = driverScreen.getSizeInMillimeters();

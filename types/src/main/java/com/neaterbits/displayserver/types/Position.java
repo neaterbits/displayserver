@@ -1,4 +1,4 @@
-package com.neaterbits.displayserver.layers;
+package com.neaterbits.displayserver.types;
 
 public final class Position {
 	

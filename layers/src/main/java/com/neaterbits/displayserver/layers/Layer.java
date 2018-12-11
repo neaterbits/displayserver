@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+import com.neaterbits.displayserver.types.Position;
 import com.neaterbits.displayserver.types.Size;
 
 public final class Layer {
