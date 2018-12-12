@@ -69,6 +69,7 @@ public final class PutImage extends Request {
         
         final int dataLength = (requestLength.getValue() - 6) * 4;
         
+        System.out.println("## requestLength: " + requestLength);
         System.out.println("## dataLength: " + dataLength);
         
         final byte [] data = stream.readData(dataLength);

@@ -1,27 +1,30 @@
 package com.neaterbits.displayserver.server;
 
-import java.util.List;
 import java.util.Set;
 
 import com.neaterbits.displayserver.buffers.PixelFormat;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
+import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.windows.Window;
 
 final class XState implements
     XScreensConstAccess,
+    XVisualsConstAccess,
     XClientsConstAccess,
     XWindowsConstAccess,
     XEventSubscriptionsConstAccess {
 
     private final XScreens screens;
+    private final XVisuals visuals;
     private final XClients clients;
     private final XWindows windows;
     private final XEventSubscriptions eventSubscriptions;
     
-    XState(List<XScreen> screens) {
+    XState(XScreensAndVisuals screensAndVisuals) {
 
-        this.screens = new XScreens(screens);
+        this.screens = new XScreens(screensAndVisuals.getScreens());
+        this.visuals = new XVisuals(screensAndVisuals.getVisuals());
         
         this.clients = new XClients();
         
@@ -38,6 +41,11 @@ final class XState implements
     @Override
     public XScreen getScreen(int screenNo) {
         return screens.getScreen(screenNo);
+    }
+    
+    @Override
+    public XVisual getVisual(VISUALID visual) {
+        return visuals.getVisual(visual);
     }
 
     @Override

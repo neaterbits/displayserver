@@ -10,11 +10,14 @@ import java.util.Set;
 import com.neaterbits.displayserver.buffers.OffscreenBuffer;
 import com.neaterbits.displayserver.buffers.PixelFormat;
 import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLog;
+import com.neaterbits.displayserver.protocol.enums.ImageFormat;
 import com.neaterbits.displayserver.protocol.enums.WindowClass;
 import com.neaterbits.displayserver.protocol.exception.DrawableException;
 import com.neaterbits.displayserver.protocol.exception.GContextException;
 import com.neaterbits.displayserver.protocol.exception.IDChoiceException;
+import com.neaterbits.displayserver.protocol.exception.MatchException;
 import com.neaterbits.displayserver.protocol.exception.ValueException;
+import com.neaterbits.displayserver.protocol.messages.replies.GetImageReply;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateCursor;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateGC;
 import com.neaterbits.displayserver.protocol.messages.requests.CreatePixmap;
@@ -26,9 +29,12 @@ import com.neaterbits.displayserver.protocol.messages.requests.GCAttributes;
 import com.neaterbits.displayserver.protocol.messages.requests.GetImage;
 import com.neaterbits.displayserver.protocol.messages.requests.PutImage;
 import com.neaterbits.displayserver.protocol.messages.requests.WindowAttributes;
+import com.neaterbits.displayserver.protocol.types.CARD16;
+import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.GCONTEXT;
 import com.neaterbits.displayserver.protocol.types.RESOURCE;
+import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.types.Size;
 import com.neaterbits.displayserver.windows.Display;
 import com.neaterbits.displayserver.windows.DisplayArea;
@@ -115,6 +121,7 @@ public class XClient extends XConnection {
                 createWindow.getWid(),
                 rootWindow.getWINDOW(),
                 createWindow.getParent(),
+                parentWindow.getVisual(),
                 createWindow.getBorderWidth(),
                 createWindow.getWindowClass(),
                 WindowAttributes.DEFAULT_ATTRIBUTES.applyImmutably(createWindow.getAttributes()));
@@ -155,8 +162,36 @@ public class XClient extends XConnection {
         
         return displayArea;
     }
-    
 
+    private XDrawable findDrawble(DRAWABLE drawable) {
+        
+        XWindow window = server.getWindows().getClientOrRootWindow(drawable);
+
+        final XDrawable xDrawable;
+        
+        if (window != null) {
+            xDrawable = window;
+        }
+        else {
+            XPixmap pixmapDrawable = drawableToXPixmap.get(drawable);
+            
+            if (pixmapDrawable == null) {
+                throw new IllegalStateException();
+            }
+
+            xDrawable = pixmapDrawable;
+        }
+        
+        return xDrawable;
+    }
+
+    private VISUALID getVisual(DRAWABLE drawable) {
+        
+        final XDrawable xDrawable = findDrawble(drawable);
+        
+        return xDrawable.getVisual();
+    }
+    
     final XPixmap createPixmap(CreatePixmap createPixmap) throws IDChoiceException {
         
         final DisplayAreaWindows displayArea = findDisplayArea(createPixmap.getDrawable());
@@ -173,7 +208,7 @@ public class XClient extends XConnection {
         
         final DRAWABLE pixmapDrawable = createPixmap.getPid().toDrawable();
         
-        final XPixmap xPixmap = new XPixmap(imageBuffer);
+        final XPixmap xPixmap = new XPixmap(getVisual(createPixmap.getDrawable()), imageBuffer);
         
         drawableToXPixmap.put(pixmapDrawable, xPixmap);
         
@@ -192,8 +227,8 @@ public class XClient extends XConnection {
         final XPixmap xPixmap = drawableToXPixmap.remove(freePixmap.getPixmap().toDrawable());
         
         if (xPixmap != null) {
-            if (xPixmap.getImageBuffer() != null) {
-                graphicsScreen.getOffscreenBufferProvider().freeOffscreenBuffer(xPixmap.getImageBuffer());
+            if (xPixmap.getOffscreenBuffer() != null) {
+                graphicsScreen.getOffscreenBufferProvider().freeOffscreenBuffer(xPixmap.getOffscreenBuffer());
             }
         }
         
@@ -256,8 +291,70 @@ public class XClient extends XConnection {
         }
     }
     
-    final void getImage(GetImage getImage, ServerToClient serverToClient) {
+    final void getImage(GetImage getImage, CARD16 sequenceNumber, ServerToClient serverToClient) throws MatchException {
+
+        final XWindow window = server.getWindows().getClientWindow(getImage.getDrawable());
         
+        if (window != null) {
+            
+        }
+        else {
+            final XPixmap xPixmap = drawableToXPixmap.get(getImage.getDrawable());
+            
+            if (xPixmap != null) {
+                getImage(
+                        getImage,
+                        sequenceNumber,
+                        xPixmap.getOffscreenBuffer(),
+                        xPixmap.getVisual(),
+                        serverToClient);
+            }
+        }
+    }
+    
+    private void getImage(
+            GetImage getImage,
+            CARD16 sequenceNumber,
+            OffscreenBuffer offscreenBuffer,
+            VISUALID visual,
+            ServerToClient serverToClient)
+    
+        throws MatchException{
+        
+        if (getImage.getX().getValue() + getImage.getWidth().getValue() > offscreenBuffer.getWidth()) {
+            throw new MatchException("Width outside of bounds");
+        }
+        
+        if (getImage.getY().getValue() + getImage.getHeight().getValue() > offscreenBuffer.getHeight()) {
+            throw new MatchException("Height outside of bounds");
+        }
+
+        final byte [] data;
+        
+        switch (getImage.getFormat().getValue()) {
+
+        case ImageFormat.ZPIXMAP:
+            data = offscreenBuffer.getImage(
+                    getImage.getX().getValue(), getImage.getY().getValue(),
+                    getImage.getWidth().getValue(), getImage.getHeight().getValue(),
+                    PixelFormat.RGB24);
+            break;
+            
+        case ImageFormat.BITMAP:
+        case ImageFormat.XYPIXMAP:
+            throw new UnsupportedOperationException("TODO");
+
+        default:
+            throw new UnsupportedOperationException();
+        }
+
+        final GetImageReply getImageReply = new GetImageReply(
+                sequenceNumber,
+                new CARD8((byte)offscreenBuffer.getDepth()),
+                visual,
+                data);
+        
+        serverToClient.sendReply(this, getImageReply);
     }
     
     final void createCursor(CreateCursor createCursor) throws IDChoiceException {

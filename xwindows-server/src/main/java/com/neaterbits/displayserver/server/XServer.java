@@ -23,6 +23,7 @@ import com.neaterbits.displayserver.protocol.enums.RevertTo;
 import com.neaterbits.displayserver.protocol.exception.DrawableException;
 import com.neaterbits.displayserver.protocol.exception.GContextException;
 import com.neaterbits.displayserver.protocol.exception.IDChoiceException;
+import com.neaterbits.displayserver.protocol.exception.MatchException;
 import com.neaterbits.displayserver.protocol.exception.ValueException;
 import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLog;
 import com.neaterbits.displayserver.protocol.messages.Encodeable;
@@ -132,7 +133,7 @@ public class XServer implements AutoCloseable {
                 displayArea
         );
 
-		final List<XScreen> screens = ScreensHelper.getScreens(
+		final XScreensAndVisuals screens = ScreensHelper.getScreens(
 		        graphicsDriver,
 		        displayAreas,
 		        resourceIdAllocator,
@@ -569,7 +570,11 @@ public class XServer implements AutoCloseable {
         case OpCodes.GET_IMAGE: {
             final GetImage getImage = log(messageLength, opcode, sequenceNumber, GetImage.decode(stream));
 
-            client.getImage(getImage, serverToClient);
+            try {
+                client.getImage(getImage, sequenceNumber, serverToClient);
+            } catch (MatchException ex) {
+                sendError(client, Errors.Match, sequenceNumber, 0L, opcode);
+            }
             break;
         }
 

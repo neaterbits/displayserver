@@ -14,6 +14,7 @@ import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD8;
+import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.windows.Window;
 
@@ -37,22 +38,24 @@ final class XWindow extends XDrawable {
     XWindow(
             Window window,
             WINDOW windowResource,
+            VISUALID visual,
             CARD16 borderWidth,
             CARD16 windowClass,
             WindowAttributes currentWindowAttributes) {
         
-        this(null, window, windowResource, WINDOW.None, WINDOW.None, borderWidth, windowClass, currentWindowAttributes, 0);
+        this(null, window, windowResource, WINDOW.None, WINDOW.None, visual, borderWidth, windowClass, currentWindowAttributes, 0);
     }
 
     XWindow(
             XClient createdBy,
             Window window,
             WINDOW windowResource, WINDOW rootWindow, WINDOW parentWindow,
+            VISUALID visual,
             CARD16 borderWidth,
             CARD16 windowClass,
             WindowAttributes currentWindowAttributes) {
         
-        this(createdBy, window, windowResource, rootWindow, parentWindow, borderWidth, windowClass, currentWindowAttributes, 0);
+        this(createdBy, window, windowResource, rootWindow, parentWindow, visual, borderWidth, windowClass, currentWindowAttributes, 0);
         
         Objects.requireNonNull(createdBy);
         
@@ -69,15 +72,19 @@ final class XWindow extends XDrawable {
             XClient createdBy,
             Window window,
             WINDOW windowResource, WINDOW rootWindow, WINDOW parentWindow,
+            VISUALID visual,
             CARD16 borderWidth,
             CARD16 windowClass,
             WindowAttributes currentWindowAttributes,
             int disambiguate) {
         
+        super(visual);
+        
         Objects.requireNonNull(window);
         Objects.requireNonNull(windowResource);
         Objects.requireNonNull(rootWindow);
         Objects.requireNonNull(parentWindow);
+        Objects.requireNonNull(visual);
         Objects.requireNonNull(borderWidth);
         Objects.requireNonNull(windowClass);
         Objects.requireNonNull(currentWindowAttributes);

@@ -4,10 +4,10 @@ public abstract class InMemoryBuffer extends ImageBuffer {
 
 	final byte [] buffer;
 	
-	public InMemoryBuffer(int width, int height, int bytesPerPixel) {
+	public InMemoryBuffer(int width, int height, PixelFormat pixelFormat) {
 		
-		super(width, height, bytesPerPixel);
+		super(width, height, pixelFormat);
 		
-		this.buffer = new byte[width * height * bytesPerPixel];
+		this.buffer = new byte[width * height * getBytesPerPixel()];
 	}
 }

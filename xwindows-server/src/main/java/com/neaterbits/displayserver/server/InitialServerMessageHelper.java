@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 
 import com.neaterbits.displayserver.buffers.PixelFormat;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolUtil;
+import com.neaterbits.displayserver.protocol.enums.VisualClass;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.DEPTH;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.FORMAT;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.SCREEN;
@@ -53,18 +54,18 @@ class InitialServerMessageHelper {
         
         for (int i = 0; i < numScreens; ++ i) {
             final XScreen xWindowsScreen = screensAccess.getScreen(i);
-            final DisplayArea driverScreen = xWindowsScreen.getDisplayArea();
+            final DisplayArea displayArea = xWindowsScreen.getDisplayArea();
             
-            final Size size = driverScreen.getSize();
-            final Size sizeInMillimeters = driverScreen.getSizeInMillimeters();
+            final Size size = displayArea.getSize();
+            final Size sizeInMillimeters = displayArea.getSizeInMillimeters();
             
-            final PixelFormat pixelFormat = driverScreen.getPixelFormat();
+            final PixelFormat pixelFormat = displayArea.getPixelFormat();
             
             final VISUALID visualId = new VISUALID(allocateVisualId.get());
             
             final VISUALTYPE visual = new VISUALTYPE(
                     visualId,
-                    new BYTE((byte)4), // TrueColor
+                    VisualClass.TrueColor,
                     new CARD8((short)pixelFormat.getBitsPerColorComponent()),
                     new CARD16(pixelFormat.getNumberOfDistinctColors()),
                     new CARD32(pixelFormat.getRedMask()),

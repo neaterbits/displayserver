@@ -3,7 +3,7 @@ package com.neaterbits.displayserver.buffers;
 public final class RGBBuffer extends InMemoryBuffer {
 
 	public RGBBuffer(int width, int height) {
-		super(width, height, 3);
+		super(width, height, PixelFormat.RGB24);
 	}
 
 	@Override

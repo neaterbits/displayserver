@@ -1,16 +1,24 @@
 package com.neaterbits.displayserver.server;
 
+import java.util.Objects;
+
 import com.neaterbits.displayserver.buffers.OffscreenBuffer;
+import com.neaterbits.displayserver.protocol.types.VISUALID;
 
 final class XPixmap extends XDrawable {
 
-    private final OffscreenBuffer imageBuffer;
+    private final OffscreenBuffer offscreenBuffer;
 
-    XPixmap(OffscreenBuffer imageBuffer) {
-        this.imageBuffer = imageBuffer;
+    XPixmap(VISUALID visual, OffscreenBuffer offscreenBuffer) {
+        
+        super(visual);
+        
+        Objects.requireNonNull(offscreenBuffer);
+        
+        this.offscreenBuffer = offscreenBuffer;
     }
 
-    OffscreenBuffer getImageBuffer() {
-        return imageBuffer;
+    OffscreenBuffer getOffscreenBuffer() {
+        return offscreenBuffer;
     }
 }
