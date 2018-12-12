@@ -3,11 +3,19 @@ package com.neaterbits.displayserver.framebuffer.xwindows;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.buffers.BufferOperations;
+import com.neaterbits.displayserver.buffers.GetImageListener;
 import com.neaterbits.displayserver.buffers.PixelFormat;
+import com.neaterbits.displayserver.driver.xwindows.common.ReplyListener;
 import com.neaterbits.displayserver.driver.xwindows.common.XWindowsDriverConnection;
+import com.neaterbits.displayserver.protocol.enums.ImageFormat;
+import com.neaterbits.displayserver.protocol.messages.Error;
+import com.neaterbits.displayserver.protocol.messages.Reply;
+import com.neaterbits.displayserver.protocol.messages.replies.GetImageReply;
+import com.neaterbits.displayserver.protocol.messages.requests.GetImage;
 import com.neaterbits.displayserver.protocol.messages.requests.PutImage;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
+import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.GCONTEXT;
@@ -87,7 +95,28 @@ abstract class XWindowsBaseBuffer implements BufferOperations {
     }
 
     @Override
-    public final byte[] getImage(int x, int y, int width, int height, PixelFormat format) {
-        throw new UnsupportedOperationException("TODO");
+    public final void getImage(int x, int y, int width, int height, PixelFormat format, GetImageListener listener) {
+
+        final GetImage getImageRequest = new GetImage(
+                ImageFormat.ZPixMap,
+                getDrawable(),
+                new INT16((short)x), new INT16((short)y),
+                new CARD16(width), new CARD16(height),
+                new CARD32(0x00FFFFFFL));
+        
+        driverConnection.sendRequestWaitReply(getImageRequest, new ReplyListener() {
+            
+            @Override
+            public void onReply(Reply reply) {
+                final GetImageReply getImageReply = (GetImageReply)reply;
+                
+                listener.onResult(getImageReply.getData());
+            }
+            
+            @Override
+            public void onError(Error error) {
+                listener.onError();
+            }
+        });
     }
 }

@@ -7,10 +7,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import com.neaterbits.displayserver.buffers.GetImageListener;
 import com.neaterbits.displayserver.buffers.OffscreenBuffer;
 import com.neaterbits.displayserver.buffers.PixelFormat;
 import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLog;
+import com.neaterbits.displayserver.protocol.enums.Errors;
 import com.neaterbits.displayserver.protocol.enums.ImageFormat;
+import com.neaterbits.displayserver.protocol.enums.OpCodes;
 import com.neaterbits.displayserver.protocol.enums.WindowClass;
 import com.neaterbits.displayserver.protocol.exception.DrawableException;
 import com.neaterbits.displayserver.protocol.exception.GContextException;
@@ -329,15 +332,30 @@ public class XClient extends XConnection {
             throw new MatchException("Height outside of bounds");
         }
 
-        final byte [] data;
-        
         switch (getImage.getFormat().getValue()) {
 
         case ImageFormat.ZPIXMAP:
-            data = offscreenBuffer.getImage(
+            offscreenBuffer.getImage(
                     getImage.getX().getValue(), getImage.getY().getValue(),
                     getImage.getWidth().getValue(), getImage.getHeight().getValue(),
-                    PixelFormat.RGB24);
+                    PixelFormat.RGB24,
+                    
+                    new GetImageListener() {
+                        @Override
+                        public void onResult(byte[] data) {
+                            sendGetImageReply(sequenceNumber, offscreenBuffer, visual, serverToClient, data);
+                        }
+                        
+                        @Override
+                        public void onError() {
+                            serverToClient.sendError(
+                                    XClient.this,
+                                    Errors.Implementation,
+                                    sequenceNumber,
+                                    0L,
+                                    OpCodes.GET_IMAGE);
+                        }
+                    }); 
             break;
             
         case ImageFormat.BITMAP:
@@ -348,6 +366,15 @@ public class XClient extends XConnection {
             throw new UnsupportedOperationException();
         }
 
+    }
+    
+    private void sendGetImageReply(
+            CARD16 sequenceNumber,
+            OffscreenBuffer offscreenBuffer,
+            VISUALID visual,
+            ServerToClient serverToClient,
+            byte [] data) {
+        
         final GetImageReply getImageReply = new GetImageReply(
                 sequenceNumber,
                 new CARD8((byte)offscreenBuffer.getDepth()),

@@ -3,7 +3,11 @@ package com.neaterbits.displayserver.driver.xwindows.common;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
 
 import com.neaterbits.displayserver.driver.common.Listeners;
 import com.neaterbits.displayserver.io.common.MessageProcessor;
@@ -11,11 +15,16 @@ import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLog;
 import com.neaterbits.displayserver.io.common.Selectable;
 import com.neaterbits.displayserver.protocol.ByteBufferXWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
+import com.neaterbits.displayserver.protocol.enums.OpCodes;
 import com.neaterbits.displayserver.protocol.logging.XWindowsClientProtocolLog;
+import com.neaterbits.displayserver.protocol.messages.Error;
+import com.neaterbits.displayserver.protocol.messages.Reply;
 import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.messages.ServerToClientMessage;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ClientConnectionError;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ClientMessage;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ServerMessage;
+import com.neaterbits.displayserver.protocol.messages.replies.GetImageReply;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 
@@ -33,13 +42,16 @@ public final class XWindowsDriverConnection
 	
 	private final ByteOrder byteOrder;
 	
+	private int sequenceNumber;
+	private final List<RequestWithReply> requestsWithReply;
+	
 	public XWindowsDriverConnection(int connectDisplay, NonBlockingChannelWriterLog writeLog, XWindowsClientProtocolLog protocolLog) throws IOException {
 
 	    this.protocolLog = protocolLog;
 	    
 	    final int port = 6000 + connectDisplay;
 	    
-		this.readerWriter = new XWindowsChannelReaderWriter(port, writeLog) {
+		this.readerWriter = new XWindowsClientReaderWriter(port, writeLog) {
 		    
 		    @Override
             protected boolean receivedInitialMessage() {
@@ -48,15 +60,23 @@ public final class XWindowsDriverConnection
 
             @Override
 		    public void onMessage(ByteBuffer byteBuffer, int messageLength) {
-		        
+
 		        if (byteBuffer.get(byteBuffer.position()) == 0) {
 		            
 		            if (receivedInitialMessage()) {
 		                try {
-                            readError(byteBuffer);
+                            final Error error = readError(byteBuffer);
+                            
+                            final CARD16 sequenceNumber = error.getSequenceNumber();
+                            
+                            final RequestWithReply requestWithReply = getRequestWithReply(sequenceNumber);
+                            
+                            if (requestWithReply != null) {
+                                requestWithReply.listener.onError(error);
+                            }
+                            
                         } catch (IOException ex) {
-                            // TODO Auto-generated catch block
-                            ex.printStackTrace();
+                            throw new IllegalStateException(ex);
                         }
 		            }
 		            else {
@@ -64,7 +84,6 @@ public final class XWindowsDriverConnection
 		            }
 		        }
 		        else {
-		        
     		        try {
         		        if (serverMessage == null) {
         		            serverMessage = processServerMessage(byteBuffer, messageLength);
@@ -74,16 +93,29 @@ public final class XWindowsDriverConnection
         		            clientResourceIdAllocator = new ClientResourceIdAllocator(
         		                    serverMessage.getResourceIdBase().getValue(),
         		                    serverMessage.getResourceIdMask().getValue());
+        		            
         		        }
         		        else {
-        		        
-        		            processEvent(byteBuffer, messageLength);
+        		            final ServerToClientMessage message = processMessage(
+        		                    byteBuffer,
+        		                    messageLength,
+        		                    seq -> getRequestOpCodeFor(seq));
+        		            
+        		            final CARD16 sequenceNumber = message.getSequenceNumber();
+        		            
+                            final RequestWithReply requestWithReply = getRequestWithReply(sequenceNumber);
+                            
+                            if (requestWithReply != null) {
+                                requestWithReply.listener.onReply((Reply)message);
+                            }
+
         		        }
     		        }
     		        catch (IOException ex) {
     		            throw new IllegalStateException(ex);
     		        }
 		        }
+		        
 		    }
 		};
 		
@@ -91,6 +123,9 @@ public final class XWindowsDriverConnection
 		this.eventListeners = new Listeners<>();
 		
 		this.byteOrder = ByteOrder.BIG_ENDIAN;
+		
+		this.sequenceNumber = 1;
+		this.requestsWithReply = new ArrayList<>();
 		
 		final List<XAuth> xAuths = XAuth.getXAuthInfo();
 		
@@ -116,6 +151,38 @@ public final class XWindowsDriverConnection
 		
 		readerWriter.writeEncodeable(clientMessage, byteOrder);
 	}
+
+	private int getRequestOpCodeFor(int sequenceNumber) {
+	    
+	    for (RequestWithReply requestWithReply : requestsWithReply) {
+	        if (requestWithReply.sequenceNumber == sequenceNumber) {
+	            return requestWithReply.opCode;
+	        }
+	    }
+	    
+	    throw new IllegalStateException();
+	}
+
+	private RequestWithReply getRequestWithReply(CARD16 sequenceNumber) {
+        final Iterator<RequestWithReply> iter = requestsWithReply.iterator();
+        
+        RequestWithReply requestWithReply = null;
+        
+        while (iter.hasNext()) {
+            final RequestWithReply seq = iter.next();
+            
+            if (seq.sequenceNumber == sequenceNumber.getValue()) {
+                
+                requestWithReply = seq;
+                
+                iter.remove();
+                
+                break;
+            }
+        }
+	
+        return requestWithReply;
+	}
 	
 	private void readInitialMessageError(ByteBuffer byteBuffer) {
 
@@ -139,7 +206,7 @@ public final class XWindowsDriverConnection
 	    }
 	}
 	
-	private void readError(ByteBuffer byteBuffer) throws IOException {
+	private com.neaterbits.displayserver.protocol.messages.Error readError(ByteBuffer byteBuffer) throws IOException {
 
 	    final XWindowsProtocolInputStream stream = new ByteBufferXWindowsProtocolInputStream(byteBuffer);
 	    
@@ -148,6 +215,8 @@ public final class XWindowsDriverConnection
 	    if (protocolLog != null) {
 	        protocolLog.onReceivedError(error);
 	    }
+	    
+	    return error;
 	}
 	
 	
@@ -158,15 +227,48 @@ public final class XWindowsDriverConnection
 	    return ServerMessage.decode(stream);
 	}
 
-	private void processEvent(ByteBuffer byteBuffer, int messageLength) {
+	private ServerToClientMessage processMessage(
+	        ByteBuffer byteBuffer,
+	        int messageLength,
+	        Function<Integer, Integer> getRequestOpCode) throws IOException {
 	    
         final int opcode = byteBuffer.get();
         
+        final ServerToClientMessage message;
+        
+        final XWindowsProtocolInputStream stream = new ByteBufferXWindowsProtocolInputStream(byteBuffer);
+        
         switch (opcode) {
+        
+        case 1:
+            
+            final int sequenceNumber = byteBuffer.getShort(byteBuffer.position() + 1);
+            
+            final int requestOpCode = getRequestOpCode.apply(sequenceNumber);
+            
+            final Reply reply;
+            
+            switch (requestOpCode) {
+            case OpCodes.GET_IMAGE:
+                reply = GetImageReply.decode(stream);
+                break;
+                
+            default:
+                throw new UnsupportedOperationException("Unknown request opcode " + requestOpCode);
+            }
+            
+            if (protocolLog != null) {
+                protocolLog.onReceivedReply(reply);
+            }
+
+            message = reply;
+            break;
         
         default:
             throw new UnsupportedOperationException("Unknown opcode " + opcode);
         }
+        
+        return message;
 	}
 	
 	public ServerMessage getServerMessage() {
@@ -216,16 +318,49 @@ public final class XWindowsDriverConnection
 
 	@Override
 	public void sendRequest(Request request) {
+	    sendRequestWithSequenceNumber(request);
+	    
+	    ++ sequenceNumber;
+	}
 
-	    try {
-    		final int messageLength = readerWriter.writeRequest(request, byteOrder);
+    @Override
+    public void sendRequestWaitReply(Request request, ReplyListener replyListener) {
+
+        final int seq = this.sequenceNumber;
+        
+        requestsWithReply.add(new RequestWithReply(seq, request.getOpCode(), replyListener));
+
+        ++ sequenceNumber;
+
+        sendRequestWithSequenceNumber(request);
+    }
     
-    		if (protocolLog != null) {
+    private void sendRequestWithSequenceNumber(Request request) {
+        try {
+            final int messageLength = readerWriter.writeRequest(request, byteOrder);
+            
+            if (protocolLog != null) {
                 protocolLog.onSendRequest(messageLength, request);
             }
-	    }
-	    catch (IOException ex) {
-	        throw new IllegalStateException(ex);
-	    }
-	}
+        }
+        catch (IOException ex) {
+            throw new IllegalStateException(ex);
+        }
+    }
+    
+    private static class RequestWithReply {
+        
+        private final int sequenceNumber;
+        private final int opCode;
+        private final ReplyListener listener;
+        
+        public RequestWithReply(int sequenceNumber, int opCode, ReplyListener listener) {
+
+            Objects.requireNonNull(listener);
+            
+            this.sequenceNumber = sequenceNumber;
+            this.opCode = opCode;
+            this.listener = listener;
+        }
+    }
 }

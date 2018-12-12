@@ -60,7 +60,7 @@ public class DisplayServerMain {
 	                        name,
 	                        driverConnection.getSelectable(),
 	                        driverConnection.getMessageProcessor(),
-	                        new SelectableLogImpl(name, DebugLevels.CONNECTION_READ));
+	                        new SelectableLogImpl(name, DebugLevels.DRIVER_READ));
 
 	             System.out.println("## start check for IO");
 

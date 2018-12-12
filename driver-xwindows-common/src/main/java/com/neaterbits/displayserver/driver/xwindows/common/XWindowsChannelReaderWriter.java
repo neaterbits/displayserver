@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.ShortBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
@@ -17,7 +16,6 @@ import com.neaterbits.displayserver.io.common.MessageProcessor;
 import com.neaterbits.displayserver.io.common.NonBlockingChannelWriter;
 import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLog;
 import com.neaterbits.displayserver.io.common.Selectable;
-import com.neaterbits.displayserver.protocol.XWindowsProtocolUtil;
 import com.neaterbits.displayserver.protocol.messages.Encodeable;
 import com.neaterbits.displayserver.protocol.messages.Request;
 
@@ -82,60 +80,6 @@ abstract class XWindowsChannelReaderWriter
 		}
 
 		return socketChannel;
-	}
-
-	@Override
-	public Integer getLengthOfMessage(ByteBuffer byteBuffer) {
-
-	    final Integer length;
-	    
-	    if (receivedInitialMessage()) {
-	        length = XWindowsProtocolUtil.getMessageLength(byteBuffer);
-	    }
-	    else {
-	        final byte initialByte = byteBuffer.get(byteBuffer.position());
-	        
-	        if (initialByte == 0) {
-	            
-	            if (byteBuffer.remaining() > 1) {
-	                final int reasonLength = byteBuffer.get(byteBuffer.position() + 1);
-	            
-	                final int completeLength = 8 + reasonLength + XWindowsProtocolUtil.getPadding(reasonLength);
-	                
-	                length = completeLength <= byteBuffer.remaining() ? completeLength : null;
-	            }
-	            else {
-	                length = null;
-	            }
-	        }
-	        else if (initialByte == 1) {
-	            
-	            if (byteBuffer.remaining() >= 8) {
-	            
-    	            // initial server message
-    	            final ShortBuffer shortBuffer = byteBuffer.asShortBuffer();
-    	            
-    	            final int additionalDataLength = shortBuffer.get(shortBuffer.position() + 3);
-    	            
-    	            final int totalLength = 8 + additionalDataLength * 4;
-    	            
-    	            if (totalLength <= byteBuffer.remaining()) {
-    	                length = totalLength;
-    	            }
-    	            else {
-    	                length = null;
-    	            }
-	            }
-	            else {
-	                length = null;
-	            }
-	        }
-	        else {
-	            throw new UnsupportedOperationException("initialByte: " + initialByte);
-	        }
-	    }
-	    
-	    return length;
 	}
 
 	public void close() throws Exception {

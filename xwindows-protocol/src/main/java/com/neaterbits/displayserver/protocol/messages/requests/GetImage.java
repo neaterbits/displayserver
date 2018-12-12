@@ -107,6 +107,8 @@ public final class GetImage extends Request {
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 
+        writeOpCode(stream);
+        
         stream.writeBYTE(format);
         
         writeRequestLength(stream, 5);

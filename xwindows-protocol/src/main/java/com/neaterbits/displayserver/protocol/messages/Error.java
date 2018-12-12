@@ -45,6 +45,22 @@ public final class Error extends Message {
         return new Error(code, sequenceNumber, value, opcode);
     }
     
+    public BYTE getCode() {
+        return code;
+    }
+
+    public CARD16 getSequenceNumber() {
+        return sequenceNumber;
+    }
+
+    public CARD32 getValue() {
+        return value;
+    }
+
+    public CARD8 getOpcode() {
+        return opcode;
+    }
+
     @Override
     public Object[] getDebugParams() {
         

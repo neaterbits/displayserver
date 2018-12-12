@@ -199,7 +199,7 @@ public class XServer implements AutoCloseable {
                     length = XWindowsProtocolUtil.getInitialMessageLength(byteBuffer);
                 }
                 else {
-                    length = XWindowsProtocolUtil.getMessageLength(byteBuffer);
+                    length = XWindowsProtocolUtil.getRequestLength(byteBuffer);
                 }
 
                 return length;
