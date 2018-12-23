@@ -2,9 +2,10 @@ package com.neaterbits.displayserver.buffers;
 
 public enum PixelFormat {
 
-	RGBA32(24, 32, 4, 8, 1 << 24, 0xFF000000, 0x00FF0000, 0x0000FF00),
+	RGBA32(24, 32, 4, 8, 1 << 24, 0xFF000000, 0x00FF0000, 0x0000FF00, 16, 8, 0),
 	
-	RGB24(24, 24, 3, 8, 1 << 24, 0x00FF0000, 0x0000FF00, 0x000000FF);
+	RGB24(24, 24, 3, 8, 1 << 24, 0x00FF0000, 0x0000FF00, 0x000000FF, 16, 8, 0),
+    RGB32(24, 32, 4, 8, 1 << 24, 0x00FF0000, 0x0000FF00, 0x000000FF, 16, 8, 0);
 	
 	private final int depth;
 	private final int bitsPerPixel;
@@ -17,10 +18,14 @@ public enum PixelFormat {
 	private final int greenMask;
 	private final int blueMask;
 	
+	private final int redShift;
+	private final int greenShift;
+	private final int blueShift;
 	
     private PixelFormat(int depth, int bitsPerPixel, int bytesPerPixel,
             int bitsPerColorComponent, int numberOfDistinctColors,
-            int redMask, int greenMask, int blueMask) {
+            int redMask, int greenMask, int blueMask,
+            int redShift, int greenShift, int blueShift) {
         
         this.depth = depth;
         this.bitsPerPixel = bitsPerPixel;
@@ -28,9 +33,14 @@ public enum PixelFormat {
     
         this.bitsPerColorComponent = bitsPerColorComponent;
         this.numberOfDistinctColors = numberOfDistinctColors;
+        
         this.redMask = redMask;
         this.greenMask = greenMask;
         this.blueMask = blueMask;
+        
+        this.redShift = redShift;
+        this.greenShift = greenShift;
+        this.blueShift = blueShift;
     }
 
     public int getDepth() {
@@ -63,5 +73,17 @@ public enum PixelFormat {
 
     public int getBlueMask() {
         return blueMask;
+    }
+
+    public int getRedShift() {
+        return redShift;
+    }
+
+    public int getGreenShift() {
+        return greenShift;
+    }
+
+    public int getBlueShift() {
+        return blueShift;
     }
 }

@@ -17,8 +17,8 @@ abstract class XWindowsRenderingProvider extends XWindowsFrameBuffer implements 
     private final XWindowsDriverConnection driverConnection;
     private final WINDOW window;
     
-    XWindowsRenderingProvider(XWindowsDriverConnection driverConnection, WINDOW window, Size size, int depth) throws IOException {
-        super(driverConnection, window, size, depth);
+    XWindowsRenderingProvider(XWindowsDriverConnection driverConnection, int screen, WINDOW window, Size size, int depth) throws IOException {
+        super(driverConnection, screen, window, size, depth);
         
         this.driverConnection = driverConnection;
         this.window = window;
@@ -32,7 +32,7 @@ abstract class XWindowsRenderingProvider extends XWindowsFrameBuffer implements 
     @Override
     public OffscreenBuffer allocateOffscreenBuffer(Size size, PixelFormat pixelFormat) {
         try {
-            return new XWindowsOffscreenBuffer(driverConnection, window, size, pixelFormat.getDepth());
+            return new XWindowsOffscreenBuffer(driverConnection, getScreenNo(), window, size, pixelFormat.getDepth());
         } catch (IOException ex) {
             throw new IllegalStateException(ex);
         }

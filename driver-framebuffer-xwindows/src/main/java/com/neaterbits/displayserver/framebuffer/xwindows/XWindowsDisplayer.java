@@ -29,12 +29,16 @@ final class XWindowsDisplayer extends XWindowsRenderingProvider implements Rende
     private final OutputConnector outputConnector;
     private final DisplayDevice displayDevice;
     
+    private static int getDefaultScreenNo() {
+        return 0;
+    }
+    
     private static SCREEN getDefaultScreen(XWindowsDriverConnection driverConnection) {
         final ServerMessage serverMessage = driverConnection.getServerMessage();
         
         Objects.requireNonNull(serverMessage);
         
-        return serverMessage.getScreens()[0];
+        return serverMessage.getScreens()[getDefaultScreenNo()];
     }
     
     XWindowsDisplayer(
@@ -45,6 +49,7 @@ final class XWindowsDisplayer extends XWindowsRenderingProvider implements Rende
         
         super(
                 driverConnection,
+                getDefaultScreenNo(),
                 XWindowsClientHelper.createWindow(
                         driverConnection,
                         position,

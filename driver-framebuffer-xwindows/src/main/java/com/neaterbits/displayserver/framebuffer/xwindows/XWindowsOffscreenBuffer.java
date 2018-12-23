@@ -15,14 +15,16 @@ import com.neaterbits.displayserver.types.Size;
 
 final class XWindowsOffscreenBuffer extends XWindowsBaseBuffer implements OffscreenBuffer {
 
+    private final int screen;
     private final PIXMAP pixmap;
     private final Size size;
     private final int depth;
     
-    XWindowsOffscreenBuffer(XWindowsDriverConnection driverConnection, WINDOW window, Size size, int depth) throws IOException {
+    XWindowsOffscreenBuffer(XWindowsDriverConnection driverConnection, int screen, WINDOW window, Size size, int depth) throws IOException {
     
         super(driverConnection, XWindowsClientHelper.createGC(driverConnection, window));
         
+        this.screen = screen;
         this.pixmap = new PIXMAP(driverConnection.allocateResourceId());
         this.size = size;
         this.depth = depth;
@@ -37,6 +39,11 @@ final class XWindowsOffscreenBuffer extends XWindowsBaseBuffer implements Offscr
         driverConnection.sendRequest(createPixmap);
     }
     
+    @Override
+    int getScreenNo() {
+        return screen;
+    }
+
     @Override
     DRAWABLE getDrawable() {
         return pixmap.toDrawable();

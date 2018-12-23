@@ -99,6 +99,7 @@ public final class ServerMessage extends Encodeable {
 	    for (int i = 0; i < screens.length; ++ i) {
 	        screens[i] = SCREEN.decode(stream);
 	    }
+
 	    return new ServerMessage(
 	            success,
 	            protocolMajorVersion, protocolMinorVersion,

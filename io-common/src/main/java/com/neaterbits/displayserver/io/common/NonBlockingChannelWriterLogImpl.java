@@ -22,6 +22,21 @@ public class NonBlockingChannelWriterLogImpl extends BaseLogImpl implements NonB
                     "bufferRemaining", writeBufferRemaining,
                     "bufferPosition", writeBufferPosition);
     }
+    
+    @Override
+    public void onQueueWriteResize(int dataLength, int offset, int length, int writeBufferLimit,
+            int writeBufferRemaining, int writeBufferPosition) {
+
+        trace("onQueueWriteResize",
+                "dataLength", dataLength,
+                "offset", offset,
+                "length", length,
+                "bufferLimit", writeBufferLimit,
+                "bufferRemaining", writeBufferRemaining,
+                "bufferPosition", writeBufferPosition);
+        
+        System.out.flush();
+    }
 
     @Override
     public void onQueueWriteExit(int writeBufferLimit, int writeBufferRemaining, int writeBufferPosition) {

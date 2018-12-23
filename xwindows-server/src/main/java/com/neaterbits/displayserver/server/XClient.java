@@ -343,7 +343,7 @@ public class XClient extends XConnection {
                     new GetImageListener() {
                         @Override
                         public void onResult(byte[] data) {
-                            sendGetImageReply(sequenceNumber, offscreenBuffer, visual, serverToClient, data);
+                            sendGetImageReply(sequenceNumber, offscreenBuffer, VISUALID.None, serverToClient, data);
                         }
                         
                         @Override

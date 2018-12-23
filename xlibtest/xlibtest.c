@@ -35,6 +35,9 @@ int main(int argc, char **argv) {
 	XSelectInput(display, window, ExposureMask | KeyPressMask | ButtonPressMask | StructureNotifyMask);
 
 	XMapWindow(display, window);
+	
+	
+	
 
 	for (;;) {
 		XEvent event;

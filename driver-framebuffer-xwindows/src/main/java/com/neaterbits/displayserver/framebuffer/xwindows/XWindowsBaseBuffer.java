@@ -10,6 +10,11 @@ import com.neaterbits.displayserver.driver.xwindows.common.XWindowsDriverConnect
 import com.neaterbits.displayserver.protocol.enums.ImageFormat;
 import com.neaterbits.displayserver.protocol.messages.Error;
 import com.neaterbits.displayserver.protocol.messages.Reply;
+import com.neaterbits.displayserver.protocol.messages.protocolsetup.DEPTH;
+import com.neaterbits.displayserver.protocol.messages.protocolsetup.FORMAT;
+import com.neaterbits.displayserver.protocol.messages.protocolsetup.SCREEN;
+import com.neaterbits.displayserver.protocol.messages.protocolsetup.ServerMessage;
+import com.neaterbits.displayserver.protocol.messages.protocolsetup.VISUALTYPE;
 import com.neaterbits.displayserver.protocol.messages.replies.GetImageReply;
 import com.neaterbits.displayserver.protocol.messages.requests.GetImage;
 import com.neaterbits.displayserver.protocol.messages.requests.PutImage;
@@ -20,6 +25,7 @@ import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.GCONTEXT;
 import com.neaterbits.displayserver.protocol.types.INT16;
+import com.neaterbits.displayserver.protocol.types.VISUALID;
 
 abstract class XWindowsBaseBuffer implements BufferOperations {
 
@@ -30,6 +36,7 @@ abstract class XWindowsBaseBuffer implements BufferOperations {
     
     abstract int getDepth();
     
+    abstract int getScreenNo();
     
     XWindowsBaseBuffer(XWindowsDriverConnection driverConnection, GCONTEXT gc) {
         
@@ -94,15 +101,149 @@ abstract class XWindowsBaseBuffer implements BufferOperations {
         }
     }
 
+    private FORMAT getFormat(int depth) {
+        
+        final ServerMessage serverMessage = driverConnection.getServerMessage();
+        
+        for (FORMAT format : serverMessage.getPixmapFormats()) {
+            if (format.getDepth().getValue() == depth) {
+                return format;
+            }
+        }
+        
+        throw new IllegalStateException();
+    }
+    private VISUALTYPE getVisual(ServerMessage serverMessage, VISUALID visual) {
+        
+        final SCREEN [] screens = serverMessage.getScreens();
+        
+        for (int i = 0; i < screens.length; ++ i) {
+            final SCREEN screen = screens[i];
+
+            for (DEPTH depth : screen.getAllowedDepths()) {
+                for (VISUALTYPE visualType : depth.getVisuals()) {
+                    if (visualType.getVisualId().equals(visual)) {
+                        return visualType;
+                    }
+                }
+            }
+        }
+
+        throw new IllegalStateException("No visual for " + visual);
+    }
+           
+    private VISUALTYPE getVisual(int screenNo, int pixelDepth, VISUALID visual) {
+        
+        final ServerMessage serverMessage = driverConnection.getServerMessage();
+        return getVisual(serverMessage, visual);
+
+        /*
+        
+        final SCREEN [] screens = serverMessage.getScreens();
+        
+        final SCREEN screen = screens[screenNo];
+        
+        for (DEPTH depth : screen.getAllowedDepths()) {
+            if (depth.getDepth().getValue() == pixelDepth) {
+                
+                for (VISUALTYPE visualtype : depth.getVisuals()) {
+                    if (visualtype.getVisualId().equals(visual)) {
+                        return visualtype;
+                    }
+                }
+            }
+        }
+        
+        throw new IllegalStateException("No visual for " + visual);
+         */
+    }
+    
+    private static boolean isPixelFormat(VISUALTYPE visualType, PixelFormat pixelFormat) {
+        return   
+                  visualType.getBitsPerRGBValue().getValue() == pixelFormat.getBitsPerPixel()
+               && visualType.getRedMask().getValue()    == pixelFormat.getRedMask()
+               && visualType.getGreenMask().getValue()  == pixelFormat.getGreenMask()
+               && visualType.getBlueMask().getValue()   == pixelFormat.getBlueMask();
+               
+    }
+
+    private static PixelFormat getPixelFormat(FORMAT format, VISUALTYPE visualType) {
+        
+        final PixelFormat pixelFormat;
+        
+        switch (format.getDepth().getValue()) {
+        
+        case 24:
+            switch (format.getBitsPerPixel().getValue()) {
+            case 24:
+                if (isPixelFormat(visualType, PixelFormat.RGB24)) {
+                    pixelFormat = PixelFormat.RGB24;
+                }
+                else {
+                    throw new UnsupportedOperationException();
+                }
+                break;
+                
+            case 32:
+                if (isPixelFormat(visualType, PixelFormat.RGBA32)) {
+                    pixelFormat = PixelFormat.RGB32;
+                }
+                else {
+                    throw new UnsupportedOperationException();
+                }
+                break;
+                
+            default:
+                throw new UnsupportedOperationException();
+            }
+            
+            break;
+            
+        default:
+            throw new UnsupportedOperationException();
+        }
+        
+        return pixelFormat;
+    }
+
+    private static PixelFormat getPixelFormat(FORMAT format) {
+        
+        final PixelFormat pixelFormat;
+        
+        switch (format.getDepth().getValue()) {
+        
+        case 24:
+            switch (format.getBitsPerPixel().getValue()) {
+            case 24:
+                pixelFormat = PixelFormat.RGB24;
+                break;
+                
+            case 32:
+                pixelFormat = PixelFormat.RGB32;
+                break;
+                
+            default:
+                throw new UnsupportedOperationException();
+            }
+            
+            break;
+            
+        default:
+            throw new UnsupportedOperationException();
+        }
+        
+        return pixelFormat;
+    }
+
     @Override
-    public final void getImage(int x, int y, int width, int height, PixelFormat format, GetImageListener listener) {
+    public final void getImage(int x, int y, int width, int height, PixelFormat pixelFormat, GetImageListener listener) {
 
         final GetImage getImageRequest = new GetImage(
                 ImageFormat.ZPixMap,
                 getDrawable(),
                 new INT16((short)x), new INT16((short)y),
                 new CARD16(width), new CARD16(height),
-                new CARD32(0x00FFFFFFL));
+                new CARD32(0xFFFFFFFFL));
         
         driverConnection.sendRequestWaitReply(getImageRequest, new ReplyListener() {
             
@@ -110,7 +251,35 @@ abstract class XWindowsBaseBuffer implements BufferOperations {
             public void onReply(Reply reply) {
                 final GetImageReply getImageReply = (GetImageReply)reply;
                 
-                listener.onResult(getImageReply.getData());
+                final int returnedDepth = getImageReply.getDepth().getValue();
+                
+                final FORMAT format = getFormat(returnedDepth);
+                
+                final PixelFormat returnedPixelFormat;
+                
+                if (!getImageReply.getVisual().equals(VISUALID.None)) {
+                    final VISUALTYPE visualType = getVisual(getScreenNo(), returnedDepth, getImageReply.getVisual());
+                
+                    returnedPixelFormat = getPixelFormat(format, visualType);
+                }
+                else {
+                    returnedPixelFormat = getPixelFormat(format);
+                }
+                
+                byte [] data;
+                
+                if (returnedPixelFormat.equals(pixelFormat)) {
+                    data = getImageReply.getData();
+                }
+                else {
+                    data = convertPixelData(
+                            getImageReply.getData(),
+                            getImageRequest.getWidth().getValue(), getImageRequest.getHeight().getValue(),
+                            returnedPixelFormat,
+                            pixelFormat);
+                }
+
+                listener.onResult(data);
             }
             
             @Override
@@ -118,5 +287,65 @@ abstract class XWindowsBaseBuffer implements BufferOperations {
                 listener.onError();
             }
         });
+    }
+    
+    private static int getPixel(byte [] data, int index, PixelFormat format) {
+        
+        int pixel = 0;
+        
+        for (int i = 0; i < format.getBytesPerPixel(); ++ i) {
+            
+            pixel <<= 8;
+            pixel |= data[index + i];
+        }
+        
+        return pixel;
+    }
+
+    private static void putPixel(byte [] data, int index, PixelFormat format, int pixel) {
+        
+       for (int i = 0; i < format.getBytesPerPixel(); ++ i) {
+            
+            pixel >>>= 8;
+            data[index + i] = (byte)(pixel & 0x000000FF);
+        }
+    }
+    
+    private static byte [] convertPixelData(
+            byte [] pixelData,
+            int width, int height,
+            PixelFormat fromFormat,
+            PixelFormat toFormat) {
+        
+        final int numPixels = width * height;
+        final int numBytes = toFormat.getBytesPerPixel() * numPixels;
+        
+        System.out.println("## getting buffer for " + numPixels + "/" + toFormat.getBytesPerPixel() + ": " + numBytes);
+        
+        final byte [] toData = new byte[numBytes];
+        
+        int srcIdx = 0;
+        int dstIdx = 0;
+        
+        for (int i = 0; i < numPixels; ++ i) {
+            
+            final int srcPixel = getPixel(pixelData, srcIdx, fromFormat);
+            
+            final int red   = (srcPixel & fromFormat.getRedMask())   >>> fromFormat.getRedShift();
+            final int green = (srcPixel & fromFormat.getGreenMask()) >>> fromFormat.getGreenShift();
+            final int blue = (srcPixel & fromFormat.getBlueMask())  >>> fromFormat.getBlueShift();
+        
+            final int dstPixel =   (red   << toFormat.getRedShift())
+                                 | (green << toFormat.getGreenShift())
+                                 | (blue  << toFormat.getBlueShift());
+            
+            
+            putPixel(toData, dstIdx, toFormat, dstPixel);
+
+            srcIdx += fromFormat.getBytesPerPixel();
+            dstIdx += toFormat.getBytesPerPixel();
+        }
+        
+        return toData;
     }
 }

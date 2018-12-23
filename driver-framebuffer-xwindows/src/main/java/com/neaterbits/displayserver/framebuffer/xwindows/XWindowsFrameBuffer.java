@@ -14,16 +14,18 @@ import com.neaterbits.displayserver.types.Size;
 
 class XWindowsFrameBuffer extends XWindowsBaseBuffer implements FrameBuffer {
 
+    private final int screen;
 	private final WINDOW window;
 	
 	private final Size size;
 	private final int depth;
 	
-	XWindowsFrameBuffer(XWindowsDriverConnection driverConnection, WINDOW window, Size size, int depth) throws IOException {
+	XWindowsFrameBuffer(XWindowsDriverConnection driverConnection, int screen, WINDOW window, Size size, int depth) throws IOException {
 	    super(driverConnection, XWindowsClientHelper.createGC(driverConnection, window));
 		
 		Objects.requireNonNull(window);
 		
+		this.screen = screen;
 		this.window = window;
 
 		this.size = size;
@@ -38,6 +40,11 @@ class XWindowsFrameBuffer extends XWindowsBaseBuffer implements FrameBuffer {
     @Override
     public final Size getFrameBufferSize() {
         return size;
+    }
+
+    @Override
+    int getScreenNo() {
+        return screen;
     }
 
     @Override

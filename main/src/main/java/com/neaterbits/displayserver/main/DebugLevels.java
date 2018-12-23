@@ -7,7 +7,7 @@ public class DebugLevels {
     public static final DebugLevel ASYNC_SERVERS = DebugLevel.DEBUG;
     
     public static final DebugLevel DRIVER_READ = DebugLevel.DEBUG;
-    public static final DebugLevel DRIVER_WRITE = DebugLevel.DEBUG;
+    public static final DebugLevel DRIVER_WRITE = DebugLevel.TRACE;
     
     public static final DebugLevel CONNECTION_READ = DebugLevel.DEBUG;
     public static final DebugLevel CONNECTION_WRITE = DebugLevel.DEBUG;
