@@ -39,6 +39,20 @@ abstract class XDrawable {
         
         gcs.put(context, xgc);
     }
+    
+    final void changeGC(GCONTEXT context, GCAttributes attributes) {
+        
+        Objects.requireNonNull(context);
+        Objects.requireNonNull(attributes);
+        
+        final XGC existing = gcs.get(context);
+        
+        if (existing == null) {
+            throw new IllegalStateException();
+        }
+
+        gcs.put(context, new XGC(existing.getAttributes().applyImmutably(attributes)));
+    }
 
     final void removeGC(GCONTEXT context) {
         

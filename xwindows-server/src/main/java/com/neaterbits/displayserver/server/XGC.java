@@ -8,14 +8,14 @@ final class XGC {
 
     private GCAttributes attributes;
 
-    public XGC(GCAttributes attributes) {
+    XGC(GCAttributes attributes) {
 
         Objects.requireNonNull(attributes);
         
         this.attributes = attributes;
     }
 
-    public GCAttributes getAttributes() {
+    GCAttributes getAttributes() {
         return attributes;
     }
 }

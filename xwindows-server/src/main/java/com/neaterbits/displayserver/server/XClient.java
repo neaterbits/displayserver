@@ -21,6 +21,7 @@ import com.neaterbits.displayserver.protocol.exception.IDChoiceException;
 import com.neaterbits.displayserver.protocol.exception.MatchException;
 import com.neaterbits.displayserver.protocol.exception.ValueException;
 import com.neaterbits.displayserver.protocol.messages.replies.GetImageReply;
+import com.neaterbits.displayserver.protocol.messages.requests.ChangeGC;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateCursor;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateGC;
 import com.neaterbits.displayserver.protocol.messages.requests.CreatePixmap;
@@ -265,6 +266,19 @@ public class XClient extends XConnection {
         xDrawable.addGC(createGC.getCid(), attributes);
         
         gcToDrawable.put(createGC.getCid(), xDrawable);
+    }
+    
+    final void changeGC(ChangeGC changeGC) throws GContextException {
+        
+        final GCONTEXT gc = changeGC.getGc();
+        
+        final XDrawable xDrawable = gcToDrawable.get(gc);
+        
+        if (xDrawable == null) {
+            throw new GContextException("Unknown GC", gc);
+        }
+        
+        xDrawable.changeGC(gc, changeGC.getAttributes());
     }
     
     final void freeGC(FreeGC freeGC) throws GContextException {

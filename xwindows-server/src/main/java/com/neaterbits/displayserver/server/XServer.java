@@ -42,6 +42,7 @@ import com.neaterbits.displayserver.protocol.messages.replies.QueryPointerReply;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryResponseReply;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryTreeReply;
 import com.neaterbits.displayserver.protocol.messages.requests.AllocColor;
+import com.neaterbits.displayserver.protocol.messages.requests.ChangeGC;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeProperty;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeWindowAttributes;
 import com.neaterbits.displayserver.protocol.messages.requests.ConvertSelection;
@@ -545,6 +546,18 @@ public class XServer implements AutoCloseable {
 		    catch (IDChoiceException ex) {
 		        sendError(client, Errors.IDChoice, sequenceNumber, ex.getResource().getValue(), opcode);
 		    }
+		    break;
+		}
+		
+		case OpCodes.CHANGE_GC: {
+		    
+		    final ChangeGC changeGC = log(messageLength, opcode, sequenceNumber, ChangeGC.decode(stream));
+		    
+		    try {
+                client.changeGC(changeGC);
+            } catch (GContextException ex) {
+                sendError(client, Errors.GContext, sequenceNumber, changeGC.getGc().getValue(), opcode);
+            }
 		    break;
 		}
 		
