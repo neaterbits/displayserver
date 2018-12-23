@@ -70,6 +70,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.QueryExtension;
 import com.neaterbits.displayserver.protocol.messages.requests.QueryPointer;
 import com.neaterbits.displayserver.protocol.messages.requests.QueryTree;
 import com.neaterbits.displayserver.protocol.messages.requests.UngrabServer;
+import com.neaterbits.displayserver.protocol.messages.requests.legacy.LookupColor;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.OpenFont;
 import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.protocol.types.BOOL;
@@ -630,6 +631,13 @@ public class XServer implements AutoCloseable {
 		            allocColor.getBlue(),
 		            new CARD32(0)));
 		    break;
+		}
+		
+		case OpCodes.LOOKUP_COLOR: {
+		    
+		    log(messageLength, opcode, sequenceNumber, LookupColor.decode(stream));
+		    
+		    throw new UnsupportedOperationException("TODO");
 		}
 		
 		case OpCodes.CREATE_CURSOR: {

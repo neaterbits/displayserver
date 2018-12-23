@@ -23,12 +23,8 @@ final class WriteBuffer {
             
             final int newLength = (writeBuffer.capacity() + (length - spaceLeft)) * 3;
 
-            System.out.println("## remaining " + writeBuffer.remaining() + ", capacity " + writeBuffer.capacity() + "/" + newLength);
-            
             final byte [] bytes = new byte[newLength];
 
-            System.out.println("writing bytes " + bytes.length);
-            
             writeBuffer.flip();
             
             final int bytesInBuffer = writeBuffer.remaining();
@@ -37,20 +33,12 @@ final class WriteBuffer {
                 log.onQueueWriteResize(data.length, offset, length, writeBuffer.limit(), writeBuffer.remaining(), writeBuffer.position());
             }
 
-            System.out.println("writing bytes " + length + " to " + bytes.length + "/"
-                    + writeBuffer.limit() + "/" + writeBuffer.remaining() + "/" + writeBuffer.position());
-
-            System.out.println("## getting " + bytesInBuffer + "/" + writeBuffer.position());
-            
             if (bytesInBuffer != 0) {
                 writeBuffer.get(bytes, writeBuffer.position(), bytesInBuffer);
             }
             
             writeBuffer = ByteBuffer.wrap(bytes, 0, bytesInBuffer);
 
-            System.out.println("after wrap " + 
-                    + writeBuffer.limit() + "/" + writeBuffer.remaining() + "/" + writeBuffer.position() + "/" + writeBuffer.capacity());
-            
             writeBuffer.compact();
         }
         
