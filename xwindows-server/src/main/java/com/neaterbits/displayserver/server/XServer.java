@@ -73,6 +73,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.UngrabServer;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.CreateGlyphCursor;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.LookupColor;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.OpenFont;
+import com.neaterbits.displayserver.protocol.messages.requests.legacy.QueryFont;
 import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.protocol.types.BOOL;
 import com.neaterbits.displayserver.protocol.types.BYTE;
@@ -525,7 +526,12 @@ public class XServer implements AutoCloseable {
             break;
         }
         
-		case OpCodes.CREATE_PIXMAP: {
+        case OpCodes.QUERY_FONT: {
+            log(messageLength, opcode, sequenceNumber, QueryFont.decode(stream));
+            break;
+        }
+
+        case OpCodes.CREATE_PIXMAP: {
 		    final CreatePixmap createPixmap = log(messageLength, opcode, sequenceNumber, CreatePixmap.decode(stream));
 		    
 		    try {

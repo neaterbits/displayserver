@@ -14,6 +14,7 @@ import com.neaterbits.displayserver.protocol.types.COLORMAP;
 import com.neaterbits.displayserver.protocol.types.CURSOR;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.FONT;
+import com.neaterbits.displayserver.protocol.types.FONTABLE;
 import com.neaterbits.displayserver.protocol.types.GCONTEXT;
 import com.neaterbits.displayserver.protocol.types.INT16;
 import com.neaterbits.displayserver.protocol.types.INT32;
@@ -141,6 +142,11 @@ public class IntPadXWindowsProtocolInputStream implements XWindowsProtocolInputS
     @Override
     public FONT readFONT() throws IOException {
         return delegate.readFONT();
+    }
+    
+    @Override
+    public FONTABLE readFONTABLE() throws IOException {
+        return delegate.readFONTABLE();
     }
 
     @Override

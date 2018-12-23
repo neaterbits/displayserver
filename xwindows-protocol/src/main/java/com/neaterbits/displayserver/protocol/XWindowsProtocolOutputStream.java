@@ -14,6 +14,7 @@ import com.neaterbits.displayserver.protocol.types.COLORMAP;
 import com.neaterbits.displayserver.protocol.types.CURSOR;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.FONT;
+import com.neaterbits.displayserver.protocol.types.FONTABLE;
 import com.neaterbits.displayserver.protocol.types.GCONTEXT;
 import com.neaterbits.displayserver.protocol.types.INT16;
 import com.neaterbits.displayserver.protocol.types.INT32;
@@ -65,6 +66,7 @@ public interface XWindowsProtocolOutputStream {
 	void writeCURSOR(CURSOR value) throws IOException;
 	
     void writeFONT(FONT value) throws IOException;
+    void writeFONTABLE(FONTABLE value) throws IOException;
 	
     void writeATOM(ATOM value) throws IOException;
     

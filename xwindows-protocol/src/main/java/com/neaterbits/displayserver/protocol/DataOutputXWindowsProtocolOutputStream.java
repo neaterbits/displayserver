@@ -16,6 +16,7 @@ import com.neaterbits.displayserver.protocol.types.COLORMAP;
 import com.neaterbits.displayserver.protocol.types.CURSOR;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.FONT;
+import com.neaterbits.displayserver.protocol.types.FONTABLE;
 import com.neaterbits.displayserver.protocol.types.GCONTEXT;
 import com.neaterbits.displayserver.protocol.types.INT16;
 import com.neaterbits.displayserver.protocol.types.INT32;
@@ -144,6 +145,11 @@ public final class DataOutputXWindowsProtocolOutputStream implements XWindowsPro
 
     @Override
     public void writeFONT(FONT value) throws IOException {
+        writeRESOURCE(value);
+    }
+    
+    @Override
+    public void writeFONTABLE(FONTABLE value) throws IOException {
         writeRESOURCE(value);
     }
 
