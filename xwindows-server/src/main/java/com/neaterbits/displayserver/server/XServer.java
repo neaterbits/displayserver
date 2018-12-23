@@ -70,6 +70,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.QueryExtension;
 import com.neaterbits.displayserver.protocol.messages.requests.QueryPointer;
 import com.neaterbits.displayserver.protocol.messages.requests.QueryTree;
 import com.neaterbits.displayserver.protocol.messages.requests.UngrabServer;
+import com.neaterbits.displayserver.protocol.messages.requests.legacy.OpenFont;
 import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.protocol.types.BOOL;
 import com.neaterbits.displayserver.protocol.types.BYTE;
@@ -514,6 +515,11 @@ public class XServer implements AutoCloseable {
             
             sendReply(client, new GetInputFocusReply(sequenceNumber, RevertTo.None, WINDOW.None));
             
+            break;
+        }
+        
+        case OpCodes.OPEN_FONT: {
+            log(messageLength, opcode, sequenceNumber, OpenFont.decode(stream));
             break;
         }
         

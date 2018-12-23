@@ -28,6 +28,8 @@ public class OpCodes {
 	
     public static final int GET_INPUT_FOCUS = 43;
     
+    public static final int OPEN_FONT = 45;
+    
 	public static final int CREATE_PIXMAP = 53;
     public static final int FREE_PIXMAP = 54;
     public static final int CREATE_GC = 55;
