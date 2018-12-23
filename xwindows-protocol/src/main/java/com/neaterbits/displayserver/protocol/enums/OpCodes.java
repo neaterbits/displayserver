@@ -48,5 +48,6 @@ public class OpCodes {
 	
 	public static final int LOOKUP_COLOR = 92;
 	public static final int CREATE_CURSOR = 93;
+	public static final int CREATE_GLYPH_CURSOR = 94;
 	public static final int QUERY_EXTENSION = 98;
 }

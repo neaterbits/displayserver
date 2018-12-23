@@ -70,6 +70,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.QueryExtension;
 import com.neaterbits.displayserver.protocol.messages.requests.QueryPointer;
 import com.neaterbits.displayserver.protocol.messages.requests.QueryTree;
 import com.neaterbits.displayserver.protocol.messages.requests.UngrabServer;
+import com.neaterbits.displayserver.protocol.messages.requests.legacy.CreateGlyphCursor;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.LookupColor;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.OpenFont;
 import com.neaterbits.displayserver.protocol.types.ATOM;
@@ -649,6 +650,13 @@ public class XServer implements AutoCloseable {
             } catch (IDChoiceException ex) {
                 sendError(client, Errors.IDChoice, sequenceNumber, createCursor.getCID().getValue(), opcode);
             }
+		    break;
+		}
+		
+		case OpCodes.CREATE_GLYPH_CURSOR: {
+		    
+		    log(messageLength, opcode, sequenceNumber, CreateGlyphCursor.decode(stream));
+		    
 		    break;
 		}
 		
