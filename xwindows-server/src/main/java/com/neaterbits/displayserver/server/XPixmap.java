@@ -2,6 +2,7 @@ package com.neaterbits.displayserver.server;
 
 import java.util.Objects;
 
+import com.neaterbits.displayserver.buffers.BufferOperations;
 import com.neaterbits.displayserver.buffers.OffscreenBuffer;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 
@@ -19,6 +20,11 @@ final class XPixmap extends XDrawable {
     }
 
     OffscreenBuffer getOffscreenBuffer() {
+        return offscreenBuffer;
+    }
+
+    @Override
+    BufferOperations getBufferOperations() {
         return offscreenBuffer;
     }
 }

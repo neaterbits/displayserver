@@ -16,6 +16,7 @@ import com.neaterbits.displayserver.protocol.messages.protocolsetup.SCREEN;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ServerMessage;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.VISUALTYPE;
 import com.neaterbits.displayserver.protocol.messages.replies.GetImageReply;
+import com.neaterbits.displayserver.protocol.messages.requests.CopyArea;
 import com.neaterbits.displayserver.protocol.messages.requests.GetImage;
 import com.neaterbits.displayserver.protocol.messages.requests.PutImage;
 import com.neaterbits.displayserver.protocol.types.BYTE;
@@ -289,6 +290,21 @@ abstract class XWindowsBaseBuffer implements BufferOperations {
         });
     }
     
+    @Override
+    public void copyArea(BufferOperations src, int srcX, int srcY, int dstX, int dstY, int width, int height) {
+
+        final DRAWABLE srcDrawable = ((XWindowsBaseBuffer)src).getDrawable();
+        final DRAWABLE dstDrawable = getDrawable();
+        
+        driverConnection.sendRequest(
+                new CopyArea(
+                        srcDrawable, dstDrawable,
+                        gc,
+                        new INT16((short)srcX), new INT16((short)srcY),
+                        new INT16((short)dstX), new INT16((short)dstY),
+                        new CARD16(width), new CARD16(height)));
+    }
+
     private static int getPixel(byte [] data, int index, PixelFormat format) {
         
         int pixel = 0;

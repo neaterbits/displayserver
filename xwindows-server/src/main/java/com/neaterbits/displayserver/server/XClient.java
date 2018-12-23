@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import com.neaterbits.displayserver.buffers.BufferOperations;
 import com.neaterbits.displayserver.buffers.GetImageListener;
 import com.neaterbits.displayserver.buffers.OffscreenBuffer;
 import com.neaterbits.displayserver.buffers.PixelFormat;
@@ -22,6 +23,7 @@ import com.neaterbits.displayserver.protocol.exception.MatchException;
 import com.neaterbits.displayserver.protocol.exception.ValueException;
 import com.neaterbits.displayserver.protocol.messages.replies.GetImageReply;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeGC;
+import com.neaterbits.displayserver.protocol.messages.requests.CopyArea;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateCursor;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateGC;
 import com.neaterbits.displayserver.protocol.messages.requests.CreatePixmap;
@@ -290,6 +292,31 @@ public class XClient extends XConnection {
         }
         
         xDrawable.removeGC(freeGC.getGContext());
+    }
+    
+    private BufferOperations getBufferOperations(DRAWABLE drawable) throws DrawableException {
+    
+        Objects.requireNonNull(drawable);
+        
+        final XDrawable xDrawable = findDrawble(drawable);
+        
+        if (xDrawable == null) {
+            throw new DrawableException("No such drawable", drawable);
+        }
+        
+        return xDrawable.getBufferOperations();
+    }
+    
+    final void copyArea(CopyArea copyArea) throws GContextException, DrawableException {
+
+        final BufferOperations src = getBufferOperations(copyArea.getSrcDrawable());
+        final BufferOperations dst = getBufferOperations(copyArea.getDstDrawable());
+        
+        dst.copyArea(
+                src,
+                copyArea.getSrcX().getValue(), copyArea.getSrcY().getValue(),
+                copyArea.getDstX().getValue(), copyArea.getDstY().getValue(),
+                copyArea.getWidth().getValue(), copyArea.getHeight().getValue());
     }
     
     final void putImage(PutImage putImage) {

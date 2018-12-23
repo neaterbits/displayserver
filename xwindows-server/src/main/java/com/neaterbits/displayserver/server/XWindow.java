@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import com.neaterbits.displayserver.buffers.BufferOperations;
 import com.neaterbits.displayserver.protocol.enums.Mode;
 import com.neaterbits.displayserver.protocol.exception.AtomException;
 import com.neaterbits.displayserver.protocol.exception.MatchException;
@@ -101,6 +102,12 @@ final class XWindow extends XDrawable {
         this.properties = new HashMap<>();
     }
     
+    
+    @Override
+    BufferOperations getBufferOperations() {
+        return window.getBuffer();
+    }
+
     boolean isRootWindow() {
         return parentWindow.equals(WINDOW.None);
     }

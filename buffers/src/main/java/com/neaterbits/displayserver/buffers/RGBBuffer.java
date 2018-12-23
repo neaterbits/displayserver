@@ -39,4 +39,9 @@ public final class RGBBuffer extends InMemoryBuffer {
     public void getImage(int x, int y, int width, int height, PixelFormat format, GetImageListener listener) {
         throw new UnsupportedOperationException("TODO");
     }
+
+    @Override
+    public void copyArea(BufferOperations src, int srcX, int srcY, int dstX, int dstY, int width, int height) {
+        throw new UnsupportedOperationException("TODO");
+    }
 }
