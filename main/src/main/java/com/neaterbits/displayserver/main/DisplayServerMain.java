@@ -1,11 +1,12 @@
 package com.neaterbits.displayserver.main;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Arrays;
 
 import com.neaterbits.displayserver.driver.xwindows.common.XWindowsDriverConnection;
-import com.neaterbits.displayserver.events.xwindows.XWindowsEventSource;
+import com.neaterbits.displayserver.events.xwindows.XWindowsInputDriver;
 import com.neaterbits.displayserver.framebuffer.common.Alignment;
 import com.neaterbits.displayserver.framebuffer.common.DisplayDeviceId;
 import com.neaterbits.displayserver.framebuffer.xwindows.XWindowsGraphicsDriver;
@@ -20,6 +21,8 @@ import com.neaterbits.displayserver.protocol.logging.XWindowsClientProtocolLog;
 import com.neaterbits.displayserver.protocol.logging.XWindowsClientProtocolLogImpl;
 import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLog;
 import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLogImpl;
+import com.neaterbits.displayserver.server.XConfig;
+import com.neaterbits.displayserver.server.XHardware;
 import com.neaterbits.displayserver.server.XServer;
 import com.neaterbits.displayserver.util.logging.DebugLevel;
 import com.neaterbits.displayserver.windows.config.DisplayAreaConfig;
@@ -37,8 +40,6 @@ public class DisplayServerMain {
 	    else {
 	        display = 0;
 	    }
-	    
-	    final DisplayDeviceId displayDeviceId = new DisplayDeviceId("XWindows", Alignment.CENTER);
 	    
 	    final AsyncServersLog asyncServersLog = new AsyncServersLogImpl("Asyncservers", DebugLevels.ASYNC_SERVERS);
 	    
@@ -64,46 +65,69 @@ public class DisplayServerMain {
 
 	             System.out.println("## start check for IO");
 
-	             while (driverConnection.getServerMessage() == null) {
-	                 asyncServers.checkForIO();
-	             }
+	             final DisplayDeviceId displayDeviceId = new DisplayDeviceId("XWindows", Alignment.CENTER);
 
-			    System.out.println("## done check for IO");
-				
-				final XWindowsEventSource eventSource = new XWindowsEventSource(driverConnection);
-				final XWindowsGraphicsDriver graphicsDriver = new XWindowsGraphicsDriver(driverConnection, displayDeviceId);
-
-				final NonBlockingChannelWriterLog connectionWriteLog = new NonBlockingChannelWriterLogImpl(
-				        "Connectionwrite",
-				        DebugLevels.CONNECTION_WRITE);
-				
-				final XWindowsServerProtocolLog protocolLog = new XWindowsServerProtocolLogImpl("XWindowsProtocol", DebugLevels.XWINDOWS_PROTOCOL);
-
-				final DisplayConfig displayConfig = new DisplayConfig(displayDeviceId, Alignment.CENTER);
-				
-				final DisplayAreaConfig displayAreaConfig = new DisplayAreaConfig(
-				        1, Arrays.asList(displayConfig));
-				
-
-				
-				try (XServer server = new XServer(
-				        eventSource,
-				        graphicsDriver,
-				        displayAreaConfig,
-				        protocolLog,
-				        connectionWriteLog,
-				        Arrays.asList("/usr/share/fonts/X11/misc"))) {
-				    
-			        asyncServers.addServer(
-			                ":1",
-			                new SocketAddress [] {
-			                    new InetSocketAddress("127.0.0.1", 6000 + display + 1)
-			                },
-			                socketChannel -> server.processConnection(socketChannel));
-				}
-				
-				asyncServers.waitForIO();
+	             final XHardware hardware = initDriver(asyncServers, driverConnection, displayDeviceId);
+			    
+	             initXWindows(display, asyncServers, displayDeviceId, hardware);
 			}
 		}
+	}
+	
+	private static XHardware initDriver(AsyncServers asyncServers, XWindowsDriverConnection driverConnection, DisplayDeviceId displayDeviceId) throws IOException {
+
+        while (driverConnection.getServerMessage() == null) {
+            asyncServers.checkForIO();
+        }
+
+        System.out.println("## done check for IO");
+
+        final XWindowsInputDriver inputDriver = new XWindowsInputDriver(driverConnection);
+        final XWindowsGraphicsDriver graphicsDriver = new XWindowsGraphicsDriver(driverConnection, displayDeviceId);
+	 
+        while (!inputDriver.isInitialized() || !graphicsDriver.isInitialized()) {
+            asyncServers.checkForIO();
+        }
+
+        final XHardware hardware = new XHardware(inputDriver, graphicsDriver, inputDriver.getModifierScancodes());
+
+        return hardware;
+	}
+	
+	private static void initXWindows(int display, AsyncServers asyncServers, DisplayDeviceId displayDeviceId, XHardware hardware) throws Exception {
+
+        final DisplayConfig displayConfig = new DisplayConfig(displayDeviceId, Alignment.CENTER);
+        
+        final DisplayAreaConfig displayAreaConfig = new DisplayAreaConfig(
+                1, Arrays.asList(displayConfig));
+
+        final XConfig config = new XConfig(displayAreaConfig, Arrays.asList("/usr/share/fonts/X11/misc"));
+                
+        startXServer(display, asyncServers, hardware, config);
+    
+        asyncServers.waitForIO();
+	}
+	
+	private static void startXServer(int display, AsyncServers asyncServers, XHardware hardware, XConfig config) throws IOException, Exception {
+	    
+        final NonBlockingChannelWriterLog connectionWriteLog = new NonBlockingChannelWriterLogImpl(
+                "Connectionwrite",
+                DebugLevels.CONNECTION_WRITE);
+        
+        final XWindowsServerProtocolLog protocolLog = new XWindowsServerProtocolLogImpl("XWindowsProtocol", DebugLevels.XWINDOWS_PROTOCOL);
+	    
+        try (XServer server = new XServer(
+                hardware,
+                config,
+                protocolLog,
+                connectionWriteLog)) {
+            
+            asyncServers.addServer(
+                    ":1",
+                    new SocketAddress [] {
+                        new InetSocketAddress("127.0.0.1", 6000 + display + 1)
+                    },
+                    socketChannel -> server.processConnection(socketChannel));
+        }
 	}
 }

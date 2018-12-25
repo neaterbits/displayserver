@@ -3,7 +3,9 @@ package com.neaterbits.displayserver.framebuffer.common;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public interface GraphicsDriver {
+import com.neaterbits.displayserver.driver.common.Driver;
+
+public interface GraphicsDriver extends Driver {
 
     List<RenderingProvider> getRenderingProviders();
     

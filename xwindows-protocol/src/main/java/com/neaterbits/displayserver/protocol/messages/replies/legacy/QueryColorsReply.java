@@ -1,7 +1,6 @@
 package com.neaterbits.displayserver.protocol.messages.replies.legacy;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
@@ -26,7 +25,6 @@ public final class QueryColorsReply extends Reply {
                 "colors", outputArrayInBrackets(colors)
         );
     }
-
 
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {

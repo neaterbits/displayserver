@@ -11,8 +11,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.neaterbits.displayserver.buffers.PixelFormat;
-import com.neaterbits.displayserver.events.common.EventSource;
-import com.neaterbits.displayserver.framebuffer.common.GraphicsDriver;
+import com.neaterbits.displayserver.events.common.Modifier;
+import com.neaterbits.displayserver.events.common.ModifierScancodes;
 import com.neaterbits.displayserver.io.common.Client;
 import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLog;
 import com.neaterbits.displayserver.protocol.ByteBufferXWindowsProtocolInputStream;
@@ -38,6 +38,7 @@ import com.neaterbits.displayserver.protocol.messages.protocolsetup.ServerMessag
 import com.neaterbits.displayserver.protocol.messages.replies.AllocColorReply;
 import com.neaterbits.displayserver.protocol.messages.replies.GetGeometryReply;
 import com.neaterbits.displayserver.protocol.messages.replies.GetInputFocusReply;
+import com.neaterbits.displayserver.protocol.messages.replies.GetModifierMappingReply;
 import com.neaterbits.displayserver.protocol.messages.replies.GetSelectionOwnerReply;
 import com.neaterbits.displayserver.protocol.messages.replies.InternAtomReply;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryPointerReply;
@@ -64,6 +65,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.FreePixmap;
 import com.neaterbits.displayserver.protocol.messages.requests.GetGeometry;
 import com.neaterbits.displayserver.protocol.messages.requests.GetImage;
 import com.neaterbits.displayserver.protocol.messages.requests.GetInputFocus;
+import com.neaterbits.displayserver.protocol.messages.requests.GetModifierMapping;
 import com.neaterbits.displayserver.protocol.messages.requests.GetProperty;
 import com.neaterbits.displayserver.protocol.messages.requests.GetSelectionOwner;
 import com.neaterbits.displayserver.protocol.messages.requests.GetWindowAttributes;
@@ -98,12 +100,13 @@ import com.neaterbits.displayserver.windows.Display;
 import com.neaterbits.displayserver.windows.DisplayAreaFinder;
 import com.neaterbits.displayserver.windows.DisplayAreaWindows;
 import com.neaterbits.displayserver.windows.Window;
-import com.neaterbits.displayserver.windows.config.DisplayAreaConfig;
 import com.neaterbits.displayserver.xwindows.fonts.NoSuchFontException;
 import com.neaterbits.displayserver.xwindows.fonts.XFont;
 
 public class XServer implements AutoCloseable {
 
+    private final XHardware hardware;
+    
     private final XWindowsServerProtocolLog protocolLog;
     private final NonBlockingChannelWriterLog connectionWriteLog;
     
@@ -120,14 +123,14 @@ public class XServer implements AutoCloseable {
 	private final ServerToClient serverToClient;
 	
 	public XServer(
-	        EventSource driverEventSource,
-	        GraphicsDriver graphicsDriver,
-	        DisplayAreaConfig displayAreaConfig,
+	        XHardware hardware,
+	        XConfig config,
 	        XWindowsServerProtocolLog protocolLog,
-	        NonBlockingChannelWriterLog connectionWriteLog,
-	        List<String> fontPaths) throws IOException {
+	        NonBlockingChannelWriterLog connectionWriteLog) throws IOException {
 		
-		Objects.requireNonNull(graphicsDriver);
+		Objects.requireNonNull(hardware);
+	
+		this.hardware = hardware;
 		
 		this.protocolLog = protocolLog;
 		this.connectionWriteLog = connectionWriteLog;
@@ -136,15 +139,15 @@ public class XServer implements AutoCloseable {
 		
 		this.atoms = new Atoms();
 
-		this.fonts = new XFonts(fontPaths, atoms::addIfNotExists);
+		this.fonts = new XFonts(config.getFontPaths(), atoms::addIfNotExists);
 		
 		final List<XWindow> rootWindows = new ArrayList<>();
 
 		final XWindowsEventListener eventListener = new XWindowsEventListener(this);
 		
 		final DisplayAreaWindows displayArea = DisplayAreaFinder.makeDisplayArea(
-		        displayAreaConfig,
-		        graphicsDriver,
+		        config.getDisplayAreaConfig(),
+		        hardware.getGraphicsDriver(),
 		        eventListener);
 		
 		if (displayArea == null) {
@@ -156,7 +159,7 @@ public class XServer implements AutoCloseable {
         );
 
 		final XScreensAndVisuals screens = ScreensHelper.getScreens(
-		        graphicsDriver,
+		        hardware.getGraphicsDriver(),
 		        displayAreas,
 		        resourceIdAllocator,
 		        rootWindows::add);
@@ -770,6 +773,29 @@ public class XServer implements AutoCloseable {
                             new CARD8((byte)0),
                             new CARD8((byte)0),
                             new CARD8((byte)0)));
+            break;
+        }
+        
+        case OpCodes.GET_MODIFIER_MAPPING: {
+            
+            log(messageLength, opcode, sequenceNumber, GetModifierMapping.decode(stream));
+            
+            final ModifierScancodes modifierScancodes = hardware.getModifierScancodes();
+            
+            final CARD8 [] keycodes = new CARD8[modifierScancodes.getCodesPerModifier() * 8];
+            
+            int dstIdx = 0;
+            
+            for (Modifier modifier : modifierScancodes.getModifiers()) {
+                for (short scancode : modifier.getScancodes()) {
+                    keycodes[dstIdx ++] = new CARD8(scancode);
+                }
+            }
+            
+            sendReply(client, new GetModifierMappingReply(
+                    sequenceNumber,
+                    new BYTE((byte)modifierScancodes.getCodesPerModifier()),
+                    keycodes));
             break;
         }
         

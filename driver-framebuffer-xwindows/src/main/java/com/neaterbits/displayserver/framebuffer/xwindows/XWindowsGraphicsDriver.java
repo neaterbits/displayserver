@@ -36,4 +36,9 @@ public final class XWindowsGraphicsDriver extends BaseGraphicsDriver implements 
 		    addDisplayDevice(displayer.getDisplayDevice());
 		}
 	}
+
+    @Override
+    public boolean isInitialized() {
+        return true;
+    }
 }
