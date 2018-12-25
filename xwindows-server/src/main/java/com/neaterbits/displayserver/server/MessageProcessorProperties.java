@@ -38,7 +38,7 @@ final class MessageProcessorProperties {
                         timestamp,
                         PropertyNotify.NewValue);
                 
-                serverToClient.sendEvent(client, propertyNotify);
+                serverToClient.sendEvent(client, changeProperty.getWindow(), propertyNotify);
             }
             catch (MatchException ex) {
                 serverToClient.sendError(client, Errors.Match, sequenceNumber, 0, opcode);
@@ -70,7 +70,7 @@ final class MessageProcessorProperties {
                         timestamp,
                         PropertyNotify.NewValue);
                 
-                serverToClient.sendEvent(client, propertyNotify);
+                serverToClient.sendEvent(client, deleteProperty.getWindow(), propertyNotify);
             }
             catch (AtomException ex) {
                 
@@ -141,7 +141,7 @@ final class MessageProcessorProperties {
                                 timestamp,
                                 PropertyNotify.Deleted);
                         
-                        serverToClient.sendEvent(client, propertyNotify);
+                        serverToClient.sendEvent(client, getProperty.getWindow(), propertyNotify);
                     }
                 }
             }

@@ -171,8 +171,8 @@ public class XServer implements AutoCloseable {
             }
             
             @Override
-            public void sendEvent(XClient client, Event event) {
-                XServer.this.sendEvent(client, event);
+            public void sendEvent(XClient client, WINDOW window, Event event) {
+                XServer.this.sendEvent(client, window, event);
             }
             
             @Override
@@ -739,7 +739,7 @@ public class XServer implements AutoCloseable {
         client.send(message);
     }
 
-    private void sendEvent(XClient client, Event event) {
+    private void sendEvent(XClient client, WINDOW window, Event event) {
         
         if (protocolLog != null) {
             protocolLog.onSendEvent(event);
