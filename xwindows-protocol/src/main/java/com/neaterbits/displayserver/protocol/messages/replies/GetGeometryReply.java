@@ -25,6 +25,7 @@ public final class GetGeometryReply extends Reply {
     public GetGeometryReply(CARD16 sequenceNumber, CARD8 depth, WINDOW root, INT16 x, INT16 y, CARD16 width,
             CARD16 height, CARD16 borderWidth) {
         super(sequenceNumber);
+        
         this.depth = depth;
         this.root = root;
         this.x = x;
@@ -32,6 +33,19 @@ public final class GetGeometryReply extends Reply {
         this.width = width;
         this.height = height;
         this.borderWidth = borderWidth;
+    }
+
+    @Override
+    public Object[] getDebugParams() {
+        return wrap(
+                "depth", depth,
+                "root", root,
+                "x", x,
+                "y", y,
+                "width", width,
+                "height", height,
+                "borderWidth", borderWidth
+        );
     }
 
     @Override
@@ -43,6 +57,8 @@ public final class GetGeometryReply extends Reply {
         
         writeSequenceNumber(stream);
         
+        writeReplyLength(stream, 0);
+        
         stream.writeWINDOW(root);
         
         stream.writeINT16(x);
@@ -52,5 +68,7 @@ public final class GetGeometryReply extends Reply {
         stream.writeCARD16(height);
         
         stream.writeCARD16(borderWidth);
+        
+        stream.pad(10);
     }
 }

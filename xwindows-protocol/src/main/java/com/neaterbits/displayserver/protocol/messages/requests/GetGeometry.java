@@ -35,6 +35,13 @@ public final class GetGeometry extends Request {
     }
 
     @Override
+    public Object[] getDebugParams() {
+        return wrap(
+                "drawable", drawable
+        );
+    }
+
+    @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
         
         writeOpCode(stream);
