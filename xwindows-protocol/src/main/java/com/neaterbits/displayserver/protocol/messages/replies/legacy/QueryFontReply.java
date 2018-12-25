@@ -37,6 +37,8 @@ public final class QueryFontReply extends Reply {
     
     private final FONTPROP [] properties;
     private final CHARINFO [] charInfos;
+
+    
     public QueryFontReply(
             CARD16 sequenceNumber,
             CHARINFO minBounds, CHARINFO maxBounds,
@@ -84,6 +86,28 @@ public final class QueryFontReply extends Reply {
         this.properties = properties;
         this.charInfos = charInfos;
     }
+    
+    @Override
+    public Object[] getDebugParams() {
+        return wrap(
+                "minBounds", minBounds,
+                "maxBounds", maxBounds,
+                "minCharOrByte2", minCharOrByte2,
+                "maxCharOrByte2", maxCharOrByte2,
+                "defaultChar", defaultChar,
+                "numberOfFontProps", numberOfFontProps,
+                "drawDirection", drawDirection,
+                "minByte1", minByte1,
+                "maxByte1", maxByte1,
+                "allCharsExist", allCharsExist,
+                "fontAscent", fontAscent,
+                "fontDescent", fontDescent,
+                "numberOfCharInfos", numberOfCharInfos,
+                "properties", outputParametersInBrackets(properties),
+                "charInfos", charInfos.length
+        );
+    }
+
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
         

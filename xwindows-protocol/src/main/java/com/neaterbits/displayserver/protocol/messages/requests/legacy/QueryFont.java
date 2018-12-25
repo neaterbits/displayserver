@@ -34,6 +34,13 @@ public final class QueryFont extends Request {
     }
 
     @Override
+    public Object[] getDebugParams() {
+        return wrap(
+                "font", font
+        );
+    }
+
+    @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 
         writeOpCode(stream);

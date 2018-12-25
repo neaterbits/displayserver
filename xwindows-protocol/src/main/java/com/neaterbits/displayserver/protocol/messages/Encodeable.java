@@ -35,6 +35,26 @@ public abstract class Encodeable {
        return null;
    }
    
+   public static <T extends Encodeable>
+   String outputParametersInBrackets(T [] encodeables) {
+       
+       final StringBuilder sb = new StringBuilder("[ ");
+       
+       for (T encodeable : encodeables) {
+           final Object [] debugParams = encodeable.getDebugParams();
+           
+           sb.append(LogUtil.outputParametersInBrackets(debugParams));
+           
+           sb.append(" ");
+       }
+
+       sb.append(']');
+       
+       return sb.toString();
+   }
+
+
+   
    protected final Object [] wrap(Object ... objects) {
        return LogUtil.wrap(objects);
    }
