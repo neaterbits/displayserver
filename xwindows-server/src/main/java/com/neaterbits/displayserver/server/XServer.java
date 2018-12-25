@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.neaterbits.displayserver.buffers.PixelFormat;
 import com.neaterbits.displayserver.events.common.EventSource;
 import com.neaterbits.displayserver.framebuffer.common.GraphicsDriver;
 import com.neaterbits.displayserver.io.common.Client;
@@ -42,6 +43,8 @@ import com.neaterbits.displayserver.protocol.messages.replies.InternAtomReply;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryPointerReply;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryResponseReply;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryTreeReply;
+import com.neaterbits.displayserver.protocol.messages.replies.legacy.QueryColorsReply;
+import com.neaterbits.displayserver.protocol.messages.replies.legacy.RGB;
 import com.neaterbits.displayserver.protocol.messages.requests.AllocColor;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeGC;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeProperty;
@@ -76,6 +79,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.legacy.CloseFont;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.CreateGlyphCursor;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.LookupColor;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.OpenFont;
+import com.neaterbits.displayserver.protocol.messages.requests.legacy.QueryColors;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.QueryFont;
 import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.protocol.types.BOOL;
@@ -83,6 +87,7 @@ import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.CARD8;
+import com.neaterbits.displayserver.protocol.types.COLORMAP;
 import com.neaterbits.displayserver.protocol.types.INT16;
 import com.neaterbits.displayserver.protocol.types.SETofKEYBUTMASK;
 import com.neaterbits.displayserver.protocol.types.TIMESTAMP;
@@ -690,6 +695,37 @@ public class XServer implements AutoCloseable {
 		            new CARD32(0)));
 		    break;
 		}
+		
+        case OpCodes.QUERY_COLORS: {
+            
+            final QueryColors queryColors = log(messageLength, opcode, sequenceNumber, QueryColors.decode(stream));
+
+            final PixelFormat pixelFormat;
+            
+            if (queryColors.getCmap().equals(COLORMAP.None)) {
+                pixelFormat = PixelFormat.RGB32;
+            }
+            else {
+                throw new UnsupportedOperationException("TODO");
+            }
+            
+            final CARD32 [] pixels = queryColors.getPixels();
+            
+            final RGB [] colors = new RGB[pixels.length];
+            
+            for (int i = 0; i < pixels.length; ++ i) {
+
+                final int pixel = (int)pixels[i].getValue();
+                
+                colors[i] = new RGB(
+                        new CARD16(pixelFormat.getRed(pixel)),
+                        new CARD16(pixelFormat.getGreen(pixel)),
+                        new CARD16(pixelFormat.getBlue(pixel)));
+            }
+            
+            sendReply(client, new QueryColorsReply(sequenceNumber, colors));
+            break;
+        }
 		
 		case OpCodes.LOOKUP_COLOR: {
 		    

@@ -36,7 +36,7 @@ public abstract class Encodeable {
    }
    
    public static <T extends Encodeable>
-   String outputParametersInBrackets(T [] encodeables) {
+   String outputArrayInBrackets(T [] encodeables) {
        
        final StringBuilder sb = new StringBuilder("[ ");
        

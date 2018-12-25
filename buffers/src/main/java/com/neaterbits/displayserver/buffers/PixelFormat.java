@@ -86,4 +86,16 @@ public enum PixelFormat {
     public int getBlueShift() {
         return blueShift;
     }
+    
+    public int getRed(int pixel) { 
+        return (pixel & redMask) >>> redShift;
+    }
+    
+    public int getGreen(int pixel) {
+        return (pixel & greenMask) >>> greenShift;
+    }
+    
+    public int getBlue(int pixel) {
+        return (pixel & blueMask)  >>> blueShift;
+    }
 }

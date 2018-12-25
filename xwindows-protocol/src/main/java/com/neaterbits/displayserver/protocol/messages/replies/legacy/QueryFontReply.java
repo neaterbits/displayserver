@@ -103,7 +103,7 @@ public final class QueryFontReply extends Reply {
                 "fontAscent", fontAscent,
                 "fontDescent", fontDescent,
                 "numberOfCharInfos", numberOfCharInfos,
-                "properties", outputParametersInBrackets(properties),
+                "properties", outputArrayInBrackets(properties),
                 "charInfos", charInfos.length
         );
     }

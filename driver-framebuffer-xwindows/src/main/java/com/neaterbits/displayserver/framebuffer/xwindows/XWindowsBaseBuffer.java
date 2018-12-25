@@ -347,9 +347,9 @@ abstract class XWindowsBaseBuffer implements BufferOperations {
             
             final int srcPixel = getPixel(pixelData, srcIdx, fromFormat);
             
-            final int red   = (srcPixel & fromFormat.getRedMask())   >>> fromFormat.getRedShift();
-            final int green = (srcPixel & fromFormat.getGreenMask()) >>> fromFormat.getGreenShift();
-            final int blue = (srcPixel & fromFormat.getBlueMask())  >>> fromFormat.getBlueShift();
+            final int red   = fromFormat.getRed(srcPixel);
+            final int green = fromFormat.getGreen(srcPixel);
+            final int blue  = fromFormat.getBlue(srcPixel);
         
             final int dstPixel =   (red   << toFormat.getRedShift())
                                  | (green << toFormat.getGreenShift())

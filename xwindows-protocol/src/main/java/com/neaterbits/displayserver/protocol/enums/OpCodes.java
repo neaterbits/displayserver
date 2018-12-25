@@ -50,6 +50,7 @@ public class OpCodes {
 	
 	public static final int ALLOC_COLOR = 84;
 	
+	public static final int QUERY_COLORS = 91;
 	public static final int LOOKUP_COLOR = 92;
 	public static final int CREATE_CURSOR = 93;
 	public static final int CREATE_GLYPH_CURSOR = 94;
