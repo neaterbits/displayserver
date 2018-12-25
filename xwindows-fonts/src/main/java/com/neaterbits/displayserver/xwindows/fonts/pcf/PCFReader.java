@@ -115,8 +115,6 @@ public class PCFReader {
         
         final String header = new String(headerBytes);
         
-        System.out.println("## header: " + header);
-        
         if (!header.equals("\1fcp")) {
             throw new IOException("Not a font file");
         }
@@ -516,8 +514,6 @@ public class PCFReader {
         for (int i = 0; i < glyphCount; ++ i) {
 
             offsets[i] = dataInput.readInt(byteOrder);
-            
-            System.out.println("## bitmap offset " + i + " : " + offsets[i]);
             
             curOffset += 4;
         }
