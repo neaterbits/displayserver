@@ -21,6 +21,7 @@ import com.neaterbits.displayserver.protocol.enums.Errors;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
 import com.neaterbits.displayserver.protocol.enums.RevertTo;
 import com.neaterbits.displayserver.protocol.exception.DrawableException;
+import com.neaterbits.displayserver.protocol.exception.FontException;
 import com.neaterbits.displayserver.protocol.exception.GContextException;
 import com.neaterbits.displayserver.protocol.exception.IDChoiceException;
 import com.neaterbits.displayserver.protocol.exception.MatchException;
@@ -70,6 +71,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.QueryExtension;
 import com.neaterbits.displayserver.protocol.messages.requests.QueryPointer;
 import com.neaterbits.displayserver.protocol.messages.requests.QueryTree;
 import com.neaterbits.displayserver.protocol.messages.requests.UngrabServer;
+import com.neaterbits.displayserver.protocol.messages.requests.legacy.CloseFont;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.CreateGlyphCursor;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.LookupColor;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.OpenFont;
@@ -90,6 +92,8 @@ import com.neaterbits.displayserver.windows.DisplayAreaFinder;
 import com.neaterbits.displayserver.windows.DisplayAreaWindows;
 import com.neaterbits.displayserver.windows.Window;
 import com.neaterbits.displayserver.windows.config.DisplayAreaConfig;
+import com.neaterbits.displayserver.xwindows.fonts.NoSuchFontException;
+import com.neaterbits.displayserver.xwindows.fonts.XFont;
 
 public class XServer implements AutoCloseable {
 
@@ -102,6 +106,8 @@ public class XServer implements AutoCloseable {
 
 	private final XState state;
 	
+	private final XFonts fonts;
+	
 	private final long timeServerStarted;
 	
 	private final ServerToClient serverToClient;
@@ -111,7 +117,8 @@ public class XServer implements AutoCloseable {
 	        GraphicsDriver graphicsDriver,
 	        DisplayAreaConfig displayAreaConfig,
 	        XWindowsServerProtocolLog protocolLog,
-	        NonBlockingChannelWriterLog connectionWriteLog) throws IOException {
+	        NonBlockingChannelWriterLog connectionWriteLog,
+	        List<String> fontPaths) throws IOException {
 		
 		Objects.requireNonNull(graphicsDriver);
 		
@@ -122,6 +129,8 @@ public class XServer implements AutoCloseable {
 		
 		this.atoms = new Atoms();
 
+		this.fonts = new XFonts(fontPaths, atoms::addIfNotExists);
+		
 		final List<XWindow> rootWindows = new ArrayList<>();
 
 		final XWindowsEventListener eventListener = new XWindowsEventListener(this);
@@ -522,12 +531,46 @@ public class XServer implements AutoCloseable {
         }
         
         case OpCodes.OPEN_FONT: {
-            log(messageLength, opcode, sequenceNumber, OpenFont.decode(stream));
+            final OpenFont openFont = log(messageLength, opcode, sequenceNumber, OpenFont.decode(stream));
+            
+            try {
+                
+                final String fontName = openFont.getName().equals("fixed")
+                        ? "6x13"
+                        : openFont.getName();
+                
+                final XFont font = fonts.getFont(fontName);
+                
+                client.openFont(openFont, font);
+                
+            } catch (NoSuchFontException ex) {
+                sendError(client, Errors.Name, sequenceNumber, openFont.getFid().getValue(), opcode);
+            } catch (IDChoiceException ex) {
+                sendError(client, Errors.IDChoice, sequenceNumber, ex.getResource().getValue(), opcode);
+            }
+            break;
+        }
+        
+        case OpCodes.CLOSE_FONT: {
+            
+            final CloseFont closeFont = log(messageLength, opcode, sequenceNumber, CloseFont.decode(stream));
+            
+            try {
+                client.closeFont(closeFont);
+            } catch (FontException ex) {
+                sendError(client, Errors.Font, sequenceNumber, ex.getFont().getValue(), opcode);
+            }
             break;
         }
         
         case OpCodes.QUERY_FONT: {
-            log(messageLength, opcode, sequenceNumber, QueryFont.decode(stream));
+            final QueryFont queryFont = log(messageLength, opcode, sequenceNumber, QueryFont.decode(stream));
+            
+            try {
+                client.queryFont(queryFont, sequenceNumber, serverToClient);
+            } catch (FontException ex) {
+                sendError(client, Errors.Font, sequenceNumber, ex.getFont().getValue(), opcode);
+            }
             break;
         }
 

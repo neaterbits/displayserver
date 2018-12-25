@@ -91,7 +91,8 @@ public class DisplayServerMain {
 				        graphicsDriver,
 				        displayAreaConfig,
 				        protocolLog,
-				        connectionWriteLog)) {
+				        connectionWriteLog,
+				        Arrays.asList("/usr/share/fonts/X11/misc"))) {
 				    
 			        asyncServers.addServer(
 			                ":1",

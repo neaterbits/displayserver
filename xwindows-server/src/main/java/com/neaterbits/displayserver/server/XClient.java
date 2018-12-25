@@ -17,6 +17,7 @@ import com.neaterbits.displayserver.protocol.enums.ImageFormat;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
 import com.neaterbits.displayserver.protocol.enums.WindowClass;
 import com.neaterbits.displayserver.protocol.exception.DrawableException;
+import com.neaterbits.displayserver.protocol.exception.FontException;
 import com.neaterbits.displayserver.protocol.exception.GContextException;
 import com.neaterbits.displayserver.protocol.exception.IDChoiceException;
 import com.neaterbits.displayserver.protocol.exception.MatchException;
@@ -35,9 +36,13 @@ import com.neaterbits.displayserver.protocol.messages.requests.GCAttributes;
 import com.neaterbits.displayserver.protocol.messages.requests.GetImage;
 import com.neaterbits.displayserver.protocol.messages.requests.PutImage;
 import com.neaterbits.displayserver.protocol.messages.requests.WindowAttributes;
+import com.neaterbits.displayserver.protocol.messages.requests.legacy.CloseFont;
+import com.neaterbits.displayserver.protocol.messages.requests.legacy.OpenFont;
+import com.neaterbits.displayserver.protocol.messages.requests.legacy.QueryFont;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
+import com.neaterbits.displayserver.protocol.types.FONT;
 import com.neaterbits.displayserver.protocol.types.GCONTEXT;
 import com.neaterbits.displayserver.protocol.types.RESOURCE;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
@@ -47,6 +52,7 @@ import com.neaterbits.displayserver.windows.DisplayArea;
 import com.neaterbits.displayserver.windows.DisplayAreaWindows;
 import com.neaterbits.displayserver.windows.Window;
 import com.neaterbits.displayserver.windows.WindowParameters;
+import com.neaterbits.displayserver.xwindows.fonts.XFont;
 
 public class XClient extends XConnection {
     
@@ -55,6 +61,8 @@ public class XClient extends XConnection {
     private final Map<DRAWABLE, XPixmap> drawableToXPixmap;
     private final Map<DRAWABLE, DRAWABLE> pixmapToOwnerDrawable;
     private final Map<GCONTEXT, XDrawable> gcToDrawable;
+    
+    private final Map<FONT, XFont> openFonts;
     
     public XClient(XServer server, SocketChannel socketChannel, int connectionNo,
             NonBlockingChannelWriterLog log) {
@@ -69,6 +77,8 @@ public class XClient extends XConnection {
         this.drawableToXPixmap = new HashMap<>();
         this.pixmapToOwnerDrawable = new HashMap<>();
         this.gcToDrawable = new HashMap<>();
+        
+        this.openFonts = new HashMap<>();
     }
 
 
@@ -196,6 +206,69 @@ public class XClient extends XConnection {
         final XDrawable xDrawable = findDrawble(drawable);
         
         return xDrawable.getVisual();
+    }
+    
+    void openFont(OpenFont openFont, XFont font) throws IDChoiceException {
+        
+        Objects.requireNonNull(openFont);
+        Objects.requireNonNull(font);
+        
+        final FONT fontResource = openFont.getFid();
+        
+        checkAndAddResourceId(fontResource);
+        
+        if (openFonts.containsKey(fontResource)) {
+            throw new IDChoiceException("Already open", fontResource);
+        }
+        
+        openFonts.put(fontResource, font);
+    }
+    
+    void closeFont(CloseFont closeFont) throws FontException {
+        
+        Objects.requireNonNull(closeFont);
+        
+        final FONT fontResource = closeFont.getFont();
+        
+        if (!openFonts.containsKey(fontResource)) {
+            throw new FontException("Font not open", fontResource);
+        }
+        
+        openFonts.remove(fontResource);
+
+        checkAndRemoveResourceId(fontResource);
+    }
+    
+    void queryFont(QueryFont queryFont, CARD16 sequenceNumber, ServerToClient serverToClient) throws FontException {
+        
+        final FONT fontResource = queryFont.getFont().toFontResource();
+        
+        XFont font = openFonts.get(fontResource);
+        
+        if (font == null) {
+            final GCONTEXT gcResource = queryFont.getFont().toGCResource();
+            
+            final XGC gc = getGC(gcResource);
+            
+            if (gc != null) {
+                font = openFonts.get(gc.getAttributes().getFont());
+            }
+        }
+        
+        if (font == null) {
+            throw new FontException("No such font", fontResource);
+        }
+        
+        MessageProcessorFonts.queryFont(queryFont, sequenceNumber, this, font, serverToClient);
+    }
+    
+    private XGC getGC(GCONTEXT gcResource) {
+        
+        Objects.requireNonNull(gcResource);
+        
+        final XDrawable xDrawable = gcToDrawable.get(gcResource);
+        
+        return xDrawable != null ? xDrawable.getGC(gcResource) : null;
     }
     
     final XPixmap createPixmap(CreatePixmap createPixmap) throws IDChoiceException {

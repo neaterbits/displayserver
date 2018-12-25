@@ -5,7 +5,7 @@
     <artifactId>root</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwindows-server</artifactId>
+  <artifactId>xwindows-fonts</artifactId>
   <dependencies>
   	<dependency>
   		<groupId>${project.groupId}</groupId>
@@ -27,11 +27,6 @@
   		<artifactId>xwindows-protocol</artifactId>
   		<version>${project.version}</version>
   	</dependency>
-    <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>xwindows-fonts</artifactId>
-        <version>${project.version}</version>
-    </dependency>
     <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>buffers</artifactId>
