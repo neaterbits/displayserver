@@ -10,6 +10,8 @@ public class OpCodes {
 	
 	public static final int MAP_WINDOW = 8;
 
+	public static final int CONFIGURE_WINDOW = 12;
+	
 	public static final int GET_GEOMETRY = 14;
 	
 	public static final int QUERY_TREE = 15;

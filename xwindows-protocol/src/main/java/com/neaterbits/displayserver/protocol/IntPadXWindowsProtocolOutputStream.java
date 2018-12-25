@@ -176,6 +176,11 @@ public class IntPadXWindowsProtocolOutputStream implements XWindowsProtocolOutpu
     public void writeBITMASK(BITMASK value) throws IOException {
         delegate.writeBITMASK(value);
     }
+    
+    @Override
+    public void writeBITMASK16(BITMASK value) throws IOException {
+        delegate.writeBITMASK16(value);
+    }
 
     @Override
     public void writeSET32(SET32 value) throws IOException {

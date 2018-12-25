@@ -61,8 +61,6 @@ public final class PropertyNotify extends Event {
         );
     }
 
-
-
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 

@@ -76,6 +76,7 @@ public interface XWindowsProtocolOutputStream {
 	void writeWINGRAVITY(WINGRAVITY value) throws IOException;
 	
 	void writeBITMASK(BITMASK value) throws IOException;
+    void writeBITMASK16(BITMASK value) throws IOException;
 	void writeSET32(SET32 value) throws IOException;
 	void writeSETofEVENT(SETofEVENT value) throws IOException;
 	void writeSETofDEVICEEVENT(SETofDEVICEEVENT value) throws IOException;

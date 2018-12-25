@@ -46,6 +46,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.AllocColor;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeGC;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeProperty;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeWindowAttributes;
+import com.neaterbits.displayserver.protocol.messages.requests.ConfigureWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.ConvertSelection;
 import com.neaterbits.displayserver.protocol.messages.requests.CopyArea;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateColorMap;
@@ -367,6 +368,13 @@ public class XServer implements AutoCloseable {
 		case OpCodes.MAP_WINDOW: {
 		    
 		    log(messageLength, opcode, sequenceNumber, MapWindow.decode(stream));
+		    
+		    break;
+		}
+		
+		case OpCodes.CONFIGURE_WINDOW: {
+		    
+		    log(messageLength, opcode, sequenceNumber, ConfigureWindow.decode(stream));
 		    
 		    break;
 		}

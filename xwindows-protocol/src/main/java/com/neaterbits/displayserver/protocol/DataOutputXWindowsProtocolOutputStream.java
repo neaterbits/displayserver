@@ -177,6 +177,18 @@ public final class DataOutputXWindowsProtocolOutputStream implements XWindowsPro
     public void writeBITMASK(BITMASK value) throws IOException {
         dataOutput.writeInt(value.getValue());
     }
+    
+    @Override
+    public void writeBITMASK16(BITMASK value) throws IOException {
+        
+        final int intValue = value.getValue();
+        
+        if (intValue > Short.MAX_VALUE) {
+            throw new IllegalArgumentException();
+        }
+        
+        dataOutput.writeShort((short)intValue);
+    }
 
     @Override
 	public void writeSET32(SET32 value) throws IOException {

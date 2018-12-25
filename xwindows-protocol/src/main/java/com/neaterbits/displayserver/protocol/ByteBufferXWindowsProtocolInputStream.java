@@ -192,6 +192,11 @@ public class ByteBufferXWindowsProtocolInputStream implements XWindowsProtocolIn
     public BITMASK readBITMASK() throws IOException {
         return new BITMASK(buffer.getInt());
     }
+    
+    @Override
+    public BITMASK readBITMASK16() throws IOException {
+        return new BITMASK(buffer.getShort());
+    }
 
     @Override
 	public SET32 readSET32() throws IOException {

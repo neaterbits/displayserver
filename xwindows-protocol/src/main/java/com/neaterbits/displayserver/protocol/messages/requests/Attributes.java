@@ -94,4 +94,8 @@ public abstract class Attributes extends Encodeable {
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
         stream.writeBITMASK(valueMask);
     }
+    
+    protected final void encodeBITMASK16(XWindowsProtocolOutputStream stream) throws IOException {
+        stream.writeBITMASK16(valueMask);
+    }
 }

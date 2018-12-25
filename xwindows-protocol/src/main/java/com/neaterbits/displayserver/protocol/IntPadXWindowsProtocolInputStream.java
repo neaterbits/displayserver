@@ -175,6 +175,11 @@ public class IntPadXWindowsProtocolInputStream implements XWindowsProtocolInputS
     }
 
     @Override
+    public BITMASK readBITMASK16() throws IOException {
+        return delegate.readBITMASK16();
+    }
+
+    @Override
     public SET32 readSET32() throws IOException {
         return delegate.readSET32();
     }

@@ -68,6 +68,7 @@ public interface XWindowsProtocolInputStream {
 	WINGRAVITY readWINGRAVITY() throws IOException;
 	
 	BITMASK readBITMASK() throws IOException;
+    BITMASK readBITMASK16() throws IOException;
 	
 	SET32 readSET32() throws IOException;
 
