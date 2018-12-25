@@ -1,5 +1,9 @@
 package com.neaterbits.displayserver.protocol.types;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 public final class SETofEVENT {
     
     public static final int KEY_PRESS           = 0x00000001;
@@ -29,6 +33,53 @@ public final class SETofEVENT {
     public static final int OWNER_GRAB_BUTTON   = 0x01000000;
     public static final int UNUSED              = 0xFE000000;
 
+    private static List<String> getEventStrings(int eventMask) {
+        
+        final List<String> strings = new ArrayList<>(32);
+        
+        addEventString(strings, "KeyPress",         eventMask, KEY_PRESS);
+        addEventString(strings, "KeyRelease",       eventMask, KEY_RELEASE);
+        addEventString(strings, "ButtonPress",      eventMask, BUTTON_PRESS);
+        addEventString(strings, "ButtonRelease",    eventMask, BUTTON_RELEASE);
+        addEventString(strings, "EnterWindow",      eventMask, ENTER_WINDOW);
+        addEventString(strings, "LeaveWindow",      eventMask, LEAVE_WINDOW);
+        addEventString(strings, "PointerMotion",    eventMask, POINTER_MOTION);
+        addEventString(strings, "PointerMotionHint", eventMask, POINTER_MOTION_HINT);
+        addEventString(strings, "Button1Motion",    eventMask, BUTTON1_MOTION);
+        addEventString(strings, "Button2Motion",    eventMask, BUTTON2_MOTION);
+        addEventString(strings, "Button3Motion",    eventMask, BUTTON3_MOTION);
+        addEventString(strings, "Button4Motion",    eventMask, BUTTON4_MOTION);
+        addEventString(strings, "Button5Motion",    eventMask, BUTTON5_MOTION);
+        addEventString(strings, "ButtonMotion",     eventMask, BUTTON_MOTION);
+        addEventString(strings, "KeymapState",      eventMask, KEYMAP_STATE);
+        addEventString(strings, "Exposure",         eventMask, EXPOSURE);
+        addEventString(strings, "VisibilityChange", eventMask, VISIBILITY_CHANGE);
+        addEventString(strings, "StructureNotify",  eventMask, STRUCTURE_NOTIFY);
+        addEventString(strings, "ResizeRedirect",   eventMask, RESIZE_REDIRECT);
+        addEventString(strings, "SubstructureNotify",   eventMask, SUBSTRUCTURE_NOTIFY);
+        addEventString(strings, "SubstructureRedirect", eventMask, SUBSTRUCTURE_REDIRECT);
+        addEventString(strings, "FocusChange",      eventMask, FOCUS_CHANGE);
+        addEventString(strings, "PropertyChange",   eventMask, PROPERTY_CHANGE);
+        addEventString(strings, "ColormapChange",   eventMask, COLORMAP_CHANGE);
+        addEventString(strings, "OwnerGrabButton",  eventMask, OWNER_GRAB_BUTTON);
+        
+        return strings;
+    }
+    
+    public List<String> getEventStrings() {
+        return getEventStrings(value);
+    }
+    
+    private static void addEventString(List<String> strings, String string, int eventMask, int event) {
+        
+        Objects.requireNonNull(strings);
+        Objects.requireNonNull(string);
+        
+        if ((eventMask & event) != 0) {
+            strings.add(string);
+        }
+    }
+    
     private final int value;
 
     public SETofEVENT(int value) {

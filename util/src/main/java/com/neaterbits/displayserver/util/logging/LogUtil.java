@@ -4,6 +4,27 @@ import java.util.function.Consumer;
 
 public class LogUtil {
 
+    public static String join(Iterable<String> iterable, String separator) {
+        
+        final StringBuilder sb = new StringBuilder();
+        
+        boolean first = true;
+        
+        for (String string : iterable) {
+            
+            if (first) {
+                first = false;
+            }
+            else {
+                sb.append(separator);
+            }
+
+            sb.append(string);
+        }
+
+        return sb.toString();
+    }
+    
     public static Object [] wrap(Object ... objects) {
         return objects;
     }

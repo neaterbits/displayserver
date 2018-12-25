@@ -20,6 +20,7 @@ import com.neaterbits.displayserver.protocol.types.PIXMAP;
 import com.neaterbits.displayserver.protocol.types.SETofDEVICEEVENT;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
 import com.neaterbits.displayserver.protocol.types.WINGRAVITY;
+import com.neaterbits.displayserver.util.logging.LogUtil;
 
 public final class WindowAttributes extends Attributes {
 
@@ -173,6 +174,10 @@ public final class WindowAttributes extends Attributes {
         params.add("bitmask");
         params.add(super.getValueMask());
 
+        final String eventMaskString = eventMask != null
+                ? LogUtil.join(eventMask.getEventStrings(), "|")
+                : null;
+        
         addIfSet(params, "bgPixmap",        backgroundPixmap,    BACKGROUND_PIXMAP);
         addIfSet(params, "bgPixel",         hex32(backgroundPixel), BACKGROUND_PIXEL);
         addIfSet(params, "borderPixmap",    borderPixmap,        BORDER_PIXMAP);
@@ -184,7 +189,7 @@ public final class WindowAttributes extends Attributes {
         addIfSet(params, "backingPixel",    hex32(backingPixel), BACKING_PIXEL);
         addIfSet(params, "overrideRedirect", overrideRedirect,   OVERRIDE_REDIRECT);
         addIfSet(params, "saveUnder",       saveUnder,           SAVE_UNDER);
-        addIfSet(params, "eventMask",       eventMask,           EVENT_MASK);
+        addIfSet(params, "eventMask",       eventMaskString,           EVENT_MASK);
         addIfSet(params, "doNotPropagateMask", doNotPropagateMask,  DO_NOT_PROPAGATE_MASK);
         addIfSet(params, "colorMap",        colormap,            COLOR_MAP);
         addIfSet(params, "cursor",          cursor,              CURSOR);
