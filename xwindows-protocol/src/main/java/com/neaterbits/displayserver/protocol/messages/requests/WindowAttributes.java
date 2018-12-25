@@ -80,7 +80,7 @@ public final class WindowAttributes extends Attributes {
             PIXMAP.None, new CARD32(0),
             BITGRAVITY.Forget, WINGRAVITY.NorthWest,
             BackingStore.NotUseful,
-            new CARD32(0xFFFFFFFFL), null,
+            new CARD32(0xFFFFFFFFL), new CARD32(0x00000000L),
             new BOOL(false),
             new BOOL(false),
             new SETofEVENT(0),
