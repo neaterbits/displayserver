@@ -52,9 +52,11 @@ public class GetPropertyReply extends Reply {
         
         stream.writeATOM(type);
 
-        stream.writeCARD32(new CARD32(data.length));
-        
         stream.writeCARD32(new CARD32(bytesAfter));
+        
+        final int lengthValue = XWindowsProtocolUtil.getPropertyEncodeDataLength(format, data.length);
+
+        stream.writeCARD32(new CARD32(lengthValue));
         
         stream.pad(12);
         
