@@ -26,6 +26,7 @@ import com.neaterbits.displayserver.protocol.types.INT8;
 import com.neaterbits.displayserver.protocol.types.KEYCODE;
 import com.neaterbits.displayserver.protocol.types.KEYSYM;
 import com.neaterbits.displayserver.protocol.types.PIXMAP;
+import com.neaterbits.displayserver.protocol.types.POINT;
 import com.neaterbits.displayserver.protocol.types.SET32;
 import com.neaterbits.displayserver.protocol.types.SETofDEVICEEVENT;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
@@ -254,6 +255,11 @@ public class ByteBufferXWindowsProtocolInputStream implements XWindowsProtocolIn
     @Override
     public SETofKEYMASK readSETofKEYMASK() throws IOException {
         return new SETofKEYMASK(buffer.getShort());
+    }
+    
+    @Override
+    public POINT readPOINT() throws IOException {
+        return new POINT(buffer.getShort(), buffer.getShort());
     }
 
     @Override

@@ -26,6 +26,7 @@ import com.neaterbits.displayserver.protocol.types.INT8;
 import com.neaterbits.displayserver.protocol.types.KEYCODE;
 import com.neaterbits.displayserver.protocol.types.KEYSYM;
 import com.neaterbits.displayserver.protocol.types.PIXMAP;
+import com.neaterbits.displayserver.protocol.types.POINT;
 import com.neaterbits.displayserver.protocol.types.RESOURCE;
 import com.neaterbits.displayserver.protocol.types.SET32;
 import com.neaterbits.displayserver.protocol.types.SETofDEVICEEVENT;
@@ -246,6 +247,12 @@ public final class DataOutputXWindowsProtocolOutputStream implements XWindowsPro
     @Override
     public void writeSETofKEYMASK(SETofKEYMASK value) throws IOException {
         dataOutput.writeShort(value.getValue());
+    }
+
+    @Override
+    public void writePOINT(POINT point) throws IOException {
+        dataOutput.writeShort(point.getX());
+        dataOutput.writeShort(point.getY());
     }
 
     @Override

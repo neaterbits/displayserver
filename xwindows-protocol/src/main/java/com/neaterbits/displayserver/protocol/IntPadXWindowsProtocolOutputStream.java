@@ -24,6 +24,7 @@ import com.neaterbits.displayserver.protocol.types.INT8;
 import com.neaterbits.displayserver.protocol.types.KEYCODE;
 import com.neaterbits.displayserver.protocol.types.KEYSYM;
 import com.neaterbits.displayserver.protocol.types.PIXMAP;
+import com.neaterbits.displayserver.protocol.types.POINT;
 import com.neaterbits.displayserver.protocol.types.SET32;
 import com.neaterbits.displayserver.protocol.types.SETofDEVICEEVENT;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
@@ -231,6 +232,11 @@ public class IntPadXWindowsProtocolOutputStream implements XWindowsProtocolOutpu
     @Override
     public void writeSETofKEYMASK(SETofKEYMASK value) throws IOException {
         writeWithPadding(value, 2, delegate::writeSETofKEYMASK);
+    }
+
+    @Override
+    public void writePOINT(POINT point) throws IOException {
+        delegate.writePOINT(point);
     }
 
     @Override
