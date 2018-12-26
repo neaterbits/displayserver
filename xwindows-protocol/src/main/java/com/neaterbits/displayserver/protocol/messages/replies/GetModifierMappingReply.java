@@ -46,7 +46,7 @@ public final class GetModifierMappingReply extends Reply {
         if (keycodes.length != 8 * keycodesPerModifier.getValue()) {
             throw new IllegalArgumentException();
         }
-
+        
         this.keycodesPerModifier = keycodesPerModifier;
         this.keycodes = keycodes;
     }
@@ -71,8 +71,8 @@ public final class GetModifierMappingReply extends Reply {
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
         
         writeReplyHeader(stream);
-        
-        writeUnusedByte(stream);
+
+        stream.writeBYTE(keycodesPerModifier);
         
         writeSequenceNumber(stream);
         
