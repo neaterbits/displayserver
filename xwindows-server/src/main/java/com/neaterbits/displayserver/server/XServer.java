@@ -85,6 +85,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.RecolorCursor;
 import com.neaterbits.displayserver.protocol.messages.requests.UngrabServer;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.CloseFont;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.CreateGlyphCursor;
+import com.neaterbits.displayserver.protocol.messages.requests.legacy.ImageText16;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.LookupColor;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.OpenFont;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.QueryColors;
@@ -697,6 +698,13 @@ public class XServer implements AutoCloseable {
             } catch (MatchException ex) {
                 sendError(client, Errors.Match, sequenceNumber, 0L, opcode);
             }
+            break;
+        }
+        
+        case OpCodes.IMAGE_TEXT_16: {
+            
+            final ImageText16 imageText16 = log(messageLength, opcode, sequenceNumber, ImageText16.decode(stream));
+            
             break;
         }
 

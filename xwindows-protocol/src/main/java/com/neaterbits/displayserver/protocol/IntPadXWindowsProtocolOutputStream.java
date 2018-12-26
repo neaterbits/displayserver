@@ -30,6 +30,7 @@ import com.neaterbits.displayserver.protocol.types.SETofEVENT;
 import com.neaterbits.displayserver.protocol.types.SETofKEYBUTMASK;
 import com.neaterbits.displayserver.protocol.types.SETofKEYMASK;
 import com.neaterbits.displayserver.protocol.types.SETofPOINTEREVENT;
+import com.neaterbits.displayserver.protocol.types.STRING16;
 import com.neaterbits.displayserver.protocol.types.TIMESTAMP;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
@@ -106,6 +107,12 @@ public class IntPadXWindowsProtocolOutputStream implements XWindowsProtocolOutpu
         throw new UnsupportedOperationException();
     }
     
+    
+    @Override
+    public void writeSTRING16(STRING16 value) throws IOException {
+        throw new UnsupportedOperationException();
+    }
+
     @Override
     public void writeTIMESTAMP(TIMESTAMP value) throws IOException {
         delegate.writeTIMESTAMP(value);

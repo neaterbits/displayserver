@@ -29,6 +29,7 @@ import com.neaterbits.displayserver.protocol.types.SETofEVENT;
 import com.neaterbits.displayserver.protocol.types.SETofKEYBUTMASK;
 import com.neaterbits.displayserver.protocol.types.SETofKEYMASK;
 import com.neaterbits.displayserver.protocol.types.SETofPOINTEREVENT;
+import com.neaterbits.displayserver.protocol.types.STRING16;
 import com.neaterbits.displayserver.protocol.types.TIMESTAMP;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
@@ -48,6 +49,7 @@ public interface XWindowsProtocolInputStream {
 	BOOL readBOOL() throws IOException;
 	
 	String readSTRING8(int length) throws IOException;
+	STRING16 readSTRING16(int length) throws IOException;
 
 	TIMESTAMP readTIMESTAMP() throws IOException;
 	

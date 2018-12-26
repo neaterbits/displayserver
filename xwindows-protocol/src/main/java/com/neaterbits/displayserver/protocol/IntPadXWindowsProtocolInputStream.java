@@ -29,6 +29,7 @@ import com.neaterbits.displayserver.protocol.types.SETofEVENT;
 import com.neaterbits.displayserver.protocol.types.SETofKEYBUTMASK;
 import com.neaterbits.displayserver.protocol.types.SETofKEYMASK;
 import com.neaterbits.displayserver.protocol.types.SETofPOINTEREVENT;
+import com.neaterbits.displayserver.protocol.types.STRING16;
 import com.neaterbits.displayserver.protocol.types.TIMESTAMP;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
@@ -100,6 +101,11 @@ public class IntPadXWindowsProtocolInputStream implements XWindowsProtocolInputS
     @Override
     public String readSTRING8(int length) throws IOException {
         return delegate.readSTRING8(length);
+    }
+    
+    @Override
+    public STRING16 readSTRING16(int length) throws IOException {
+        return delegate.readSTRING16(length);
     }
 
     @Override

@@ -13,6 +13,7 @@ import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.CARD8;
+import com.neaterbits.displayserver.protocol.types.CHAR2B;
 import com.neaterbits.displayserver.protocol.types.COLORMAP;
 import com.neaterbits.displayserver.protocol.types.CURSOR;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
@@ -31,6 +32,7 @@ import com.neaterbits.displayserver.protocol.types.SETofEVENT;
 import com.neaterbits.displayserver.protocol.types.SETofKEYBUTMASK;
 import com.neaterbits.displayserver.protocol.types.SETofKEYMASK;
 import com.neaterbits.displayserver.protocol.types.SETofPOINTEREVENT;
+import com.neaterbits.displayserver.protocol.types.STRING16;
 import com.neaterbits.displayserver.protocol.types.TIMESTAMP;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
@@ -117,6 +119,18 @@ public class ByteBufferXWindowsProtocolInputStream implements XWindowsProtocolIn
 		
 		return sb.toString();
 	}
+    
+    @Override
+    public STRING16 readSTRING16(int length) throws IOException {
+
+        final CHAR2B [] characters = new CHAR2B[length];
+        
+        for (int i = 0; i < length; ++ i) {
+            characters[i] = new CHAR2B(buffer.get(), buffer.get());
+        }
+        
+        return new STRING16(characters);
+    }
 
     @Override
     public TIMESTAMP readTIMESTAMP() throws IOException {

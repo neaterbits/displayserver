@@ -13,6 +13,7 @@ import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.CARD8;
+import com.neaterbits.displayserver.protocol.types.CHAR2B;
 import com.neaterbits.displayserver.protocol.types.COLORMAP;
 import com.neaterbits.displayserver.protocol.types.CURSOR;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
@@ -32,6 +33,7 @@ import com.neaterbits.displayserver.protocol.types.SETofEVENT;
 import com.neaterbits.displayserver.protocol.types.SETofKEYBUTMASK;
 import com.neaterbits.displayserver.protocol.types.SETofKEYMASK;
 import com.neaterbits.displayserver.protocol.types.SETofPOINTEREVENT;
+import com.neaterbits.displayserver.protocol.types.STRING16;
 import com.neaterbits.displayserver.protocol.types.TIMESTAMP;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
@@ -102,8 +104,20 @@ public final class DataOutputXWindowsProtocolOutputStream implements XWindowsPro
 		}
 		*/
 	}
-
+	
 	@Override
+    public void writeSTRING16(STRING16 value) throws IOException {
+
+	    for (int i = 0; i < value.length(); ++ i) {
+	        
+	        final CHAR2B character = value.getCharacter(i);
+	        
+	        dataOutput.writeByte(character.getByte1());
+	        dataOutput.writeByte(character.getByte2());
+	    }
+	}
+
+    @Override
     public void writeTIMESTAMP(TIMESTAMP value) throws IOException {
 	    dataOutput.writeInt((int)value.getValue());
     }
