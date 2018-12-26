@@ -24,6 +24,8 @@ public class OpCodes {
 	public static final int GET_SELECTION_OWNER = 23;
 	public static final int CONVERT_SELECTION = 24;
 	
+	public static final int GRAB_BUTTON = 28;
+	
 	public static final int GRAB_SERVER = 36;
     public static final int UNGRAB_SERVER = 37;
     public static final int QUERY_POINTER = 38;

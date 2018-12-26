@@ -6,6 +6,7 @@ import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.protocol.types.BITGRAVITY;
 import com.neaterbits.displayserver.protocol.types.BITMASK;
 import com.neaterbits.displayserver.protocol.types.BOOL;
+import com.neaterbits.displayserver.protocol.types.BUTTON;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD32;
@@ -25,6 +26,8 @@ import com.neaterbits.displayserver.protocol.types.SET32;
 import com.neaterbits.displayserver.protocol.types.SETofDEVICEEVENT;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
 import com.neaterbits.displayserver.protocol.types.SETofKEYBUTMASK;
+import com.neaterbits.displayserver.protocol.types.SETofKEYMASK;
+import com.neaterbits.displayserver.protocol.types.SETofPOINTEREVENT;
 import com.neaterbits.displayserver.protocol.types.TIMESTAMP;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
@@ -48,6 +51,8 @@ public interface XWindowsProtocolInputStream {
 	TIMESTAMP readTIMESTAMP() throws IOException;
 	
 	KEYCODE readKEYCODE() throws IOException;
+	
+	BUTTON readBUTTON() throws IOException;
 	
 	WINDOW readWINDOW() throws IOException;
 	PIXMAP readPIXMAP() throws IOException;
@@ -74,7 +79,9 @@ public interface XWindowsProtocolInputStream {
 
 	SETofEVENT readSETofEVENT() throws IOException;
 	SETofDEVICEEVENT readSETofDEVICEEVENT() throws IOException;
+	SETofPOINTEREVENT readSETofPOINTEREVENT() throws IOException;
 	SETofKEYBUTMASK readSETofKEYBUTMASK() throws IOException;
+	SETofKEYMASK readSETofKEYMASK() throws IOException;
 	
 	byte [] readData(int length) throws IOException;
 	

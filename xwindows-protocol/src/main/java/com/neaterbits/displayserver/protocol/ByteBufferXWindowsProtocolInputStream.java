@@ -8,6 +8,7 @@ import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.protocol.types.BITGRAVITY;
 import com.neaterbits.displayserver.protocol.types.BITMASK;
 import com.neaterbits.displayserver.protocol.types.BOOL;
+import com.neaterbits.displayserver.protocol.types.BUTTON;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD32;
@@ -27,6 +28,8 @@ import com.neaterbits.displayserver.protocol.types.SET32;
 import com.neaterbits.displayserver.protocol.types.SETofDEVICEEVENT;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
 import com.neaterbits.displayserver.protocol.types.SETofKEYBUTMASK;
+import com.neaterbits.displayserver.protocol.types.SETofKEYMASK;
+import com.neaterbits.displayserver.protocol.types.SETofPOINTEREVENT;
 import com.neaterbits.displayserver.protocol.types.TIMESTAMP;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
@@ -123,8 +126,13 @@ public class ByteBufferXWindowsProtocolInputStream implements XWindowsProtocolIn
 	public KEYCODE readKEYCODE() throws IOException {
 		return new KEYCODE(readCARD8());
 	}
+    
+	@Override
+    public BUTTON readBUTTON() throws IOException {
+        return new BUTTON(buffer.get());
+    }
 
-	private int readIdentifier() {
+    private int readIdentifier() {
 		return buffer.getInt();
 	}
 	
@@ -214,8 +222,18 @@ public class ByteBufferXWindowsProtocolInputStream implements XWindowsProtocolIn
     }
     
     @Override
+    public SETofPOINTEREVENT readSETofPOINTEREVENT() throws IOException {
+        return new SETofPOINTEREVENT(buffer.getShort());
+    }
+
+    @Override
     public SETofKEYBUTMASK readSETofKEYBUTMASK() throws IOException {
         return new SETofKEYBUTMASK(buffer.getShort());
+    }
+
+    @Override
+    public SETofKEYMASK readSETofKEYMASK() throws IOException {
+        return new SETofKEYMASK(buffer.getShort());
     }
 
     @Override

@@ -8,6 +8,7 @@ import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.protocol.types.BITGRAVITY;
 import com.neaterbits.displayserver.protocol.types.BITMASK;
 import com.neaterbits.displayserver.protocol.types.BOOL;
+import com.neaterbits.displayserver.protocol.types.BUTTON;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD32;
@@ -28,6 +29,8 @@ import com.neaterbits.displayserver.protocol.types.SET32;
 import com.neaterbits.displayserver.protocol.types.SETofDEVICEEVENT;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
 import com.neaterbits.displayserver.protocol.types.SETofKEYBUTMASK;
+import com.neaterbits.displayserver.protocol.types.SETofKEYMASK;
+import com.neaterbits.displayserver.protocol.types.SETofPOINTEREVENT;
 import com.neaterbits.displayserver.protocol.types.TIMESTAMP;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
@@ -114,6 +117,11 @@ public final class DataOutputXWindowsProtocolOutputStream implements XWindowsPro
 	}
 
 	@Override
+    public void writeBUTTON(BUTTON value) throws IOException {
+	    dataOutput.writeByte(value.getValue());
+    }
+
+    @Override
 	public void writeWINDOW(WINDOW value) throws IOException {
 		writeRESOURCE(value);
 	}
@@ -206,7 +214,17 @@ public final class DataOutputXWindowsProtocolOutputStream implements XWindowsPro
     }
     
     @Override
+    public void writeSETofPOINTEREVENT(SETofPOINTEREVENT value) throws IOException {
+        dataOutput.writeShort((short)value.getValue());
+    }
+
+    @Override
     public void writeSETofKEYBUTMASK(SETofKEYBUTMASK value) throws IOException {
+        dataOutput.writeShort(value.getValue());
+    }
+
+    @Override
+    public void writeSETofKEYMASK(SETofKEYMASK value) throws IOException {
         dataOutput.writeShort(value.getValue());
     }
 

@@ -6,6 +6,7 @@ import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.protocol.types.BITGRAVITY;
 import com.neaterbits.displayserver.protocol.types.BITMASK;
 import com.neaterbits.displayserver.protocol.types.BOOL;
+import com.neaterbits.displayserver.protocol.types.BUTTON;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD32;
@@ -25,6 +26,8 @@ import com.neaterbits.displayserver.protocol.types.SET32;
 import com.neaterbits.displayserver.protocol.types.SETofDEVICEEVENT;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
 import com.neaterbits.displayserver.protocol.types.SETofKEYBUTMASK;
+import com.neaterbits.displayserver.protocol.types.SETofKEYMASK;
+import com.neaterbits.displayserver.protocol.types.SETofPOINTEREVENT;
 import com.neaterbits.displayserver.protocol.types.TIMESTAMP;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
@@ -53,7 +56,6 @@ public class IntPadXWindowsProtocolInputStream implements XWindowsProtocolInputS
         return reader.read();
     }
 
-    
     @Override
     public INT8 readINT8() throws IOException {
         return readWithPadding(1, delegate::readINT8);
@@ -107,6 +109,11 @@ public class IntPadXWindowsProtocolInputStream implements XWindowsProtocolInputS
     @Override
     public KEYCODE readKEYCODE() throws IOException {
         return readWithPadding(1, delegate::readKEYCODE);
+    }
+
+    @Override
+    public BUTTON readBUTTON() throws IOException {
+        return readWithPadding(1, delegate::readBUTTON);
     }
 
     @Override
@@ -195,8 +202,18 @@ public class IntPadXWindowsProtocolInputStream implements XWindowsProtocolInputS
     }
 
     @Override
+    public SETofPOINTEREVENT readSETofPOINTEREVENT() throws IOException {
+        return readWithPadding(2, delegate::readSETofPOINTEREVENT);
+    }
+
+    @Override
     public SETofKEYBUTMASK readSETofKEYBUTMASK() throws IOException {
         return readWithPadding(2, delegate::readSETofKEYBUTMASK);
+    }
+    
+    @Override
+    public SETofKEYMASK readSETofKEYMASK() throws IOException {
+        return readWithPadding(2, delegate::readSETofKEYMASK);
     }
 
     @Override
