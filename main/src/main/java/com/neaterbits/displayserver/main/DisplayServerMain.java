@@ -89,7 +89,7 @@ public class DisplayServerMain {
             asyncServers.checkForIO();
         }
 
-        final XHardware hardware = new XHardware(inputDriver, graphicsDriver, inputDriver.getModifierScancodes());
+        final XHardware hardware = new XHardware(inputDriver, graphicsDriver);
 
         return hardware;
 	}

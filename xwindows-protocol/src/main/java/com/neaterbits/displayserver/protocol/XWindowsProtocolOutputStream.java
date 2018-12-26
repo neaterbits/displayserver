@@ -21,6 +21,7 @@ import com.neaterbits.displayserver.protocol.types.INT16;
 import com.neaterbits.displayserver.protocol.types.INT32;
 import com.neaterbits.displayserver.protocol.types.INT8;
 import com.neaterbits.displayserver.protocol.types.KEYCODE;
+import com.neaterbits.displayserver.protocol.types.KEYSYM;
 import com.neaterbits.displayserver.protocol.types.PIXMAP;
 import com.neaterbits.displayserver.protocol.types.SET32;
 import com.neaterbits.displayserver.protocol.types.SETofDEVICEEVENT;
@@ -57,6 +58,8 @@ public interface XWindowsProtocolOutputStream {
 	void writeTIMESTAMP(TIMESTAMP value) throws IOException;
 	
 	void writeKEYCODE(KEYCODE value) throws IOException;
+
+	void writeKEYSYM(KEYSYM value) throws IOException;
 	
 	void writeBUTTON(BUTTON value) throws IOException;
 	

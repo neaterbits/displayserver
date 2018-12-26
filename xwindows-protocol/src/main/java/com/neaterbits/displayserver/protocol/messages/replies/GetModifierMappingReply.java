@@ -1,6 +1,7 @@
 package com.neaterbits.displayserver.protocol.messages.replies;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
@@ -16,7 +17,6 @@ public final class GetModifierMappingReply extends Reply {
     private final CARD8 [] keycodes;
 
     public static GetModifierMappingReply decode(XWindowsProtocolInputStream stream) throws IOException {
-
 
         final BYTE keycodesPerModifier = stream.readBYTE();
         
@@ -43,6 +43,10 @@ public final class GetModifierMappingReply extends Reply {
         Objects.requireNonNull(keycodesPerModifier);
         Objects.requireNonNull(keycodes);
         
+        if (keycodes.length != 8 * keycodesPerModifier.getValue()) {
+            throw new IllegalArgumentException();
+        }
+
         this.keycodesPerModifier = keycodesPerModifier;
         this.keycodes = keycodes;
     }
@@ -59,7 +63,7 @@ public final class GetModifierMappingReply extends Reply {
     public Object[] getDebugParams() {
         return wrap(
                 "keycodesPerModifier", keycodesPerModifier,
-                "keycodes", keycodes
+                "keycodes", Arrays.toString(keycodes)
         );
     }
 

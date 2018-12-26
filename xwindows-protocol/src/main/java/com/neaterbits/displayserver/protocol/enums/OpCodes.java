@@ -59,5 +59,7 @@ public class OpCodes {
 	public static final int RECOLOR_CURSOR = 96;
 	public static final int QUERY_EXTENSION = 98;
 
+	public static final int GET_KEYBOARD_MAPPING = 101;
+	
 	public static final int GET_MODIFIER_MAPPING = 119;
 }

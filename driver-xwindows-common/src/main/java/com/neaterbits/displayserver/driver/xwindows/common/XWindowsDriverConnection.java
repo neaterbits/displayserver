@@ -25,6 +25,7 @@ import com.neaterbits.displayserver.protocol.messages.protocolsetup.ClientConnec
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ClientMessage;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ServerMessage;
 import com.neaterbits.displayserver.protocol.messages.replies.GetImageReply;
+import com.neaterbits.displayserver.protocol.messages.replies.GetKeyboardMappingReply;
 import com.neaterbits.displayserver.protocol.messages.replies.GetModifierMappingReply;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD8;
@@ -252,6 +253,10 @@ public final class XWindowsDriverConnection
             switch (requestOpCode) {
             case OpCodes.GET_IMAGE:
                 reply = GetImageReply.decode(stream);
+                break;
+                
+            case OpCodes.GET_KEYBOARD_MAPPING:
+                reply = GetKeyboardMappingReply.decode(stream);
                 break;
                 
             case OpCodes.GET_MODIFIER_MAPPING:

@@ -6,6 +6,8 @@ public interface InputDriver extends Driver {
     
     ModifierScancodes getModifierScancodes();
     
+    KeyboardMapping getKeyboardMapping();
+    
     void registerInputEventListener(InputEventListener eventListener);
     
     void deregisterInputEventListener(InputEventListener eventListener);

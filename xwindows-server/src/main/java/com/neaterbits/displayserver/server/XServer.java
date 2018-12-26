@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.neaterbits.displayserver.buffers.PixelFormat;
+import com.neaterbits.displayserver.events.common.KeyboardMapping;
 import com.neaterbits.displayserver.events.common.Modifier;
 import com.neaterbits.displayserver.events.common.ModifierScancodes;
 import com.neaterbits.displayserver.io.common.Client;
@@ -38,6 +39,7 @@ import com.neaterbits.displayserver.protocol.messages.protocolsetup.ServerMessag
 import com.neaterbits.displayserver.protocol.messages.replies.AllocColorReply;
 import com.neaterbits.displayserver.protocol.messages.replies.GetGeometryReply;
 import com.neaterbits.displayserver.protocol.messages.replies.GetInputFocusReply;
+import com.neaterbits.displayserver.protocol.messages.replies.GetKeyboardMappingReply;
 import com.neaterbits.displayserver.protocol.messages.replies.GetModifierMappingReply;
 import com.neaterbits.displayserver.protocol.messages.replies.GetSelectionOwnerReply;
 import com.neaterbits.displayserver.protocol.messages.replies.InternAtomReply;
@@ -65,6 +67,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.FreePixmap;
 import com.neaterbits.displayserver.protocol.messages.requests.GetGeometry;
 import com.neaterbits.displayserver.protocol.messages.requests.GetImage;
 import com.neaterbits.displayserver.protocol.messages.requests.GetInputFocus;
+import com.neaterbits.displayserver.protocol.messages.requests.GetKeyboardMapping;
 import com.neaterbits.displayserver.protocol.messages.requests.GetModifierMapping;
 import com.neaterbits.displayserver.protocol.messages.requests.GetProperty;
 import com.neaterbits.displayserver.protocol.messages.requests.GetSelectionOwner;
@@ -93,6 +96,7 @@ import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.COLORMAP;
 import com.neaterbits.displayserver.protocol.types.INT16;
+import com.neaterbits.displayserver.protocol.types.KEYSYM;
 import com.neaterbits.displayserver.protocol.types.SETofKEYBUTMASK;
 import com.neaterbits.displayserver.protocol.types.TIMESTAMP;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
@@ -784,11 +788,73 @@ public class XServer implements AutoCloseable {
             break;
         }
         
+        case OpCodes.GET_KEYBOARD_MAPPING: {
+            
+            final GetKeyboardMapping getKeyboardMapping = log(messageLength, opcode, sequenceNumber, GetKeyboardMapping.decode(stream));
+            
+            final KeyboardMapping keyboardMapping = hardware.getInputDriver().getKeyboardMapping();
+         
+            final int index = getKeyboardMapping.getFirstKeycode().getValue() - keyboardMapping.getMinScancode();
+            
+            final int count = getKeyboardMapping.getCount().getValue();
+            
+            if (index < 0) {
+                sendError(client, Errors.Value, sequenceNumber, getKeyboardMapping.getFirstKeycode().getValue(), opcode);
+            }
+            else if (index + getKeyboardMapping.getCount().getValue() > keyboardMapping.getNumScancodes()) {
+                sendError(client, Errors.Value, sequenceNumber, count, opcode);
+            }
+            else {
+                
+                final int keysymsPerKeycode = Arrays.stream(keyboardMapping.getScancodeToKeysym())
+                        .skip(index)
+                        .limit(count)
+                        .map(keysyms -> keysyms.length)
+                        .max(Integer::compare)
+                        .orElse(0);
+                
+                
+                final KEYSYM [] keysyms = new KEYSYM[count * keysymsPerKeycode];
+                
+                int dstIdx = 0;
+                
+                for (int i = 0; i < count; ++ i) {
+                    final int [] srcKeysyms = keyboardMapping.getKeysyms(index + i);
+                    
+                    if (srcKeysyms.length > keysymsPerKeycode) {
+                        throw new IllegalStateException();
+                    }
+                    
+                    for (int j = 0; j < srcKeysyms.length; ++ j) {
+                        keysyms[dstIdx ++] = new KEYSYM(srcKeysyms[j]);
+                    }
+                    
+                    final int remaining = keysymsPerKeycode - srcKeysyms.length;
+
+                    for (int j = 0; j < remaining; ++ j) {
+                        keysyms[dstIdx ++] = KEYSYM.NoSymbol;
+                    }
+                }
+                
+                if (dstIdx != keysyms.length) {
+                    throw new IllegalStateException();
+                }
+                
+                final GetKeyboardMappingReply reply = new GetKeyboardMappingReply(
+                        sequenceNumber,
+                        new BYTE((byte)keysymsPerKeycode),
+                        keysyms);
+                
+                sendReply(client, reply);
+            }
+            break;
+        }
+        
         case OpCodes.GET_MODIFIER_MAPPING: {
             
             log(messageLength, opcode, sequenceNumber, GetModifierMapping.decode(stream));
             
-            final ModifierScancodes modifierScancodes = hardware.getModifierScancodes();
+            final ModifierScancodes modifierScancodes = hardware.getInputDriver().getModifierScancodes();
             
             final CARD8 [] keycodes = new CARD8[modifierScancodes.getCodesPerModifier() * 8];
             

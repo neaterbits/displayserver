@@ -23,6 +23,7 @@ import com.neaterbits.displayserver.protocol.types.INT16;
 import com.neaterbits.displayserver.protocol.types.INT32;
 import com.neaterbits.displayserver.protocol.types.INT8;
 import com.neaterbits.displayserver.protocol.types.KEYCODE;
+import com.neaterbits.displayserver.protocol.types.KEYSYM;
 import com.neaterbits.displayserver.protocol.types.PIXMAP;
 import com.neaterbits.displayserver.protocol.types.RESOURCE;
 import com.neaterbits.displayserver.protocol.types.SET32;
@@ -115,8 +116,13 @@ public final class DataOutputXWindowsProtocolOutputStream implements XWindowsPro
 	public void writeKEYCODE(KEYCODE value) throws IOException {
 		dataOutput.writeByte(value.getValue());
 	}
-
+	
 	@Override
+    public void writeKEYSYM(KEYSYM value) throws IOException {
+	    dataOutput.writeInt(value.getValue());
+    }
+
+    @Override
     public void writeBUTTON(BUTTON value) throws IOException {
 	    dataOutput.writeByte(value.getValue());
     }
