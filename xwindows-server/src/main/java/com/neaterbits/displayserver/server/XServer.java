@@ -75,6 +75,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.GetWindowAttribut
 import com.neaterbits.displayserver.protocol.messages.requests.GrabButton;
 import com.neaterbits.displayserver.protocol.messages.requests.GrabServer;
 import com.neaterbits.displayserver.protocol.messages.requests.InternAtom;
+import com.neaterbits.displayserver.protocol.messages.requests.MapSubwindows;
 import com.neaterbits.displayserver.protocol.messages.requests.MapWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.PutImage;
 import com.neaterbits.displayserver.protocol.messages.requests.QueryExtension;
@@ -383,6 +384,13 @@ public class XServer implements AutoCloseable {
 		    
 		    log(messageLength, opcode, sequenceNumber, MapWindow.decode(stream));
 		    
+		    break;
+		}
+		
+		case OpCodes.MAP_SUBWINDOWS: {
+		    
+		    log(messageLength, opcode, sequenceNumber, MapSubwindows.decode(stream));
+
 		    break;
 		}
 		
