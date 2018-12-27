@@ -110,6 +110,9 @@ import com.neaterbits.displayserver.windows.DisplayAreaWindows;
 import com.neaterbits.displayserver.windows.Window;
 import com.neaterbits.displayserver.xwindows.fonts.NoSuchFontException;
 import com.neaterbits.displayserver.xwindows.fonts.XFont;
+import com.neaterbits.displayserver.xwindows.model.Atoms;
+import com.neaterbits.displayserver.xwindows.model.XScreensAndVisuals;
+import com.neaterbits.displayserver.xwindows.model.XWindow;
 
 public class XServer implements AutoCloseable {
 
@@ -199,7 +202,7 @@ public class XServer implements AutoCloseable {
         };
 	}
 	
-	XWindowsConstAccess getWindows() {
+	XClientWindowsConstAccess getWindows() {
 	    return state;
 	}
 

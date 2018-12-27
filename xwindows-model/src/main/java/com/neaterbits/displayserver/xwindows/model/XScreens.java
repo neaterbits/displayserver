@@ -1,4 +1,4 @@
-package com.neaterbits.displayserver.server;
+package com.neaterbits.displayserver.xwindows.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,11 +8,11 @@ import java.util.stream.Collectors;
 
 import com.neaterbits.displayserver.buffers.PixelFormat;
 
-final class XScreens implements XScreensConstAccess {
+public final class XScreens implements XScreensConstAccess {
 
     private final List<XScreen> screens;
 
-    XScreens(List<XScreen> screens) {
+    public XScreens(List<XScreen> screens) {
         this.screens = new ArrayList<>(screens);
     }
 

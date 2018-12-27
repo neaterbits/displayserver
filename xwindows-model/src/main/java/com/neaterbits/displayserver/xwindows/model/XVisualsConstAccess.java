@@ -1,4 +1,4 @@
-package com.neaterbits.displayserver.server;
+package com.neaterbits.displayserver.xwindows.model;
 
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 

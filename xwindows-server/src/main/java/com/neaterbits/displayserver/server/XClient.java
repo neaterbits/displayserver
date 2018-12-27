@@ -53,6 +53,10 @@ import com.neaterbits.displayserver.windows.DisplayAreaWindows;
 import com.neaterbits.displayserver.windows.Window;
 import com.neaterbits.displayserver.windows.WindowParameters;
 import com.neaterbits.displayserver.xwindows.fonts.XFont;
+import com.neaterbits.displayserver.xwindows.model.XDrawable;
+import com.neaterbits.displayserver.xwindows.model.XGC;
+import com.neaterbits.displayserver.xwindows.model.XPixmap;
+import com.neaterbits.displayserver.xwindows.model.XWindow;
 
 public class XClient extends XConnection {
     
@@ -131,7 +135,7 @@ public class XClient extends XConnection {
         
         final XWindow rootWindow = server.getWindows().findRootWindowOf(createWindow.getParent());
         
-        final XWindow xWindowsWindow = new XWindow(
+        final XWindow xWindowsWindow = new XClientWindow(
                 this,
                 window,
                 createWindow.getWid(),

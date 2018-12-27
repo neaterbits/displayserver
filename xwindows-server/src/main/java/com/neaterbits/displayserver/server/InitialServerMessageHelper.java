@@ -22,6 +22,8 @@ import com.neaterbits.displayserver.protocol.types.SET32;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.types.Size;
 import com.neaterbits.displayserver.windows.DisplayArea;
+import com.neaterbits.displayserver.xwindows.model.XScreen;
+import com.neaterbits.displayserver.xwindows.model.XScreensConstAccess;
 
 class InitialServerMessageHelper {
 

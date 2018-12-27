@@ -1,10 +1,10 @@
-package com.neaterbits.displayserver.server;
+package com.neaterbits.displayserver.xwindows.model;
 
 import java.util.Objects;
 
 import com.neaterbits.displayserver.protocol.messages.requests.GCAttributes;
 
-final class XGC {
+public final class XGC {
 
     private GCAttributes attributes;
 
@@ -15,7 +15,7 @@ final class XGC {
         this.attributes = attributes;
     }
 
-    GCAttributes getAttributes() {
+    public GCAttributes getAttributes() {
         return attributes;
     }
 }

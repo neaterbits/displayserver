@@ -1,4 +1,4 @@
-package com.neaterbits.displayserver.server;
+package com.neaterbits.displayserver.xwindows.model;
 
 import java.util.Objects;
 
@@ -6,11 +6,11 @@ import com.neaterbits.displayserver.buffers.BufferOperations;
 import com.neaterbits.displayserver.buffers.OffscreenBuffer;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 
-final class XPixmap extends XDrawable {
+public final class XPixmap extends XDrawable {
 
     private final OffscreenBuffer offscreenBuffer;
 
-    XPixmap(VISUALID visual, OffscreenBuffer offscreenBuffer) {
+    public XPixmap(VISUALID visual, OffscreenBuffer offscreenBuffer) {
         
         super(visual);
         
@@ -19,12 +19,12 @@ final class XPixmap extends XDrawable {
         this.offscreenBuffer = offscreenBuffer;
     }
 
-    OffscreenBuffer getOffscreenBuffer() {
+    public OffscreenBuffer getOffscreenBuffer() {
         return offscreenBuffer;
     }
 
     @Override
-    BufferOperations getBufferOperations() {
+    public BufferOperations getBufferOperations() {
         return offscreenBuffer;
     }
 }

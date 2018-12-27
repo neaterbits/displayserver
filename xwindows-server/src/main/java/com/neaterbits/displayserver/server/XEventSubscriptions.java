@@ -1,5 +1,7 @@
 package com.neaterbits.displayserver.server;
 
+import com.neaterbits.displayserver.xwindows.model.XWindow;
+
 final class XEventSubscriptions implements XEventSubscriptionsConstAccess {
 
     @Override

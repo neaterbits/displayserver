@@ -1,4 +1,4 @@
-package com.neaterbits.displayserver.server;
+package com.neaterbits.displayserver.xwindows.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,13 +8,13 @@ import java.util.Objects;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.windows.DisplayArea;
 
-final class XScreen {
+public final class XScreen {
 
     private final DisplayArea displayArea;
     private final XWindow rootWindow;
     private final List<XVisual> visuals;
 
-    XScreen(DisplayArea displayArea, XWindow rootWindow, Collection<XVisual> visuals) {
+    public XScreen(DisplayArea displayArea, XWindow rootWindow, Collection<XVisual> visuals) {
 
         Objects.requireNonNull(displayArea);
         Objects.requireNonNull(rootWindow);
@@ -24,11 +24,11 @@ final class XScreen {
         this.visuals = new ArrayList<>(visuals);
     }
 
-    DisplayArea getDisplayArea() {
+    public final DisplayArea getDisplayArea() {
         return displayArea;
     }
 
-    WINDOW getRootWINDOW() {
+    public final WINDOW getRootWINDOW() {
         return rootWindow.getWINDOW();
     }
 

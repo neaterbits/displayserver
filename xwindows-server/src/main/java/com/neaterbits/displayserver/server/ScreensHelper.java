@@ -27,6 +27,10 @@ import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.protocol.types.WINGRAVITY;
 import com.neaterbits.displayserver.windows.DisplayArea;
 import com.neaterbits.displayserver.windows.DisplayAreaWindows;
+import com.neaterbits.displayserver.xwindows.model.XScreen;
+import com.neaterbits.displayserver.xwindows.model.XScreensAndVisuals;
+import com.neaterbits.displayserver.xwindows.model.XVisual;
+import com.neaterbits.displayserver.xwindows.model.XWindow;
 
 class ScreensHelper {
 

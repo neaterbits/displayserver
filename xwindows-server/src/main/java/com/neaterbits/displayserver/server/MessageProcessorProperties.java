@@ -13,10 +13,12 @@ import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.TIMESTAMP;
+import com.neaterbits.displayserver.xwindows.model.Property;
+import com.neaterbits.displayserver.xwindows.model.XWindow;
 
 final class MessageProcessorProperties {
 
-    static void changeProperty(ChangeProperty changeProperty, int opcode, CARD16 sequenceNumber, TIMESTAMP timestamp, XClient client, XWindowsConstAccess xWindows, ServerToClient serverToClient) {
+    static void changeProperty(ChangeProperty changeProperty, int opcode, CARD16 sequenceNumber, TIMESTAMP timestamp, XClient client, XClientWindowsConstAccess xWindows, ServerToClient serverToClient) {
         final XWindow xWindow = xWindows.getClientWindow(changeProperty.getWindow());
         
         if (xWindow == null) {
@@ -52,7 +54,7 @@ final class MessageProcessorProperties {
         }
     }
     
-    static void deleteProperty(DeleteProperty deleteProperty, int opcode, CARD16 sequenceNumber, TIMESTAMP timestamp, XClient client, XWindowsConstAccess xWindows, ServerToClient serverToClient) {
+    static void deleteProperty(DeleteProperty deleteProperty, int opcode, CARD16 sequenceNumber, TIMESTAMP timestamp, XClient client, XClientWindowsConstAccess xWindows, ServerToClient serverToClient) {
         final XWindow xWindow = xWindows.getClientWindow(deleteProperty.getWindow());
         
         if (xWindow == null) {
@@ -81,7 +83,7 @@ final class MessageProcessorProperties {
         }
     }
     
-    static void getProperty(GetProperty getProperty, int opcode, CARD16 sequenceNumber, TIMESTAMP timestamp, XClient client, XWindowsConstAccess xWindows, ServerToClient serverToClient) {
+    public static void getProperty(GetProperty getProperty, int opcode, CARD16 sequenceNumber, TIMESTAMP timestamp, XClient client, XClientWindowsConstAccess xWindows, ServerToClient serverToClient) {
         final XWindow xWindow = xWindows.getClientOrRootWindow(getProperty.getWindow());
         
         if (xWindow == null) {
@@ -130,18 +132,22 @@ final class MessageProcessorProperties {
                             (int)bytesAfter,
                             data));
                     
-                    if (xWindow.isCreatedBy(client) && bytesAfter == 0 && getProperty.getDelete().isSet()) {
-
-                        xWindow.removeProperty(property.getProperty());
+                    if (!xWindow.isRootWindow()) {
+                        final XClientWindow xClientWindow = (XClientWindow)xWindow;
                         
-                        final PropertyNotify propertyNotify = new PropertyNotify(
-                                sequenceNumber,
-                                getProperty.getWindow(),
-                                property.getProperty(),
-                                timestamp,
-                                PropertyNotify.Deleted);
-                        
-                        serverToClient.sendEvent(client, getProperty.getWindow(), propertyNotify);
+                        if (xClientWindow.isCreatedBy(client) && bytesAfter == 0 && getProperty.getDelete().isSet()) {
+    
+                            xClientWindow.removeProperty(property.getProperty());
+                            
+                            final PropertyNotify propertyNotify = new PropertyNotify(
+                                    sequenceNumber,
+                                    getProperty.getWindow(),
+                                    property.getProperty(),
+                                    timestamp,
+                                    PropertyNotify.Deleted);
+                            
+                            serverToClient.sendEvent(client, getProperty.getWindow(), propertyNotify);
+                        }
                     }
                 }
             }

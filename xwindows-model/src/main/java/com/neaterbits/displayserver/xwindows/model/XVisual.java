@@ -1,4 +1,4 @@
-package com.neaterbits.displayserver.server;
+package com.neaterbits.displayserver.xwindows.model;
 
 import com.neaterbits.displayserver.protocol.enums.VisualClass;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.VISUALTYPE;
@@ -7,7 +7,7 @@ import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 
-final class XVisual {
+public final class XVisual {
 
     private final int _class;
     private final int bitsPerRGBValue;
@@ -16,7 +16,7 @@ final class XVisual {
     private final int greenMask;
     private final int blueMask;
     
-    XVisual(int _class, int bitsPerRGBValue, int colormapEntries, int redMask, int greenMask, int blueMask) {
+    public XVisual(int _class, int bitsPerRGBValue, int colormapEntries, int redMask, int greenMask, int blueMask) {
         this._class = _class;
         this.bitsPerRGBValue = bitsPerRGBValue;
         this.colormapEntries = colormapEntries;

@@ -1,4 +1,4 @@
-package com.neaterbits.displayserver.server;
+package com.neaterbits.displayserver.xwindows.model;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,27 +8,23 @@ import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.windows.Window;
 
-final class XWindows implements XWindowsConstAccess {
+public class XWindows<T extends XWindow> implements XWindowsConstAccess<T> {
 
     private final WindowMap rootWindows;
     private final WindowMap clientWindows;
     
     private final Map<Window, XWindow> xWindowByWindow;
-    
-    private final Map<XWindow, XClient> creatingClientByWindow;
 
 
-    XWindows() {
+    protected XWindows() {
         
         this.rootWindows = new WindowMap();
         this.clientWindows = new WindowMap();
         
         this.xWindowByWindow = new HashMap<>();
-        
-        this.creatingClientByWindow = new HashMap<>();
     }
     
-    void addRootWindow(XWindow xWindow) {
+    public final void addRootWindow(XWindow xWindow) {
         
         Objects.requireNonNull(xWindow);
         
@@ -42,16 +38,13 @@ final class XWindows implements XWindowsConstAccess {
     }
 
     
-    void addClientWindow(XWindow xWindow, XClient creatingClient) {
+    protected final void addClientWindow(XWindow xWindow) {
 
         Objects.requireNonNull(xWindow);
-        Objects.requireNonNull(creatingClient);
         
         if (xWindow.isRootWindow()) {
             throw new IllegalArgumentException();
         }
-        
-        creatingClientByWindow.put(xWindow, creatingClient);
 
         clientWindows.addToMaps(xWindow);
         
@@ -62,7 +55,7 @@ final class XWindows implements XWindowsConstAccess {
         xWindowByWindow.put(xWindow.getWindow(), xWindow);
     }
 
-    void removeClientWindow(XWindow xWindow) {
+    protected boolean removeClientWindow(XWindow xWindow) {
         
         Objects.requireNonNull(xWindow);
         
@@ -70,28 +63,21 @@ final class XWindows implements XWindowsConstAccess {
             throw new IllegalArgumentException();
         }
 
-        if (clientWindows.remove(xWindow)) {
-            if (creatingClientByWindow.remove(xWindow) == null) {
-                throw new IllegalStateException();
-            }
-        }
-        else {
-            if (creatingClientByWindow.remove(xWindow) != null) {
-                throw new IllegalStateException();
-            }
-        }
+        final boolean removed = clientWindows.remove(xWindow);
         
         xWindowByWindow.remove(xWindow.getWindow());
+        
+        return removed;
     }
 
     @Override
-    public XWindow getClientOrRootWindow(WINDOW windowResource) {
+    public final XWindow getClientOrRootWindow(WINDOW windowResource) {
 
         return getClientOrRootWindow(windowResource.toDrawable());
     }
     
     @Override
-    public XWindow getClientOrRootWindow(DRAWABLE windowResource) {
+    public final XWindow getClientOrRootWindow(DRAWABLE windowResource) {
 
         XWindow result = clientWindows.getWindow(windowResource);
         
@@ -102,26 +88,29 @@ final class XWindows implements XWindowsConstAccess {
         return result;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public XWindow getClientWindow(WINDOW windowResource) {
-        return clientWindows.getWindow(windowResource.toDrawable());
+    public final T getClientWindow(WINDOW windowResource) {
+        return (T)clientWindows.getWindow(windowResource.toDrawable());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public XWindow getClientWindow(DRAWABLE windowResource) {
-        return clientWindows.getWindow(windowResource);
+    public final T getClientWindow(DRAWABLE windowResource) {
+        return (T)clientWindows.getWindow(windowResource);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public XWindow getClientWindow(Window window) {
+    public final T getClientWindow(Window window) {
         
         Objects.requireNonNull(window);
         
-        return xWindowByWindow.get(window);
+        return (T)xWindowByWindow.get(window);
     }
 
     @Override
-    public XWindow findRootWindowOf(WINDOW window) {
+    public final XWindow findRootWindowOf(WINDOW window) {
         
         Objects.requireNonNull(window);
         

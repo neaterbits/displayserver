@@ -1,4 +1,4 @@
-package com.neaterbits.displayserver.server;
+package com.neaterbits.displayserver.xwindows.model;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,13 +6,13 @@ import java.util.Objects;
 
 import com.neaterbits.displayserver.protocol.types.ATOM;
 
-final class Atoms {
+public final class Atoms {
 
     private int allocator;
     
     private final Map<String, Atom> byName;
     
-    Atoms() {
+    public Atoms() {
         this.allocator = 1;
         
         this.byName = new HashMap<>();
@@ -25,7 +25,7 @@ final class Atoms {
         return byName.containsKey(name);
     }
     
-    ATOM getAtom(String name) {
+    public ATOM getAtom(String name) {
         
         Objects.requireNonNull(name);
         
@@ -34,7 +34,7 @@ final class Atoms {
         return atom != null ? atom.getAtom() : null;
     }
     
-    ATOM addIfNotExists(String name) {
+    public ATOM addIfNotExists(String name) {
         
         final Atom atom = byName.get(name);
         

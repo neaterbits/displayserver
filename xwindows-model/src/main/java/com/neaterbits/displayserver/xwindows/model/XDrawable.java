@@ -1,4 +1,4 @@
-package com.neaterbits.displayserver.server;
+package com.neaterbits.displayserver.xwindows.model;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,12 +9,12 @@ import com.neaterbits.displayserver.protocol.messages.requests.GCAttributes;
 import com.neaterbits.displayserver.protocol.types.GCONTEXT;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 
-abstract class XDrawable {
+public abstract class XDrawable {
 
     private final VISUALID visual;
     private final Map<GCONTEXT, XGC> gcs;
 
-    abstract BufferOperations getBufferOperations();
+    public abstract BufferOperations getBufferOperations();
     
     XDrawable(VISUALID visual) {
         
@@ -25,11 +25,11 @@ abstract class XDrawable {
         this.gcs = new HashMap<>();
     }
     
-    final VISUALID getVisual() {
+    public final VISUALID getVisual() {
         return visual;
     }
 
-    final void addGC(GCONTEXT context, GCAttributes attributes) {
+    public final void addGC(GCONTEXT context, GCAttributes attributes) {
         
         Objects.requireNonNull(context);
         Objects.requireNonNull(attributes);
@@ -43,7 +43,7 @@ abstract class XDrawable {
         gcs.put(context, xgc);
     }
     
-    final void changeGC(GCONTEXT context, GCAttributes attributes) {
+    public final void changeGC(GCONTEXT context, GCAttributes attributes) {
         
         Objects.requireNonNull(context);
         Objects.requireNonNull(attributes);
@@ -57,14 +57,14 @@ abstract class XDrawable {
         gcs.put(context, new XGC(existing.getAttributes().applyImmutably(attributes)));
     }
 
-    final XGC getGC(GCONTEXT context) {
+    public final XGC getGC(GCONTEXT context) {
         
         Objects.requireNonNull(context);
         
         return gcs.get(context);
     }
     
-    final void removeGC(GCONTEXT context) {
+    public final void removeGC(GCONTEXT context) {
         
         Objects.requireNonNull(context);
         

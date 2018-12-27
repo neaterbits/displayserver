@@ -48,6 +48,7 @@
 
 		<module>xwindows-protocol</module>
 		<module>xwindows-server</module>
+		<module>xwindows-model</module>
 		<module>xwindows-fonts</module>
 	</modules>
 

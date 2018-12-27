@@ -1,4 +1,4 @@
-package com.neaterbits.displayserver.server;
+package com.neaterbits.displayserver.xwindows.model;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -19,9 +19,8 @@ import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.windows.Window;
 
-final class XWindow extends XDrawable {
+public class XWindow extends XDrawable {
 
-    private final XClient createdBy;
     private final Window window;
     
     private final WINDOW windowResource;
@@ -36,7 +35,7 @@ final class XWindow extends XDrawable {
     private final Map<ATOM, Property> properties;
 
     // Root window
-    XWindow(
+    public XWindow(
             Window window,
             WINDOW windowResource,
             VISUALID visual,
@@ -44,11 +43,10 @@ final class XWindow extends XDrawable {
             CARD16 windowClass,
             WindowAttributes currentWindowAttributes) {
         
-        this(null, window, windowResource, WINDOW.None, WINDOW.None, visual, borderWidth, windowClass, currentWindowAttributes, 0);
+        this(window, windowResource, WINDOW.None, WINDOW.None, visual, borderWidth, windowClass, currentWindowAttributes, 0);
     }
 
-    XWindow(
-            XClient createdBy,
+    protected XWindow(
             Window window,
             WINDOW windowResource, WINDOW rootWindow, WINDOW parentWindow,
             VISUALID visual,
@@ -56,9 +54,7 @@ final class XWindow extends XDrawable {
             CARD16 windowClass,
             WindowAttributes currentWindowAttributes) {
         
-        this(createdBy, window, windowResource, rootWindow, parentWindow, visual, borderWidth, windowClass, currentWindowAttributes, 0);
-        
-        Objects.requireNonNull(createdBy);
+        this(window, windowResource, rootWindow, parentWindow, visual, borderWidth, windowClass, currentWindowAttributes, 0);
         
         if (rootWindow.equals(WINDOW.None)) {
             throw new IllegalArgumentException();
@@ -69,8 +65,7 @@ final class XWindow extends XDrawable {
         }
     }
 
-    XWindow(
-            XClient createdBy,
+    private XWindow(
             Window window,
             WINDOW windowResource, WINDOW rootWindow, WINDOW parentWindow,
             VISUALID visual,
@@ -90,7 +85,6 @@ final class XWindow extends XDrawable {
         Objects.requireNonNull(windowClass);
         Objects.requireNonNull(currentWindowAttributes);
         
-        this.createdBy = createdBy;
         this.window = window;
         this.windowResource = windowResource;
         this.rootWindow = rootWindow;
@@ -104,81 +98,74 @@ final class XWindow extends XDrawable {
     
     
     @Override
-    BufferOperations getBufferOperations() {
+    public BufferOperations getBufferOperations() {
         return window.getBuffer();
     }
 
-    boolean isRootWindow() {
+    public final boolean isRootWindow() {
         return parentWindow.equals(WINDOW.None);
     }
-    
-    boolean isCreatedBy(XClient client) {
 
-        Objects.requireNonNull(client);
-
-        return createdBy == client;
-    }
-
-    Window getWindow() {
+    public final Window getWindow() {
         return window;
     }
     
-    WINDOW getWINDOW() {
+    public final WINDOW getWINDOW() {
         return windowResource;
     }
     
-    WINDOW getRootWINDOW() {
+    public final WINDOW getRootWINDOW() {
         return rootWindow;
     }
     
-    WINDOW getParentWINDOW() {
+    public final WINDOW getParentWINDOW() {
         return parentWindow;
     }
 
-    byte getDepth() {
+    public final byte getDepth() {
         return (byte)window.getDepth();
     }
 
-    short getX() {
+    public final short getX() {
         return (short)window.getPosition().getLeft();
     }
     
-    short getY() {
+    public final short getY() {
         return (short)window.getPosition().getTop();
     }
     
-    int getWidth() {
+    public final int getWidth() {
         return window.getSize().getWidth();
     }
     
-    int getHeight() {
+    public final int getHeight() {
         return window.getSize().getHeight();
     }
 
-    CARD16 getBorderWidth() {
+    public final CARD16 getBorderWidth() {
         return borderWidth;
     }
     
-    CARD16 getWindowClass() {
+    public final CARD16 getWindowClass() {
         return windowClass;
     }
 
-    WindowAttributes getCurrentWindowAttributes() {
+    public final WindowAttributes getCurrentWindowAttributes() {
         return currentWindowAttributes;
     }
     
-    void setCurrentWindowAttributes(WindowAttributes currentWindowAttributes) {
+    final void setCurrentWindowAttributes(WindowAttributes currentWindowAttributes) {
         this.currentWindowAttributes = currentWindowAttributes;
     }
 
-    Property getProperty(ATOM property) {
+    public final Property getProperty(ATOM property) {
         
         Objects.requireNonNull(property);
         
         return properties.get(property);
     }
     
-    void changeProperty(BYTE mode, ATOM propertyAtom, ATOM type, CARD8 format, byte[] data) throws MatchException, AtomException, ValueException {
+    public final void changeProperty(BYTE mode, ATOM propertyAtom, ATOM type, CARD8 format, byte[] data) throws MatchException, AtomException, ValueException {
         
         final Property property = properties.get(propertyAtom);
         
@@ -205,7 +192,7 @@ final class XWindow extends XDrawable {
         }
     }
     
-    void deleteProperty(ATOM propertyAtom) throws AtomException {
+    public final void deleteProperty(ATOM propertyAtom) throws AtomException {
 
         final Property property = removeProperty(propertyAtom);
         
@@ -214,7 +201,7 @@ final class XWindow extends XDrawable {
         }
     }
 
-    Property removeProperty(ATOM propertyAtom) {
+    public final Property removeProperty(ATOM propertyAtom) {
         return properties.remove(propertyAtom);
     }
 

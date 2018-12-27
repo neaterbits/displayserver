@@ -9,10 +9,11 @@ import com.neaterbits.displayserver.protocol.types.BOOL;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
+import com.neaterbits.displayserver.xwindows.model.XWindow;
 
 final class MessageProcessorWindows {
 
-    static void getWindowAttributes(GetWindowAttributes getWindowAttributes, int opcode, CARD16 sequenceNumber, XClient client, XWindowsConstAccess xWindows, ServerToClient serverToClient) {
+    static void getWindowAttributes(GetWindowAttributes getWindowAttributes, int opcode, CARD16 sequenceNumber, XClient client, XClientWindowsConstAccess xWindows, ServerToClient serverToClient) {
         
         final XWindow window = xWindows.getClientWindow(getWindowAttributes.getWindow());
 

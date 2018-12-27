@@ -13,6 +13,7 @@ import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.windows.Window;
 import com.neaterbits.displayserver.windows.WindowEventListener;
+import com.neaterbits.displayserver.xwindows.model.XWindow;
 
 final class XWindowsEventListener implements WindowEventListener {
 

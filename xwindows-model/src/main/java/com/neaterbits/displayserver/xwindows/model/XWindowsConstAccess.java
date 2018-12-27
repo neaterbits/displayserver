@@ -1,14 +1,14 @@
-package com.neaterbits.displayserver.server;
+package com.neaterbits.displayserver.xwindows.model;
 
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.windows.Window;
 
-interface XWindowsConstAccess {
+public interface XWindowsConstAccess<T extends XWindow> {
 
-    XWindow getClientWindow(WINDOW windowResource);
+    T getClientWindow(WINDOW windowResource);
 
-    XWindow getClientWindow(DRAWABLE windowResource);
+    T getClientWindow(DRAWABLE windowResource);
 
     XWindow getClientOrRootWindow(WINDOW windowResource);
 
@@ -16,5 +16,5 @@ interface XWindowsConstAccess {
     
     XWindow findRootWindowOf(WINDOW windowResource);
     
-    XWindow getClientWindow(Window window);
+    T getClientWindow(Window window);
 }

@@ -1,10 +1,10 @@
-package com.neaterbits.displayserver.server;
+package com.neaterbits.displayserver.xwindows.model;
 
 import java.util.Set;
 
 import com.neaterbits.displayserver.buffers.PixelFormat;
 
-interface XScreensConstAccess {
+public interface XScreensConstAccess {
 
     int getNumberOfScreens();
     

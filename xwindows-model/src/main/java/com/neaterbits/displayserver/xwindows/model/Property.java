@@ -1,11 +1,11 @@
-package com.neaterbits.displayserver.server;
+package com.neaterbits.displayserver.xwindows.model;
 
 import java.util.Objects;
 
 import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 
-final class Property {
+public final class Property {
     private final ATOM property;
     private final ATOM type;
     private final CARD8 format;
@@ -24,19 +24,19 @@ final class Property {
         this.data = data;
     }
 
-    ATOM getProperty() {
+    public ATOM getProperty() {
         return property;
     }
 
-    ATOM getType() {
+    public ATOM getType() {
         return type;
     }
 
-    CARD8 getFormat() {
+    public CARD8 getFormat() {
         return format;
     }
 
-    byte[] getData() {
+    public byte[] getData() {
         return data;
     }
 }
