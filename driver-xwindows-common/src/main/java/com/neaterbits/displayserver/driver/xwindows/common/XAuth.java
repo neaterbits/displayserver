@@ -12,7 +12,7 @@ import java.util.List;
  * @author nhl
  *
  */
-final class XAuth {
+public final class XAuth {
 
     private final String host;
     private final String communicationProtocol;
@@ -43,11 +43,11 @@ final class XAuth {
         return display;
     }
 
-    String getAuthorizationProtocol() {
+    public String getAuthorizationProtocol() {
         return authorizationProtocol;
     }
 
-    byte [] getAuthorizationData() {
+    public byte [] getAuthorizationData() {
         return authorizationData;
     }
 
@@ -57,9 +57,27 @@ final class XAuth {
                 + ", authorizationProtocol=" + authorizationProtocol + ", authorizationData=" + authorizationData + "]";
     }
 
+    
+    public static XAuth getXAuthInfo(int connectDisplay, String protocol) throws IOException {
+    
+        final List<XAuth> xAuths = XAuth.getXAuthInfo();
+        
+        final XAuth found = xAuths.stream()
+                .filter(xAuth -> xAuth.getAuthorizationProtocol().equals(protocol))
+                .filter(xAuth -> xAuth.getCommunicationProtocol() == null)
+                .filter(xAuth -> xAuth.getDisplay() == connectDisplay)
+                .findFirst()
+                .orElse(null);
+    
+        return found;
+    }
+
+    
     static List<XAuth> getXAuthInfo() throws IOException {
         
-        final ProcessBuilder builder = new ProcessBuilder("xauth", "list");
+        final String home = System.getenv("HOME");
+        
+        final ProcessBuilder builder = new ProcessBuilder("xauth", "-f", home + "/.Xauthority", "list");
         
         final Process process = builder.start();
         
@@ -101,6 +119,8 @@ final class XAuth {
             String line;
             
             while (null != (line = reader.readLine())) {
+                
+                System.out.println("## got line " + line);
                 
                 final String [] parts = line.trim().split("  ");
             
