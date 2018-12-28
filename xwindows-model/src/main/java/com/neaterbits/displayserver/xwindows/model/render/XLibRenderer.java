@@ -7,6 +7,9 @@ import com.neaterbits.displayserver.xwindows.model.XGC;
 
 public interface XLibRenderer extends Disposable {
 
+    void fillRectangle(int x, int y, int width, int height, int r, int g, int b);
+    
     void polyLine(XGC gc, BYTE coordinateMode, POINT [] points);
     
+    void flush();
 }

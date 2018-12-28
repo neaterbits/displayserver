@@ -28,10 +28,23 @@ final class CairoXLibRenderer implements XLibRenderer {
         
     }
     
-    private void flush() {
+    @Override
+    public void flush() {
         surface.flush();
     }
     
+    @Override
+    public void fillRectangle(int x, int y, int width, int height, int r, int g, int b) {
+        
+        cr.setSourceRGB(r, g, b);
+        
+        cr.rectangle(x, y, width, height);
+        
+        cr.strokePreserve();
+        
+        cr.fill();
+    }
+
     @Override
     public void polyLine(XGC gc, BYTE coordinateMode, POINT[] points) {
 

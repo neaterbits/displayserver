@@ -155,6 +155,24 @@ public class XClient extends XConnection {
                 WindowAttributes.DEFAULT_ATTRIBUTES.applyImmutably(createWindow.getAttributes()),
                 renderer);
         
+        final WindowAttributes windowAttributes = createWindow.getAttributes();
+        
+        if (windowAttributes.isSet(WindowAttributes.BACKGROUND_PIXEL)) {
+        
+            final int bgPixel = (int)windowAttributes.getBackgroundPixel().getValue();
+            
+            final PixelFormat pixelFormat = window.getPixelFormat();
+            
+            renderer.fillRectangle(
+                    window.getPosition().getLeft(), window.getPosition().getTop(),
+                    window.getSize().getWidth(), window.getSize().getHeight(),
+                    pixelFormat.getRed(bgPixel),
+                    pixelFormat.getGreen(bgPixel),
+                    pixelFormat.getBlue(bgPixel));
+            
+            renderer.flush();
+        }
+            
         return xWindowsWindow;
     }
     
