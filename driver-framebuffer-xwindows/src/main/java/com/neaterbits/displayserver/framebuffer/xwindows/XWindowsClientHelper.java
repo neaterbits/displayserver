@@ -3,6 +3,7 @@ package com.neaterbits.displayserver.framebuffer.xwindows;
 import java.io.IOException;
 
 import com.neaterbits.displayserver.driver.xwindows.common.XWindowsDriverConnection;
+import com.neaterbits.displayserver.protocol.enums.BackingStore;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.SCREEN;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateGC;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateWindow;
@@ -38,14 +39,14 @@ class XWindowsClientHelper {
                 new CARD16(1),
                 screen.getRootVisual(),
                 new WindowAttributes(
-                        new BITMASK(0),
+                        new BITMASK(WindowAttributes.BACKING_STORE),
                         null,
                         null,
                         null,
                         null,
                         null,
                         null,
-                        null,
+                        BackingStore.WhenMapped,
                         null,
                         null,
                         null,
