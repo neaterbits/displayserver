@@ -17,19 +17,13 @@ class XWindowsFrameBuffer extends XWindowsBaseBuffer implements FrameBuffer {
     private final int screen;
 	private final WINDOW window;
 	
-	private final Size size;
-	private final int depth;
-	
 	XWindowsFrameBuffer(XWindowsDriverConnection driverConnection, int screen, WINDOW window, Size size, int depth) throws IOException {
-	    super(driverConnection, XWindowsClientHelper.createGC(driverConnection, window));
+	    super(driverConnection, XWindowsClientHelper.createGC(driverConnection, window), size, depth);
 		
 		Objects.requireNonNull(window);
 		
 		this.screen = screen;
 		this.window = window;
-
-		this.size = size;
-		this.depth = depth;
 	}
 
 	@Override

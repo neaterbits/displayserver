@@ -12,6 +12,9 @@ import com.neaterbits.displayserver.protocol.messages.protocolsetup.ClientMessag
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ServerMessage;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD8;
+import com.neaterbits.displayserver.render.cairo.xcb.XCBConnection;
+import com.neaterbits.displayserver.render.cairo.xcb.XCBVisual;
+import com.neaterbits.displayserver.xwindows.util.XAuth;
 
 public final class XWindowsDriverConnection
 		implements AutoCloseable, XWindowsRequestSender {
@@ -26,6 +29,9 @@ public final class XWindowsDriverConnection
 	private ClientResourceIdAllocator clientResourceIdAllocator;
 	
 	private final XWindowsDriverMessageProcessing messageProcessing;
+	
+	private final XCBConnection xcbConnection;
+	private final XCBVisual xcbVisual;
 	
 	public XWindowsDriverConnection(int connectDisplay, NonBlockingChannelWriterLog writeLog, XWindowsClientProtocolLog protocolLog) throws IOException {
 
@@ -74,9 +80,32 @@ public final class XWindowsDriverConnection
 		        xAuthForTCPConnection != null ? xAuthForTCPConnection.getAuthorizationData() : "".getBytes());
 		
 		readerWriter.writeEncodeable(clientMessage, messageProcessing.getByteOrder());
+		
+		this.xcbConnection = XCBConnection.connect(
+		        ":" + connectDisplay,
+		        xAuthForTCPConnection.getAuthorizationProtocol(),
+		        xAuthForTCPConnection.getAuthorizationData());
+		
+		this.xcbVisual = xcbConnection.getSetup().getScreens()
+	            .get(0)
+	            .getDepths()
+	            .stream()
+	            .filter(depth -> depth.getDepth() == 24)
+	            .findFirst()
+	            .get()
+	            .getVisuals()
+	            .get(0);
 	}
 
-	@Override
+	public XCBConnection getXCBConnection() {
+        return xcbConnection;
+    }
+
+    public XCBVisual getXCBVisual() {
+        return xcbVisual;
+    }
+
+    @Override
     public void sendRequest(Request request) {
 	    messageProcessing.sendRequest(request, readerWriter);
     }

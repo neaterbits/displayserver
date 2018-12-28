@@ -57,10 +57,12 @@ import com.neaterbits.displayserver.xwindows.model.XDrawable;
 import com.neaterbits.displayserver.xwindows.model.XGC;
 import com.neaterbits.displayserver.xwindows.model.XPixmap;
 import com.neaterbits.displayserver.xwindows.model.XWindow;
+import com.neaterbits.displayserver.xwindows.model.render.XLibRenderer;
 
 public class XClient extends XConnection {
     
     private final XServer server;
+    private final XRendering rendering;
     private final Set<Integer> utilizedResourceIds;
     private final Map<DRAWABLE, XPixmap> drawableToXPixmap;
     private final Map<DRAWABLE, DRAWABLE> pixmapToOwnerDrawable;
@@ -69,12 +71,14 @@ public class XClient extends XConnection {
     private final Map<FONT, XFont> openFonts;
     
     public XClient(XServer server, SocketChannel socketChannel, int connectionNo,
-            NonBlockingChannelWriterLog log) {
+            NonBlockingChannelWriterLog log, XRendering rendering) {
         super(socketChannel, connectionNo, log);
 
         Objects.requireNonNull(server);
+        Objects.requireNonNull(rendering);
 
         this.server = server;
+        this.rendering = rendering;
 
         this.utilizedResourceIds = new HashSet<>();
         
@@ -135,6 +139,10 @@ public class XClient extends XConnection {
         
         final XWindow rootWindow = server.getWindows().findRootWindowOf(createWindow.getParent());
         
+        final BufferOperations windowBuffer = rendering.getCompositor().getBufferForWindow(window);
+        
+        final XLibRenderer renderer = rendering.getRendererFactory().createRenderer(windowBuffer);
+        
         final XWindow xWindowsWindow = new XClientWindow(
                 this,
                 window,
@@ -144,7 +152,8 @@ public class XClient extends XConnection {
                 parentWindow.getVisual(),
                 createWindow.getBorderWidth(),
                 createWindow.getWindowClass(),
-                WindowAttributes.DEFAULT_ATTRIBUTES.applyImmutably(createWindow.getAttributes()));
+                WindowAttributes.DEFAULT_ATTRIBUTES.applyImmutably(createWindow.getAttributes()),
+                renderer);
         
         return xWindowsWindow;
     }
@@ -152,13 +161,15 @@ public class XClient extends XConnection {
     final XWindow destroyWindow(Display display, DestroyWindow destroyWindow) {
         checkAndRemoveResourceId(destroyWindow.getWindow());
     
-        final XWindow window = server.getWindows().getClientWindow(destroyWindow.getWindow());
+        final XWindow xWindow = server.getWindows().getClientWindow(destroyWindow.getWindow());
         
-        if (window != null) {
-            display.disposeWindow(window.getWindow());
+        if (xWindow != null) {
+            display.disposeWindow(xWindow.getWindow());
+            
+            xWindow.dispose();
         }
         
-        return window;
+        return xWindow;
     }
     
     private DisplayAreaWindows findDisplayArea(DRAWABLE drawable) {
@@ -291,7 +302,10 @@ public class XClient extends XConnection {
         
         final DRAWABLE pixmapDrawable = createPixmap.getPid().toDrawable();
         
-        final XPixmap xPixmap = new XPixmap(getVisual(createPixmap.getDrawable()), imageBuffer);
+        final XPixmap xPixmap = new XPixmap(
+                getVisual(createPixmap.getDrawable()),
+                imageBuffer,
+                rendering.getRendererFactory().createRenderer(imageBuffer));
         
         drawableToXPixmap.put(pixmapDrawable, xPixmap);
         
@@ -313,6 +327,8 @@ public class XClient extends XConnection {
             if (xPixmap.getOffscreenBuffer() != null) {
                 graphicsScreen.getOffscreenBufferProvider().freeOffscreenBuffer(xPixmap.getOffscreenBuffer());
             }
+            
+            xPixmap.dispose();
         }
         
         pixmapToOwnerDrawable.remove(pixmapDrawable);
@@ -412,7 +428,7 @@ public class XClient extends XConnection {
         }
     }
     
-    final void getImage(GetImage getImage, CARD16 sequenceNumber, ServerToClient serverToClient) throws MatchException {
+    final void getImage(GetImage getImage, CARD16 sequenceNumber, ServerToClient serverToClient) throws MatchException, DrawableException {
 
         final XWindow window = server.getWindows().getClientWindow(getImage.getDrawable());
         
@@ -429,6 +445,9 @@ public class XClient extends XConnection {
                         xPixmap.getOffscreenBuffer(),
                         xPixmap.getVisual(),
                         serverToClient);
+            }
+            else {
+                throw new DrawableException("No such drawable", getImage.getDrawable());
             }
         }
     }

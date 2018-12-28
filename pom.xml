@@ -32,6 +32,8 @@
 	<modules>
 		<module>types</module>
 		<module>io-common</module>
+		<module>render-cairo</module>
+		<module>render-cairo-xcb</module>
 		<module>layers</module>
 		<module>main</module>
 		<module>windows</module>
@@ -49,6 +51,7 @@
 		<module>xwindows-protocol</module>
 		<module>xwindows-server</module>
 		<module>xwindows-model</module>
+		<module>xwindows-util</module>
 		<module>xwindows-fonts</module>
 	</modules>
 

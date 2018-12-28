@@ -8,19 +8,25 @@ import com.neaterbits.displayserver.buffers.BufferOperations;
 import com.neaterbits.displayserver.protocol.messages.requests.GCAttributes;
 import com.neaterbits.displayserver.protocol.types.GCONTEXT;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
+import com.neaterbits.displayserver.util.Disposable;
+import com.neaterbits.displayserver.xwindows.model.render.XLibRenderer;
 
-public abstract class XDrawable {
+public abstract class XDrawable implements Disposable {
 
     private final VISUALID visual;
     private final Map<GCONTEXT, XGC> gcs;
 
+    private final XLibRenderer renderer;
+    
     public abstract BufferOperations getBufferOperations();
     
-    XDrawable(VISUALID visual) {
+    XDrawable(VISUALID visual, XLibRenderer renderer) {
         
         Objects.requireNonNull(visual);
+        Objects.requireNonNull(renderer);
         
         this.visual = visual;
+        this.renderer = renderer;
         
         this.gcs = new HashMap<>();
     }
@@ -69,5 +75,10 @@ public abstract class XDrawable {
         Objects.requireNonNull(context);
         
         gcs.remove(context);
+    }
+
+    @Override
+    public void dispose() {
+        renderer.dispose();
     }
 }

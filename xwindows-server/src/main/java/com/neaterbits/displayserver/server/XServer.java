@@ -117,6 +117,8 @@ import com.neaterbits.displayserver.xwindows.model.XWindow;
 public class XServer implements AutoCloseable {
 
     private final XHardware hardware;
+
+    private final XRendering rendering;
     
     private final XWindowsServerProtocolLog protocolLog;
     private final NonBlockingChannelWriterLog connectionWriteLog;
@@ -136,12 +138,15 @@ public class XServer implements AutoCloseable {
 	public XServer(
 	        XHardware hardware,
 	        XConfig config,
+	        XRendering rendering,
 	        XWindowsServerProtocolLog protocolLog,
 	        NonBlockingChannelWriterLog connectionWriteLog) throws IOException {
 		
 		Objects.requireNonNull(hardware);
-	
+		Objects.requireNonNull(rendering);
+		
 		this.hardware = hardware;
+		this.rendering = rendering;
 		
 		this.protocolLog = protocolLog;
 		this.connectionWriteLog = connectionWriteLog;
@@ -173,6 +178,7 @@ public class XServer implements AutoCloseable {
 		        hardware.getGraphicsDriver(),
 		        displayAreas,
 		        resourceIdAllocator,
+		        rendering,
 		        rootWindows::add);
 		
 		this.state = new XState(screens);
@@ -219,7 +225,7 @@ public class XServer implements AutoCloseable {
 	}
 	
 	public Client processConnection(SocketChannel socketChannel) {
-	    return new ConnectionState(XServer.this, socketChannel, connectionWriteLog) {
+	    return new ConnectionState(XServer.this, socketChannel, connectionWriteLog, rendering) {
 
             @Override
             public Integer getLengthOfMessage(ByteBuffer byteBuffer) {
@@ -254,12 +260,17 @@ public class XServer implements AutoCloseable {
 	
 	private abstract class ConnectionState extends XClient implements Client {
 
-		public ConnectionState(XServer server, SocketChannel socketChannel, NonBlockingChannelWriterLog connectionWriteLog) {
+		public ConnectionState(
+		        XServer server,
+		        SocketChannel socketChannel,
+		        NonBlockingChannelWriterLog connectionWriteLog,
+		        XRendering rendering) {
 			super(
 			        server,
 			        socketChannel,
 			        resourceIdAllocator.allocateConnection(),
-			        connectionWriteLog);
+			        connectionWriteLog,
+			        rendering);
 		}
 	}
 	
@@ -708,6 +719,8 @@ public class XServer implements AutoCloseable {
                 client.getImage(getImage, sequenceNumber, serverToClient);
             } catch (MatchException ex) {
                 sendError(client, Errors.Match, sequenceNumber, 0L, opcode);
+            } catch (DrawableException ex) {
+                sendError(client, Errors.Drawable, sequenceNumber, ex.getDrawable().getValue(), opcode);
             }
             break;
         }

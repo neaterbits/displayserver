@@ -23,8 +23,12 @@ import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLog;
 import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLogImpl;
 import com.neaterbits.displayserver.server.XConfig;
 import com.neaterbits.displayserver.server.XHardware;
+import com.neaterbits.displayserver.server.XRendering;
 import com.neaterbits.displayserver.server.XServer;
+import com.neaterbits.displayserver.server.render.cairo.CairoXLibRendererFactory;
 import com.neaterbits.displayserver.util.logging.DebugLevel;
+import com.neaterbits.displayserver.windows.compositor.Compositor;
+import com.neaterbits.displayserver.windows.compositor.SingleViewPortCompositor;
 import com.neaterbits.displayserver.windows.config.DisplayAreaConfig;
 import com.neaterbits.displayserver.windows.config.DisplayConfig;
 
@@ -32,6 +36,11 @@ public class DisplayServerMain {
 
 	public static void main(String [] args) throws Exception {
 
+	    final String rootDir = System.getenv("HOME") + "/projects/displayserver";
+	    
+	    System.load(rootDir + "/native-xcb/Debug/libxcbjni.so");
+	    System.load(rootDir + "/native-cairo/Debug/libcairojni.so");
+        
 	    final int display;
 	    
 	    if (args.length == 1) {
@@ -115,10 +124,15 @@ public class DisplayServerMain {
                 DebugLevels.CONNECTION_WRITE);
         
         final XWindowsServerProtocolLog protocolLog = new XWindowsServerProtocolLogImpl("XWindowsProtocol", DebugLevels.XWINDOWS_PROTOCOL);
-	    
+
+        final Compositor compositor = new SingleViewPortCompositor();
+        
+        final XRendering rendering = new XRendering(compositor, new CairoXLibRendererFactory());
+        
         try (XServer server = new XServer(
                 hardware,
                 config,
+                rendering,
                 protocolLog,
                 connectionWriteLog)) {
             

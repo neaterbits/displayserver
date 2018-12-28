@@ -8,6 +8,7 @@ import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.windows.Window;
 import com.neaterbits.displayserver.xwindows.model.XWindow;
+import com.neaterbits.displayserver.xwindows.model.render.XLibRenderer;
 
 public final class XClientWindow extends XWindow {
 
@@ -19,9 +20,10 @@ public final class XClientWindow extends XWindow {
             VISUALID visual,
             CARD16 borderWidth,
             CARD16 windowClass,
-            WindowAttributes currentWindowAttributes) {
+            WindowAttributes currentWindowAttributes,
+            XLibRenderer renderer) {
         
-        this(null, window, windowResource, rootWindow, parentWindow, visual, borderWidth, windowClass, currentWindowAttributes, 0);
+        this(null, window, windowResource, rootWindow, parentWindow, visual, borderWidth, windowClass, currentWindowAttributes, renderer, 0);
         
     }
 
@@ -32,9 +34,10 @@ public final class XClientWindow extends XWindow {
             VISUALID visual,
             CARD16 borderWidth,
             CARD16 windowClass,
-            WindowAttributes currentWindowAttributes) {
+            WindowAttributes currentWindowAttributes,
+            XLibRenderer renderer) {
         
-        this(createdBy, window, windowResource, rootWindow, parentWindow, visual, borderWidth, windowClass, currentWindowAttributes, 0);
+        this(createdBy, window, windowResource, rootWindow, parentWindow, visual, borderWidth, windowClass, currentWindowAttributes, renderer, 0);
         
         Objects.requireNonNull(createdBy);
         
@@ -49,9 +52,10 @@ public final class XClientWindow extends XWindow {
             CARD16 borderWidth,
             CARD16 windowClass,
             WindowAttributes currentWindowAttributes,
+            XLibRenderer renderer,
             int disambiguate) {
 
-        super(window, windowResource, rootWindow, parentWindow, visual, borderWidth, windowClass, currentWindowAttributes);
+        super(window, windowResource, rootWindow, parentWindow, visual, borderWidth, windowClass, currentWindowAttributes, renderer);
         
         this.createdBy = createdBy;
         

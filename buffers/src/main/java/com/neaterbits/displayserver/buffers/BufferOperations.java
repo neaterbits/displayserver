@@ -1,5 +1,7 @@
 package com.neaterbits.displayserver.buffers;
 
+import com.neaterbits.displayserver.render.cairo.CairoSurface;
+
 public interface BufferOperations {
     
     void putImage(int x, int y, int width, int height, PixelFormat format, byte [] data);
@@ -8,4 +10,5 @@ public interface BufferOperations {
     
     void copyArea(BufferOperations src, int srcX, int srcY, int dstX, int dstY, int width, int height);
     
+    CairoSurface createCairoSurface();
 }

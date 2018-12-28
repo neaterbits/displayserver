@@ -27,25 +27,32 @@ import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.GCONTEXT;
 import com.neaterbits.displayserver.protocol.types.INT16;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
+import com.neaterbits.displayserver.render.cairo.CairoSurface;
+import com.neaterbits.displayserver.render.cairo.xcb.CairoXCBSurface;
+import com.neaterbits.displayserver.types.Size;
 
 abstract class XWindowsBaseBuffer implements BufferOperations {
 
     final XWindowsDriverConnection driverConnection;
     final GCONTEXT gc;
+    final Size size;
+    final int depth;
 
     abstract DRAWABLE getDrawable();
     
-    abstract int getDepth();
-    
     abstract int getScreenNo();
     
-    XWindowsBaseBuffer(XWindowsDriverConnection driverConnection, GCONTEXT gc) {
+    XWindowsBaseBuffer(XWindowsDriverConnection driverConnection, GCONTEXT gc, Size size, int depth) {
         
         Objects.requireNonNull(driverConnection);
         Objects.requireNonNull(gc);
+        Objects.requireNonNull(size);
         
         this.driverConnection = driverConnection;
         this.gc = gc;
+        
+        this.size = size;
+        this.depth = depth;
     }
 
     final XWindowsDriverConnection getDriverConnection() {
@@ -55,7 +62,7 @@ abstract class XWindowsBaseBuffer implements BufferOperations {
     @Override
     public final void putImage(int x, int y, int width, int height, PixelFormat format, byte[] data) {
         
-        if (format.getDepth() != getDepth()) {
+        if (format.getDepth() != depth) {
             throw new IllegalArgumentException();
         }
         
@@ -91,7 +98,7 @@ abstract class XWindowsBaseBuffer implements BufferOperations {
                     new CARD16(width), new CARD16(h),
                     new INT16((short)dstX), new INT16((short)dstY),
                     new CARD8((short)0),
-                    new CARD8((short)getDepth()),
+                    new CARD8((short)depth),
                     data,
                     dataOffset,
                     dataLength);
@@ -290,6 +297,19 @@ abstract class XWindowsBaseBuffer implements BufferOperations {
         });
     }
     
+    @Override
+    public final CairoSurface createCairoSurface() {
+
+        final DRAWABLE drawable = getDrawable();
+        
+        return CairoXCBSurface.create(
+                driverConnection.getXCBConnection(),
+                drawable.getValue(),
+                driverConnection.getXCBVisual(),
+                size.getWidth(),
+                size.getHeight());
+    }
+
     @Override
     public void copyArea(BufferOperations src, int srcX, int srcY, int dstX, int dstY, int width, int height) {
 

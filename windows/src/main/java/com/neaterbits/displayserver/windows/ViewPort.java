@@ -10,7 +10,7 @@ import com.neaterbits.displayserver.types.Size;
  *
  */
 
-final class ViewPort extends Output {
+public final class ViewPort extends Output {
 
     private final Position position;
     private final Size size;

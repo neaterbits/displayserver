@@ -54,4 +54,8 @@ abstract class XWindowsRenderingProvider extends XWindowsFrameBuffer implements 
     public boolean supports(DisplayDevice device) {
         return true;
     }
+    
+    final WINDOW getWindow() {
+        return window;
+    }
 }

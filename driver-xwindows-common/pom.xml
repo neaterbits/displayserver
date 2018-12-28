@@ -23,5 +23,15 @@
 			<artifactId>xwindows-protocol</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>xwindows-util</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+	    <dependency>
+	        <groupId>${project.groupId}</groupId>
+	        <artifactId>render-cairo-xcb</artifactId>
+	        <version>${project.version}</version>
+	    </dependency>
 	</dependencies>
 </project>

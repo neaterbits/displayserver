@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import com.neaterbits.displayserver.buffers.BufferOperations;
 import com.neaterbits.displayserver.buffers.PixelFormat;
 import com.neaterbits.displayserver.framebuffer.common.GraphicsDriver;
 import com.neaterbits.displayserver.protocol.enums.VisualClass;
@@ -57,6 +58,7 @@ class ScreensHelper {
             GraphicsDriver graphicsDriver,
             List<DisplayAreaWindows> displayAreas,
             ServerResourceIdAllocator resourceIdAllocator,
+            XRendering rendering,
             Consumer<XWindow> addRootWindow) {
         
         final List<XScreen> screens = new ArrayList<>(displayAreas.size());
@@ -83,13 +85,16 @@ class ScreensHelper {
 
             visuals.put(visualId, xVisual);
             
+            final BufferOperations bufferOperations = rendering.getCompositor().getBufferForWindow(displayArea.getRootWindow());
+            
             final XWindow xWindow = new XWindow(
                     displayArea.getRootWindow(),
                     rootWindowResource,
                     visualId,
                     new CARD16(0),
                     WindowClass.InputOnly,
-                    getRootWindowAttributes(displayArea));
+                    getRootWindowAttributes(displayArea),
+                    rendering.getRendererFactory().createRenderer(bufferOperations));
             
             addRootWindow.accept(xWindow);
             

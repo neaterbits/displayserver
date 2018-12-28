@@ -1,4 +1,4 @@
-package com.neaterbits.displayserver.driver.xwindows.common;
+package com.neaterbits.displayserver.xwindows.util;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;

@@ -18,6 +18,7 @@ import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.windows.Window;
+import com.neaterbits.displayserver.xwindows.model.render.XLibRenderer;
 
 public class XWindow extends XDrawable {
 
@@ -41,9 +42,10 @@ public class XWindow extends XDrawable {
             VISUALID visual,
             CARD16 borderWidth,
             CARD16 windowClass,
-            WindowAttributes currentWindowAttributes) {
+            WindowAttributes currentWindowAttributes,
+            XLibRenderer renderer) {
         
-        this(window, windowResource, WINDOW.None, WINDOW.None, visual, borderWidth, windowClass, currentWindowAttributes, 0);
+        this(window, windowResource, WINDOW.None, WINDOW.None, visual, borderWidth, windowClass, currentWindowAttributes, renderer, 0);
     }
 
     protected XWindow(
@@ -52,9 +54,10 @@ public class XWindow extends XDrawable {
             VISUALID visual,
             CARD16 borderWidth,
             CARD16 windowClass,
-            WindowAttributes currentWindowAttributes) {
+            WindowAttributes currentWindowAttributes,
+            XLibRenderer renderer) {
         
-        this(window, windowResource, rootWindow, parentWindow, visual, borderWidth, windowClass, currentWindowAttributes, 0);
+        this(window, windowResource, rootWindow, parentWindow, visual, borderWidth, windowClass, currentWindowAttributes, renderer, 0);
         
         if (rootWindow.equals(WINDOW.None)) {
             throw new IllegalArgumentException();
@@ -72,9 +75,10 @@ public class XWindow extends XDrawable {
             CARD16 borderWidth,
             CARD16 windowClass,
             WindowAttributes currentWindowAttributes,
+            XLibRenderer renderer,
             int disambiguate) {
         
-        super(visual);
+        super(visual, renderer);
         
         Objects.requireNonNull(window);
         Objects.requireNonNull(windowResource);
