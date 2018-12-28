@@ -73,6 +73,46 @@ JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNativ
 
 /*
  * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
+ * Method:    cairo_new_path
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1new_1path
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
+ * Method:    cairo_move_to
+ * Signature: (JDD)V
+ */
+JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1move_1to
+  (JNIEnv *, jclass, jlong, jdouble, jdouble);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
+ * Method:    cairo_rel_move_to
+ * Signature: (JDD)V
+ */
+JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1rel_1move_1to
+  (JNIEnv *, jclass, jlong, jdouble, jdouble);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
+ * Method:    cairo_line_to
+ * Signature: (JDD)V
+ */
+JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1line_1to
+  (JNIEnv *, jclass, jlong, jdouble, jdouble);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
+ * Method:    cairo_rel_line_to
+ * Signature: (JDD)V
+ */
+JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1rel_1line_1to
+  (JNIEnv *, jclass, jlong, jdouble, jdouble);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
  * Method:    cairo_rectangle
  * Signature: (JDDDD)V
  */

@@ -30,6 +30,28 @@ public class Cairo extends CairoReference {
         CairoNative.cairo_stroke_preserve(getCairoReference());
     }
     
+    // Path
+    
+    public void newPath() {
+        CairoNative.cairo_new_path(getCairoReference());
+    }
+    
+    public void moveTo(double x, double y) {
+        CairoNative.cairo_move_to(getCairoReference(), x, y);
+    }
+    
+    public void relMoveTo(double dx, double dy) {
+        CairoNative.cairo_rel_move_to(getCairoReference(), dx, dy);
+    }
+    
+    public void lineTo(double x, double y) {
+        CairoNative.cairo_line_to(getCairoReference(), x, y);
+    }
+    
+    public void relLineTo(double dx, double dy) {
+        CairoNative.cairo_rel_line_to(getCairoReference(), dx, dy);
+    }
+    
     public void rectangle(double x, double y, double width, double height) {
         CairoNative.cairo_rectangle(getCairoReference(), x, y, width, height);
     }

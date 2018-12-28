@@ -19,6 +19,16 @@ public class CairoNative {
     static native void cairo_stroke_preserve(long cr);
     
     // paths
+    static native void cairo_new_path(long cr);
+
+    static native void cairo_move_to(long cr, double x, double y);
+
+    static native void cairo_rel_move_to(long cr, double dx, double dy);
+
+    static native void cairo_line_to(long cr, double x, double y);
+
+    static native void cairo_rel_line_to(long cr, double dx, double dy);
+
     static native void cairo_rectangle(long cr, double x, double y, double width, double height);
     
     // cairo_surface_t

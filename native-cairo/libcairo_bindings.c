@@ -82,6 +82,39 @@ JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNativ
 	printf("cairo status: %s\n", cairo_status_to_string(cairo_status(cr)));
 }
 
+
+JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1move_1to
+  (JNIEnv *env, jclass cl, jlong cairo_reference, jdouble x, jdouble y) {
+
+	cairo_t *cr = (cairo_t *)cairo_reference;
+
+	cairo_move_to(cr, x, y);
+}
+
+JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1rel_1move_1to
+(JNIEnv *env, jclass cl, jlong cairo_reference, jdouble dx, jdouble dy) {
+
+	cairo_t *cr = (cairo_t *)cairo_reference;
+
+	cairo_rel_move_to(cr, dx, dy);
+}
+
+JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1line_1to
+(JNIEnv *env, jclass cl, jlong cairo_reference, jdouble x, jdouble y) {
+
+	cairo_t *cr = (cairo_t *)cairo_reference;
+
+	cairo_line_to(cr, x, y);
+}
+
+JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1rel_1line_1to
+(JNIEnv *env, jclass cl, jlong cairo_reference, jdouble dx, jdouble dy) {
+
+	cairo_t *cr = (cairo_t *)cairo_reference;
+
+	cairo_rel_line_to(cr, dx, dy);
+}
+
 JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1surface_1destroy
 (JNIEnv *env, jclass cl, jlong surface_reference) {
 
@@ -101,6 +134,8 @@ JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNativ
 
 	printf("cairo device status after flush: %s\n", cairo_status_to_string(cairo_device_status(cairo_surface_get_device(surface))));
 }
+
+
 
 /*
 JNIEXPORT jint JNICALL Java_com_neaterbits_runtime__1native_NativeMethods_getReferenceSizeInBytes
