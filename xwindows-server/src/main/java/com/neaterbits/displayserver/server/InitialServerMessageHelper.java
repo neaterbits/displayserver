@@ -82,7 +82,7 @@ class InitialServerMessageHelper {
             final SCREEN screen = new SCREEN(
                     xWindowsScreen.getRootWINDOW(),
                     new COLORMAP(0),
-                    new CARD32(0x000000), new CARD32(0xFFFFFFF),
+                    new CARD32(0xFFFFFFF), new CARD32(0x000000),
                     new SET32(0),
                     new CARD16(size.getWidth()), new CARD16(size.getHeight()),
                     new CARD16(sizeInMillimeters.getWidth()), new CARD16(sizeInMillimeters.getHeight()),
