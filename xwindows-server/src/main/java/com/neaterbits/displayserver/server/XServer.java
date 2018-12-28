@@ -113,6 +113,7 @@ import com.neaterbits.displayserver.xwindows.fonts.XFont;
 import com.neaterbits.displayserver.xwindows.model.Atoms;
 import com.neaterbits.displayserver.xwindows.model.XScreensAndVisuals;
 import com.neaterbits.displayserver.xwindows.model.XWindow;
+import com.neaterbits.displayserver.xwindows.util.Unsigned;
 
 public class XServer implements AutoCloseable {
 
@@ -742,13 +743,21 @@ public class XServer implements AutoCloseable {
 		case OpCodes.ALLOC_COLOR: {
 		    
 		    final AllocColor allocColor = log(messageLength, opcode, sequenceNumber, AllocColor.decode(stream));
-		    
+
+            final PixelFormat pixelFormat = getPixelFormat(allocColor.getCmap());
+
+            final int pixel = getPixel(
+                    pixelFormat,
+                    allocColor.getRed(),
+                    allocColor.getGreen(),
+                    allocColor.getBlue());
+            
 		    sendReply(client, new AllocColorReply(
 		            sequenceNumber,
-		            allocColor.getRed(),
-		            allocColor.getGreen(),
-		            allocColor.getBlue(),
-		            new CARD32(0)));
+		            getRed(pixelFormat, pixel),
+		            getGreen(pixelFormat, pixel),
+		            getBlue(pixelFormat, pixel),
+		            new CARD32(Unsigned.intToUnsigned(pixel))));
 		    break;
 		}
 		
@@ -756,14 +765,7 @@ public class XServer implements AutoCloseable {
             
             final QueryColors queryColors = log(messageLength, opcode, sequenceNumber, QueryColors.decode(stream));
 
-            final PixelFormat pixelFormat;
-            
-            if (queryColors.getCmap().equals(COLORMAP.None)) {
-                pixelFormat = PixelFormat.RGB32;
-            }
-            else {
-                throw new UnsupportedOperationException("TODO");
-            }
+            final PixelFormat pixelFormat = getPixelFormat(queryColors.getCmap());
             
             final CARD32 [] pixels = queryColors.getPixels();
             
@@ -774,9 +776,9 @@ public class XServer implements AutoCloseable {
                 final int pixel = (int)pixels[i].getValue();
                 
                 colors[i] = new RGB(
-                        new CARD16(pixelFormat.getRed(pixel)),
-                        new CARD16(pixelFormat.getGreen(pixel)),
-                        new CARD16(pixelFormat.getBlue(pixel)));
+                        getRed(pixelFormat, pixel),
+                        getGreen(pixelFormat, pixel),
+                        getBlue(pixelFormat, pixel));
             }
             
             sendReply(client, new QueryColorsReply(sequenceNumber, colors));
@@ -917,6 +919,37 @@ public class XServer implements AutoCloseable {
 			throw new UnsupportedOperationException("Unknown opcode " + opcode);
 		}
 	}
+
+    private PixelFormat getPixelFormat(COLORMAP cmap) {
+        
+        final PixelFormat pixelFormat;
+        
+        if (cmap.equals(COLORMAP.None)) {
+            pixelFormat = PixelFormat.RGB32;
+        }
+        else {
+            throw new UnsupportedOperationException("TODO");
+        }
+
+        return pixelFormat;
+    }
+    
+    private static CARD16 getRed(PixelFormat pixelFormat, int pixel) {
+        return new CARD16(pixelFormat.getRed(pixel) * 256);
+    }
+
+    private static CARD16 getGreen(PixelFormat pixelFormat, int pixel) {
+        return new CARD16(pixelFormat.getGreen(pixel) * 256);
+    }
+
+    private static CARD16 getBlue(PixelFormat pixelFormat, int pixel) {
+        return new CARD16(pixelFormat.getBlue(pixel) * 256);
+    }
+    
+    private static int getPixel(PixelFormat pixelFormat, CARD16 red, CARD16 green, CARD16 blue) {
+        return pixelFormat.getPixel(red.getValue() / 256, green.getValue() / 256, blue.getValue() / 256);
+    }
+    
 
     private void send(XClient client, Encodeable message) {
         client.send(message);

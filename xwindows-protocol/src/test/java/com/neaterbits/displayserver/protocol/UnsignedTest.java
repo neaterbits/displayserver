@@ -2,6 +2,8 @@ package com.neaterbits.displayserver.protocol;
 
 import org.junit.Test;
 
+import com.neaterbits.displayserver.xwindows.util.Unsigned;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class UnsignedTest {

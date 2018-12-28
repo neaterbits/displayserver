@@ -1,8 +1,8 @@
-package com.neaterbits.displayserver.protocol;
+package com.neaterbits.displayserver.xwindows.util;
 
-class Unsigned {
+public class Unsigned {
 
-    static int byteToUnsigned(byte value) {
+    public static int byteToUnsigned(byte value) {
         
         final int unsigned;
         
@@ -16,7 +16,7 @@ class Unsigned {
         return unsigned;
     }
 
-    static int shortToUnsigned(short value) {
+    public static int shortToUnsigned(short value) {
         final int unsigned;
         
         if (value < 0) {
@@ -29,7 +29,7 @@ class Unsigned {
         return unsigned;
     }
 
-    static long intToUnsigned(int value) {
+    public static long intToUnsigned(int value) {
         
         final long unsigned;
         

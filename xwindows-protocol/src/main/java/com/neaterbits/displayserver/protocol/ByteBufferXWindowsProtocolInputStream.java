@@ -38,6 +38,7 @@ import com.neaterbits.displayserver.protocol.types.TIMESTAMP;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.protocol.types.WINGRAVITY;
+import com.neaterbits.displayserver.xwindows.util.Unsigned;
 
 public class ByteBufferXWindowsProtocolInputStream implements XWindowsProtocolInputStream {
 

@@ -59,6 +59,16 @@ public final class AllocColor extends Request {
     }
 
     @Override
+    public Object[] getDebugParams() {
+        return wrap(
+                "cmap", cmap,
+                "red", red,
+                "green", green,
+                "blue", blue
+        );
+    }
+
+    @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
         
         writeOpCode(stream);
