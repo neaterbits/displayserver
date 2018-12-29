@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import com.neaterbits.displayserver.xwindows.fonts.model.XFont;
+
 public final class FontCache {
 
     private final Map<String, XFont> map; 

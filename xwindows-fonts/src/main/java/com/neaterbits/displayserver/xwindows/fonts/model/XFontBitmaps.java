@@ -1,4 +1,4 @@
-package com.neaterbits.displayserver.xwindows.fonts;
+package com.neaterbits.displayserver.xwindows.fonts.model;
 
 import java.util.Collections;
 import java.util.List;

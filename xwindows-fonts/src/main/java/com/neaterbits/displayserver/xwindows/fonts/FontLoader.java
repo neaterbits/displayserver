@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 import com.neaterbits.displayserver.protocol.types.ATOM;
+import com.neaterbits.displayserver.xwindows.fonts.model.XFont;
 import com.neaterbits.displayserver.xwindows.fonts.pcf.PCFReader;
 
 public final class FontLoader {

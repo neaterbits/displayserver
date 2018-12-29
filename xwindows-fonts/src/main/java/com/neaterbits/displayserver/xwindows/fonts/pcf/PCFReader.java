@@ -12,8 +12,8 @@ import java.util.function.Function;
 
 import com.neaterbits.displayserver.protocol.enums.DrawDirection;
 import com.neaterbits.displayserver.protocol.types.ATOM;
-import com.neaterbits.displayserver.xwindows.fonts.XFont;
-import com.neaterbits.displayserver.xwindows.fonts.XFontCharacter;
+import com.neaterbits.displayserver.xwindows.fonts.model.XFont;
+import com.neaterbits.displayserver.xwindows.fonts.model.XFontCharacter;
 
 public class PCFReader {
 

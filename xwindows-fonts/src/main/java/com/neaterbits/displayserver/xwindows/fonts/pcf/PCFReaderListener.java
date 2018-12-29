@@ -1,6 +1,6 @@
 package com.neaterbits.displayserver.xwindows.fonts.pcf;
 
-import com.neaterbits.displayserver.xwindows.fonts.XFontCharacter;
+import com.neaterbits.displayserver.xwindows.fonts.model.XFontCharacter;
 
 public interface PCFReaderListener<T> {
 

@@ -7,7 +7,7 @@ import java.util.zip.GZIPInputStream;
 
 import org.junit.Test;
 
-import com.neaterbits.displayserver.xwindows.fonts.XFontCharacter;
+import com.neaterbits.displayserver.xwindows.fonts.model.XFontCharacter;
 import com.neaterbits.displayserver.xwindows.fonts.pcf.PCFReader;
 
 public class PCFReaderTest {

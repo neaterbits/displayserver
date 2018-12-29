@@ -1,4 +1,4 @@
-package com.neaterbits.displayserver.xwindows.fonts;
+package com.neaterbits.displayserver.xwindows.fonts.model;
 
 import com.neaterbits.displayserver.protocol.types.ATOM;
 

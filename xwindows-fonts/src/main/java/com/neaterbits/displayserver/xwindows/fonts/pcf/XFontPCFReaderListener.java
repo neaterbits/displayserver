@@ -6,14 +6,14 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import com.neaterbits.displayserver.protocol.types.ATOM;
-import com.neaterbits.displayserver.xwindows.fonts.XFont;
-import com.neaterbits.displayserver.xwindows.fonts.XFontAccelerators;
-import com.neaterbits.displayserver.xwindows.fonts.XFontBitmaps;
-import com.neaterbits.displayserver.xwindows.fonts.XFontCharacter;
-import com.neaterbits.displayserver.xwindows.fonts.XFontEncodings;
-import com.neaterbits.displayserver.xwindows.fonts.XFontIntegerProperty;
-import com.neaterbits.displayserver.xwindows.fonts.XFontProperty;
-import com.neaterbits.displayserver.xwindows.fonts.XFontStringProperty;
+import com.neaterbits.displayserver.xwindows.fonts.model.XFont;
+import com.neaterbits.displayserver.xwindows.fonts.model.XFontAccelerators;
+import com.neaterbits.displayserver.xwindows.fonts.model.XFontBitmaps;
+import com.neaterbits.displayserver.xwindows.fonts.model.XFontCharacter;
+import com.neaterbits.displayserver.xwindows.fonts.model.XFontEncodings;
+import com.neaterbits.displayserver.xwindows.fonts.model.XFontIntegerProperty;
+import com.neaterbits.displayserver.xwindows.fonts.model.XFontProperty;
+import com.neaterbits.displayserver.xwindows.fonts.model.XFontStringProperty;
 
 final class XFontPCFReaderListener implements PCFReaderListener<Void> {
 
