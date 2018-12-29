@@ -66,8 +66,8 @@ public class XClient extends XConnection {
     private final Set<Integer> utilizedResourceIds;
     private final Map<DRAWABLE, XPixmap> drawableToXPixmap;
     private final Map<DRAWABLE, DRAWABLE> pixmapToOwnerDrawable;
-    private final Map<GCONTEXT, XDrawable> gcToDrawable;
-    
+    private final Map<GCONTEXT, XGC> gcs;
+
     private final Map<FONT, XFont> openFonts;
     
     public XClient(XServer server, SocketChannel socketChannel, int connectionNo,
@@ -84,7 +84,7 @@ public class XClient extends XConnection {
         
         this.drawableToXPixmap = new HashMap<>();
         this.pixmapToOwnerDrawable = new HashMap<>();
-        this.gcToDrawable = new HashMap<>();
+        this.gcs = new HashMap<>();
         
         this.openFonts = new HashMap<>();
     }
@@ -300,10 +300,8 @@ public class XClient extends XConnection {
     private XGC getGC(GCONTEXT gcResource) {
         
         Objects.requireNonNull(gcResource);
-        
-        final XDrawable xDrawable = gcToDrawable.get(gcResource);
-        
-        return xDrawable != null ? xDrawable.getGC(gcResource) : null;
+
+        return gcs.get(gcResource);
     }
     
     final XPixmap createPixmap(CreatePixmap createPixmap) throws IDChoiceException {
@@ -358,7 +356,7 @@ public class XClient extends XConnection {
     
     final void createGC(CreateGC createGC) throws DrawableException, IDChoiceException {
         
-        if (gcToDrawable.containsKey(createGC.getCid())) {
+        if (gcs.containsKey(createGC.getCid())) {
             throw new IDChoiceException("ID already added", createGC.getCid());
         }
         
@@ -380,33 +378,53 @@ public class XClient extends XConnection {
             throw new DrawableException("No such drawable", drawable);
         }
 
-        xDrawable.addGC(createGC.getCid(), attributes);
-        
-        gcToDrawable.put(createGC.getCid(), xDrawable);
+        addGC(createGC.getCid(), attributes);
     }
     
+    private void addGC(GCONTEXT context, GCAttributes attributes) {
+        
+        Objects.requireNonNull(context);
+        Objects.requireNonNull(attributes);
+
+        if (gcs.containsKey(context)) {
+            throw new IllegalStateException();
+        }
+        
+        final XGC xgc = new XGC(attributes);
+        
+        gcs.put(context, xgc);
+    }
+    
+    private void changeGC(GCONTEXT context, GCAttributes attributes) {
+        
+        Objects.requireNonNull(context);
+        Objects.requireNonNull(attributes);
+        
+        final XGC existing = gcs.get(context);
+        
+        if (existing == null) {
+            throw new IllegalStateException();
+        }
+
+        gcs.put(context, new XGC(existing.getAttributes().applyImmutably(attributes)));
+    }
+
+    private void removeGC(GCONTEXT context) {
+        
+        Objects.requireNonNull(context);
+        
+        gcs.remove(context);
+    }
+
     final void changeGC(ChangeGC changeGC) throws GContextException {
         
         final GCONTEXT gc = changeGC.getGc();
         
-        final XDrawable xDrawable = gcToDrawable.get(gc);
-        
-        if (xDrawable == null) {
-            throw new GContextException("Unknown GC", gc);
-        }
-        
-        xDrawable.changeGC(gc, changeGC.getAttributes());
+        changeGC(gc, changeGC.getAttributes());
     }
     
     final void freeGC(FreeGC freeGC) throws GContextException {
-        
-        final XDrawable xDrawable = gcToDrawable.remove(freeGC.getGContext());
-        
-        if (xDrawable == null) {
-            throw new GContextException("No such GContext", freeGC.getGContext());
-        }
-        
-        xDrawable.removeGC(freeGC.getGContext());
+        removeGC(freeGC.getGContext());
     }
     
     private BufferOperations getBufferOperations(DRAWABLE drawable) throws DrawableException {
@@ -433,6 +451,7 @@ public class XClient extends XConnection {
                 copyArea.getDstX().getValue(), copyArea.getDstY().getValue(),
                 copyArea.getWidth().getValue(), copyArea.getHeight().getValue());
     }
+    
     
     final void putImage(PutImage putImage) {
         

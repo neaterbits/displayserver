@@ -8,7 +8,7 @@ public final class XGC {
 
     private GCAttributes attributes;
 
-    XGC(GCAttributes attributes) {
+    public XGC(GCAttributes attributes) {
 
         Objects.requireNonNull(attributes);
         
