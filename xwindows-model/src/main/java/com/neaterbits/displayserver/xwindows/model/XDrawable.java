@@ -24,6 +24,10 @@ public abstract class XDrawable implements Disposable {
         this.renderer = renderer;
     }
     
+    public final XLibRenderer getRenderer() {
+        return renderer;
+    }
+
     public final VISUALID getVisual() {
         return visual;
     }

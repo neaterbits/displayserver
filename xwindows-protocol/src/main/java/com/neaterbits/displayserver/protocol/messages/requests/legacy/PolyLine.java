@@ -55,8 +55,22 @@ public final class PolyLine extends Request {
         this.points = points;
     }
 
-    
-    
+    public BYTE getCoordinateMode() {
+        return coordinateMode;
+    }
+
+    public DRAWABLE getDrawable() {
+        return drawable;
+    }
+
+    public GCONTEXT getGC() {
+        return gc;
+    }
+
+    public POINT[] getPoints() {
+        return points;
+    }
+
     @Override
     public Object[] getDebugParams() {
         return wrap(
@@ -67,8 +81,6 @@ public final class PolyLine extends Request {
                 
         );
     }
-
-
 
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {

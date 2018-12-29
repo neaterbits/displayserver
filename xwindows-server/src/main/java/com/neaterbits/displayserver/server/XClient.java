@@ -38,6 +38,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.PutImage;
 import com.neaterbits.displayserver.protocol.messages.requests.WindowAttributes;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.CloseFont;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.OpenFont;
+import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolyLine;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.QueryFont;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD8;
@@ -212,7 +213,7 @@ public class XClient extends XConnection {
         return displayArea;
     }
 
-    private XDrawable findDrawble(DRAWABLE drawable) {
+    private XDrawable findDrawble(DRAWABLE drawable) throws DrawableException {
         
         XWindow window = server.getWindows().getClientOrRootWindow(drawable);
 
@@ -225,7 +226,7 @@ public class XClient extends XConnection {
             XPixmap pixmapDrawable = drawableToXPixmap.get(drawable);
             
             if (pixmapDrawable == null) {
-                throw new IllegalStateException();
+                throw new DrawableException("No such drawable", drawable);
             }
 
             xDrawable = pixmapDrawable;
@@ -234,7 +235,7 @@ public class XClient extends XConnection {
         return xDrawable;
     }
 
-    private VISUALID getVisual(DRAWABLE drawable) {
+    private VISUALID getVisual(DRAWABLE drawable) throws DrawableException {
         
         final XDrawable xDrawable = findDrawble(drawable);
         
@@ -283,10 +284,14 @@ public class XClient extends XConnection {
         if (font == null) {
             final GCONTEXT gcResource = queryFont.getFont().toGCResource();
             
-            final XGC gc = getGC(gcResource);
-            
-            if (gc != null) {
+            final XGC gc;
+            try {
+                gc = getGC(gcResource);
+
                 font = openFonts.get(gc.getAttributes().getFont());
+                
+            } catch (GContextException ex) {
+                throw new FontException("No such font", queryFont.getFont());
             }
         }
         
@@ -297,14 +302,20 @@ public class XClient extends XConnection {
         MessageProcessorFonts.queryFont(queryFont, sequenceNumber, this, font, serverToClient);
     }
     
-    private XGC getGC(GCONTEXT gcResource) {
+    private XGC getGC(GCONTEXT gcResource) throws GContextException {
         
         Objects.requireNonNull(gcResource);
 
-        return gcs.get(gcResource);
+        final XGC gc = gcs.get(gcResource);
+        
+        if (gc == null) {
+            throw new GContextException("No such GC", gcResource);
+        }
+        
+        return gc;
     }
     
-    final XPixmap createPixmap(CreatePixmap createPixmap) throws IDChoiceException {
+    final XPixmap createPixmap(CreatePixmap createPixmap) throws IDChoiceException, DrawableException {
         
         final DisplayAreaWindows displayArea = findDisplayArea(createPixmap.getDrawable());
         
@@ -451,7 +462,14 @@ public class XClient extends XConnection {
                 copyArea.getDstX().getValue(), copyArea.getDstY().getValue(),
                 copyArea.getWidth().getValue(), copyArea.getHeight().getValue());
     }
-    
+
+    final void polyLine(PolyLine polyLine) throws DrawableException, GContextException {
+        
+        final XDrawable drawable = findDrawble(polyLine.getDrawable());
+        final XGC gc = getGC(polyLine.getGC());
+        
+        drawable.getRenderer().polyLine(gc, polyLine.getCoordinateMode(), polyLine.getPoints());
+    }
     
     final void putImage(PutImage putImage) {
         

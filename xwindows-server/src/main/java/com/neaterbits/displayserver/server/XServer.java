@@ -637,6 +637,8 @@ public class XServer implements AutoCloseable {
                 client.createPixmap(createPixmap);
             } catch (IDChoiceException ex) {
                 sendError(client, Errors.IDChoice, sequenceNumber, ex.getResource().getValue(), opcode);
+            } catch (DrawableException ex) {
+                sendError(client, Errors.Drawable, sequenceNumber, ex.getDrawable().getValue(), opcode);
             }
 		    break;
 		}
@@ -703,8 +705,15 @@ public class XServer implements AutoCloseable {
 		
 		case OpCodes.POLY_LINE: {
 		    
-		    log(messageLength, opcode, sequenceNumber, PolyLine.decode(stream));
+		    final PolyLine polyLine = log(messageLength, opcode, sequenceNumber, PolyLine.decode(stream));
 		    
+		    try {
+                client.polyLine(polyLine);
+            } catch (DrawableException ex) {
+                sendError(client, Errors.Drawable, sequenceNumber, ex.getDrawable().getValue(), opcode);
+            } catch (GContextException ex) {
+                sendError(client, Errors.GContext, sequenceNumber, ex.getGContext().getValue(), opcode);
+            }
 		    break;
 		}
 		    
