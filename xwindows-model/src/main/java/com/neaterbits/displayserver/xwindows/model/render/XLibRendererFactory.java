@@ -1,8 +1,9 @@
 package com.neaterbits.displayserver.xwindows.model.render;
 
 import com.neaterbits.displayserver.buffers.BufferOperations;
+import com.neaterbits.displayserver.buffers.PixelConversion;
 
 public interface XLibRendererFactory {
 
-    XLibRenderer createRenderer(BufferOperations bufferOperations);
+    XLibRenderer createRenderer(BufferOperations bufferOperations, PixelConversion pixelConversion);
 }

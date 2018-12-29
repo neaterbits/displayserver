@@ -22,6 +22,15 @@ JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNativ
 	cairo_destroy((cairo_t *)cr);
 }
 
+JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1set_1operator
+  (JNIEnv *env, jclass cl, jlong cairo_reference, jint operator) {
+
+	cairo_t *cr = (cairo_t *)cairo_reference;
+
+	cairo_set_operator(cr, operator);
+}
+
+
 JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1set_1source_1rgb
   (JNIEnv *env, jclass cl, jlong cairo_reference, jdouble red, jdouble green, jdouble blue) {
 
@@ -133,6 +142,60 @@ JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNativ
 	printf("cairo status after flush: %s\n", cairo_status_to_string(cairo_surface_status(surface)));
 
 	printf("cairo device status after flush: %s\n", cairo_status_to_string(cairo_device_status(cairo_surface_get_device(surface))));
+}
+
+#define OP(name) \
+	{ "CAIRO_OPERATOR_" "name", CAIRO_OPERATOR_ ## name }
+
+#define ENUM_MAPPING_TERMINATOR { NULL, 0 }
+
+struct enum_mapping {
+
+	const char *name;
+	const int value;
+};
+
+struct enum_mapping operator_mapping [] = {
+
+		OP(CLEAR),
+		OP(SOURCE),
+	    OP(OVER),
+		OP(IN),
+		OP(OUT),
+		OP(ATOP),
+		OP(DEST),
+		OP(DEST_OVER),
+		OP(DEST_IN),
+		OP(DEST_OUT),
+		OP(DEST_ATOP),
+		OP(XOR),
+		OP(ADD),
+		OP(SATURATE),
+		ENUM_MAPPING_TERMINATOR
+};
+
+static int get_enum_value(struct enum_mapping *mappings, const char *name) {
+
+	while (mappings->name != NULL) {
+
+		if (strcmp(mappings->name, name) == 0) {
+			return mappings->value;
+		}
+	}
+
+	return -1;
+}
+
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_get_1cairo_1operator_1value
+  (JNIEnv *env, jclass cl, jstring name) {
+
+	const char *native_name = (*env)->GetStringUTFChars(env, name, NULL);
+
+	cairo_operator_t operator = get_enum_value(operator_mapping, native_name);
+
+	(*env)->ReleaseStringUTFChars(env, name, native_name);
+
+	return operator;
 }
 
 

@@ -141,7 +141,7 @@ public class XClient extends XConnection {
         
         final BufferOperations windowBuffer = rendering.getCompositor().getBufferForWindow(window);
         
-        final XLibRenderer renderer = rendering.getRendererFactory().createRenderer(windowBuffer);
+        final XLibRenderer renderer = rendering.getRendererFactory().createRenderer(windowBuffer, window.getPixelFormat());
         
         final XWindow xWindowsWindow = new XClientWindow(
                 this,
@@ -314,16 +314,18 @@ public class XClient extends XConnection {
                 createPixmap.getWidth().getValue(),
                 createPixmap.getHeight().getValue());
         
+        final PixelFormat pixelFormat = PixelFormat.RGB24;
+        
         final OffscreenBuffer imageBuffer = displayArea.getOffscreenBufferProvider().allocateOffscreenBuffer(
                 size,
-                PixelFormat.RGB24);
+                pixelFormat);
         
         final DRAWABLE pixmapDrawable = createPixmap.getPid().toDrawable();
         
         final XPixmap xPixmap = new XPixmap(
                 getVisual(createPixmap.getDrawable()),
                 imageBuffer,
-                rendering.getRendererFactory().createRenderer(imageBuffer));
+                rendering.getRendererFactory().createRenderer(imageBuffer, pixelFormat));
         
         drawableToXPixmap.put(pixmapDrawable, xPixmap);
         

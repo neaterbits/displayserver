@@ -7,6 +7,8 @@ public class CairoNative {
     
     static native void cairo_destroy(long cr);
     
+    static native void cairo_set_operator(long cr, int operator);
+    
     static native void cairo_set_source_rgb(long cr, double red, double green, double blue);
     
     static native void cairo_set_fill_rule(long cr, int fillRule);
@@ -17,6 +19,8 @@ public class CairoNative {
     
     static native void cairo_stroke(long cr);
     static native void cairo_stroke_preserve(long cr);
+    
+    static native int get_cairo_operator_value(String enumName);
     
     // paths
     static native void cairo_new_path(long cr);

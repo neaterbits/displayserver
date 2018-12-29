@@ -1,6 +1,6 @@
 package com.neaterbits.displayserver.buffers;
 
-public enum PixelFormat {
+public enum PixelFormat implements PixelConversion {
 
 	RGBA32(24, 32, 4, 8, 1 << 24, 0xFF000000, 0x00FF0000, 0x0000FF00, 16, 8, 0),
 	
@@ -86,19 +86,23 @@ public enum PixelFormat {
     public int getBlueShift() {
         return blueShift;
     }
-    
+
+    @Override
     public int getRed(int pixel) { 
         return (pixel & redMask) >>> redShift;
     }
     
+    @Override
     public int getGreen(int pixel) {
         return (pixel & greenMask) >>> greenShift;
     }
     
+    @Override
     public int getBlue(int pixel) {
         return (pixel & blueMask)  >>> blueShift;
     }
     
+    @Override
     public int getPixel(int red, int green, int blue) {
         return red << redShift | green << greenShift | blue << blueShift;
     }

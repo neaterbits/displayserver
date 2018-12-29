@@ -6,6 +6,10 @@ public class Cairo extends CairoReference {
         super(CairoNative.cairo_create(surface.getCairoReference()));
     }
 
+    public void setOperator(CairoOperator operator) {
+        CairoNative.cairo_set_operator(getCairoReference(), operator.getCairoValue());
+    }
+    
     public void setSourceRGB(double red, double green, double blue) {
         CairoNative.cairo_set_source_rgb(getCairoReference(), red, green, blue);
     }

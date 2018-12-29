@@ -2,10 +2,15 @@ package com.neaterbits.displayserver.server.render.cairo;
 
 import java.util.Objects;
 
+import com.neaterbits.displayserver.buffers.PixelConversion;
 import com.neaterbits.displayserver.protocol.enums.CoordinateMode;
+import com.neaterbits.displayserver.protocol.enums.gc.Function;
+import com.neaterbits.displayserver.protocol.messages.requests.GCAttributes;
 import com.neaterbits.displayserver.protocol.types.BYTE;
+import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.POINT;
 import com.neaterbits.displayserver.render.cairo.Cairo;
+import com.neaterbits.displayserver.render.cairo.CairoOperator;
 import com.neaterbits.displayserver.render.cairo.CairoSurface;
 import com.neaterbits.displayserver.xwindows.model.XGC;
 import com.neaterbits.displayserver.xwindows.model.render.XLibRenderer;
@@ -13,19 +18,55 @@ import com.neaterbits.displayserver.xwindows.model.render.XLibRenderer;
 final class CairoXLibRenderer implements XLibRenderer {
 
     private final CairoSurface surface;
+    private final PixelConversion pixelConversion;
 
     private final Cairo cr;
     
-    CairoXLibRenderer(CairoSurface surface) {
+    CairoXLibRenderer(CairoSurface surface, PixelConversion pixelConversion) {
+        
         Objects.requireNonNull(surface);
+        Objects.requireNonNull(pixelConversion);
         
         this.surface = surface;
+        this.pixelConversion = pixelConversion;
         
         this.cr = new Cairo(surface);
     }
 
     private void applyGC(XGC gc) {
         
+        final BYTE function = XLibRenderer.getGCValue(gc, GCAttributes.FUNCTION, GCAttributes::getFunction);
+        
+        final CairoOperator operator;
+        
+        switch (function.getValue()) {
+
+        case Function.CLEAR:
+            operator = CairoOperator.CLEAR;
+            break;
+            
+        case Function.COPY:
+            operator = CairoOperator.SOURCE;
+            break;
+            
+        default:
+            throw new UnsupportedOperationException();
+        }
+
+        cr.setOperator(operator);
+
+        final CARD32 planeMask = XLibRenderer.getGCValue(gc, GCAttributes.PLANE_MASK, GCAttributes::getPlaneMask);
+        
+        if (planeMask.getValue() != 0xFFFFFFFFL) {
+            throw new UnsupportedOperationException();
+        }
+        
+        final int foreground = (int)XLibRenderer.getGCValue(gc, GCAttributes.FOREGROUND, GCAttributes::getForeground).getValue();
+        
+        cr.setSourceRGB(
+                pixelConversion.getRed(foreground),
+                pixelConversion.getGreen(foreground),
+                pixelConversion.getBlue(foreground));
     }
     
     @Override

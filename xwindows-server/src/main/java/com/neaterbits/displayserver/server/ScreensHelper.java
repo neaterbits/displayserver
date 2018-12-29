@@ -94,7 +94,7 @@ class ScreensHelper {
                     new CARD16(0),
                     WindowClass.InputOnly,
                     getRootWindowAttributes(displayArea),
-                    rendering.getRendererFactory().createRenderer(bufferOperations));
+                    rendering.getRendererFactory().createRenderer(bufferOperations, pixelFormat));
             
             addRootWindow.accept(xWindow);
             
