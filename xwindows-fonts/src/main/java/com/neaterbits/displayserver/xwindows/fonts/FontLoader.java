@@ -36,7 +36,7 @@ public final class FontLoader {
             
             try (GZIPInputStream inputStream = new GZIPInputStream(new FileInputStream(file))) {
             
-                font = PCFReader.read(inputStream, getAtom);
+                font = PCFReader.read(fontName, inputStream, getAtom);
             }
         }
         else {

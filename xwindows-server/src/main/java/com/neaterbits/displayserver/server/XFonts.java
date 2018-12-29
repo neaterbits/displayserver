@@ -8,7 +8,7 @@ import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.xwindows.fonts.FontCache;
 import com.neaterbits.displayserver.xwindows.fonts.FontLoader;
 import com.neaterbits.displayserver.xwindows.fonts.NoSuchFontException;
-import com.neaterbits.displayserver.xwindows.fonts.XFont;
+import com.neaterbits.displayserver.xwindows.fonts.model.XFont;
 
 final class XFonts {
 
@@ -21,7 +21,7 @@ final class XFonts {
         this.fontCache = new FontCache();
     }
     
-    XFont getFont(String fontName) throws NoSuchFontException, IOException {
+    XFont openFont(String fontName) throws NoSuchFontException, IOException {
         
         XFont font = fontCache.getFont(fontName);
         
@@ -34,7 +34,19 @@ final class XFonts {
             
             fontCache.add(fontName, font);
         }
+        else {
+            font.addRef();
+        }
         
         return font;
+    }
+    
+    void closeFont(XFont font) {
+        
+        final boolean referenced = font.remRef();
+        
+        if (referenced) {
+            fontCache.remove(font.getName());
+        }
     }
 }

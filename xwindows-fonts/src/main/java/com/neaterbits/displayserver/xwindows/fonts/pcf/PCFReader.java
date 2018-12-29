@@ -17,9 +17,9 @@ import com.neaterbits.displayserver.xwindows.fonts.model.XFontCharacter;
 
 public class PCFReader {
 
-    public static XFont read(InputStream inputStream, Function<String, ATOM> getAtom) throws IOException {
+    public static XFont read(String fontName, InputStream inputStream, Function<String, ATOM> getAtom) throws IOException {
     
-        final XFontPCFReaderListener listener = new XFontPCFReaderListener(getAtom);
+        final XFontPCFReaderListener listener = new XFontPCFReaderListener(fontName, getAtom);
         
         read(inputStream, listener, null);
         

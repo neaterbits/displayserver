@@ -109,7 +109,7 @@ import com.neaterbits.displayserver.windows.DisplayAreaFinder;
 import com.neaterbits.displayserver.windows.DisplayAreaWindows;
 import com.neaterbits.displayserver.windows.Window;
 import com.neaterbits.displayserver.xwindows.fonts.NoSuchFontException;
-import com.neaterbits.displayserver.xwindows.fonts.XFont;
+import com.neaterbits.displayserver.xwindows.fonts.model.XFont;
 import com.neaterbits.displayserver.xwindows.model.Atoms;
 import com.neaterbits.displayserver.xwindows.model.XScreensAndVisuals;
 import com.neaterbits.displayserver.xwindows.model.XWindow;
@@ -593,7 +593,7 @@ public class XServer implements AutoCloseable {
                         ? "6x13"
                         : openFont.getName();
                 
-                final XFont font = fonts.getFont(fontName);
+                final XFont font = fonts.openFont(fontName);
                 
                 client.openFont(openFont, font);
                 
@@ -610,7 +610,9 @@ public class XServer implements AutoCloseable {
             final CloseFont closeFont = log(messageLength, opcode, sequenceNumber, CloseFont.decode(stream));
             
             try {
-                client.closeFont(closeFont);
+                final XFont font = client.closeFont(closeFont);
+
+                fonts.closeFont(font);
             } catch (FontException ex) {
                 sendError(client, Errors.Font, sequenceNumber, ex.getFont().getValue(), opcode);
             }

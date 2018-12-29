@@ -4,8 +4,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public final class XFont {
+import com.neaterbits.displayserver.xwindows.util.Refcountable;
 
+public final class XFont extends Refcountable {
+
+    private final String name;
     private final List<XFontProperty> properties;
     private final XFontAccelerators accelerators;
     private final List<XFontCharacter> metrics;
@@ -16,6 +19,7 @@ public final class XFont {
     private final String [] glyphNames;
 
     public XFont(
+            String name,
             List<XFontProperty> properties,
             XFontAccelerators accelerators,
             List<XFontCharacter> metrics,
@@ -25,6 +29,7 @@ public final class XFont {
             int [] scalableWidths,
             String [] names) {
 
+        Objects.requireNonNull(name);
         Objects.requireNonNull(properties);
         Objects.requireNonNull(accelerators);
         Objects.requireNonNull(metrics);
@@ -34,6 +39,7 @@ public final class XFont {
         Objects.requireNonNull(scalableWidths);
         Objects.requireNonNull(names);
         
+        this.name = name;
         this.properties = Collections.unmodifiableList(properties);
         this.accelerators = accelerators;
         this.metrics = Collections.unmodifiableList(metrics);
@@ -44,13 +50,17 @@ public final class XFont {
         this.glyphNames = names;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public List<XFontProperty> getProperties() {
         return properties;
     }
 
     public XFontAccelerators getAccelerators() {
         return accelerators;
-}
+    }
 
     public List<XFontCharacter> getMetrics() {
         return metrics;

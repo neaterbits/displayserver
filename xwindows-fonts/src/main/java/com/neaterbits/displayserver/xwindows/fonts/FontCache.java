@@ -28,4 +28,11 @@ public final class FontCache {
         
         return map.get(name);
     }
+
+    public void remove(String name) {
+        
+        Objects.requireNonNull(name);
+        
+        map.remove(name);
+    }
 }

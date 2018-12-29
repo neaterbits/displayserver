@@ -17,6 +17,7 @@ import com.neaterbits.displayserver.xwindows.fonts.model.XFontStringProperty;
 
 final class XFontPCFReaderListener implements PCFReaderListener<Void> {
 
+    private final String fontName;
     private final Function<String, ATOM> getAtom;
     
     private List<XFontProperty> properties;
@@ -34,7 +35,8 @@ final class XFontPCFReaderListener implements PCFReaderListener<Void> {
 
     private XFontAccelerators bdfAccelerators;
     
-    XFontPCFReaderListener(Function<String, ATOM> getAtom) {
+    XFontPCFReaderListener(String fontName, Function<String, ATOM> getAtom) {
+        this.fontName = fontName;
         this.getAtom = getAtom;
     }
 
@@ -187,6 +189,7 @@ final class XFontPCFReaderListener implements PCFReaderListener<Void> {
 
     XFont getFont() {
         return new XFont(
+                fontName,
                 properties,
                 accelerators,
                 metrics,

@@ -12,8 +12,8 @@ import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.INT16;
-import com.neaterbits.displayserver.xwindows.fonts.XFont;
-import com.neaterbits.displayserver.xwindows.fonts.XFontCharacter;
+import com.neaterbits.displayserver.xwindows.fonts.model.XFont;
+import com.neaterbits.displayserver.xwindows.fonts.model.XFontCharacter;
 
 final class MessageProcessorFonts {
 

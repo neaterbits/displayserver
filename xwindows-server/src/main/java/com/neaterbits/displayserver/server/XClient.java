@@ -52,7 +52,7 @@ import com.neaterbits.displayserver.windows.DisplayArea;
 import com.neaterbits.displayserver.windows.DisplayAreaWindows;
 import com.neaterbits.displayserver.windows.Window;
 import com.neaterbits.displayserver.windows.WindowParameters;
-import com.neaterbits.displayserver.xwindows.fonts.XFont;
+import com.neaterbits.displayserver.xwindows.fonts.model.XFont;
 import com.neaterbits.displayserver.xwindows.model.XDrawable;
 import com.neaterbits.displayserver.xwindows.model.XGC;
 import com.neaterbits.displayserver.xwindows.model.XPixmap;
@@ -257,7 +257,7 @@ public class XClient extends XConnection {
         openFonts.put(fontResource, font);
     }
     
-    void closeFont(CloseFont closeFont) throws FontException {
+    XFont closeFont(CloseFont closeFont) throws FontException {
         
         Objects.requireNonNull(closeFont);
         
@@ -267,9 +267,11 @@ public class XClient extends XConnection {
             throw new FontException("Font not open", fontResource);
         }
         
-        openFonts.remove(fontResource);
+        final XFont font = openFonts.remove(fontResource);
 
         checkAndRemoveResourceId(fontResource);
+        
+        return font;
     }
     
     void queryFont(QueryFont queryFont, CARD16 sequenceNumber, ServerToClient serverToClient) throws FontException {
