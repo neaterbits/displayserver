@@ -56,6 +56,26 @@ public final class ImageText16 extends Request {
         this.string = string;
     }
 
+    public DRAWABLE getDrawable() {
+        return drawable;
+    }
+
+    public GCONTEXT getGC() {
+        return gc;
+    }
+
+    public INT16 getX() {
+        return x;
+    }
+
+    public INT16 getY() {
+        return y;
+    }
+
+    public STRING16 getString() {
+        return string;
+    }
+
     @Override
     public Object[] getDebugParams() {
         return wrap(
@@ -67,8 +87,6 @@ public final class ImageText16 extends Request {
                 "string", string
         );
     }
-
-
 
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {

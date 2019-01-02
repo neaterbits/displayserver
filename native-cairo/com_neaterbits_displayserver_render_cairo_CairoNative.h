@@ -41,6 +41,14 @@ JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNativ
 
 /*
  * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
+ * Method:    cairo_set_source_surface
+ * Signature: (JJDD)V
+ */
+JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1set_1source_1surface
+  (JNIEnv *, jclass, jlong, jlong, jdouble, jdouble);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
  * Method:    cairo_set_fill_rule
  * Signature: (JI)V
  */
@@ -49,11 +57,27 @@ JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNativ
 
 /*
  * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
+ * Method:    cairo_clip
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1clip
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
  * Method:    cairo_fill
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1fill
   (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
+ * Method:    cairo_mask_surface
+ * Signature: (JJDD)V
+ */
+JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1mask_1surface
+  (JNIEnv *, jclass, jlong, jlong, jdouble, jdouble);
 
 /*
  * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
@@ -81,10 +105,10 @@ JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNativ
 
 /*
  * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
- * Method:    get_cairo_operator_value
+ * Method:    get_cairo_operator_enum_value
  * Signature: (Ljava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_get_1cairo_1operator_1value
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_get_1cairo_1operator_1enum_1value
   (JNIEnv *, jclass, jstring);
 
 /*
@@ -150,6 +174,54 @@ JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNativ
  */
 JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1surface_1flush
   (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
+ * Method:    cairo_surface_get_reference_count
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1surface_1get_1reference_1count
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
+ * Method:    cairo_image_surface_create
+ * Signature: (III)J
+ */
+JNIEXPORT jlong JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1image_1surface_1create
+  (JNIEnv *, jclass, jint, jint, jint);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
+ * Method:    cairo_image_surface_create_for_data
+ * Signature: ([BIIII)[J
+ */
+JNIEXPORT jlongArray JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1image_1surface_1create_1for_1data
+  (JNIEnv *, jclass, jbyteArray, jint, jint, jint, jint);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
+ * Method:    free_image_surface_data
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_free_1image_1surface_1data
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
+ * Method:    get_cairo_format_enum_value
+ * Signature: (Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_get_1cairo_1format_1enum_1value
+  (JNIEnv *, jclass, jstring);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
+ * Method:    cairo_format_stride_for_width
+ * Signature: (II)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1format_1stride_1for_1width
+  (JNIEnv *, jclass, jint, jint);
 
 #ifdef __cplusplus
 }

@@ -37,15 +37,18 @@ import com.neaterbits.displayserver.protocol.messages.requests.GetImage;
 import com.neaterbits.displayserver.protocol.messages.requests.PutImage;
 import com.neaterbits.displayserver.protocol.messages.requests.WindowAttributes;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.CloseFont;
+import com.neaterbits.displayserver.protocol.messages.requests.legacy.ImageText16;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.OpenFont;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolyLine;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.QueryFont;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD8;
+import com.neaterbits.displayserver.protocol.types.CHAR2B;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.FONT;
 import com.neaterbits.displayserver.protocol.types.GCONTEXT;
 import com.neaterbits.displayserver.protocol.types.RESOURCE;
+import com.neaterbits.displayserver.protocol.types.STRING16;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.types.Size;
 import com.neaterbits.displayserver.windows.Display;
@@ -241,6 +244,20 @@ public class XClient extends XConnection {
         
         return xDrawable.getVisual();
     }
+    
+    private XFont getFont(FONT fontResource) throws FontException {
+        
+        Objects.requireNonNull(fontResource);
+        
+        final XFont font = openFonts.get(fontResource);
+        
+        if (font == null) {
+            throw new FontException("No such font", fontResource);
+        }
+        
+        return font;
+    }
+
     
     void openFont(OpenFont openFont, XFont font) throws IDChoiceException {
         
@@ -578,6 +595,40 @@ public class XClient extends XConnection {
                 data);
         
         serverToClient.sendReply(this, getImageReply);
+    }
+    
+    final void imageText16(ImageText16 imageText) throws DrawableException, GContextException, MatchException {
+
+        final XDrawable drawable = findDrawble(imageText.getDrawable());
+        final XGC gc = getGC(imageText.getGC());
+
+        final FONT fontResource = gc.getAttributes().getFont();
+        
+        final XFont font;
+        try {
+            font = getFont(fontResource);
+        } catch (FontException ex) {
+            throw new GContextException("No such font", imageText.getGC());
+        }
+        
+        final STRING16 string = imageText.getString();
+        
+        int x = imageText.getX().getValue();
+        final int y = imageText.getY().getValue();
+        
+        for (int i = 0; i < string.length(); ++ i) {
+            
+            final CHAR2B character = string.getCharacter(i);
+            
+            final int glyphIndex = font.getGlyphIndex(character);
+            
+            drawable.getRenderer().renderBitmap(gc, font.getRenderBitmap(glyphIndex), x, y);
+            // drawable.getRenderer().fillRectangle(x, y, 15, 15, 0, 0, 0);
+            
+            x += font.getGlyphRenderWidth(glyphIndex);
+        }
+        
+        drawable.getRenderer().flush();
     }
     
     final void createCursor(CreateCursor createCursor) throws IDChoiceException {

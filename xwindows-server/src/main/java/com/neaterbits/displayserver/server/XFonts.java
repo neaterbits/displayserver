@@ -9,6 +9,7 @@ import com.neaterbits.displayserver.xwindows.fonts.FontCache;
 import com.neaterbits.displayserver.xwindows.fonts.FontLoader;
 import com.neaterbits.displayserver.xwindows.fonts.NoSuchFontException;
 import com.neaterbits.displayserver.xwindows.fonts.model.XFont;
+import com.neaterbits.displayserver.xwindows.fonts.render.FontBufferFactory;
 
 final class XFonts {
 
@@ -21,12 +22,12 @@ final class XFonts {
         this.fontCache = new FontCache();
     }
     
-    XFont openFont(String fontName) throws NoSuchFontException, IOException {
+    XFont openFont(String fontName, FontBufferFactory fontBufferFactory) throws NoSuchFontException, IOException {
         
         XFont font = fontCache.getFont(fontName);
         
         if (font == null) {
-            font = fontLoader.loadFont(fontName);
+            font = fontLoader.loadFont(fontName, fontBufferFactory);
             
             if (font == null) {
                 throw new IllegalStateException(); // Exception if font not found

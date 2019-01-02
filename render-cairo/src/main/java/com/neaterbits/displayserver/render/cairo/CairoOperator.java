@@ -20,9 +20,9 @@ public enum CairoOperator {
     private final int cairoValue;
     
     private CairoOperator() {
-        this.cairoValue = CairoNative.get_cairo_operator_value("CAIRO_OPERATOR_" + name());
+        this.cairoValue = CairoNative.get_cairo_operator_enum_value("CAIRO_OPERATOR_" + name());
         
-        if (cairoValue < 0 || cairoValue >= CairoOperator.values().length) {
+        if (cairoValue < 0) {
             throw new IllegalStateException();
         }
     }

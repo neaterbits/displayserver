@@ -2,6 +2,9 @@ package com.neaterbits.displayserver.xwindows.fonts.model;
 
 import java.util.Objects;
 
+import com.neaterbits.displayserver.protocol.exception.MatchException;
+import com.neaterbits.displayserver.protocol.types.CHAR2B;
+
 public final class XFontEncodings {
 
     private final short minCharOrByte2;
@@ -49,6 +52,29 @@ public final class XFontEncodings {
 
     public short[] getGlyphIndices() {
         return glyphIndices;
+    }
+
+    int getGlyphIndex(int character) throws MatchException {
+        final int index = character - minCharOrByte2;
+    
+        if (index >= glyphIndices.length) {
+            throw new MatchException("Glyph index outside range");
+        }
+        
+        return glyphIndices[index];
+    }
+        
+    int getGlyphIndex(CHAR2B character) throws MatchException {
+        
+        Objects.requireNonNull(character);
+        
+        final int index = (character.getByte1() - minByte1) * (maxCharOrByte2 - minCharOrByte2 + 1) + character.getByte2() - minCharOrByte2;
+        
+        if (index >= glyphIndices.length) {
+            throw new MatchException("Glyph index outside range");
+        }
+        
+        return glyphIndices[index];
     }
 
     @Override

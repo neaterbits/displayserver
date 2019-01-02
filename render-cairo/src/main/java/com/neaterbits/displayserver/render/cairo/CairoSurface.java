@@ -6,12 +6,16 @@ public class CairoSurface extends CairoReference {
         super(reference);
     }
 
+    public int getReferenceCount() {
+        return CairoNative.cairo_surface_get_reference_count(getCairoReference());
+    }
+    
     public void flush() {
         CairoNative.cairo_surface_flush(getCairoReference());
     }
     
     @Override
-    public final void dispose() {
+    public void dispose() {
         CairoNative.cairo_surface_destroy(getReference());
     }
 }

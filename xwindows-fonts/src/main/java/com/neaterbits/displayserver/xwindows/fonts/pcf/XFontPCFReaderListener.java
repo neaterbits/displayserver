@@ -6,24 +6,25 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import com.neaterbits.displayserver.protocol.types.ATOM;
-import com.neaterbits.displayserver.xwindows.fonts.model.XFont;
+import com.neaterbits.displayserver.xwindows.fonts.model.FontBitmapFormat;
 import com.neaterbits.displayserver.xwindows.fonts.model.XFontAccelerators;
 import com.neaterbits.displayserver.xwindows.fonts.model.XFontBitmaps;
 import com.neaterbits.displayserver.xwindows.fonts.model.XFontCharacter;
 import com.neaterbits.displayserver.xwindows.fonts.model.XFontEncodings;
 import com.neaterbits.displayserver.xwindows.fonts.model.XFontIntegerProperty;
+import com.neaterbits.displayserver.xwindows.fonts.model.XFontModel;
 import com.neaterbits.displayserver.xwindows.fonts.model.XFontProperty;
 import com.neaterbits.displayserver.xwindows.fonts.model.XFontStringProperty;
 
 final class XFontPCFReaderListener implements PCFReaderListener<Void> {
 
-    private final String fontName;
     private final Function<String, ATOM> getAtom;
     
     private List<XFontProperty> properties;
     private XFontAccelerators accelerators;
     private List<XFontCharacter> metrics;
     
+    private FontBitmapFormat bitmapFormat;
     private List<byte[]> bitmaps;
 
     private List<XFontCharacter> inkMetrics;
@@ -35,8 +36,7 @@ final class XFontPCFReaderListener implements PCFReaderListener<Void> {
 
     private XFontAccelerators bdfAccelerators;
     
-    XFontPCFReaderListener(String fontName, Function<String, ATOM> getAtom) {
-        this.fontName = fontName;
+    XFontPCFReaderListener(Function<String, ATOM> getAtom) {
         this.getAtom = getAtom;
     }
 
@@ -98,11 +98,19 @@ final class XFontPCFReaderListener implements PCFReaderListener<Void> {
     }
     
     @Override
-    public void onBitmaps(Void data, int count) {
+    public void onBitmaps(Void data, FontBitmapFormat bitmapFormat, int count) {
+        
+        Objects.requireNonNull(bitmapFormat);
+        
+        if (this.bitmapFormat != null) {
+            throw new IllegalStateException();
+        }
+        
         if (this.bitmaps != null) {
             throw new IllegalStateException();
         }
         
+        this.bitmapFormat = bitmapFormat;
         this.bitmaps = new ArrayList<>(count);
     }
 
@@ -187,13 +195,12 @@ final class XFontPCFReaderListener implements PCFReaderListener<Void> {
                 inkMinbounds, inkMaxbounds);
     }
 
-    XFont getFont() {
-        return new XFont(
-                fontName,
+    XFontModel getFontModel() {
+        return new XFontModel(
                 properties,
                 accelerators,
                 metrics,
-                new XFontBitmaps(bitmaps),
+                new XFontBitmaps(bitmapFormat, bitmaps),
                 inkMetrics,
                 encodings,
                 scalableWidths,

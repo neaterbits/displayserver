@@ -2,7 +2,7 @@ package com.neaterbits.displayserver.buffers;
 
 import com.neaterbits.displayserver.render.cairo.CairoSurface;
 
-public interface BufferOperations {
+public interface BufferOperations extends Buffer {
     
     void putImage(int x, int y, int width, int height, PixelFormat format, byte [] data);
  

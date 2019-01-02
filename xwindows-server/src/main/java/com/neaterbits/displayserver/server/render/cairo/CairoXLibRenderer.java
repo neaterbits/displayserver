@@ -2,6 +2,7 @@ package com.neaterbits.displayserver.server.render.cairo;
 
 import java.util.Objects;
 
+import com.neaterbits.displayserver.buffers.Buffer;
 import com.neaterbits.displayserver.buffers.PixelConversion;
 import com.neaterbits.displayserver.protocol.enums.CoordinateMode;
 import com.neaterbits.displayserver.protocol.enums.gc.Function;
@@ -10,6 +11,7 @@ import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.POINT;
 import com.neaterbits.displayserver.render.cairo.Cairo;
+import com.neaterbits.displayserver.render.cairo.CairoImageSurface;
 import com.neaterbits.displayserver.render.cairo.CairoOperator;
 import com.neaterbits.displayserver.render.cairo.CairoSurface;
 import com.neaterbits.displayserver.xwindows.model.XGC;
@@ -113,6 +115,41 @@ final class CairoXLibRenderer implements XLibRenderer {
             
             flush();
         }
+    }
+
+    @Override
+    public void renderBitmap(XGC gc, Buffer buffer, int x, int y) {
+
+        Objects.requireNonNull(gc);
+        Objects.requireNonNull(buffer);
+        
+        applyGC(gc);
+        
+        final CairoFontBuffer fontBuffer = (CairoFontBuffer)buffer;
+        
+        final CairoImageSurface surface = fontBuffer.getSurface();
+
+  //      cr.rectangle(x, y, surface.getWidth(), surface.getHeight());
+        //cr.clip();
+
+        cr.newPath();
+//        cr.setSourceSurface(surface, 0, 0);
+        
+        // cr.moveTo(x, y);
+
+        cr.setSourceRGB(0, 0, 0);
+
+        cr.maskSurface(surface, x, y);
+
+
+        /*
+        cr.rectangle(x, y, surface.getWidth(), surface.getHeight());
+        cr.strokePreserve();
+        cr.fill();
+        */
+
+        
+        // cr.paint();
     }
 
     @Override

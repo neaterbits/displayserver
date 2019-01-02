@@ -25,22 +25,20 @@ import com.neaterbits.displayserver.server.XConfig;
 import com.neaterbits.displayserver.server.XHardware;
 import com.neaterbits.displayserver.server.XRendering;
 import com.neaterbits.displayserver.server.XServer;
+import com.neaterbits.displayserver.server.render.cairo.CairoFontBufferFactory;
 import com.neaterbits.displayserver.server.render.cairo.CairoXLibRendererFactory;
 import com.neaterbits.displayserver.util.logging.DebugLevel;
 import com.neaterbits.displayserver.windows.compositor.Compositor;
 import com.neaterbits.displayserver.windows.compositor.SingleViewPortCompositor;
 import com.neaterbits.displayserver.windows.config.DisplayAreaConfig;
 import com.neaterbits.displayserver.windows.config.DisplayConfig;
+import com.neaterbits.displayserver.xwindows.fonts.model.StoreOrder;
+import com.neaterbits.displayserver.xwindows.util.JNIBindings;
 
 public class DisplayServerMain {
 
 	public static void main(String [] args) throws Exception {
 
-	    final String rootDir = System.getenv("HOME") + "/projects/displayserver";
-	    
-	    System.load(rootDir + "/native-xcb/Debug/libxcbjni.so");
-	    System.load(rootDir + "/native-cairo/Debug/libcairojni.so");
-        
 	    final int display;
 	    
 	    if (args.length == 1) {
@@ -49,6 +47,8 @@ public class DisplayServerMain {
 	    else {
 	        display = 0;
 	    }
+
+	    JNIBindings.load();
 	    
 	    final AsyncServersLog asyncServersLog = new AsyncServersLogImpl("Asyncservers", DebugLevels.ASYNC_SERVERS);
 	    
@@ -127,7 +127,12 @@ public class DisplayServerMain {
 
         final Compositor compositor = new SingleViewPortCompositor();
         
-        final XRendering rendering = new XRendering(compositor, new CairoXLibRendererFactory());
+        final StoreOrder nativeOrder = StoreOrder.getNativeOrder();
+        
+        final XRendering rendering = new XRendering(
+                compositor,
+                new CairoXLibRendererFactory(),
+                new CairoFontBufferFactory(nativeOrder));
         
         try (XServer server = new XServer(
                 hardware,

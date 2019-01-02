@@ -7,6 +7,7 @@ import java.util.zip.GZIPInputStream;
 
 import org.junit.Test;
 
+import com.neaterbits.displayserver.xwindows.fonts.model.FontBitmapFormat;
 import com.neaterbits.displayserver.xwindows.fonts.model.XFontCharacter;
 import com.neaterbits.displayserver.xwindows.fonts.pcf.PCFReader;
 
@@ -55,8 +56,8 @@ public class PCFReaderTest {
         }
 
         @Override
-        public void onBitmaps(Object data, int count) {
-            System.out.println("onBitmaps " + count);
+        public void onBitmaps(Object data, FontBitmapFormat bitmapFormat, int count) {
+            System.out.println("onBitmaps [bitmapFormat=" + bitmapFormat + ", count=" + count + "]");
         }
 
         @Override

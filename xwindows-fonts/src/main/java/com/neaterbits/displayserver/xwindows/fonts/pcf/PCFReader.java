@@ -12,18 +12,21 @@ import java.util.function.Function;
 
 import com.neaterbits.displayserver.protocol.enums.DrawDirection;
 import com.neaterbits.displayserver.protocol.types.ATOM;
-import com.neaterbits.displayserver.xwindows.fonts.model.XFont;
+import com.neaterbits.displayserver.xwindows.fonts.model.DataLength;
+import com.neaterbits.displayserver.xwindows.fonts.model.FontBitmapFormat;
+import com.neaterbits.displayserver.xwindows.fonts.model.StoreOrder;
 import com.neaterbits.displayserver.xwindows.fonts.model.XFontCharacter;
+import com.neaterbits.displayserver.xwindows.fonts.model.XFontModel;
 
 public class PCFReader {
 
-    public static XFont read(String fontName, InputStream inputStream, Function<String, ATOM> getAtom) throws IOException {
+    public static XFontModel read(InputStream inputStream, Function<String, ATOM> getAtom) throws IOException {
     
-        final XFontPCFReaderListener listener = new XFontPCFReaderListener(fontName, getAtom);
+        final XFontPCFReaderListener listener = new XFontPCFReaderListener(getAtom);
         
         read(inputStream, listener, null);
         
-        return listener.getFont();
+        return listener.getFontModel();
     }
     
     static <T> void read(InputStream inputStream, PCFReaderListener<T> listener, T data) throws IOException {
@@ -530,7 +533,13 @@ public class PCFReader {
         
         System.out.println("## bitmap size " + bitmapSize);
         
-        listener.onBitmaps(data, glyphCount);
+        final FontBitmapFormat bitmapFormat = new FontBitmapFormat(
+                (format & 4) != 0 ? StoreOrder.LEAST_SIGNIFICANT_FIRST : StoreOrder.MOST_SIGNIFICANT_FIRST,
+                (format & 8) != 0 ? StoreOrder.LEAST_SIGNIFICANT_FIRST : StoreOrder.MOST_SIGNIFICANT_FIRST,
+                decodeDataLength(format & 3),
+                decodeDataLength((format >>> 4) & 3));
+        
+        listener.onBitmaps(data, bitmapFormat, glyphCount);
         
         for (int i = 0; i < offsets.length; ++ i) {
             
@@ -557,6 +566,22 @@ public class PCFReader {
         }
         
         return curOffset;
+    }
+    
+    private static DataLength decodeDataLength(int value) {
+        
+        final DataLength dataLength;
+        
+        switch (value) {
+        case 0: dataLength = DataLength.BYTE; break;
+        case 1: dataLength = DataLength.SHORT; break;
+        case 2: dataLength = DataLength.INT; break;
+        
+        default:
+            throw new IllegalArgumentException();
+        }
+        
+        return dataLength;
     }
 
     private static <T> int readEncodings(PCFStream dataInput, PCFReaderListener<T> listener, T data, int startOffset) throws IOException {

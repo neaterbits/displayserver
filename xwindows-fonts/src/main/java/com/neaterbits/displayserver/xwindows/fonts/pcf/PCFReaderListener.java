@@ -1,5 +1,6 @@
 package com.neaterbits.displayserver.xwindows.fonts.pcf;
 
+import com.neaterbits.displayserver.xwindows.fonts.model.FontBitmapFormat;
 import com.neaterbits.displayserver.xwindows.fonts.model.XFontCharacter;
 
 public interface PCFReaderListener<T> {
@@ -20,7 +21,7 @@ public interface PCFReaderListener<T> {
     
     void onMetric(T data, XFontCharacter fontCharacter);
 
-    void onBitmaps(T data, int count);
+    void onBitmaps(T data, FontBitmapFormat bitmapFormat, int count);
     
     void onBitmap(T data, byte [] bitmapData);
 

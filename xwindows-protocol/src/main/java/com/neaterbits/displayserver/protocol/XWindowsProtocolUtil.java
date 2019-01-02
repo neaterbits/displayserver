@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 
 import com.neaterbits.displayserver.protocol.types.CARD8;
+import com.neaterbits.displayserver.xwindows.util.Padding;
 
 public class XWindowsProtocolUtil {
 
@@ -121,9 +122,7 @@ public class XWindowsProtocolUtil {
 
 	
 	public static int getPadding(int length) {
-		final int pad = (4 - (length % 4)) % 4;
-
-		return pad;
+	    return Padding.getPadding(length, 4);
 	}
 
 	public static int getPropertyEncodeDataLength(CARD8 format, int dataLength) {

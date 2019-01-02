@@ -590,10 +590,10 @@ public class XServer implements AutoCloseable {
             try {
                 
                 final String fontName = openFont.getName().equals("fixed")
-                        ? "6x13"
+                        ? "7x13"
                         : openFont.getName();
                 
-                final XFont font = fonts.openFont(fontName);
+                final XFont font = fonts.openFont(fontName, rendering.getFontBufferFactory());
                 
                 client.openFont(openFont, font);
                 
@@ -738,9 +738,18 @@ public class XServer implements AutoCloseable {
         }
         
         case OpCodes.IMAGE_TEXT_16: {
-            
+
             final ImageText16 imageText16 = log(messageLength, opcode, sequenceNumber, ImageText16.decode(stream));
             
+            try {
+                client.imageText16(imageText16);
+            } catch (DrawableException ex) {
+                sendError(client, Errors.Drawable, sequenceNumber, ex.getDrawable().getValue(), opcode);
+            } catch (GContextException ex) {
+                sendError(client, Errors.GContext, sequenceNumber, ex.getGContext().getValue(), opcode);
+            } catch (MatchException ex) {
+                sendError(client, Errors.Match, sequenceNumber, 0L, opcode);
+            }
             break;
         }
 
@@ -930,7 +939,7 @@ public class XServer implements AutoCloseable {
 			throw new UnsupportedOperationException("Unknown opcode " + opcode);
 		}
 	}
-
+    
     private PixelFormat getPixelFormat(COLORMAP cmap) {
         
         final PixelFormat pixelFormat;

@@ -10,7 +10,11 @@ import java.util.zip.GZIPInputStream;
 
 import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.xwindows.fonts.model.XFont;
+import com.neaterbits.displayserver.xwindows.fonts.model.XFontCharacter;
+import com.neaterbits.displayserver.xwindows.fonts.model.XFontModel;
 import com.neaterbits.displayserver.xwindows.fonts.pcf.PCFReader;
+import com.neaterbits.displayserver.xwindows.fonts.render.FontBuffer;
+import com.neaterbits.displayserver.xwindows.fonts.render.FontBufferFactory;
 
 public final class FontLoader {
 
@@ -26,24 +30,47 @@ public final class FontLoader {
                 .collect(Collectors.toList());
     }
     
-    public XFont loadFont(String fontName) throws IOException, NoSuchFontException {
+    public XFont loadFont(String fontName, FontBufferFactory fontBufferFactory) throws IOException, NoSuchFontException {
 
         final File file = findFontFile(fontName);
         
-        final XFont font;
+        final XFontModel fontModel;
         
         if (file != null) {
             
             try (GZIPInputStream inputStream = new GZIPInputStream(new FileInputStream(file))) {
             
-                font = PCFReader.read(fontName, inputStream, getAtom);
+                fontModel = PCFReader.read(inputStream, getAtom);
             }
         }
         else {
             throw new NoSuchFontException("Unknown font " + fontName);
         }
         
-        return font;
+        return new XFont(fontName, fontModel, createRenderBitmaps(fontModel, fontBufferFactory));
+    }
+    
+    private static FontBuffer [] createRenderBitmaps(XFontModel fontModel, FontBufferFactory fontBufferFactory) {
+        
+        final List<byte []> bitmaps = fontModel.getBitmaps().getBitmaps();
+        
+        final FontBuffer [] fontBuffers = new FontBuffer[bitmaps.size()];
+        
+        for (int i = 0; i < bitmaps.size(); ++ i) {
+            
+            final XFontCharacter metrics = fontModel.getMetrics().get(i);
+            
+            fontBuffers[i] = fontBufferFactory.createFontBuffer(
+                    i,
+                    bitmaps.get(i),
+                    fontModel.getBitmaps().getBitmapFormat(),
+                    metrics.getCharacterWidth(),
+                    metrics.getAscent() + metrics.getDescent());
+            
+        }
+        
+        
+        return fontBuffers;
     }
     
     private File findFontFile(String fontName) {

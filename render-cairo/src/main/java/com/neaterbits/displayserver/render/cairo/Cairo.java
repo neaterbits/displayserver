@@ -14,12 +14,24 @@ public class Cairo extends CairoReference {
         CairoNative.cairo_set_source_rgb(getCairoReference(), red, green, blue);
     }
     
+    public void setSourceSurface(CairoSurface surface, double x, double y) {
+        CairoNative.cairo_set_source_surface(getCairoReference(), surface.getCairoReference(), x, y);
+    }
+    
     public void setFillRule(CairoFillRule fillRule) {
         CairoNative.cairo_set_fill_rule(getCairoReference(), fillRule.getCairoFillRule());
     }
     
+    public void clip() {
+        CairoNative.cairo_clip(getCairoReference());
+    }
+    
     public void fill() {
         CairoNative.cairo_fill(getCairoReference());
+    }
+    
+    public void maskSurface(CairoSurface surface, double surfaceX, double surfaceY) {
+        CairoNative.cairo_mask_surface(getCairoReference(), surface.getCairoReference(), surfaceX, surfaceY);
     }
     
     public void paint() {
