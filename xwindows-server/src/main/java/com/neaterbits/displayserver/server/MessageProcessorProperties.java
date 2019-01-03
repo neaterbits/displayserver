@@ -23,7 +23,7 @@ import com.neaterbits.displayserver.xwindows.model.XWindow;
 final class MessageProcessorProperties {
 
     static void changeProperty(ChangeProperty changeProperty, int opcode, CARD16 sequenceNumber, TIMESTAMP timestamp, XClient client, XClientWindowsConstAccess xWindows, ServerToClient serverToClient) {
-        final XWindow xWindow = xWindows.getClientWindow(changeProperty.getWindow());
+        final XWindow xWindow = xWindows.getClientOrRootWindow(changeProperty.getWindow());
         
         if (xWindow == null) {
             serverToClient.sendError(client, Errors.Window, sequenceNumber, changeProperty.getWindow().getValue(), opcode);
