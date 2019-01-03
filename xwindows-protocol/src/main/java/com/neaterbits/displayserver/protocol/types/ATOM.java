@@ -1,6 +1,11 @@
 package com.neaterbits.displayserver.protocol.types;
 
-public final class ATOM {
+import java.io.IOException;
+
+import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
+import com.neaterbits.displayserver.protocol.messages.Encodeable;
+
+public final class ATOM extends Encodeable {
 
     public static final ATOM None = new ATOM(0);
     public static final ATOM AnyPropertyType = new ATOM(0);
@@ -13,6 +18,11 @@ public final class ATOM {
 
     public int getValue() {
         return value;
+    }
+    
+    @Override
+    public void encode(XWindowsProtocolOutputStream stream) throws IOException {
+        stream.writeATOM(this);
     }
 
     @Override

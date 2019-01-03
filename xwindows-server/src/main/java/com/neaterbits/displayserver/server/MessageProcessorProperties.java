@@ -1,14 +1,18 @@
 package com.neaterbits.displayserver.server;
 
+import java.util.Collection;
+
 import com.neaterbits.displayserver.protocol.enums.Errors;
 import com.neaterbits.displayserver.protocol.exception.AtomException;
 import com.neaterbits.displayserver.protocol.exception.MatchException;
 import com.neaterbits.displayserver.protocol.exception.ValueException;
 import com.neaterbits.displayserver.protocol.messages.events.PropertyNotify;
 import com.neaterbits.displayserver.protocol.messages.replies.GetPropertyReply;
+import com.neaterbits.displayserver.protocol.messages.replies.ListPropertiesReply;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeProperty;
 import com.neaterbits.displayserver.protocol.messages.requests.DeleteProperty;
 import com.neaterbits.displayserver.protocol.messages.requests.GetProperty;
+import com.neaterbits.displayserver.protocol.messages.requests.ListProperties;
 import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD8;
@@ -154,4 +158,16 @@ final class MessageProcessorProperties {
         }
     }
     
+    public static void listProperties(ListProperties listProperties, int opcode, CARD16 sequenceNumber, XClient client, XClientWindowsConstAccess xWindows, ServerToClient serverToClient) {
+        final XWindow xWindow = xWindows.getClientOrRootWindow(listProperties.getWindow());
+        
+        if (xWindow == null) {
+            serverToClient.sendError(client, Errors.Window, sequenceNumber, listProperties.getWindow().getValue(), opcode);
+        }
+        else {
+            final Collection<ATOM> atoms = xWindow.listPropertyAtoms();
+            
+            serverToClient.sendReply(client, new ListPropertiesReply(sequenceNumber, atoms.toArray(new ATOM[atoms.size()])));
+        }
+    }
 }

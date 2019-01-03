@@ -1,6 +1,8 @@
 package com.neaterbits.displayserver.xwindows.model;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -167,6 +169,10 @@ public class XWindow extends XDrawable {
         Objects.requireNonNull(property);
         
         return properties.get(property);
+    }
+    
+    public final Collection<ATOM> listPropertyAtoms() {
+        return Collections.unmodifiableCollection(properties.keySet());
     }
     
     public final void changeProperty(BYTE mode, ATOM propertyAtom, ATOM type, CARD8 format, byte[] data) throws MatchException, AtomException, ValueException {
