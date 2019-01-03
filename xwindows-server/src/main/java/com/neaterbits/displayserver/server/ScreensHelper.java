@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 import com.neaterbits.displayserver.buffers.BufferOperations;
 import com.neaterbits.displayserver.buffers.PixelFormat;
@@ -29,6 +29,7 @@ import com.neaterbits.displayserver.protocol.types.WINGRAVITY;
 import com.neaterbits.displayserver.windows.DisplayArea;
 import com.neaterbits.displayserver.windows.DisplayAreaWindows;
 import com.neaterbits.displayserver.xwindows.model.XScreen;
+import com.neaterbits.displayserver.xwindows.model.XScreenDepth;
 import com.neaterbits.displayserver.xwindows.model.XScreensAndVisuals;
 import com.neaterbits.displayserver.xwindows.model.XVisual;
 import com.neaterbits.displayserver.xwindows.model.XWindow;
@@ -59,12 +60,14 @@ class ScreensHelper {
             List<DisplayAreaWindows> displayAreas,
             ServerResourceIdAllocator resourceIdAllocator,
             XRendering rendering,
-            Consumer<XWindow> addRootWindow) {
+            BiConsumer<Integer, XWindow> addRootWindow) {
         
         final List<XScreen> screens = new ArrayList<>(displayAreas.size());
         
         final Map<VISUALID, XVisual> visuals = new HashMap<>();
 
+        int screenNo = 0;
+        
         for (DisplayAreaWindows displayArea : displayAreas) {
             
             final int rootWindow = resourceIdAllocator.allocateRootWindowId();
@@ -87,7 +90,7 @@ class ScreensHelper {
             
             final BufferOperations bufferOperations = rendering.getCompositor().getBufferForWindow(displayArea.getRootWindow());
             
-            final XWindow xWindow = new XWindow(
+            final XWindow xRootWindow = new XWindow(
                     displayArea.getRootWindow(),
                     rootWindowResource,
                     visualId,
@@ -96,9 +99,15 @@ class ScreensHelper {
                     getRootWindowAttributes(displayArea),
                     rendering.getRendererFactory().createRenderer(bufferOperations, pixelFormat));
             
-            addRootWindow.accept(xWindow);
+            addRootWindow.accept(screenNo, xRootWindow);
             
-            screens.add(new XScreen(displayArea, xWindow, Arrays.asList(xVisual)));
+            final int rootDepth = pixelFormat.getDepth();
+            
+            final XScreenDepth xScreenDepth = new XScreenDepth(rootDepth, Arrays.asList(visualId));
+            
+            final XScreen xScreen = new XScreen(screenNo, displayArea, xRootWindow, visualId, Arrays.asList(xScreenDepth));
+            
+            screens.add(xScreen);
         }
         
         return new XScreensAndVisuals(screens, visuals);

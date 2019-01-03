@@ -10,6 +10,8 @@ import com.neaterbits.displayserver.windows.Window;
 
 public class XWindows<T extends XWindow> implements XWindowsConstAccess<T> {
 
+    private final Map<WINDOW, Integer> screenByRootWindow;
+    
     private final WindowMap rootWindows;
     private final WindowMap clientWindows;
     
@@ -18,13 +20,15 @@ public class XWindows<T extends XWindow> implements XWindowsConstAccess<T> {
 
     protected XWindows() {
         
+        this.screenByRootWindow = new HashMap<>();
+        
         this.rootWindows = new WindowMap();
         this.clientWindows = new WindowMap();
         
         this.xWindowByWindow = new HashMap<>();
     }
     
-    public final void addRootWindow(XWindow xWindow) {
+    public final void addRootWindow(int screen, XWindow xWindow) {
         
         Objects.requireNonNull(xWindow);
         
@@ -32,11 +36,21 @@ public class XWindows<T extends XWindow> implements XWindowsConstAccess<T> {
             throw new IllegalArgumentException();
         }
         
+        screenByRootWindow.put(xWindow.getWINDOW(), screen);
+        
         rootWindows.addToMaps(xWindow);
 
         addWindowToXWindowMapping(xWindow);
     }
-
+    
+    public final Integer getScreenForWindow(WINDOW window) {
+     
+        Objects.requireNonNull(window);
+        
+        final XWindow rootWindow = findRootWindowOf(window);
+        
+        return rootWindow != null ? screenByRootWindow.get(rootWindow.getWINDOW()) : null;
+    }
     
     protected final void addClientWindow(XWindow xWindow) {
 

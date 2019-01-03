@@ -19,6 +19,8 @@ final class XVisuals implements XVisualsConstAccess {
         
         Objects.requireNonNull(visual);
         
+        System.out.println("## get visual " + visual + " from " + visualsById);
+        
         return visualsById.get(visual);
     }
 }

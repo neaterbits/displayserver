@@ -6,9 +6,10 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,8 @@ import com.neaterbits.displayserver.protocol.XWindowsProtocolUtil;
 import com.neaterbits.displayserver.protocol.enums.Errors;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
 import com.neaterbits.displayserver.protocol.enums.RevertTo;
+import com.neaterbits.displayserver.protocol.enums.VisualClass;
+import com.neaterbits.displayserver.protocol.exception.ColormapException;
 import com.neaterbits.displayserver.protocol.exception.DrawableException;
 import com.neaterbits.displayserver.protocol.exception.FontException;
 import com.neaterbits.displayserver.protocol.exception.GContextException;
@@ -124,7 +127,11 @@ import com.neaterbits.displayserver.xwindows.fonts.model.XFont;
 import com.neaterbits.displayserver.xwindows.model.Atoms;
 import com.neaterbits.displayserver.xwindows.model.XBuiltinColor;
 import com.neaterbits.displayserver.xwindows.model.XBuiltinColors;
+import com.neaterbits.displayserver.xwindows.model.XColorMap;
+import com.neaterbits.displayserver.xwindows.model.XColorMaps;
+import com.neaterbits.displayserver.xwindows.model.XScreen;
 import com.neaterbits.displayserver.xwindows.model.XScreensAndVisuals;
+import com.neaterbits.displayserver.xwindows.model.XVisual;
 import com.neaterbits.displayserver.xwindows.model.XWindow;
 import com.neaterbits.displayserver.xwindows.util.Unsigned;
 
@@ -144,6 +151,8 @@ public class XServer implements AutoCloseable {
 	private final XState state;
 	
 	private final XFonts fonts;
+	
+	private final XColorMaps colormaps;
 	
 	private final long timeServerStarted;
 	
@@ -173,7 +182,9 @@ public class XServer implements AutoCloseable {
 
 		this.fonts = new XFonts(config.getFontPaths(), atoms::addIfNotExists);
 		
-		final List<XWindow> rootWindows = new ArrayList<>();
+		this.colormaps = new XColorMaps();
+		
+		final Map<XWindow, Integer> rootWindows = new HashMap<>();
 
 		final XWindowsEventListener eventListener = new XWindowsEventListener(this);
 		
@@ -195,11 +206,11 @@ public class XServer implements AutoCloseable {
 		        displayAreas,
 		        resourceIdAllocator,
 		        rendering,
-		        rootWindows::add);
+		        (screenNo, window) -> rootWindows.put(window, screenNo));
 		
 		this.state = new XState(screens);
 		
-		rootWindows.forEach(state::addRootWindow);
+		rootWindows.entrySet().forEach(entry -> state.addRootWindow(entry.getValue(), entry.getKey()));
 		
 		this.display = new Display(displayAreas);
 		
@@ -349,9 +360,9 @@ public class XServer implements AutoCloseable {
         final ServerMessage serverMessage = InitialServerMessageHelper.constructServerMessage(
                 connectionNo,
                 state,
+                state,
                 resourceIdAllocator.getResourceBase(connectionNo),
-                resourceIdAllocator.getResourceMask(connectionNo),
-                resourceIdAllocator::allocateVisualId);
+                resourceIdAllocator.getResourceMask(connectionNo));
 
         send(client, serverMessage);
         
@@ -830,8 +841,41 @@ public class XServer implements AutoCloseable {
 
         case OpCodes.CREATE_COLOR_MAP: {
 		    
-		    log(messageLength, opcode, sequenceNumber, CreateColorMap.decode(stream));
+		    final CreateColorMap createColorMap = log(messageLength, opcode, sequenceNumber, CreateColorMap.decode(stream));
 		    
+		    final XWindow xWindow = getWindows().getClientOrRootWindow(createColorMap.getWindow());
+		    
+		    if (xWindow == null) {
+		        sendError(client, Errors.Window, sequenceNumber, createColorMap.getWindow().getValue(), opcode);
+		    }
+		    else if (colormaps.contains(createColorMap.getMid())) {
+		        sendError(client, Errors.IDChoice, sequenceNumber, createColorMap.getMid().getValue(), opcode);
+		    }
+		    else {
+		        final Integer screenNo = state.getScreenForWindow(xWindow.getWINDOW());
+		        
+		        if (screenNo == null) {
+	                sendError(client, Errors.Window, sequenceNumber, createColorMap.getWindow().getValue(), opcode);
+		        }
+		        else {
+		            final XScreen xScreen = state.getScreen(screenNo);
+		            
+		            if (xScreen == null) {
+		                throw new IllegalStateException();
+		            }
+
+		            final XVisual xVisual = state.getVisual(createColorMap.getVisual());
+		            
+		            if (xVisual == null || !xScreen.supportsVisual(xVisual, state)) {
+		                sendError(client, Errors.Match, sequenceNumber, createColorMap.getVisual().getValue(), opcode);
+		            }
+		            else {
+		                final XColorMap colormap = new XColorMap(xScreen, xVisual);
+		                
+		                colormaps.add(createColorMap.getMid(), colormap);
+		            }
+		        }
+		    }
 		    break;
 		}
 		
@@ -839,20 +883,25 @@ public class XServer implements AutoCloseable {
 		    
 		    final AllocColor allocColor = log(messageLength, opcode, sequenceNumber, AllocColor.decode(stream));
 
-            final PixelFormat pixelFormat = getPixelFormat(allocColor.getCmap());
-
-            final int pixel = getPixel(
-                    pixelFormat,
-                    allocColor.getRed(),
-                    allocColor.getGreen(),
-                    allocColor.getBlue());
-            
-		    sendReply(client, new AllocColorReply(
-		            sequenceNumber,
-		            getRed(pixelFormat, pixel),
-		            getGreen(pixelFormat, pixel),
-		            getBlue(pixelFormat, pixel),
-		            new CARD32(Unsigned.intToUnsigned(pixel))));
+		    try {
+                final PixelFormat pixelFormat = getPixelFormat(allocColor.getCmap());
+    
+                final int pixel = getPixel(
+                        pixelFormat,
+                        allocColor.getRed(),
+                        allocColor.getGreen(),
+                        allocColor.getBlue());
+                
+    		    sendReply(client, new AllocColorReply(
+    		            sequenceNumber,
+    		            getRed(pixelFormat, pixel),
+    		            getGreen(pixelFormat, pixel),
+    		            getBlue(pixelFormat, pixel),
+    		            new CARD32(Unsigned.intToUnsigned(pixel))));
+		    }
+		    catch (ColormapException ex) {
+		        sendError(client, Errors.Colormap, sequenceNumber, ex.getColormap().getValue(), opcode);
+		    }
 		    break;
 		}
 		
@@ -867,23 +916,28 @@ public class XServer implements AutoCloseable {
             
             final QueryColors queryColors = log(messageLength, opcode, sequenceNumber, QueryColors.decode(stream));
 
-            final PixelFormat pixelFormat = getPixelFormat(queryColors.getCmap());
-            
-            final CARD32 [] pixels = queryColors.getPixels();
-            
-            final RGB [] colors = new RGB[pixels.length];
-            
-            for (int i = 0; i < pixels.length; ++ i) {
-
-                final int pixel = (int)pixels[i].getValue();
+            try {
+                final PixelFormat pixelFormat = getPixelFormat(queryColors.getCmap());
                 
-                colors[i] = new RGB(
-                        getRed(pixelFormat, pixel),
-                        getGreen(pixelFormat, pixel),
-                        getBlue(pixelFormat, pixel));
+                final CARD32 [] pixels = queryColors.getPixels();
+                
+                final RGB [] colors = new RGB[pixels.length];
+                
+                for (int i = 0; i < pixels.length; ++ i) {
+    
+                    final int pixel = (int)pixels[i].getValue();
+                    
+                    colors[i] = new RGB(
+                            getRed(pixelFormat, pixel),
+                            getGreen(pixelFormat, pixel),
+                            getBlue(pixelFormat, pixel));
+                }
+                
+                sendReply(client, new QueryColorsReply(sequenceNumber, colors));
             }
-            
-            sendReply(client, new QueryColorsReply(sequenceNumber, colors));
+            catch (ColormapException ex) {
+                sendError(client, Errors.Colormap, sequenceNumber, ex.getColormap().getValue(), opcode);
+            }
             break;
         }
 		
@@ -1049,7 +1103,7 @@ public class XServer implements AutoCloseable {
 		}
 	}
     
-    private PixelFormat getPixelFormat(COLORMAP cmap) {
+    private PixelFormat getPixelFormat(COLORMAP cmap) throws ColormapException {
         
         final PixelFormat pixelFormat;
         
@@ -1057,7 +1111,20 @@ public class XServer implements AutoCloseable {
             pixelFormat = PixelFormat.RGB32;
         }
         else {
-            throw new UnsupportedOperationException("TODO");
+            final XColorMap xColorMap = colormaps.get(cmap);
+            
+            if (xColorMap == null) {
+                throw new ColormapException("No such colormap", cmap);
+            }
+            
+            switch (xColorMap.getVisualClass()) {
+            case VisualClass.TRUECOLOR:
+                pixelFormat = PixelFormat.RGB32;
+                break;
+                
+            default:
+                throw new UnsupportedOperationException("TODO");
+            }
         }
 
         return pixelFormat;

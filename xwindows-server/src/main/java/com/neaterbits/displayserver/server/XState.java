@@ -1,5 +1,6 @@
 package com.neaterbits.displayserver.server;
 
+import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.xwindows.model.XDisplayState;
 import com.neaterbits.displayserver.xwindows.model.XScreensAndVisuals;
 import com.neaterbits.displayserver.xwindows.model.XWindow;
@@ -26,8 +27,12 @@ final class XState extends XDisplayState<XClientWindow, XClientWindows> implemen
         return clients.getClients();
     }
     
-    void addRootWindow(XWindow window) {
-        getWindows().addRootWindow(window);
+    void addRootWindow(int screen, XWindow window) {
+        getWindows().addRootWindow(screen, window);
+    }
+    
+    Integer getScreenForWindow(WINDOW window) {
+        return getWindows().getScreenForWindow(window);
     }
 
     void addClientWindow(XWindow window, XClient creatingClient) {

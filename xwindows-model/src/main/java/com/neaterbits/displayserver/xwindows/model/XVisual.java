@@ -25,6 +25,30 @@ public final class XVisual {
         this.blueMask = blueMask;
     }
 
+    public int getVisualClass() {
+        return _class;
+    }
+
+    public int getBitsPerRGBValue() {
+        return bitsPerRGBValue;
+    }
+
+    public int getColormapEntries() {
+        return colormapEntries;
+    }
+
+    public int getRedMask() {
+        return redMask;
+    }
+
+    public int getGreenMask() {
+        return greenMask;
+    }
+
+    public int getBlueMask() {
+        return blueMask;
+    }
+
     VISUALTYPE toVISUALTYPE(VISUALID visualId) {
         
         final VISUALTYPE visualType = new VISUALTYPE(

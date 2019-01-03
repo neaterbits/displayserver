@@ -1,11 +1,11 @@
 package com.neaterbits.displayserver.server;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import com.neaterbits.displayserver.buffers.PixelFormat;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolUtil;
-import com.neaterbits.displayserver.protocol.enums.VisualClass;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.DEPTH;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.FORMAT;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.SCREEN;
@@ -23,16 +23,20 @@ import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.types.Size;
 import com.neaterbits.displayserver.windows.DisplayArea;
 import com.neaterbits.displayserver.xwindows.model.XScreen;
+import com.neaterbits.displayserver.xwindows.model.XScreenDepth;
 import com.neaterbits.displayserver.xwindows.model.XScreensConstAccess;
+import com.neaterbits.displayserver.xwindows.model.XVisual;
+import com.neaterbits.displayserver.xwindows.model.XVisualsConstAccess;
 
 class InitialServerMessageHelper {
 
     static ServerMessage constructServerMessage(
             int connectionNo,
             XScreensConstAccess screensAccess,
+            XVisualsConstAccess visualsAccess,
             long resourceBase,
-            long resourceMask,
-            Supplier<Integer> allocateVisualId) {
+            long resourceMask) {
+        
         final String vendor = "Test";
         
         final Set<PixelFormat> distinctPixelFormats = screensAccess.getDistinctPixelFormats();
@@ -61,23 +65,38 @@ class InitialServerMessageHelper {
             final Size size = displayArea.getSize();
             final Size sizeInMillimeters = displayArea.getSizeInMillimeters();
             
-            final PixelFormat pixelFormat = displayArea.getPixelFormat();
+            final List<DEPTH> depths = new ArrayList<>(xWindowsScreen.getDepths().size());
             
-            final VISUALID visualId = new VISUALID(allocateVisualId.get());
-            
-            final VISUALTYPE visual = new VISUALTYPE(
-                    visualId,
-                    VisualClass.TrueColor,
-                    new CARD8((short)pixelFormat.getBitsPerColorComponent()),
-                    new CARD16(pixelFormat.getNumberOfDistinctColors()),
-                    new CARD32(pixelFormat.getRedMask()),
-                    new CARD32(pixelFormat.getGreenMask()),
-                    new CARD32(pixelFormat.getBlueMask()));
-            
-            final DEPTH depth = new DEPTH(
-                    new CARD8((short)pixelFormat.getDepth()),
-                    new CARD16(1),
-                    new VISUALTYPE[] { visual });
+            for (XScreenDepth xScreenDepth : xWindowsScreen.getDepths()) {
+
+                final List<VISUALTYPE> visualTypes = new ArrayList<>(xScreenDepth.getVisuals().size());
+                
+                for (VISUALID visual : xScreenDepth.getVisuals()) {
+                    
+                    final XVisual xVisual = visualsAccess.getVisual(visual);
+                    
+                    if (xVisual != null) {
+                    
+                        final VISUALTYPE visualType = new VISUALTYPE(
+                            visual,
+                            new BYTE((byte)xVisual.getVisualClass()),
+                            new CARD8((short)xVisual.getBitsPerRGBValue()),
+                            new CARD16(xVisual.getColormapEntries()),
+                            new CARD32(xVisual.getRedMask()),
+                            new CARD32(xVisual.getGreenMask()),
+                            new CARD32(xVisual.getBlueMask()));
+                    
+                        visualTypes.add(visualType);
+                    }
+                }
+                
+                final DEPTH depth = new DEPTH(
+                        new CARD8((short)xScreenDepth.getDepth()),
+                        new CARD16(1),
+                        visualTypes.toArray(new VISUALTYPE[visualTypes.size()]));
+
+                depths.add(depth);
+            }
             
             final SCREEN screen = new SCREEN(
                     xWindowsScreen.getRootWINDOW(),
@@ -87,9 +106,11 @@ class InitialServerMessageHelper {
                     new CARD16(size.getWidth()), new CARD16(size.getHeight()),
                     new CARD16(sizeInMillimeters.getWidth()), new CARD16(sizeInMillimeters.getHeight()),
                     new CARD16(0), new CARD16(0),
-                    visualId,
+                    xWindowsScreen.getRootVisual(),
                     new BYTE((byte)0), new BOOL((byte)0),
-                    new CARD8((short)24), new CARD8((short)1), new DEPTH [] { depth });
+                    new CARD8((short)xWindowsScreen.getDisplayArea().getDepth()),
+                    new CARD8((short)depths.size()),
+                    depths.toArray(new DEPTH[depths.size()]));
          
             screens[i] = screen;
         }

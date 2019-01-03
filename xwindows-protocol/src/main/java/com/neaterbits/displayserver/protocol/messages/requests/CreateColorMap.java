@@ -46,6 +46,22 @@ public final class CreateColorMap extends Request {
         this.visual = visual;
     }
     
+    public BYTE getAlloc() {
+        return alloc;
+    }
+
+    public COLORMAP getMid() {
+        return mid;
+    }
+
+    public WINDOW getWindow() {
+        return window;
+    }
+
+    public VISUALID getVisual() {
+        return visual;
+    }
+
     @Override
     public Object[] getDebugParams() {
         return wrap("alloc", Alloc.name(alloc), "mid", mid, "window", window, "visual", visual);

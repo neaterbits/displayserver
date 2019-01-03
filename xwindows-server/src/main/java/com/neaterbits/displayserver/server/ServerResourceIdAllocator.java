@@ -60,7 +60,7 @@ final class ServerResourceIdAllocator {
     }
     
     int allocateVisualId() {
-        return numVisuals ++;
+        return (numVisuals ++) + 1;
     }
     
     boolean isRootWindow(int windowId) {
