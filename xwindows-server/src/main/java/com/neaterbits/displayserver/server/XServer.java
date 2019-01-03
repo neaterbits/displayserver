@@ -1,5 +1,7 @@
 package com.neaterbits.displayserver.server;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -46,6 +48,7 @@ import com.neaterbits.displayserver.protocol.messages.replies.InternAtomReply;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryPointerReply;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryResponseReply;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryTreeReply;
+import com.neaterbits.displayserver.protocol.messages.replies.legacy.LookupColorReply;
 import com.neaterbits.displayserver.protocol.messages.replies.legacy.QueryColorsReply;
 import com.neaterbits.displayserver.protocol.messages.replies.legacy.RGB;
 import com.neaterbits.displayserver.protocol.messages.requests.AllocColor;
@@ -114,6 +117,8 @@ import com.neaterbits.displayserver.windows.Window;
 import com.neaterbits.displayserver.xwindows.fonts.NoSuchFontException;
 import com.neaterbits.displayserver.xwindows.fonts.model.XFont;
 import com.neaterbits.displayserver.xwindows.model.Atoms;
+import com.neaterbits.displayserver.xwindows.model.XBuiltinColor;
+import com.neaterbits.displayserver.xwindows.model.XBuiltinColors;
 import com.neaterbits.displayserver.xwindows.model.XScreensAndVisuals;
 import com.neaterbits.displayserver.xwindows.model.XWindow;
 import com.neaterbits.displayserver.xwindows.util.Unsigned;
@@ -138,6 +143,8 @@ public class XServer implements AutoCloseable {
 	private final long timeServerStarted;
 	
 	private final ServerToClient serverToClient;
+	
+	private final XBuiltinColors builtinColors;
 	
 	public XServer(
 	        XHardware hardware,
@@ -210,6 +217,12 @@ public class XServer implements AutoCloseable {
                 XServer.this.sendError(client, errorCode, sequenceNumber, value, opcode);
             }
         };
+        
+        final File colorsFile = new File(config.getColorsFile());
+        
+        try (FileInputStream colorsInputStream = new FileInputStream(colorsFile)) {
+            this.builtinColors = XBuiltinColors.decode(colorsInputStream);
+        }
 	}
 	
 	XClientWindowsConstAccess getWindows() {
@@ -841,9 +854,29 @@ public class XServer implements AutoCloseable {
 		
 		case OpCodes.LOOKUP_COLOR: {
 		    
-		    log(messageLength, opcode, sequenceNumber, LookupColor.decode(stream));
+		    final LookupColor lookupColor = log(messageLength, opcode, sequenceNumber, LookupColor.decode(stream));
+
+		    final XBuiltinColor builtinColor = builtinColors.getColor(lookupColor.getName());
 		    
-		    throw new UnsupportedOperationException("TODO");
+		    if (builtinColor == null) {
+		        sendError(client, Errors.Name, sequenceNumber, 0L, opcode);
+		    }
+		    else if (!lookupColor.getCmap().equals(COLORMAP.None)) {
+		        throw new UnsupportedOperationException("TODO");
+		    }
+		    else {
+		        sendReply(client, new LookupColorReply(
+		                sequenceNumber,
+		                
+		                new CARD16(builtinColor.getR() * 256),
+                        new CARD16(builtinColor.getG() * 256),
+                        new CARD16(builtinColor.getB() * 256),
+		                
+                        new CARD16(builtinColor.getR() * 256),
+                        new CARD16(builtinColor.getG() * 256),
+                        new CARD16(builtinColor.getB() * 256)));
+		    }
+		    break;
 		}
 		
 		case OpCodes.CREATE_CURSOR: {
@@ -1003,7 +1036,6 @@ public class XServer implements AutoCloseable {
     private static int getPixel(PixelFormat pixelFormat, CARD16 red, CARD16 green, CARD16 blue) {
         return pixelFormat.getPixel(red.getValue() / 256, green.getValue() / 256, blue.getValue() / 256);
     }
-    
 
     private void send(XClient client, Encodeable message) {
         client.send(message);

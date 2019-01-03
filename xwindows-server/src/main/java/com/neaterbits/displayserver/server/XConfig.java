@@ -10,14 +10,17 @@ public final class XConfig {
 
     private final DisplayAreaConfig displayAreaConfig;
     private final List<String> fontPaths;
+    private final String colorsFile;
 
-    public XConfig(DisplayAreaConfig displayAreaConfig, List<String> fontPaths) {
+    public XConfig(DisplayAreaConfig displayAreaConfig, List<String> fontPaths, String colorsFile) {
         
         Objects.requireNonNull(displayAreaConfig);
         Objects.requireNonNull(fontPaths);
+        Objects.requireNonNull(colorsFile);
         
         this.displayAreaConfig = displayAreaConfig;
         this.fontPaths = Collections.unmodifiableList(fontPaths);
+        this.colorsFile = colorsFile;
     }
 
     DisplayAreaConfig getDisplayAreaConfig() {
@@ -26,5 +29,9 @@ public final class XConfig {
 
     List<String> getFontPaths() {
         return fontPaths;
+    }
+
+    String getColorsFile() {
+        return colorsFile;
     }
 }

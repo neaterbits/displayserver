@@ -63,6 +63,20 @@ public final class LookupColorReply extends Reply {
         return visualBlue;
     }
 
+    
+    
+    @Override
+    public Object[] getDebugParams() {
+        return wrap(
+                "exactRed", exactRed,
+                "exactGreen", exactGreen,
+                "exactBlue", exactBlue,
+                "visualRed", visualRed,
+                "visualGreen", visualGreen,
+                "visualBlue", visualBlue
+        );
+    }
+
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 

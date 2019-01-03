@@ -110,7 +110,10 @@ public class DisplayServerMain {
         final DisplayAreaConfig displayAreaConfig = new DisplayAreaConfig(
                 1, Arrays.asList(displayConfig));
 
-        final XConfig config = new XConfig(displayAreaConfig, Arrays.asList("/usr/share/fonts/X11/misc"));
+        final XConfig config = new XConfig(
+                displayAreaConfig,
+                Arrays.asList("/usr/share/fonts/X11/misc"),
+                "/usr/share/X11/rgb.txt");
                 
         startXServer(display, asyncServers, hardware, config);
     
