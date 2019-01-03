@@ -55,6 +55,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.AllocColor;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeGC;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeProperty;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeWindowAttributes;
+import com.neaterbits.displayserver.protocol.messages.requests.ClearArea;
 import com.neaterbits.displayserver.protocol.messages.requests.ConfigureWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.ConvertSelection;
 import com.neaterbits.displayserver.protocol.messages.requests.CopyArea;
@@ -712,6 +713,15 @@ public class XServer implements AutoCloseable {
             } catch (GContextException ex) {
                 sendError(client, Errors.GContext, sequenceNumber, ex.getGContext().getValue(), opcode);
             }
+		    break;
+		}
+		
+		case OpCodes.CLEAR_AREA: {
+		    
+		    final ClearArea clearArea = log(messageLength, opcode, sequenceNumber, ClearArea.decode(stream));
+		    
+		    client.clearArea(clearArea);
+		    
 		    break;
 		}
 		

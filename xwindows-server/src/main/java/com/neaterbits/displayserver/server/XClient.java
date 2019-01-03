@@ -24,6 +24,7 @@ import com.neaterbits.displayserver.protocol.exception.MatchException;
 import com.neaterbits.displayserver.protocol.exception.ValueException;
 import com.neaterbits.displayserver.protocol.messages.replies.GetImageReply;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeGC;
+import com.neaterbits.displayserver.protocol.messages.requests.ClearArea;
 import com.neaterbits.displayserver.protocol.messages.requests.CopyArea;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateCursor;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateGC;
@@ -469,7 +470,11 @@ public class XClient extends XConnection {
         
         return xDrawable.getBufferOperations();
     }
-    
+
+    final void clearArea(ClearArea clearArea) {
+
+    }
+
     final void copyArea(CopyArea copyArea) throws GContextException, DrawableException {
 
         final BufferOperations src = getBufferOperations(copyArea.getSrcDrawable());

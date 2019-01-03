@@ -45,6 +45,7 @@ public class OpCodes {
     
     public static final int FREE_GC = 60;
 	
+    public static final int CLEAR_AREA = 61;
 	public static final int COPY_AREA = 62;
 	
 	public static final int POLY_POINT = 64;
