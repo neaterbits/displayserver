@@ -1,6 +1,11 @@
 package com.neaterbits.displayserver.protocol.types;
 
-public final class CARD32 {
+import java.io.IOException;
+
+import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
+import com.neaterbits.displayserver.protocol.messages.Encodeable;
+
+public final class CARD32 extends Encodeable {
 
 	private final long value;
 
@@ -16,6 +21,11 @@ public final class CARD32 {
 	public long getValue() {
 		return value;
 	}
+
+    @Override
+    public void encode(XWindowsProtocolOutputStream stream) throws IOException {
+        stream.writeCARD32(this);
+    }
 
     @Override
     public String toString() {

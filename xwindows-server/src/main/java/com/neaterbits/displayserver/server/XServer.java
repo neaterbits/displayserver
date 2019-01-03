@@ -65,6 +65,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.CreatePixmap;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.DeleteProperty;
 import com.neaterbits.displayserver.protocol.messages.requests.DestroyWindow;
+import com.neaterbits.displayserver.protocol.messages.requests.FreeColors;
 import com.neaterbits.displayserver.protocol.messages.requests.FreeGC;
 import com.neaterbits.displayserver.protocol.messages.requests.FreePixmap;
 import com.neaterbits.displayserver.protocol.messages.requests.GetGeometry;
@@ -825,6 +826,13 @@ public class XServer implements AutoCloseable {
 		            getGreen(pixelFormat, pixel),
 		            getBlue(pixelFormat, pixel),
 		            new CARD32(Unsigned.intToUnsigned(pixel))));
+		    break;
+		}
+		
+		case OpCodes.FREE_COLORS: {
+		    
+		    log(messageLength, opcode, sequenceNumber, FreeColors.decode(stream));
+		    
 		    break;
 		}
 		
