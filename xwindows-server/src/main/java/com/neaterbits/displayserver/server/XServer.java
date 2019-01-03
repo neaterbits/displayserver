@@ -91,6 +91,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.legacy.LookupColo
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.OpenFont;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolyFillRectangle;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolyLine;
+import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolyPoint;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.QueryColors;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.QueryFont;
 import com.neaterbits.displayserver.protocol.types.ATOM;
@@ -709,6 +710,20 @@ public class XServer implements AutoCloseable {
                 sendError(client, Errors.GContext, sequenceNumber, ex.getGContext().getValue(), opcode);
             } catch (DrawableException ex) {
                 sendError(client, Errors.Drawable, sequenceNumber, ex.getDrawable().getValue(), opcode);
+            }
+		    break;
+		}
+		
+		case OpCodes.POLY_POINT: {
+		    
+		    final PolyPoint polyPoint = log(messageLength, opcode, sequenceNumber, PolyPoint.decode(stream));
+		    
+            try {
+                client.polyPoint(polyPoint);
+            } catch (DrawableException ex) {
+                sendError(client, Errors.Drawable, sequenceNumber, ex.getDrawable().getValue(), opcode);
+            } catch (GContextException ex) {
+                sendError(client, Errors.GContext, sequenceNumber, ex.getGContext().getValue(), opcode);
             }
 		    break;
 		}

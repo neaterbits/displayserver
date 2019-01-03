@@ -1,6 +1,11 @@
 package com.neaterbits.displayserver.protocol.types;
 
-public final class POINT {
+import java.io.IOException;
+
+import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
+import com.neaterbits.displayserver.protocol.messages.Encodeable;
+
+public final class POINT extends Encodeable {
 
     private final short x;
     private final short y;
@@ -20,6 +25,11 @@ public final class POINT {
 
     public short getY() {
         return y;
+    }
+
+    @Override
+    public void encode(XWindowsProtocolOutputStream stream) throws IOException {
+        stream.writePOINT(this);
     }
 
     @Override

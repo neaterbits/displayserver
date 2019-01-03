@@ -98,6 +98,39 @@ final class CairoXLibRenderer implements XLibRenderer {
         cr.fill();
     }
 
+    
+    
+    @Override
+    public void polyPoint(XGC gc, BYTE coordinateMode, POINT[] points) {
+
+        if (points.length != 0) {
+
+            applyGC(gc);
+            
+            cr.newPath();
+            
+            for (POINT point : points) {
+                
+                switch (coordinateMode.getValue()) {
+                case CoordinateMode.ORIGIN:
+                    cr.moveTo(point.getX(), point.getY());
+                    cr.lineTo(point.getX(), point.getY());
+                    break;
+                    
+                case CoordinateMode.PREVIOUS:
+                    cr.relMoveTo(point.getX(), point.getY());
+                    cr.relLineTo(0, 0);
+                    break;
+                    
+                default:
+                    throw new IllegalArgumentException();
+                }
+            }
+            
+            flush();
+        }
+    }
+
     @Override
     public void polyLine(XGC gc, BYTE coordinateMode, POINT[] points) {
 

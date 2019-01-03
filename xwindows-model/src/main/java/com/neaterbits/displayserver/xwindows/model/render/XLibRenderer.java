@@ -33,6 +33,8 @@ public interface XLibRenderer extends Disposable {
     
     void fillRectangle(int x, int y, int width, int height, int r, int g, int b);
     
+    void polyPoint(XGC gc, BYTE coordinateMode, POINT [] points);
+
     void polyLine(XGC gc, BYTE coordinateMode, POINT [] points);
     
     void polyFillRectangle(XGC gc, RECTANGLE [] rectangles);
