@@ -99,6 +99,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.legacy.OpenFont;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolyFillRectangle;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolyLine;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolyPoint;
+import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolySegment;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.QueryColors;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.QueryFont;
 import com.neaterbits.displayserver.protocol.types.ATOM;
@@ -772,6 +773,13 @@ public class XServer implements AutoCloseable {
             } catch (GContextException ex) {
                 sendError(client, Errors.GContext, sequenceNumber, ex.getGContext().getValue(), opcode);
             }
+		    break;
+		}
+		
+		case OpCodes.POLY_SEGMENT: {
+		    
+		    log(messageLength, opcode, sequenceNumber, PolySegment.decode(stream));
+		    
 		    break;
 		}
 		

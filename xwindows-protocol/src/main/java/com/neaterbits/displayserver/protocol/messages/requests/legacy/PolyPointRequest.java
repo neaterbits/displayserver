@@ -1,24 +1,23 @@
 package com.neaterbits.displayserver.protocol.messages.requests.legacy;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
-import com.neaterbits.displayserver.protocol.messages.Request;
 import com.neaterbits.displayserver.protocol.types.BYTE;
-import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.GCONTEXT;
 import com.neaterbits.displayserver.protocol.types.POINT;
 
-public abstract class PolyPointRequest extends Request {
+public abstract class PolyPointRequest extends PolyRequest<POINT> {
 
+    private static final int CARD32_PER_ENTRY = 1;
+    
+    @FunctionalInterface
+    public interface CreatePolyPointRequest<REQUEST extends PolyPointRequest> {
 
-    public interface CreatePolyPointRequest<T extends PolyPointRequest> {
-
-        T create(
+        REQUEST create(
                 BYTE coordinateMode, 
                 DRAWABLE drawable,
                 GCONTEXT gc,
@@ -26,84 +25,49 @@ public abstract class PolyPointRequest extends Request {
 
     }
     
-    
     private final BYTE coordinateMode;
-    private final DRAWABLE drawable;
-    private final GCONTEXT gc;
-    private final POINT [] points;
     
-    public static <T extends PolyPointRequest> T decode(XWindowsProtocolInputStream stream, CreatePolyPointRequest<T> createPolyPointRequest) throws IOException {
+    public static <REQUEST extends PolyPointRequest> REQUEST decode(XWindowsProtocolInputStream stream, CreatePolyPointRequest<REQUEST> createPolyPointRequest) throws IOException {
         
-        final BYTE coordinateMode = stream.readBYTE();
-        
-        final CARD16 requestLength = stream.readCARD16();
-        
-        final int numPoints = requestLength.getValue() - 3;
-        
-        final DRAWABLE drawable = stream.readDRAWABLE();
-        final GCONTEXT gc = stream.readGCONTEXT();
-        
-        final POINT [] points = new POINT[numPoints];
-        
-        for (int i = 0; i < numPoints; ++ i) {
-            points[i] = stream.readPOINT();
-        }
-        
-        return createPolyPointRequest.create(coordinateMode, drawable, gc, points);
+        return PolyRequest.decode(
+                stream,
+                CARD32_PER_ENTRY,
+                POINT[]::new,
+                XWindowsProtocolInputStream::readPOINT,
+                (BYTE initialByte, DRAWABLE drawable, GCONTEXT gc, POINT [] list) -> createPolyPointRequest.create(initialByte, drawable, gc, list));
     }
+    
     
     public PolyPointRequest(BYTE coordinateMode, DRAWABLE drawable, GCONTEXT gc, POINT[] points) {
 
+        super(drawable, gc, points);
+        
         Objects.requireNonNull(coordinateMode);
-        Objects.requireNonNull(drawable);
-        Objects.requireNonNull(gc);
-        Objects.requireNonNull(points);
         
         this.coordinateMode = coordinateMode;
-        this.drawable = drawable;
-        this.gc = gc;
-        this.points = points;
     }
 
     public final BYTE getCoordinateMode() {
         return coordinateMode;
     }
 
-    public final DRAWABLE getDrawable() {
-        return drawable;
-    }
-
-    public final GCONTEXT getGC() {
-        return gc;
-    }
-
     public final POINT[] getPoints() {
-        return points;
+        return getList();
     }
 
     @Override
     public final Object[] getDebugParams() {
         return wrap(
                 "coordinateMode", coordinateMode,
-                "drawable", drawable,
-                "gc", gc,
-                "points", Arrays.toString(points)
+                "drawable", getDrawable(),
+                "gc", getGC(),
+                "points", getListDebugParam()
                 
         );
     }
 
     @Override
     public final void encode(XWindowsProtocolOutputStream stream) throws IOException {
-
-        writeOpCode(stream);
-        
-        stream.writeBYTE(coordinateMode);
-        
-        writeRequestLength(stream, 3 + points.length);
-        
-        stream.writeDRAWABLE(drawable);
-        stream.writeGCONTEXT(gc);
-
-        encodeArray(points, stream);
+        super.encode(stream, coordinateMode, CARD32_PER_ENTRY);
     }
 }
