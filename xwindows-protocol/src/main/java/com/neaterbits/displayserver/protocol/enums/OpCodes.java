@@ -48,6 +48,8 @@ public class OpCodes {
 	
 	public static final int POLY_LINE = 65;
 	
+	public static final int POLY_FILL_RECTANGLE = 70;
+	
 	public static final int PUT_IMAGE = 72;
 	public static final int GET_IMAGE = 73;
 	

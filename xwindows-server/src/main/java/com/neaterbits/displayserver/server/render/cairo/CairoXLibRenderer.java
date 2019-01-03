@@ -10,6 +10,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.GCAttributes;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.POINT;
+import com.neaterbits.displayserver.protocol.types.RECTANGLE;
 import com.neaterbits.displayserver.render.cairo.Cairo;
 import com.neaterbits.displayserver.render.cairo.CairoImageSurface;
 import com.neaterbits.displayserver.render.cairo.CairoOperator;
@@ -88,6 +89,15 @@ final class CairoXLibRenderer implements XLibRenderer {
         cr.fill();
     }
 
+    private void fillRectangle(int x, int y, int width, int height) {
+        
+        cr.rectangle(x, y, width, height);
+        
+        cr.strokePreserve();
+        
+        cr.fill();
+    }
+
     @Override
     public void polyLine(XGC gc, BYTE coordinateMode, POINT[] points) {
 
@@ -115,6 +125,25 @@ final class CairoXLibRenderer implements XLibRenderer {
             
             flush();
         }
+    }
+
+    @Override
+    public void polyFillRectangle(XGC gc, RECTANGLE[] rectangles) {
+
+        
+        if (rectangles.length != 0) {
+
+            applyGC(gc);
+
+            for (RECTANGLE rectangle : rectangles) {
+                fillRectangle(
+                        rectangle.getX().getValue(),
+                        rectangle.getY().getValue(),
+                        rectangle.getWidth().getValue(),
+                        rectangle.getHeight().getValue());
+            }
+        }
+        
     }
 
     @Override

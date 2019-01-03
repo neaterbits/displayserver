@@ -5,6 +5,7 @@ import java.nio.ByteOrder;
 
 import com.neaterbits.displayserver.io.common.DataWriter;
 import com.neaterbits.displayserver.protocol.DataOutputXWindowsProtocolOutputStream;
+import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.util.logging.LogUtil;
@@ -18,8 +19,26 @@ public abstract class Encodeable {
 			element.encode(stream);
 		}
 	}
+	
+	@FunctionalInterface
+	public interface DecodeArrayElement<T> {
+	    T decode(XWindowsProtocolInputStream stream) throws IOException;
+	}
 
-   public static DataWriter makeDataWriter(Encodeable encodeable) {
+	protected static <T extends Encodeable> T [] decodeArray(
+	        XWindowsProtocolInputStream stream,
+	        T [] array,
+	        DecodeArrayElement<T> decode) throws IOException {
+	    
+	    for (int i = 0; i < array.length; ++ i) {
+	        array[i] = decode.decode(stream);
+	    }
+	    
+	    return array;
+	}
+
+
+    public static DataWriter makeDataWriter(Encodeable encodeable) {
         return dataOutputStream -> {
             final XWindowsProtocolOutputStream protocolOutputStream = new DataOutputXWindowsProtocolOutputStream(dataOutputStream);
             

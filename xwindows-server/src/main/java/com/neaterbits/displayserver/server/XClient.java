@@ -39,6 +39,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.WindowAttributes;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.CloseFont;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.ImageText16;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.OpenFont;
+import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolyFillRectangle;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolyLine;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.QueryFont;
 import com.neaterbits.displayserver.protocol.types.CARD16;
@@ -487,7 +488,15 @@ public class XClient extends XConnection {
         
         drawable.getRenderer().polyLine(gc, polyLine.getCoordinateMode(), polyLine.getPoints());
     }
-    
+
+    final void polyFillRectangle(PolyFillRectangle polyFillRectangle) throws DrawableException, GContextException {
+        
+        final XDrawable drawable = findDrawble(polyFillRectangle.getDrawable());
+        final XGC gc = getGC(polyFillRectangle.getGC());
+        
+        drawable.getRenderer().polyFillRectangle(gc, polyFillRectangle.getRectangles());
+    }
+
     final void putImage(PutImage putImage) {
         
         final XWindow window = server.getWindows().getClientWindow(putImage.getDrawable());
