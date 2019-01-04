@@ -160,7 +160,10 @@ public class XWindow extends XDrawable {
         return currentWindowAttributes;
     }
     
-    final void setCurrentWindowAttributes(WindowAttributes currentWindowAttributes) {
+    public final void setCurrentWindowAttributes(WindowAttributes currentWindowAttributes) {
+        
+        Objects.requireNonNull(currentWindowAttributes);
+        
         this.currentWindowAttributes = currentWindowAttributes;
     }
 

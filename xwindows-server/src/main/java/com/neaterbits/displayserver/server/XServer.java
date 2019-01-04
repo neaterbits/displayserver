@@ -33,6 +33,7 @@ import com.neaterbits.displayserver.protocol.exception.GContextException;
 import com.neaterbits.displayserver.protocol.exception.IDChoiceException;
 import com.neaterbits.displayserver.protocol.exception.MatchException;
 import com.neaterbits.displayserver.protocol.exception.ValueException;
+import com.neaterbits.displayserver.protocol.exception.WindowException;
 import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLog;
 import com.neaterbits.displayserver.protocol.messages.Encodeable;
 import com.neaterbits.displayserver.protocol.messages.Error;
@@ -423,8 +424,13 @@ public class XServer implements AutoCloseable {
 		}
 		
 		case OpCodes.CHANGE_WINDOW_ATTRIBUTES: {
-		    log(messageLength, opcode, sequenceNumber, ChangeWindowAttributes.decode(stream));
+		    final ChangeWindowAttributes changeWindowAttributes = log(messageLength, opcode, sequenceNumber, ChangeWindowAttributes.decode(stream));
 		    
+		    try {
+                client.changeWindowAttributes(changeWindowAttributes);
+            } catch (WindowException ex) {
+                sendError(client, Errors.Window, sequenceNumber, ex.getWindow().getValue(), opcode);
+            }
 		    break;
 		}
 		

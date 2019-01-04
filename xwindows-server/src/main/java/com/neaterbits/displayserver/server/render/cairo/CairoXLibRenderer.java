@@ -223,9 +223,8 @@ final class CairoXLibRenderer implements XLibRenderer {
                         cr.rectangle(dstX, dstY, width, height);
                         cr.clip();
                         
-                        cr.newPath();
                         cr.setSourceSurface(imageSurface, 0, 0);
-                        cr.moveTo(dstX, dstY);
+                        cr.paint();
                     }
                     finally {
                         imageSurface.dispose();

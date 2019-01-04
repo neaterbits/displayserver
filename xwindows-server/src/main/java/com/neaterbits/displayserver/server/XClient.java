@@ -22,8 +22,10 @@ import com.neaterbits.displayserver.protocol.exception.GContextException;
 import com.neaterbits.displayserver.protocol.exception.IDChoiceException;
 import com.neaterbits.displayserver.protocol.exception.MatchException;
 import com.neaterbits.displayserver.protocol.exception.ValueException;
+import com.neaterbits.displayserver.protocol.exception.WindowException;
 import com.neaterbits.displayserver.protocol.messages.replies.GetImageReply;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeGC;
+import com.neaterbits.displayserver.protocol.messages.requests.ChangeWindowAttributes;
 import com.neaterbits.displayserver.protocol.messages.requests.ClearArea;
 import com.neaterbits.displayserver.protocol.messages.requests.CopyArea;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateCursor;
@@ -44,15 +46,18 @@ import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolyFillRe
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolyLine;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolyPoint;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.QueryFont;
+import com.neaterbits.displayserver.protocol.types.BITMASK;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.CHAR2B;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.FONT;
 import com.neaterbits.displayserver.protocol.types.GCONTEXT;
+import com.neaterbits.displayserver.protocol.types.PIXMAP;
 import com.neaterbits.displayserver.protocol.types.RESOURCE;
 import com.neaterbits.displayserver.protocol.types.STRING16;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
+import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.types.Size;
 import com.neaterbits.displayserver.windows.Display;
 import com.neaterbits.displayserver.windows.DisplayArea;
@@ -92,6 +97,12 @@ public class XClient extends XConnection {
         this.openFonts = new HashMap<>();
     }
 
+    private BufferOperations getBufferForWindow(Window window) {
+        final BufferOperations windowBuffer = rendering.getCompositor().getBufferForWindow(window);
+
+        return windowBuffer;
+    }
+    
 
     final XWindow createWindow(Display display, CreateWindow createWindow, XWindow parentWindow) throws ValueException, IDChoiceException {
 
@@ -142,7 +153,7 @@ public class XClient extends XConnection {
         
         final XWindow rootWindow = server.getWindows().findRootWindowOf(createWindow.getParent());
         
-        final BufferOperations windowBuffer = rendering.getCompositor().getBufferForWindow(window);
+        final BufferOperations windowBuffer = getBufferForWindow(window);
         
         final XLibRenderer renderer = rendering.getRendererFactory().createRenderer(windowBuffer, window.getPixelFormat());
         
@@ -157,26 +168,38 @@ public class XClient extends XConnection {
                 createWindow.getWindowClass(),
                 WindowAttributes.DEFAULT_ATTRIBUTES.applyImmutably(createWindow.getAttributes()),
                 renderer);
-        
-        final WindowAttributes windowAttributes = createWindow.getAttributes();
-        
-        if (windowAttributes.isSet(WindowAttributes.BACKGROUND_PIXEL)) {
-        
-            final int bgPixel = (int)windowAttributes.getBackgroundPixel().getValue();
-            
-            final PixelFormat pixelFormat = window.getPixelFormat();
-            
-            renderer.fillRectangle(
-                    window.getPosition().getLeft(), window.getPosition().getTop(),
-                    window.getSize().getWidth(), window.getSize().getHeight(),
-                    pixelFormat.getRed(bgPixel),
-                    pixelFormat.getGreen(bgPixel),
-                    pixelFormat.getBlue(bgPixel));
-            
-            renderer.flush();
-        }
+
+        renderWindowBackground(createWindow.getAttributes(), window, renderer, windowBuffer);
             
         return xWindowsWindow;
+    }
+    
+    final void changeWindowAttributes(ChangeWindowAttributes changeWindowAttributes) throws WindowException {
+    
+        final XWindow xWindow = findWindow(changeWindowAttributes.getWindow());
+     
+        final WindowAttributes currentAttributes = xWindow.getCurrentWindowAttributes();
+
+        final WindowAttributes updatedAttributes = currentAttributes.applyImmutably(changeWindowAttributes.getAttributes());
+        
+        xWindow.setCurrentWindowAttributes(updatedAttributes);
+        
+        final boolean sameBgMask = BITMASK.isSameMask(
+                currentAttributes.getValueMask(),
+                updatedAttributes.getValueMask(),
+                WindowAttributes.BACKGROUND_PIXEL|WindowAttributes.BACKGROUND_PIXMAP);
+        
+        if (    !sameBgMask
+             || (    updatedAttributes.isSet(WindowAttributes.BACKGROUND_PIXEL)
+                  && !updatedAttributes.getBackgroundPixel().equals(currentAttributes.getBackgroundPixel()))
+             || (    updatedAttributes.isSet(WindowAttributes.BACKGROUND_PIXMAP)
+                  && !updatedAttributes.getBackgroundPixmap().equals(currentAttributes.getBackgroundPixmap()))
+         ) {
+
+            final BufferOperations windowBuffer = getBufferForWindow(xWindow.getWindow());
+
+            renderWindowBackground(updatedAttributes, xWindow.getWindow(), xWindow.getRenderer(), windowBuffer);
+        }
     }
     
     final XWindow destroyWindow(Display display, DestroyWindow destroyWindow) {
@@ -191,6 +214,59 @@ public class XClient extends XConnection {
         }
         
         return xWindow;
+    }
+    
+    private void renderWindowBackground(WindowAttributes windowAttributes, Window window, XLibRenderer renderer, BufferOperations windowBuffer) {
+        
+    if (windowAttributes.isSet(WindowAttributes.BACKGROUND_PIXMAP) && !windowAttributes.getBackgroundPixmap().equals(PIXMAP.None)) {
+        final PIXMAP pixmapResource = windowAttributes.getBackgroundPixmap();
+        
+        final XPixmap xPixmap = server.getPixmaps().getPixmap(pixmapResource);
+    
+        System.out.println("## render to window of size " + window.getSize());
+        
+        if (xPixmap != null) {
+            
+            final OffscreenBuffer src = xPixmap.getOffscreenBuffer();
+            
+            final Size windowSize = window.getSize();
+            
+            for (int dstY = 0; dstY < windowSize.getHeight(); ) {
+            
+                final int height = Math.min(src.getHeight(), windowSize.getHeight() - dstY);
+
+                for (int dstX = 0; dstX < windowSize.getWidth(); ) {
+                
+                    final int width = Math.min(src.getWidth(), windowSize.getWidth() - dstX);
+                    
+                    windowBuffer.copyArea(
+                            src,
+                            0, 0,
+                            dstX, dstY,
+                            width, height);
+
+                    dstX += width;
+                }
+                
+                dstY += height;
+            }
+        }
+    }
+    else if (windowAttributes.isSet(WindowAttributes.BACKGROUND_PIXEL)) {
+        
+            final int bgPixel = (int)windowAttributes.getBackgroundPixel().getValue();
+            
+            final PixelFormat pixelFormat = window.getPixelFormat();
+            
+            renderer.fillRectangle(
+                    window.getPosition().getLeft(), window.getPosition().getTop(),
+                    window.getSize().getWidth(), window.getSize().getHeight(),
+                    pixelFormat.getRed(bgPixel),
+                    pixelFormat.getGreen(bgPixel),
+                    pixelFormat.getBlue(bgPixel));
+            
+            renderer.flush();
+        }
     }
     
     private DisplayAreaWindows findDisplayArea(DRAWABLE drawable) {
@@ -208,6 +284,17 @@ public class XClient extends XConnection {
         return xDrawable;
     }
 
+    private XWindow findWindow(WINDOW window) throws WindowException {
+        
+        final XWindow xWindow = server.getWindows().getClientOrRootWindow(window);
+        
+        if (xWindow == null) {
+            throw new WindowException("No such window", window);
+        }
+        
+        return xWindow;
+    }
+    
     private VISUALID getVisual(DRAWABLE drawable) throws DrawableException {
         
         final XDrawable xDrawable = findDrawable(drawable);

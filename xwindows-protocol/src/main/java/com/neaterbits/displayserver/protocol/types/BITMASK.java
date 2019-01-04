@@ -6,6 +6,10 @@ public final class BITMASK {
 
 	private final int value;
 
+	public static boolean isSameMask(BITMASK bitmask1, BITMASK bitmask2, int flags) {
+	    return (bitmask1.value & flags) == (bitmask2.value & flags);
+	}
+	
 	public BITMASK(int value) {
 		this.value = value;
 	}
