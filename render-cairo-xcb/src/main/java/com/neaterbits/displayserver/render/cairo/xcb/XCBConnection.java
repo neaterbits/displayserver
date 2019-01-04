@@ -5,18 +5,22 @@ public class XCBConnection extends XCBReference implements AutoCloseable {
     public static XCBConnection connect(String display) {
         final long connection = XCBNative.xcb_connect(display);
         
-        return connection != 0L ? new XCBConnection(connection) : null;
+        return connection != 0L ? new XCBConnection(connection, display) : null;
     }
 
     public static XCBConnection connect(String display, String authMethod, byte [] authData) {
         
         final long connection = XCBNative.xcb_connect_display(display, authMethod, authData);
         
-        return connection != 0L ? new XCBConnection(connection) : null;
+        return connection != 0L ? new XCBConnection(connection, display) : null;
     }
     
-    private XCBConnection(long reference) {
+    private final String display;
+    
+    private XCBConnection(long reference, String display) {
         super(reference);
+        
+        this.display = display;
     }
 
     public XCBSetup getSetup() {
@@ -41,5 +45,10 @@ public class XCBConnection extends XCBReference implements AutoCloseable {
             close();
         } catch (Exception ex) {
         }
+    }
+
+    @Override
+    public String toString() {
+        return display + "/" + String.format("%08x", getReference());
     }
 }

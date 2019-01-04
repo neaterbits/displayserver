@@ -28,6 +28,7 @@ import com.neaterbits.displayserver.protocol.types.INT16;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.render.cairo.CairoSurface;
 import com.neaterbits.displayserver.render.cairo.xcb.CairoXCBSurface;
+import com.neaterbits.displayserver.render.cairo.xcb.DrawableType;
 import com.neaterbits.displayserver.types.Size;
 
 abstract class XWindowsBaseBuffer implements BufferOperations {
@@ -38,6 +39,8 @@ abstract class XWindowsBaseBuffer implements BufferOperations {
     final int depth;
 
     abstract DRAWABLE getDrawable();
+    
+    abstract DrawableType getDrawableType();
     
     abstract int getScreenNo();
     
@@ -304,6 +307,7 @@ abstract class XWindowsBaseBuffer implements BufferOperations {
         return CairoXCBSurface.create(
                 driverConnection.getXCBConnection(),
                 drawable.getValue(),
+                getDrawableType(),
                 driverConnection.getXCBVisual(),
                 size.getWidth(),
                 size.getHeight());

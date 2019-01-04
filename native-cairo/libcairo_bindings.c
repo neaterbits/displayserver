@@ -225,6 +225,20 @@ JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNativ
 	free(data);
 }
 
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1surface_1write_1to_1png
+  (JNIEnv *env, jclass cl, jlong surface_reference, jstring filename) {
+
+	const char *native_filename = (*env)->GetStringUTFChars(env, filename, NULL);
+
+	cairo_surface_t *surface = (cairo_surface_t *)surface_reference;
+
+	cairo_status_t status = cairo_surface_write_to_png(surface, native_filename);
+
+	(*env)->ReleaseStringUTFChars(env, filename, native_filename);
+
+	return status;
+}
+
 
 #define OP(name) \
 	ENUM(CAIRO_OPERATOR_, name)
@@ -313,6 +327,71 @@ JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNativ
 
 	return format;
 }
+
+#define STATUS(name) \
+		ENUM(CAIRO_STATUS_, name)
+
+static struct enum_mapping status_mapping [] = {
+	    STATUS(SUCCESS),
+
+		STATUS(NO_MEMORY),
+		STATUS(INVALID_RESTORE),
+		STATUS(INVALID_POP_GROUP),
+		STATUS(NO_CURRENT_POINT),
+		STATUS(INVALID_MATRIX),
+		STATUS(INVALID_STATUS),
+		STATUS(NULL_POINTER),
+		STATUS(INVALID_STRING),
+		STATUS(INVALID_PATH_DATA),
+		STATUS(READ_ERROR),
+		STATUS(WRITE_ERROR),
+		STATUS(SURFACE_FINISHED),
+		STATUS(SURFACE_TYPE_MISMATCH),
+		STATUS(PATTERN_TYPE_MISMATCH),
+		STATUS(INVALID_CONTENT),
+		STATUS(INVALID_FORMAT),
+		STATUS(INVALID_VISUAL),
+		STATUS(FILE_NOT_FOUND),
+		STATUS(INVALID_DASH),
+		STATUS(INVALID_DSC_COMMENT),
+		STATUS(INVALID_INDEX),
+		STATUS(CLIP_NOT_REPRESENTABLE),
+		STATUS(TEMP_FILE_ERROR),
+		STATUS(INVALID_STRIDE),
+		STATUS(FONT_TYPE_MISMATCH),
+		STATUS(USER_FONT_IMMUTABLE),
+		STATUS(USER_FONT_ERROR),
+		STATUS(NEGATIVE_COUNT),
+		STATUS(INVALID_CLUSTERS),
+		STATUS(INVALID_SLANT),
+		STATUS(INVALID_WEIGHT),
+		STATUS(INVALID_SIZE),
+		STATUS(USER_FONT_NOT_IMPLEMENTED),
+		STATUS(DEVICE_TYPE_MISMATCH),
+		STATUS(DEVICE_ERROR),
+		STATUS(INVALID_MESH_CONSTRUCTION),
+		STATUS(DEVICE_FINISHED),
+		STATUS(JBIG2_GLOBAL_MISSING),
+		STATUS(PNG_ERROR),
+		STATUS(FREETYPE_ERROR),
+		STATUS(WIN32_GDI_ERROR),
+		STATUS(TAG_ERROR),
+
+		ENUM_MAPPING_TERMINATOR
+};
+
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_get_1cairo_1status_1enum_1value
+  (JNIEnv *env, jclass cl, jstring name) {
+
+	const char *native_name = (*env)->GetStringUTFChars(env, name, NULL);
+
+	cairo_status_t status = get_enum_value(status_mapping, native_name);
+
+	(*env)->ReleaseStringUTFChars(env, name, native_name);
+
+	return status;
+}
+
 
 
 JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1format_1stride_1for_1width

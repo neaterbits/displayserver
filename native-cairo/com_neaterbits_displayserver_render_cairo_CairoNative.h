@@ -209,6 +209,14 @@ JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNativ
 
 /*
  * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
+ * Method:    cairo_surface_write_to_png
+ * Signature: (JLjava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1surface_1write_1to_1png
+  (JNIEnv *, jclass, jlong, jstring);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
  * Method:    get_cairo_format_enum_value
  * Signature: (Ljava/lang/String;)I
  */
@@ -222,6 +230,14 @@ JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNativ
  */
 JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1format_1stride_1for_1width
   (JNIEnv *, jclass, jint, jint);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
+ * Method:    get_cairo_status_enum_value
+ * Signature: (Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_get_1cairo_1status_1enum_1value
+  (JNIEnv *, jclass, jstring);
 
 #ifdef __cplusplus
 }

@@ -1,12 +1,16 @@
 package com.neaterbits.displayserver.render.cairo.xcb;
 
+import java.util.Objects;
+
 import com.neaterbits.displayserver.render.cairo.CairoSurface;
 
 public final class CairoXCBSurface extends CairoSurface {
 
     private final XCBConnection connection;
+    private final int drawable;
+    private final DrawableType drawableType;
     
-    public static CairoXCBSurface create(XCBConnection connection, int drawable, XCBVisual visual, int width, int height) {
+    public static CairoXCBSurface create(XCBConnection connection, int drawable, DrawableType drawableType, XCBVisual visual, int width, int height) {
 
         final long surface = XCBNative.cairo_create_xcb_surface(
                 connection.getXCBReference(),
@@ -15,12 +19,16 @@ public final class CairoXCBSurface extends CairoSurface {
                 width,
                 height);
         
-        return surface != 0L ? new CairoXCBSurface(surface, connection) : null;
+        return surface != 0L ? new CairoXCBSurface(surface, drawable, drawableType, connection) : null;
     }
     
-    private CairoXCBSurface(long reference, XCBConnection connection) {
+    private CairoXCBSurface(long reference, int drawable, DrawableType drawableType, XCBConnection connection) {
         super(reference);
 
+        Objects.requireNonNull(drawableType);
+        
+        this.drawable = drawable;
+        this.drawableType = drawableType;
         this.connection = connection;
     }
 
@@ -29,5 +37,11 @@ public final class CairoXCBSurface extends CairoSurface {
         super.flush();
         
         connection.flush();
+    }
+
+    @Override
+    public String toString() {
+        return "CairoXCBSurface [connection=" + connection
+                + ", drawable=" + String.format("%s@%08x", drawableType.toString(), drawable) + "]";
     }
 }

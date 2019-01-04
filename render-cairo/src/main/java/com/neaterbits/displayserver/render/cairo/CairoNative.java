@@ -56,9 +56,14 @@ public class CairoNative {
     
     static native void free_image_surface_data(long data);
     
+    // png surface
+    static native int cairo_surface_write_to_png(long surface, String filename);
+    
     // cairo_format_t
     static native int get_cairo_format_enum_value(String enumName);
     
     static native int cairo_format_stride_for_width(int format, int width);
-    
+
+    // cairo_status_t
+    static native int get_cairo_status_enum_value(String enumName);
 }

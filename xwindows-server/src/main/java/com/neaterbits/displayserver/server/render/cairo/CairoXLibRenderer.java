@@ -16,6 +16,8 @@ import com.neaterbits.displayserver.render.cairo.Cairo;
 import com.neaterbits.displayserver.render.cairo.CairoFormat;
 import com.neaterbits.displayserver.render.cairo.CairoImageSurface;
 import com.neaterbits.displayserver.render.cairo.CairoOperator;
+import com.neaterbits.displayserver.render.cairo.CairoPNGSurface;
+import com.neaterbits.displayserver.render.cairo.CairoStatus;
 import com.neaterbits.displayserver.render.cairo.CairoSurface;
 import com.neaterbits.displayserver.xwindows.model.XGC;
 import com.neaterbits.displayserver.xwindows.model.render.XLibRenderer;
@@ -26,6 +28,8 @@ final class CairoXLibRenderer implements XLibRenderer {
     private final PixelConversion pixelConversion;
 
     private final Cairo cr;
+    
+    private static int fileSequenceCounter = 0;
     
     CairoXLibRenderer(CairoSurface surface, PixelConversion pixelConversion) {
         
@@ -217,8 +221,13 @@ final class CairoXLibRenderer implements XLibRenderer {
                     }
                     
                     final CairoImageSurface imageSurface = new CairoImageSurface(data, cairoFormat, width, height, stride);
+
+                    writeToPNG(imageSurface);
                     
                     try {
+                        System.out.println("## write image surface to " + surface + " at "
+                                    + "(" + dstX + ", " + dstY + "), size "
+                                    + "(" + width + ", " + height + ")");
                         
                         cr.rectangle(dstX, dstY, width, height);
                         cr.clip();
@@ -233,6 +242,17 @@ final class CairoXLibRenderer implements XLibRenderer {
                 break;
                 
             }
+        }
+    }
+    
+    private void writeToPNG(CairoImageSurface surface) {
+        
+        final String fileName = System.getenv("HOME") + "/projects/displayserver/image" + (fileSequenceCounter ++) + ".png";
+        
+        final CairoStatus status = CairoPNGSurface.writePNG(surface, fileName);
+        
+        if (status != CairoStatus.SUCCESS) {
+            throw new IllegalStateException();
         }
     }
 

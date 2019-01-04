@@ -10,6 +10,7 @@ import com.neaterbits.displayserver.framebuffer.common.FrameBuffer;
 import com.neaterbits.displayserver.protocol.messages.requests.DestroyWindow;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
+import com.neaterbits.displayserver.render.cairo.xcb.DrawableType;
 import com.neaterbits.displayserver.types.Size;
 
 class XWindowsFrameBuffer extends XWindowsBaseBuffer implements FrameBuffer {
@@ -29,6 +30,11 @@ class XWindowsFrameBuffer extends XWindowsBaseBuffer implements FrameBuffer {
 	@Override
     final DRAWABLE getDrawable() {
         return window.toDrawable();
+    }
+	
+    @Override
+    DrawableType getDrawableType() {
+        return DrawableType.WINDOW;
     }
 
     @Override

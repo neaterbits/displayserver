@@ -11,6 +11,7 @@ import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.PIXMAP;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
+import com.neaterbits.displayserver.render.cairo.xcb.DrawableType;
 import com.neaterbits.displayserver.types.Size;
 
 final class XWindowsOffscreenBuffer extends XWindowsBaseBuffer implements OffscreenBuffer {
@@ -45,6 +46,11 @@ final class XWindowsOffscreenBuffer extends XWindowsBaseBuffer implements Offscr
         return pixmap.toDrawable();
     }
     
+    @Override
+    DrawableType getDrawableType() {
+        return DrawableType.PIXMAP;
+    }
+
     @Override
     public Size getSize() {
         return size;
