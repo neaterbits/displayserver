@@ -10,6 +10,7 @@ public class OpCodes {
 	
 	public static final int MAP_WINDOW = 8;
 	public static final int MAP_SUBWINDOWS = 9;
+	public static final int UNMAP_WINDOW = 10;
 
 	public static final int CONFIGURE_WINDOW = 12;
 	
