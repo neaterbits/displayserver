@@ -430,26 +430,38 @@ public class XClient extends XConnection {
 
     final void polyPoint(PolyPoint polyPoint) throws DrawableException, GContextException {
         
-        final XDrawable drawable = findDrawable(polyPoint.getDrawable());
+        final XDrawable xDrawable = findDrawable(polyPoint.getDrawable());
         final XGC gc = getGC(polyPoint.getGC());
         
-        drawable.getRenderer().polyPoint(gc, polyPoint.getCoordinateMode(), polyPoint.getPoints());
+        final XLibRenderer renderer = xDrawable.getRenderer();
+
+        renderer.polyPoint(gc, polyPoint.getCoordinateMode(), polyPoint.getPoints());
+        
+        renderer.flush();
     }
 
     final void polyLine(PolyLine polyLine) throws DrawableException, GContextException {
         
-        final XDrawable drawable = findDrawable(polyLine.getDrawable());
+        final XDrawable xDrawable = findDrawable(polyLine.getDrawable());
         final XGC gc = getGC(polyLine.getGC());
         
-        drawable.getRenderer().polyLine(gc, polyLine.getCoordinateMode(), polyLine.getPoints());
+        final XLibRenderer renderer = xDrawable.getRenderer();
+
+        renderer.polyLine(gc, polyLine.getCoordinateMode(), polyLine.getPoints());
+        
+        renderer.flush();
     }
 
     final void polyFillRectangle(PolyFillRectangle polyFillRectangle) throws DrawableException, GContextException {
         
-        final XDrawable drawable = findDrawable(polyFillRectangle.getDrawable());
+        final XDrawable xDrawable = findDrawable(polyFillRectangle.getDrawable());
         final XGC gc = getGC(polyFillRectangle.getGC());
         
-        drawable.getRenderer().polyFillRectangle(gc, polyFillRectangle.getRectangles());
+        final XLibRenderer renderer = xDrawable.getRenderer();
+
+        renderer.polyFillRectangle(gc, polyFillRectangle.getRectangles());
+        
+        renderer.flush();
     }
 
     final void putImage(PutImage putImage) throws DrawableException, GContextException {
@@ -465,7 +477,9 @@ public class XClient extends XConnection {
             throw new IllegalArgumentException();
         }
         
-        xDrawable.getRenderer().putImage(
+        final XLibRenderer renderer = xDrawable.getRenderer();
+        
+        renderer.putImage(
                 gc,
                 putImage.getFormat().getValue(),
                 putImage.getWidth().getValue(),
@@ -476,6 +490,8 @@ public class XClient extends XConnection {
                 putImage.getDepth().getValue(),
                 putImage.getData()
         );
+        
+        renderer.flush();
     }
     
     final void getImage(GetImage getImage, CARD16 sequenceNumber, ServerToClient serverToClient) throws MatchException, DrawableException {
@@ -573,7 +589,7 @@ public class XClient extends XConnection {
     
     final void imageText16(ImageText16 imageText) throws DrawableException, GContextException, MatchException {
 
-        final XDrawable drawable = findDrawable(imageText.getDrawable());
+        final XDrawable xDrawable = findDrawable(imageText.getDrawable());
         final XGC gc = getGC(imageText.getGC());
 
         final FONT fontResource = gc.getAttributes().getFont();
@@ -590,19 +606,21 @@ public class XClient extends XConnection {
         int x = imageText.getX().getValue();
         final int y = imageText.getY().getValue();
         
+        final XLibRenderer renderer = xDrawable.getRenderer();
+
         for (int i = 0; i < string.length(); ++ i) {
             
             final CHAR2B character = string.getCharacter(i);
             
             final int glyphIndex = font.getGlyphIndex(character);
             
-            drawable.getRenderer().renderBitmap(gc, font.getRenderBitmap(glyphIndex), x, y);
+            renderer.renderBitmap(gc, font.getRenderBitmap(glyphIndex), x, y);
             // drawable.getRenderer().fillRectangle(x, y, 15, 15, 0, 0, 0);
             
             x += font.getGlyphRenderWidth(glyphIndex);
         }
         
-        drawable.getRenderer().flush();
+        renderer.flush();
     }
     
     final void createCursor(CreateCursor createCursor) throws IDChoiceException {

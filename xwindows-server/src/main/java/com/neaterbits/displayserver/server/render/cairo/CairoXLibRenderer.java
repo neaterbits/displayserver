@@ -235,7 +235,6 @@ final class CairoXLibRenderer implements XLibRenderer {
                 
             }
         }
-        
     }
 
     @Override
