@@ -478,25 +478,58 @@ public class XServer implements AutoCloseable {
 		    
 		    final GetGeometry getGeometry = log(messageLength, opcode, sequenceNumber, GetGeometry.decode(stream));
 		    
-		    final WINDOW windowResource = getGeometry.getDrawable().toWindow();
+		    final DRAWABLE drawable = getGeometry.getDrawable();
 		    
-            final XWindow window = state.getClientWindow(windowResource);
+		    final WINDOW windowResource = drawable.toWindow();
+            
+            final WINDOW root;
+            final int depth;
+            
+            final int x, y;
+            final int width, height;
+            final int borderWidth;
 
-            if (window == null) {
-                sendError(client, Errors.Window, sequenceNumber, windowResource.getValue(), opcode);
-            }
-            else {
+            final XWindow xWindow;
+            final XPixmap xPixmap;
+            
+            try {
+                if (null != (xWindow = state.getClientWindow(windowResource))) {
+                    root = state.findRootWindowOf(xWindow.getWINDOW()).getWINDOW();
+                    depth = xWindow.getDepth();
+                    x = xWindow.getX();
+                    y = xWindow.getY();
+                    width = xWindow.getWidth();
+                    height = xWindow.getHeight();
+                    borderWidth = xWindow.getBorderWidth().getValue();
+                }
+                else if (null != (xPixmap = state.getPixmap(drawable.toPixmap()))) {
+                    
+                    final XWindow pixmapXWindow = state.findPixmapWindow(drawable.toPixmap());
+                    
+                    root = state.findRootWindowOf(pixmapXWindow.getWINDOW()).getWINDOW();
+                    depth = xPixmap.getOffscreenBuffer().getDepth();
+                    x = 0;
+                    y = 0;
+                    width = xPixmap.getOffscreenBuffer().getWidth();
+                    height = xPixmap.getOffscreenBuffer().getHeight();
+                    borderWidth = 0;
+                }
+                else {
+                    throw new DrawableException("No such drawable", drawable);
+                }
                 
-                // TODO
                 final GetGeometryReply reply = new GetGeometryReply(
                         sequenceNumber,
-                        new CARD8(window.getDepth()),
-                        window.getRootWINDOW(),
-                        new INT16(window.getX()), new INT16(window.getY()),
-                        new CARD16(window.getWidth()), new CARD16(window.getHeight()),
-                        window.getBorderWidth());
+                        new CARD8((byte)depth),
+                        root,
+                        new INT16((short)x), new INT16((short)y),
+                        new CARD16(width), new CARD16(height),
+                        new CARD16(borderWidth));
                 
                 sendReply(client, reply);
+            }
+            catch (DrawableException ex) {
+                sendError(client, Errors.Drawable, sequenceNumber, ex.getDrawable().getValue(), opcode);
             }
 		    break;
 		}

@@ -121,6 +121,11 @@ public class XWindow extends XDrawable {
     }
     
     public final WINDOW getRootWINDOW() {
+        
+        if (isRootWindow()) {
+            throw new IllegalStateException();
+        }
+        
         return rootWindow;
     }
     

@@ -109,27 +109,36 @@ public class XDisplayState<W extends XWindow, WINDOWS extends XWindows<W>>
         return xDrawable;
     }
     
+    @Override
+    public XWindow findPixmapWindow(PIXMAP pixmap) {
+
+        final DRAWABLE pixmapOwnerDrawable = pixmaps.getOwnerDrawable(pixmap);
+        
+        if (pixmapOwnerDrawable == null) {
+            throw new IllegalStateException();
+        }
+
+        XWindow xWindow = getClientOrRootWindow(pixmapOwnerDrawable.toWindow());
+        
+        if (xWindow == null) {
+            // See if is pixmap instead
+            xWindow = findPixmapWindow(pixmapOwnerDrawable.toPixmap());
+        }
+        
+        return xWindow;
+    }
+
+    
     public final DisplayAreaWindows findDisplayArea(DRAWABLE drawable) {
         
         Objects.requireNonNull(drawable);
         
         XWindow window = getClientOrRootWindow(drawable.toWindow());
         
-        DisplayAreaWindows displayArea = null;
-        
-        if (window != null) {
-            displayArea = window.getWindow().getDisplayArea();
+        if (window == null) {
+            window = findPixmapWindow(drawable.toPixmap());
         }
-        else {
-            final DRAWABLE pixmapOwnerDrawable = pixmaps.getOwnerDrawable(drawable.toPixmap());
-            
-            if (pixmapOwnerDrawable == null) {
-                throw new IllegalStateException();
-            }
-            
-            displayArea = findDisplayArea(pixmapOwnerDrawable);
-        }
-        
-        return displayArea;
+
+        return window.getWindow().getDisplayArea();
     }
 }
