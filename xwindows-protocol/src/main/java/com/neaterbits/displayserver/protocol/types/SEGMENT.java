@@ -68,4 +68,9 @@ public final class SEGMENT extends Encodeable {
         stream.writeINT16(x2);
         stream.writeINT16(y2);
     }
+
+    @Override
+    public String toString() {
+        return "(" + x1 + ", " + y1 + ", " + x2 + ", " + y2 + ")";
+    }
 }

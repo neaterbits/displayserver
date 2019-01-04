@@ -35,7 +35,7 @@ public final class PolySegment extends PolyRequest<SEGMENT> {
         return wrap(
                 "drawable", getDrawable(),
                 "gc", getGC(),
-                "segnemts", getSegments()
+                "segments", getListDebugParam()
         );
     }
 
