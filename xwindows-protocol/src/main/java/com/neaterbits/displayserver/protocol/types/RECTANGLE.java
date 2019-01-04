@@ -63,4 +63,9 @@ public final class RECTANGLE extends Encodeable {
         stream.writeCARD16(width);
         stream.writeCARD16(height);
     }
+
+    @Override
+    public String toString() {
+        return "(" + x + ", " + y + ", " + width + ", " + height + ")";
+    }
 }

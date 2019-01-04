@@ -36,7 +36,7 @@ public abstract class PolyRectangleRequest extends PolyRequest<RECTANGLE> {
         return wrap(
                 "drawable", getDrawable(),
                 "gc", getGC(),
-                "rectangles", getRectangles()
+                "rectangles", getListDebugParam()
         );
     }
 
