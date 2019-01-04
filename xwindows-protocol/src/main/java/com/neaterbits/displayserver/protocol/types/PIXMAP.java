@@ -8,6 +8,10 @@ public final class PIXMAP extends RESOURCE {
 		super(value);
 	}
 
+	PIXMAP(DRAWABLE drawable) {
+	    this(drawable.getValue());
+	}
+	
 	public DRAWABLE toDrawable() {
 		return new DRAWABLE(getValue());
 	}

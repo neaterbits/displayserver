@@ -61,16 +61,6 @@ public class XDisplayState<W extends XWindow, WINDOWS extends XWindows<W>>
     }
     
     @Override
-    public final XWindow getClientOrRootWindow(DRAWABLE windowResource) {
-        return windows.getClientOrRootWindow(windowResource);
-    }
-
-    @Override
-    public final W getClientWindow(DRAWABLE windowResource) {
-        return windows.getClientWindow(windowResource);
-    }
-
-    @Override
     public final W getClientWindow(WINDOW windowResource) {
         return windows.getClientWindow(windowResource);
     }
@@ -98,13 +88,14 @@ public class XDisplayState<W extends XWindow, WINDOWS extends XWindows<W>>
     }
     
     @Override
-    public XPixmap getPixmap(DRAWABLE drawable) {
-        return pixmaps.getPixmap(drawable);
+    public XPixmap getPixmap(PIXMAP pixmap) {
+        return pixmaps.getPixmap(pixmap);
     }
 
     @Override
     public XDrawable findDrawable(DRAWABLE drawable) {
-        XWindow window = getClientOrRootWindow(drawable);
+        
+        XWindow window = getClientOrRootWindow(drawable.toWindow());
 
         final XDrawable xDrawable;
         
@@ -112,7 +103,7 @@ public class XDisplayState<W extends XWindow, WINDOWS extends XWindows<W>>
             xDrawable = window;
         }
         else {
-            xDrawable = pixmaps.getPixmap(drawable);
+            xDrawable = pixmaps.getPixmap(drawable.toPixmap());
         }
         
         return xDrawable;
@@ -122,7 +113,7 @@ public class XDisplayState<W extends XWindow, WINDOWS extends XWindows<W>>
         
         Objects.requireNonNull(drawable);
         
-        XWindow window = getClientOrRootWindow(drawable);
+        XWindow window = getClientOrRootWindow(drawable.toWindow());
         
         DisplayAreaWindows displayArea = null;
         
@@ -130,7 +121,7 @@ public class XDisplayState<W extends XWindow, WINDOWS extends XWindows<W>>
             displayArea = window.getWindow().getDisplayArea();
         }
         else {
-            final DRAWABLE pixmapOwnerDrawable = pixmaps.getOwnerDrawable(drawable);
+            final DRAWABLE pixmapOwnerDrawable = pixmaps.getOwnerDrawable(drawable.toPixmap());
             
             if (pixmapOwnerDrawable == null) {
                 throw new IllegalStateException();

@@ -9,7 +9,7 @@ public final class WINDOW extends RESOURCE {
 		super(value);
 	}
 
-	public WINDOW(DRAWABLE drawable) {
+	WINDOW(DRAWABLE drawable) {
 	    super(drawable.getValue());
 	}
 	

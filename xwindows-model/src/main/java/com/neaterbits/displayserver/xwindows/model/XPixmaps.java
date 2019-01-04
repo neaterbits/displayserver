@@ -11,8 +11,8 @@ import com.neaterbits.displayserver.protocol.types.PIXMAP;
 
 public final class XPixmaps extends XResources<XPixmap> implements XPixmapsConstAccess {
 
-    private final Map<DRAWABLE, XPixmap> drawableToXPixmap;
-    private final Map<DRAWABLE, DRAWABLE> pixmapToOwnerDrawable;
+    private final Map<PIXMAP, XPixmap> drawableToXPixmap;
+    private final Map<PIXMAP, DRAWABLE> pixmapToOwnerDrawable;
 
     public XPixmaps() {
         this.drawableToXPixmap = new HashMap<>();
@@ -25,11 +25,11 @@ public final class XPixmaps extends XResources<XPixmap> implements XPixmapsConst
     }
 
     @Override
-    public XPixmap getPixmap(DRAWABLE drawable) {
+    public XPixmap getPixmap(PIXMAP pixmap) {
         
-        Objects.requireNonNull(drawable);
+        Objects.requireNonNull(pixmap);
         
-        return drawableToXPixmap.get(drawable);
+        return drawableToXPixmap.get(pixmap);
     }
     
     void addPixmap(PIXMAP resource, DRAWABLE drawable, XPixmap xPixmap) {
@@ -38,11 +38,9 @@ public final class XPixmaps extends XResources<XPixmap> implements XPixmapsConst
         Objects.requireNonNull(drawable);
         Objects.requireNonNull(xPixmap);
 
-        final DRAWABLE pixmapDrawable = resource.toDrawable();
+        drawableToXPixmap.put(resource, xPixmap);
         
-        drawableToXPixmap.put(pixmapDrawable, xPixmap);
-        
-        pixmapToOwnerDrawable.put(pixmapDrawable, drawable);
+        pixmapToOwnerDrawable.put(resource, drawable);
         
     }
 
@@ -50,16 +48,14 @@ public final class XPixmaps extends XResources<XPixmap> implements XPixmapsConst
         
         Objects.requireNonNull(resource);
         
-        final DRAWABLE pixmapDrawable = resource.toDrawable();
-
-        final XPixmap xPixmap = drawableToXPixmap.remove(pixmapDrawable);
+        final XPixmap xPixmap = drawableToXPixmap.remove(resource);
         
-        pixmapToOwnerDrawable.remove(pixmapDrawable);
+        pixmapToOwnerDrawable.remove(resource);
 
         return xPixmap;
     }
 
-    DRAWABLE getOwnerDrawable(DRAWABLE pixmapDrawable) {
+    DRAWABLE getOwnerDrawable(PIXMAP pixmapDrawable) {
         return pixmapToOwnerDrawable.get(pixmapDrawable);        
     }
 }

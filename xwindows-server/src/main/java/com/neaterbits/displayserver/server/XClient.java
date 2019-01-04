@@ -583,13 +583,13 @@ public class XClient extends XConnection {
     
     final void getImage(GetImage getImage, CARD16 sequenceNumber, ServerToClient serverToClient) throws MatchException, DrawableException {
 
-        final XWindow window = server.getWindows().getClientWindow(getImage.getDrawable());
+        final XWindow window = server.getWindows().getClientWindow(getImage.getDrawable().toWindow());
         
         if (window != null) {
             
         }
         else {
-            final XPixmap xPixmap = server.getPixmaps().getPixmap(getImage.getDrawable());
+            final XPixmap xPixmap = server.getPixmaps().getPixmap(getImage.getDrawable().toPixmap());
             
             if (xPixmap != null) {
                 getImage(

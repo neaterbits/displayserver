@@ -478,7 +478,7 @@ public class XServer implements AutoCloseable {
 		    
 		    final GetGeometry getGeometry = log(messageLength, opcode, sequenceNumber, GetGeometry.decode(stream));
 		    
-		    final WINDOW windowResource = new WINDOW(getGeometry.getDrawable());
+		    final WINDOW windowResource = getGeometry.getDrawable().toWindow();
 		    
             final XWindow window = state.getClientWindow(windowResource);
 

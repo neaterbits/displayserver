@@ -93,12 +93,6 @@ public class XWindows<T extends XWindow> extends XResources<XWindow> implements 
     @Override
     public final XWindow getClientOrRootWindow(WINDOW windowResource) {
 
-        return getClientOrRootWindow(windowResource.toDrawable());
-    }
-    
-    @Override
-    public final XWindow getClientOrRootWindow(DRAWABLE windowResource) {
-
         XWindow result = clientWindows.getWindow(windowResource);
         
         if (result == null) {
@@ -111,12 +105,6 @@ public class XWindows<T extends XWindow> extends XResources<XWindow> implements 
     @SuppressWarnings("unchecked")
     @Override
     public final T getClientWindow(WINDOW windowResource) {
-        return (T)clientWindows.getWindow(windowResource.toDrawable());
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public final T getClientWindow(DRAWABLE windowResource) {
         return (T)clientWindows.getWindow(windowResource);
     }
 
@@ -157,36 +145,32 @@ public class XWindows<T extends XWindow> extends XResources<XWindow> implements 
     }
     
     private static class WindowMap {
-        private final Map<DRAWABLE, XWindow> drawableToWindow;
-        private final Map<XWindow, DRAWABLE> windowToDrawable;
+        private final Map<WINDOW, XWindow> resourceToWindow;
+        private final Map<XWindow, WINDOW> windowToResource;
 
         public WindowMap() {
-            this.drawableToWindow = new HashMap<>();
-            this.windowToDrawable = new HashMap<>();
+            this.resourceToWindow = new HashMap<>();
+            this.windowToResource = new HashMap<>();
         }
 
         XWindow getWindow(WINDOW windowResource) {
-            return getWindow(windowResource.toDrawable());
-        }
-
-        XWindow getWindow(DRAWABLE windowResource) {
             
             Objects.requireNonNull(windowResource);
             
-            return drawableToWindow.get(windowResource);
+            return resourceToWindow.get(windowResource);
         }
         
         void addToMaps(XWindow window) {
-            final DRAWABLE drawable = window.getWINDOW().toDrawable();
+            final WINDOW resource = window.getWINDOW();
             
-            drawableToWindow.put(drawable, window);
-            windowToDrawable.put(window, drawable);
+            resourceToWindow.put(resource, window);
+            windowToResource.put(window, resource);
         }
         
         boolean remove(XWindow window) {
             
-            final DRAWABLE drawable = window.getWINDOW().toDrawable();
-            final XWindow removedWindow = drawableToWindow.remove(drawable);
+            final WINDOW resource = window.getWINDOW();
+            final XWindow removedWindow = resourceToWindow.remove(resource);
 
             final boolean removed;
             
@@ -196,7 +180,7 @@ public class XWindows<T extends XWindow> extends XResources<XWindow> implements 
                     throw new IllegalStateException();
                 }
                 
-                windowToDrawable.remove(removedWindow);
+                windowToResource.remove(removedWindow);
 
                 removed = true;
             }
