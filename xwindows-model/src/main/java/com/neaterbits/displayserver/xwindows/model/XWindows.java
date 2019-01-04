@@ -1,5 +1,7 @@
 package com.neaterbits.displayserver.xwindows.model;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -8,7 +10,7 @@ import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.windows.Window;
 
-public class XWindows<T extends XWindow> implements XWindowsConstAccess<T> {
+public class XWindows<T extends XWindow> extends XResources<XWindow> implements XWindowsConstAccess<T> {
 
     private final Map<WINDOW, Integer> screenByRootWindow;
     
@@ -16,7 +18,6 @@ public class XWindows<T extends XWindow> implements XWindowsConstAccess<T> {
     private final WindowMap clientWindows;
     
     private final Map<Window, XWindow> xWindowByWindow;
-
 
     protected XWindows() {
         
@@ -28,6 +29,11 @@ public class XWindows<T extends XWindow> implements XWindowsConstAccess<T> {
         this.xWindowByWindow = new HashMap<>();
     }
     
+    @Override
+    public final Collection<XWindow> getResources() {
+        return Collections.unmodifiableCollection(xWindowByWindow.values());
+    }
+
     public final void addRootWindow(int screen, XWindow xWindow) {
         
         Objects.requireNonNull(xWindow);

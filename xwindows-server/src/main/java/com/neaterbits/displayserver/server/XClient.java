@@ -71,8 +71,6 @@ public class XClient extends XConnection {
     private final XServer server;
     private final XRendering rendering;
     private final Set<Integer> utilizedResourceIds;
-    private final Map<DRAWABLE, XPixmap> drawableToXPixmap;
-    private final Map<DRAWABLE, DRAWABLE> pixmapToOwnerDrawable;
     private final Map<GCONTEXT, XGC> gcs;
 
     private final Map<FONT, XFont> openFonts;
@@ -89,8 +87,6 @@ public class XClient extends XConnection {
 
         this.utilizedResourceIds = new HashSet<>();
         
-        this.drawableToXPixmap = new HashMap<>();
-        this.pixmapToOwnerDrawable = new HashMap<>();
         this.gcs = new HashMap<>();
         
         this.openFonts = new HashMap<>();
@@ -198,44 +194,15 @@ public class XClient extends XConnection {
     }
     
     private DisplayAreaWindows findDisplayArea(DRAWABLE drawable) {
-        
-        XWindow window = server.getWindows().getClientOrRootWindow(drawable);
-        
-        DisplayAreaWindows displayArea = null;
-        
-        if (window != null) {
-            displayArea = window.getWindow().getDisplayArea();
-        }
-        else {
-            DRAWABLE pixmapDrawable = pixmapToOwnerDrawable.get(drawable);
-            
-            if (pixmapDrawable == null) {
-                throw new IllegalStateException();
-            }
-            
-            displayArea = findDisplayArea(pixmapDrawable);
-        }
-        
-        return displayArea;
+        return server.findDisplayArea(drawable);
     }
 
     private XDrawable findDrawable(DRAWABLE drawable) throws DrawableException {
         
-        XWindow window = server.getWindows().getClientOrRootWindow(drawable);
+        final XDrawable xDrawable = server.getDrawables().findDrawable(drawable);
 
-        final XDrawable xDrawable;
-        
-        if (window != null) {
-            xDrawable = window;
-        }
-        else {
-            XPixmap pixmapDrawable = drawableToXPixmap.get(drawable);
-            
-            if (pixmapDrawable == null) {
-                throw new DrawableException("No such drawable", drawable);
-            }
-
-            xDrawable = pixmapDrawable;
+        if (drawable == null) {
+            throw new DrawableException("No such drawable", drawable);
         }
         
         return xDrawable;
@@ -351,38 +318,24 @@ public class XClient extends XConnection {
                 size,
                 pixelFormat);
         
-        final DRAWABLE pixmapDrawable = createPixmap.getPid().toDrawable();
-        
         final XPixmap xPixmap = new XPixmap(
                 getVisual(createPixmap.getDrawable()),
                 imageBuffer,
                 rendering.getRendererFactory().createRenderer(imageBuffer, pixelFormat));
         
-        drawableToXPixmap.put(pixmapDrawable, xPixmap);
-        
-        pixmapToOwnerDrawable.put(pixmapDrawable, createPixmap.getDrawable());
-        
         return xPixmap;
     }
     
-    final void freePixmap(FreePixmap freePixmap) {
+
+    final void freePixmap(FreePixmap freePixmap, XPixmap xPixmap, DisplayArea graphicsScreen) {
+
         checkAndRemoveResourceId(freePixmap.getPixmap());
         
-        final DRAWABLE pixmapDrawable = freePixmap.getPixmap().toDrawable();
-        
-        final DisplayArea graphicsScreen = findDisplayArea(pixmapDrawable);
-
-        final XPixmap xPixmap = drawableToXPixmap.remove(freePixmap.getPixmap().toDrawable());
-        
-        if (xPixmap != null) {
-            if (xPixmap.getOffscreenBuffer() != null) {
-                graphicsScreen.getOffscreenBufferProvider().freeOffscreenBuffer(xPixmap.getOffscreenBuffer());
-            }
-            
-            xPixmap.dispose();
+        if (xPixmap.getOffscreenBuffer() != null) {
+            graphicsScreen.getOffscreenBufferProvider().freeOffscreenBuffer(xPixmap.getOffscreenBuffer());
         }
         
-        pixmapToOwnerDrawable.remove(pixmapDrawable);
+        xPixmap.dispose();
     }
     
     final void createGC(CreateGC createGC) throws DrawableException, IDChoiceException {
@@ -395,16 +348,8 @@ public class XClient extends XConnection {
         
         final DRAWABLE drawable = createGC.getDrawable();
         
-        final XPixmap xPixmap = drawableToXPixmap.get(drawable);
-        final XDrawable xDrawable;
+        final XDrawable xDrawable = findDrawable(drawable);
         
-        if (xPixmap != null) {
-            xDrawable = xPixmap;
-        }
-        else {
-            xDrawable = server.getWindows().getClientOrRootWindow(drawable);
-        }
-
         if (xDrawable == null) {
             throw new DrawableException("No such drawable", drawable);
         }
@@ -541,7 +486,7 @@ public class XClient extends XConnection {
             
         }
         else {
-            final XPixmap xPixmap = drawableToXPixmap.get(getImage.getDrawable());
+            final XPixmap xPixmap = server.getPixmaps().getPixmap(getImage.getDrawable());
             
             if (xPixmap != null) {
                 getImage(

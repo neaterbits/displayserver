@@ -21,7 +21,6 @@ final class XState extends XDisplayState<XClientWindow, XClientWindows> implemen
         this.eventSubscriptions = new XEventSubscriptions();
     }
 
-
     @Override
     public Iterable<XClient> getClients() {
         return clients.getClients();

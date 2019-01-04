@@ -112,6 +112,7 @@ import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.COLORMAP;
+import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.INT16;
 import com.neaterbits.displayserver.protocol.types.KEYSYM;
 import com.neaterbits.displayserver.protocol.types.SETofKEYBUTMASK;
@@ -129,6 +130,9 @@ import com.neaterbits.displayserver.xwindows.model.XBuiltinColor;
 import com.neaterbits.displayserver.xwindows.model.XBuiltinColors;
 import com.neaterbits.displayserver.xwindows.model.XColorMap;
 import com.neaterbits.displayserver.xwindows.model.XColorMaps;
+import com.neaterbits.displayserver.xwindows.model.XDrawablesConstAccess;
+import com.neaterbits.displayserver.xwindows.model.XPixmap;
+import com.neaterbits.displayserver.xwindows.model.XPixmapsConstAccess;
 import com.neaterbits.displayserver.xwindows.model.XScreen;
 import com.neaterbits.displayserver.xwindows.model.XScreensAndVisuals;
 import com.neaterbits.displayserver.xwindows.model.XVisual;
@@ -244,9 +248,21 @@ public class XServer implements AutoCloseable {
 	XClientWindowsConstAccess getWindows() {
 	    return state;
 	}
+	
+	XPixmapsConstAccess getPixmaps() {
+	    return state;
+	}
+	
+	XDrawablesConstAccess getDrawables() {
+	    return state;
+	}
 
 	XEventSubscriptionsConstAccess getEventSubscriptions() {
 	    return state;
+	}
+	
+	DisplayAreaWindows findDisplayArea(DRAWABLE drawable) {
+	    return state.findDisplayArea(drawable);
 	}
 	
 	TIMESTAMP getTimestamp() {
@@ -682,7 +698,10 @@ public class XServer implements AutoCloseable {
 		    final CreatePixmap createPixmap = log(messageLength, opcode, sequenceNumber, CreatePixmap.decode(stream));
 		    
 		    try {
-                client.createPixmap(createPixmap);
+                final XPixmap xPixmap = client.createPixmap(createPixmap);
+                
+                state.addPixmap(createPixmap.getPid(), createPixmap.getDrawable(), xPixmap);
+                
             } catch (IDChoiceException ex) {
                 sendError(client, Errors.IDChoice, sequenceNumber, ex.getResource().getValue(), opcode);
             } catch (DrawableException ex) {
@@ -694,7 +713,15 @@ public class XServer implements AutoCloseable {
 		case OpCodes.FREE_PIXMAP: {
 		    final FreePixmap freePixmap = log(messageLength, opcode, sequenceNumber, FreePixmap.decode(stream));
 
-		    client.freePixmap(freePixmap);
+	        final DRAWABLE pixmapDrawable = freePixmap.getPixmap().toDrawable();
+	        
+	        final DisplayAreaWindows displayArea = findDisplayArea(pixmapDrawable);
+		    
+		    final XPixmap xPixmap = state.removePixmap(freePixmap.getPixmap());
+		    
+		    if (xPixmap != null) {
+		        client.freePixmap(freePixmap, xPixmap, displayArea);
+		    }
 		    break;
 		}
 		
