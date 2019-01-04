@@ -91,6 +91,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.QueryExtension;
 import com.neaterbits.displayserver.protocol.messages.requests.QueryPointer;
 import com.neaterbits.displayserver.protocol.messages.requests.QueryTree;
 import com.neaterbits.displayserver.protocol.messages.requests.RecolorCursor;
+import com.neaterbits.displayserver.protocol.messages.requests.SetCloseDownMode;
 import com.neaterbits.displayserver.protocol.messages.requests.SetInputFocus;
 import com.neaterbits.displayserver.protocol.messages.requests.UngrabServer;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.CloseFont;
@@ -1106,6 +1107,13 @@ public class XServer implements AutoCloseable {
                 
                 sendReply(client, reply);
             }
+            break;
+        }
+        
+        case OpCodes.SET_CLOSE_DOWN_MODE: {
+            
+            log(messageLength, opcode, sequenceNumber, SetCloseDownMode.decode(stream));
+            
             break;
         }
         
