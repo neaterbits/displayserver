@@ -222,7 +222,7 @@ final class CairoXLibRenderer implements XLibRenderer {
                     
                     final CairoImageSurface imageSurface = new CairoImageSurface(data, cairoFormat, width, height, stride);
 
-                    writeToPNG(imageSurface);
+                    writeToPNG(imageSurface, "src");
                     
                     try {
                         System.out.println("## write image surface to " + surface + " at "
@@ -234,6 +234,8 @@ final class CairoXLibRenderer implements XLibRenderer {
                         
                         cr.setSourceSurface(imageSurface, 0, 0);
                         cr.paint();
+
+                        // writeToPNG(surface, "dst");
                     }
                     finally {
                         imageSurface.dispose();
@@ -245,14 +247,14 @@ final class CairoXLibRenderer implements XLibRenderer {
         }
     }
     
-    private void writeToPNG(CairoImageSurface surface) {
+    private void writeToPNG(CairoSurface surface, String suffix) {
         
-        final String fileName = System.getenv("HOME") + "/projects/displayserver/image" + (fileSequenceCounter ++) + ".png";
+        final String fileName = System.getenv("HOME") + "/projects/displayserver/image" + (fileSequenceCounter ++) + "_" + suffix + ".png";
         
         final CairoStatus status = CairoPNGSurface.writePNG(surface, fileName);
         
         if (status != CairoStatus.SUCCESS) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("status=" + status);
         }
     }
 
