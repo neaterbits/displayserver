@@ -8,7 +8,7 @@ public interface XWindowsClientProtocolLog {
 
     void onInitialMessageError(byte errorCode, int sequenceNumber, String reason);
 
-    void onSendRequest(int messageLength, Request request);
+    void onSendRequest(int messageLength, int sequenceNumber, Request request);
     
     void onRecivedEvent(Event event);
     

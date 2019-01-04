@@ -26,10 +26,11 @@ public final class XWindowsClientProtocolLogImpl extends BaseLogImpl implements 
     }
 
     @Override
-    public void onSendRequest(int messageLength, Request request) {
+    public void onSendRequest(int messageLength, int sequenceNumber, Request request) {
         debug("onSendRequest",
                 "messageLength", messageLength,
                 "opcode", request.getOpCode(),
+                "seq", sequenceNumber,
                 "request", request.toDebugString());
     }
 

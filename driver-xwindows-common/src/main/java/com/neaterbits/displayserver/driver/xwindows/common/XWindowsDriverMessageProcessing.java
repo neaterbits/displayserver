@@ -54,8 +54,6 @@ class XWindowsDriverMessageProcessing {
 
     void sendRequest(Request request, XWindowsChannelReaderWriter readerWriter) {
         sendRequestWithSequenceNumber(request, readerWriter);
-        
-        ++ sequenceNumber;
     }
 
     void sendRequestWaitReply(Request request, ReplyListener replyListener, XWindowsChannelReaderWriter readerWriter) {
@@ -63,8 +61,6 @@ class XWindowsDriverMessageProcessing {
         final int seq = this.sequenceNumber;
         
         requestsWithReply.add(new RequestWithReply(seq, request.getOpCode(), replyListener));
-
-        ++ sequenceNumber;
 
         sendRequestWithSequenceNumber(request, readerWriter);
     }
@@ -269,11 +265,14 @@ class XWindowsDriverMessageProcessing {
             final int messageLength = readerWriter.writeRequest(request, byteOrder);
             
             if (protocolLog != null) {
-                protocolLog.onSendRequest(messageLength, request);
+                protocolLog.onSendRequest(messageLength, sequenceNumber, request);
             }
         }
         catch (IOException ex) {
             throw new IllegalStateException(ex);
+        }
+        finally {
+            ++ sequenceNumber;
         }
     }
 }

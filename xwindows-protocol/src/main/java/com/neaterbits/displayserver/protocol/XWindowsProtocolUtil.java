@@ -76,49 +76,52 @@ public class XWindowsProtocolUtil {
 	    return length;
 	}
 
-	   public static Integer getReplyOrEventLength(ByteBuffer byteBuffer) {
-	        
-	        final Integer length;
-	        
-	        if (byteBuffer.get(byteBuffer.position()) == 0) {
-	            
-	            // System.out.println("## error message : " + byteBuffer.remaining());
-	            
-	            length = byteBuffer.remaining() >= 32 ? 32 : null;
-	        }
-	        else if (byteBuffer.get(byteBuffer.position()) == 1) {
-                // System.out.println("## standard message " + byteBuffer.remaining() + "/" + byteBuffer.limit() + "/" + byteBuffer.position());
+   public static Integer getReplyOrEventLength(ByteBuffer byteBuffer) {
+        
+        final Integer length;
+        
+        if (byteBuffer.get(byteBuffer.position()) == 0) {
+            
+            // System.out.println("## error message : " + byteBuffer.remaining());
+            
+            length = byteBuffer.remaining() >= 32 ? 32 : null;
+        }
+        else if (byteBuffer.get(byteBuffer.position()) == 1) {
+            // System.out.println("## standard message " + byteBuffer.remaining() + "/" + byteBuffer.limit() + "/" + byteBuffer.position());
+            
+            if (byteBuffer.remaining() >= 4) {
+
+                final long messageLength32Bits = (int)byteBuffer.getInt(byteBuffer.position() + 4);
+
+                final long messageLengthBytes = messageLength32Bits * 4;
+
+                // System.out.println("## messageLength: " + messageLengthBytes);
                 
-                if (byteBuffer.remaining() >= 4) {
-
-                    final long messageLength32Bits = (int)byteBuffer.getInt(byteBuffer.position() + 4);
-
-                    final long messageLengthBytes = messageLength32Bits * 4;
-
-                    // System.out.println("## messageLength: " + messageLengthBytes);
+                if (messageLengthBytes <= byteBuffer.remaining()) {
                     
-                    if (messageLengthBytes <= byteBuffer.remaining()) {
-                        
-                        if (messageLengthBytes > Integer.MAX_VALUE) {
-                            throw new IllegalStateException();
-                        }
-                        
-                        length = (int)messageLengthBytes;
+                    if (messageLengthBytes > Integer.MAX_VALUE) {
+                        throw new IllegalStateException();
                     }
-                    else {
-                        length = null;
-                    }
+                    
+                    length = (int)messageLengthBytes;
                 }
                 else {
                     length = null;
                 }
-	        }
-	        else {
-	            throw new UnsupportedOperationException("TODO");
-	        }
+            }
+            else {
+                length = null;
+            }
+        }
+        else if (byteBuffer.get(byteBuffer.position()) > 1) {
+            length = byteBuffer.remaining() >= 32 ? 32 : null;
+        }
+        else {
+            throw new UnsupportedOperationException("TODO");
+        }
 
-	        return length;
-	    }
+        return length;
+    }
 
 	
 	public static int getPadding(int length) {

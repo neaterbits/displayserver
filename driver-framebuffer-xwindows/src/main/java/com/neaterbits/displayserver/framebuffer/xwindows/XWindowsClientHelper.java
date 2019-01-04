@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.neaterbits.displayserver.driver.xwindows.common.XWindowsDriverConnection;
 import com.neaterbits.displayserver.protocol.enums.BackingStore;
+import com.neaterbits.displayserver.protocol.enums.gc.Function;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.SCREEN;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateGC;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateWindow;
@@ -11,6 +12,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.GCAttributes;
 import com.neaterbits.displayserver.protocol.messages.requests.MapWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.WindowAttributes;
 import com.neaterbits.displayserver.protocol.types.BITMASK;
+import com.neaterbits.displayserver.protocol.types.BOOL;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.GCONTEXT;
@@ -77,7 +79,10 @@ class XWindowsClientHelper {
                 gc,
                 window.toDrawable(),
                 new GCAttributes(
-                        new BITMASK(0),
+                        new BITMASK(GCAttributes.FUNCTION|GCAttributes.GRAPHICS_EXPOSURES),
+                        Function.Copy,
+                        null,
+                        null,   
                         null,
                         null,
                         null,
@@ -91,10 +96,7 @@ class XWindowsClientHelper {
                         null,
                         null,
                         null,
-                        null,
-                        null,
-                        null,
-                        null,
+                        new BOOL(false),
                         null,
                         null,
                         null,

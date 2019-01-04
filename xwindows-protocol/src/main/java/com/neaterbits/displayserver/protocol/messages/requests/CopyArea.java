@@ -135,7 +135,7 @@ public final class CopyArea extends Request {
         
         writeUnusedByte(stream);
         
-        writeRequestLength(stream, 8);
+        writeRequestLength(stream, 7);
         
         stream.writeDRAWABLE(srcDrawable);
         stream.writeDRAWABLE(dstDrawable);
