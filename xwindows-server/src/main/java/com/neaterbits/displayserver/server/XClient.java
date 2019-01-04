@@ -223,11 +223,11 @@ public class XClient extends XConnection {
         
         final XPixmap xPixmap = server.getPixmaps().getPixmap(pixmapResource);
     
-        System.out.println("## render to window of size " + window.getSize());
-        
         if (xPixmap != null) {
-            
+
             final OffscreenBuffer src = xPixmap.getOffscreenBuffer();
+
+            System.out.println("## render to window of size " + window.getSize() + " from " + src.getWidth() + "/" + src.getHeight());
             
             final Size windowSize = window.getSize();
             

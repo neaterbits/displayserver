@@ -229,11 +229,16 @@ final class CairoXLibRenderer implements XLibRenderer {
                                     + "(" + dstX + ", " + dstY + "), size "
                                     + "(" + width + ", " + height + ")");
                         
+
+                        // cr.rectangle(dstX, dstY, width, height);
+                        // cr.clip();
+
+                        cr.setSourceSurface(imageSurface, dstX, dstY);
                         cr.rectangle(dstX, dstY, width, height);
-                        cr.clip();
-                        
-                        cr.setSourceSurface(imageSurface, 0, 0);
-                        cr.paint();
+                        cr.fill();
+
+
+                        // cr.paint();
 
                         // writeToPNG(surface, "dst");
                     }

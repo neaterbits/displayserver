@@ -17,4 +17,9 @@ public final class Size {
 	public int getHeight() {
 		return height;
 	}
+
+    @Override
+    public String toString() {
+        return "(" + width + ", " + height + ")";
+    }
 }
