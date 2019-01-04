@@ -40,6 +40,10 @@ final class XWindowsDisplayer extends XWindowsRenderingProvider implements Rende
         
         return serverMessage.getScreens()[getDefaultScreenNo()];
     }
+
+    private static int getDepth(XWindowsDriverConnection driverConnection) {
+        return getDefaultScreen(driverConnection).getRootDepth().getValue();
+    }
     
     XWindowsDisplayer(
             XWindowsDriverConnection driverConnection,
@@ -56,7 +60,7 @@ final class XWindowsDisplayer extends XWindowsRenderingProvider implements Rende
                         size,
                         getDefaultScreen(driverConnection)),
                 size,
-                getDefaultScreen(driverConnection).getRootDepth().getValue());
+                getDepth(driverConnection));
 
         Objects.requireNonNull(driverConnection);
         Objects.requireNonNull(size);
@@ -80,7 +84,7 @@ final class XWindowsDisplayer extends XWindowsRenderingProvider implements Rende
             
             @Override
             public List<DisplayMode> getAvailableModes() {
-                return Arrays.asList(new DisplayMode(new Size(1280, 1024), 24, 75.0f));
+                return Arrays.asList(new DisplayMode(size, getDepth(driverConnection), 75.0f));
             }
         };
         
