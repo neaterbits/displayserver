@@ -4,10 +4,9 @@ import java.util.Objects;
 
 import com.neaterbits.displayserver.buffers.BufferOperations;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
-import com.neaterbits.displayserver.util.Disposable;
 import com.neaterbits.displayserver.xwindows.model.render.XLibRenderer;
 
-public abstract class XDrawable implements Disposable {
+public abstract class XDrawable extends XResource {
 
     private final VISUALID visual;
 

@@ -219,7 +219,7 @@ public class XClient extends XConnection {
         return displayArea;
     }
 
-    private XDrawable findDrawble(DRAWABLE drawable) throws DrawableException {
+    private XDrawable findDrawable(DRAWABLE drawable) throws DrawableException {
         
         XWindow window = server.getWindows().getClientOrRootWindow(drawable);
 
@@ -243,7 +243,7 @@ public class XClient extends XConnection {
 
     private VISUALID getVisual(DRAWABLE drawable) throws DrawableException {
         
-        final XDrawable xDrawable = findDrawble(drawable);
+        final XDrawable xDrawable = findDrawable(drawable);
         
         return xDrawable.getVisual();
     }
@@ -462,11 +462,7 @@ public class XClient extends XConnection {
     
         Objects.requireNonNull(drawable);
         
-        final XDrawable xDrawable = findDrawble(drawable);
-        
-        if (xDrawable == null) {
-            throw new DrawableException("No such drawable", drawable);
-        }
+        final XDrawable xDrawable = findDrawable(drawable);
         
         return xDrawable.getBufferOperations();
     }
@@ -489,7 +485,7 @@ public class XClient extends XConnection {
 
     final void polyPoint(PolyPoint polyPoint) throws DrawableException, GContextException {
         
-        final XDrawable drawable = findDrawble(polyPoint.getDrawable());
+        final XDrawable drawable = findDrawable(polyPoint.getDrawable());
         final XGC gc = getGC(polyPoint.getGC());
         
         drawable.getRenderer().polyPoint(gc, polyPoint.getCoordinateMode(), polyPoint.getPoints());
@@ -497,7 +493,7 @@ public class XClient extends XConnection {
 
     final void polyLine(PolyLine polyLine) throws DrawableException, GContextException {
         
-        final XDrawable drawable = findDrawble(polyLine.getDrawable());
+        final XDrawable drawable = findDrawable(polyLine.getDrawable());
         final XGC gc = getGC(polyLine.getGC());
         
         drawable.getRenderer().polyLine(gc, polyLine.getCoordinateMode(), polyLine.getPoints());
@@ -505,7 +501,7 @@ public class XClient extends XConnection {
 
     final void polyFillRectangle(PolyFillRectangle polyFillRectangle) throws DrawableException, GContextException {
         
-        final XDrawable drawable = findDrawble(polyFillRectangle.getDrawable());
+        final XDrawable drawable = findDrawable(polyFillRectangle.getDrawable());
         final XGC gc = getGC(polyFillRectangle.getGC());
         
         drawable.getRenderer().polyFillRectangle(gc, polyFillRectangle.getRectangles());
@@ -513,7 +509,7 @@ public class XClient extends XConnection {
 
     final void putImage(PutImage putImage) throws DrawableException, GContextException {
         
-        final XDrawable xDrawable = findDrawble(putImage.getDrawable());
+        final XDrawable xDrawable = findDrawable(putImage.getDrawable());
         final XGC gc = getGC(putImage.getGC());
         
         if (putImage.getDataOffset() != 0) {
@@ -632,7 +628,7 @@ public class XClient extends XConnection {
     
     final void imageText16(ImageText16 imageText) throws DrawableException, GContextException, MatchException {
 
-        final XDrawable drawable = findDrawble(imageText.getDrawable());
+        final XDrawable drawable = findDrawable(imageText.getDrawable());
         final XGC gc = getGC(imageText.getGC());
 
         final FONT fontResource = gc.getAttributes().getFont();
