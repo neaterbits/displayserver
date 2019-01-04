@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.neaterbits.displayserver.buffers.OffscreenBuffer;
 import com.neaterbits.displayserver.driver.xwindows.common.XWindowsDriverConnection;
 import com.neaterbits.displayserver.protocol.messages.requests.CreatePixmap;
+import com.neaterbits.displayserver.protocol.messages.requests.FreeGC;
 import com.neaterbits.displayserver.protocol.messages.requests.FreePixmap;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD8;
@@ -62,6 +63,7 @@ final class XWindowsOffscreenBuffer extends XWindowsBaseBuffer implements Offscr
     }
 
     void dispose() {
+        getDriverConnection().sendRequest(new FreeGC(gc));
         getDriverConnection().sendRequest(new FreePixmap(pixmap));
     }
 }
