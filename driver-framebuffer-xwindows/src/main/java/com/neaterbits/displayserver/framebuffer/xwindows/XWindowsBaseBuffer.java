@@ -19,7 +19,6 @@ import com.neaterbits.displayserver.protocol.messages.replies.GetImageReply;
 import com.neaterbits.displayserver.protocol.messages.requests.CopyArea;
 import com.neaterbits.displayserver.protocol.messages.requests.GetImage;
 import com.neaterbits.displayserver.protocol.messages.requests.PutImage;
-import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.CARD8;
@@ -93,7 +92,7 @@ abstract class XWindowsBaseBuffer implements BufferOperations {
             final int dataLength = h * stride;
             
             final PutImage putImage = new PutImage(
-                    new BYTE((byte)2),
+                    ImageFormat.ZPixMap,
                     getDrawable(), gc,
                     new CARD16(width), new CARD16(h),
                     new INT16((short)dstX), new INT16((short)dstY),

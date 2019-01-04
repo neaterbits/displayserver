@@ -33,23 +33,6 @@ public final class PutImage extends Request {
     private final int dataOffset;
     private final int dataLength;
 
-    public PutImage(BYTE format, DRAWABLE drawable, GCONTEXT gc, CARD16 width, CARD16 height, INT16 dstX, INT16 dstY,
-            CARD8 leftPad, CARD8 depth, byte[] data, int dataOffset, int dataLength) {
-        
-        this.format = format;
-        this.drawable = drawable;
-        this.gc = gc;
-        this.width = width;
-        this.height = height;
-        this.dstX = dstX;
-        this.dstY = dstY;
-        this.leftPad = leftPad;
-        this.depth = depth;
-        this.data = data;
-        this.dataOffset = dataOffset;
-        this.dataLength = dataLength;
-    }
-
     public static PutImage decode(XWindowsProtocolInputStream stream) throws IOException {
         
         final BYTE format = stream.readBYTE();
@@ -75,6 +58,71 @@ public final class PutImage extends Request {
         final byte [] data = stream.readData(dataLength);
         
         return new PutImage(format, drawable, gc, width, height, dstX, dstY, leftPad, depth, data, 0, data.length);
+    }
+
+    public PutImage(BYTE format, DRAWABLE drawable, GCONTEXT gc, CARD16 width, CARD16 height, INT16 dstX, INT16 dstY,
+            CARD8 leftPad, CARD8 depth, byte[] data, int dataOffset, int dataLength) {
+        
+        this.format = format;
+        this.drawable = drawable;
+        this.gc = gc;
+        this.width = width;
+        this.height = height;
+        this.dstX = dstX;
+        this.dstY = dstY;
+        this.leftPad = leftPad;
+        this.depth = depth;
+        this.data = data;
+        this.dataOffset = dataOffset;
+        this.dataLength = dataLength;
+    }
+
+    public BYTE getFormat() {
+        return format;
+    }
+
+    public DRAWABLE getDrawable() {
+        return drawable;
+    }
+
+    public GCONTEXT getGC() {
+        return gc;
+    }
+
+    public CARD16 getWidth() {
+        return width;
+    }
+
+    public CARD16 getHeight() {
+        return height;
+    }
+
+    public INT16 getDstX() {
+        return dstX;
+    }
+
+    public INT16 getDstY() {
+        return dstY;
+    }
+
+    public CARD8 getLeftPad() {
+        return leftPad;
+    }
+
+    public CARD8 getDepth() {
+        return depth;
+    }
+
+    public byte[] getData() {
+        return data;
+    }
+    
+    public int getDataOffset() {
+        return dataOffset;
+    }
+
+    public int getDataLength() {
+        return dataLength;
     }
 
     @Override
@@ -128,45 +176,5 @@ public final class PutImage extends Request {
     @Override
     public int getOpCode() {
         return OpCodes.PUT_IMAGE;
-    }
-
-    public BYTE getFormat() {
-        return format;
-    }
-
-    public DRAWABLE getDrawable() {
-        return drawable;
-    }
-
-    public GCONTEXT getGc() {
-        return gc;
-    }
-
-    public CARD16 getWidth() {
-        return width;
-    }
-
-    public CARD16 getHeight() {
-        return height;
-    }
-
-    public INT16 getDstX() {
-        return dstX;
-    }
-
-    public INT16 getDstY() {
-        return dstY;
-    }
-
-    public CARD8 getLeftPad() {
-        return leftPad;
-    }
-
-    public CARD8 getDepth() {
-        return depth;
-    }
-
-    public byte[] getData() {
-        return data;
     }
 }

@@ -511,20 +511,30 @@ public class XClient extends XConnection {
         drawable.getRenderer().polyFillRectangle(gc, polyFillRectangle.getRectangles());
     }
 
-    final void putImage(PutImage putImage) {
+    final void putImage(PutImage putImage) throws DrawableException, GContextException {
         
-        final XWindow window = server.getWindows().getClientWindow(putImage.getDrawable());
+        final XDrawable xDrawable = findDrawble(putImage.getDrawable());
+        final XGC gc = getGC(putImage.getGC());
         
-        if (window != null) {
-            
+        if (putImage.getDataOffset() != 0) {
+            throw new IllegalArgumentException();
         }
-        else {
-            final XPixmap xPixmap = drawableToXPixmap.get(putImage.getDrawable());
-            
-            if (xPixmap != null) {
-                
-            }
+        
+        if (putImage.getDataLength() != putImage.getData().length) {
+            throw new IllegalArgumentException();
         }
+        
+        xDrawable.getRenderer().putImage(
+                gc,
+                putImage.getFormat().getValue(),
+                putImage.getWidth().getValue(),
+                putImage.getHeight().getValue(),
+                putImage.getDstX().getValue(),
+                putImage.getDstY().getValue(),
+                putImage.getLeftPad().getValue(),
+                putImage.getDepth().getValue(),
+                putImage.getData()
+        );
     }
     
     final void getImage(GetImage getImage, CARD16 sequenceNumber, ServerToClient serverToClient) throws MatchException, DrawableException {

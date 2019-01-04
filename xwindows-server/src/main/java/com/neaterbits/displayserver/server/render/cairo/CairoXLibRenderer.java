@@ -5,6 +5,7 @@ import java.util.Objects;
 import com.neaterbits.displayserver.buffers.Buffer;
 import com.neaterbits.displayserver.buffers.PixelConversion;
 import com.neaterbits.displayserver.protocol.enums.CoordinateMode;
+import com.neaterbits.displayserver.protocol.enums.ImageFormat;
 import com.neaterbits.displayserver.protocol.enums.gc.Function;
 import com.neaterbits.displayserver.protocol.messages.requests.GCAttributes;
 import com.neaterbits.displayserver.protocol.types.BYTE;
@@ -12,6 +13,7 @@ import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.POINT;
 import com.neaterbits.displayserver.protocol.types.RECTANGLE;
 import com.neaterbits.displayserver.render.cairo.Cairo;
+import com.neaterbits.displayserver.render.cairo.CairoFormat;
 import com.neaterbits.displayserver.render.cairo.CairoImageSurface;
 import com.neaterbits.displayserver.render.cairo.CairoOperator;
 import com.neaterbits.displayserver.render.cairo.CairoSurface;
@@ -163,7 +165,6 @@ final class CairoXLibRenderer implements XLibRenderer {
     @Override
     public void polyFillRectangle(XGC gc, RECTANGLE[] rectangles) {
 
-        
         if (rectangles.length != 0) {
 
             applyGC(gc);
@@ -174,6 +175,64 @@ final class CairoXLibRenderer implements XLibRenderer {
                         rectangle.getY().getValue(),
                         rectangle.getWidth().getValue(),
                         rectangle.getHeight().getValue());
+            }
+        }
+    }
+
+    @Override
+    public void putImage(XGC gc, int format, int width, int height, int dstX, int dstY, int leftPad, int depth, byte[] data) {
+
+        if (width != 0 && height != 0) {
+            
+            applyGC(gc);
+            
+            switch (format) {
+            case ImageFormat.XYPIXMAP:
+                
+                if (depth != 1) {
+                    throw new UnsupportedOperationException("TODO");
+                }
+                
+                if (leftPad != 0) {
+                    throw new UnsupportedOperationException("TODO");
+                }
+                
+                break;
+                
+                
+            case ImageFormat.ZPIXMAP:
+                
+                switch (depth) {
+                
+                case 1:
+                    break;
+                    
+                case 24:
+                    final CairoFormat cairoFormat = CairoFormat.RGB24;
+                    
+                    final int stride = cairoFormat.strideForWidth(width);
+                    
+                    if (data.length != stride * height) {
+                        throw new IllegalArgumentException();
+                    }
+                    
+                    final CairoImageSurface imageSurface = new CairoImageSurface(data, cairoFormat, width, height, stride);
+                    
+                    try {
+                        
+                        cr.rectangle(dstX, dstY, width, height);
+                        cr.clip();
+                        
+                        cr.newPath();
+                        cr.setSourceSurface(imageSurface, 0, 0);
+                        cr.moveTo(dstX, dstY);
+                    }
+                    finally {
+                        imageSurface.dispose();
+                    }
+                }
+                break;
+                
             }
         }
         

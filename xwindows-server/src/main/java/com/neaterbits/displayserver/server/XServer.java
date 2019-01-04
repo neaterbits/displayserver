@@ -361,6 +361,7 @@ public class XServer implements AutoCloseable {
                 connectionNo,
                 state,
                 state,
+                rendering.getRendererFactory(),
                 resourceIdAllocator.getResourceBase(connectionNo),
                 resourceIdAllocator.getResourceMask(connectionNo));
 
@@ -806,7 +807,13 @@ public class XServer implements AutoCloseable {
 		case OpCodes.PUT_IMAGE: {
 		    final PutImage putImage = log(messageLength, opcode, sequenceNumber, PutImage.decode(stream));
 
-		    client.putImage(putImage);
+		    try {
+                client.putImage(putImage);
+            } catch (DrawableException ex) {
+                sendError(client, Errors.Drawable, sequenceNumber, ex.getDrawable().getValue(), opcode);
+            } catch (GContextException ex) {
+                sendError(client, Errors.GContext, sequenceNumber, ex.getGContext().getValue(), opcode);
+            }
 		    break;
 		}
 		
