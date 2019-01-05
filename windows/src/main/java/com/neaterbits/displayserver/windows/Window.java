@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import com.neaterbits.displayserver.buffers.BufferOperations;
 import com.neaterbits.displayserver.buffers.PixelFormat;
 import com.neaterbits.displayserver.layers.Layer;
 import com.neaterbits.displayserver.types.Position;
@@ -71,10 +70,6 @@ public final class Window {
     public DisplayAreaWindows getDisplayArea() {
 	    return displayArea;
 	}
-    
-    public BufferOperations getBuffer() {
-        throw new UnsupportedOperationException("TODO");
-    }
     
     public PixelFormat getPixelFormat() {
         return displayArea.getPixelFormat();

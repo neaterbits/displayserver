@@ -583,49 +583,37 @@ public class XClient extends XConnection {
     
     final void getImage(GetImage getImage, CARD16 sequenceNumber, ServerToClient serverToClient) throws MatchException, DrawableException {
 
-        final XWindow window = server.getWindows().getClientWindow(getImage.getDrawable().toWindow());
+        final XDrawable xDrawable = server.getDrawables().findDrawable(getImage.getDrawable());
         
-        if (window != null) {
-            
-        }
-        else {
-            final XPixmap xPixmap = server.getPixmaps().getPixmap(getImage.getDrawable().toPixmap());
-            
-            if (xPixmap != null) {
-                getImage(
-                        getImage,
-                        sequenceNumber,
-                        xPixmap.getOffscreenBuffer(),
-                        xPixmap.getVisual(),
-                        serverToClient);
-            }
-            else {
-                throw new DrawableException("No such drawable", getImage.getDrawable());
-            }
-        }
+        getImage(
+                getImage,
+                sequenceNumber,
+                xDrawable.getBufferOperations(),
+                xDrawable.getVisual(),
+                serverToClient);
     }
     
     private void getImage(
             GetImage getImage,
             CARD16 sequenceNumber,
-            OffscreenBuffer offscreenBuffer,
+            BufferOperations bufferOperations,
             VISUALID visual,
             ServerToClient serverToClient)
     
         throws MatchException{
         
-        if (getImage.getX().getValue() + getImage.getWidth().getValue() > offscreenBuffer.getWidth()) {
+        if (getImage.getX().getValue() + getImage.getWidth().getValue() > bufferOperations.getWidth()) {
             throw new MatchException("Width outside of bounds");
         }
         
-        if (getImage.getY().getValue() + getImage.getHeight().getValue() > offscreenBuffer.getHeight()) {
+        if (getImage.getY().getValue() + getImage.getHeight().getValue() > bufferOperations.getHeight()) {
             throw new MatchException("Height outside of bounds");
         }
 
         switch (getImage.getFormat().getValue()) {
 
         case ImageFormat.ZPIXMAP:
-            offscreenBuffer.getImage(
+            bufferOperations.getImage(
                     getImage.getX().getValue(), getImage.getY().getValue(),
                     getImage.getWidth().getValue(), getImage.getHeight().getValue(),
                     PixelFormat.RGB24,
@@ -633,7 +621,7 @@ public class XClient extends XConnection {
                     new GetImageListener() {
                         @Override
                         public void onResult(byte[] data) {
-                            sendGetImageReply(sequenceNumber, offscreenBuffer, VISUALID.None, serverToClient, data);
+                            sendGetImageReply(sequenceNumber, bufferOperations, VISUALID.None, serverToClient, data);
                         }
                         
                         @Override
@@ -660,14 +648,14 @@ public class XClient extends XConnection {
     
     private void sendGetImageReply(
             CARD16 sequenceNumber,
-            OffscreenBuffer offscreenBuffer,
+            BufferOperations bufferOperations,
             VISUALID visual,
             ServerToClient serverToClient,
             byte [] data) {
         
         final GetImageReply getImageReply = new GetImageReply(
                 sequenceNumber,
-                new CARD8((byte)offscreenBuffer.getDepth()),
+                new CARD8((byte)bufferOperations.getDepth()),
                 visual,
                 data);
         

@@ -62,6 +62,16 @@ abstract class XWindowsBaseBuffer implements BufferOperations {
     }
 
     @Override
+    public final Size getSize() {
+        return size;
+    }
+
+    @Override
+    public final int getDepth() {
+        return depth;
+    }
+
+    @Override
     public final void putImage(int x, int y, int width, int height, PixelFormat format, byte[] data) {
         
         if (format.getDepth() != depth) {

@@ -5,4 +5,8 @@ import com.neaterbits.displayserver.util.Disposable;
 
 public interface FontBuffer extends Buffer, Disposable {
 
+    default int getDepth() {
+        return 1;
+    }
+    
 }

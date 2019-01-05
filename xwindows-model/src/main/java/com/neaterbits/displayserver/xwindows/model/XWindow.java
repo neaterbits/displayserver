@@ -102,10 +102,9 @@ public class XWindow extends XDrawable {
         this.properties = new HashMap<>();
     }
     
-    
     @Override
     public BufferOperations getBufferOperations() {
-        return window.getBuffer();
+        throw new UnsupportedOperationException("TODO");
     }
 
     public final boolean isRootWindow() {

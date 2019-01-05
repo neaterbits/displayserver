@@ -48,11 +48,6 @@ class XWindowsFrameBuffer extends XWindowsBaseBuffer implements FrameBuffer {
     }
 
     @Override
-    public final int getDepth() {
-        return depth;
-    }
-    
-    @Override
     public final PixelFormat getPixelFormat() {
         return PixelFormat.RGB24;
     }

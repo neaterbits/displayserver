@@ -52,16 +52,6 @@ final class XWindowsOffscreenBuffer extends XWindowsBaseBuffer implements Offscr
         return DrawableType.PIXMAP;
     }
 
-    @Override
-    public Size getSize() {
-        return size;
-    }
-
-    @Override
-    public int getDepth() {
-        return depth;
-    }
-
     void dispose() {
         getDriverConnection().sendRequest(new FreeGC(gc));
         getDriverConnection().sendRequest(new FreePixmap(pixmap));
