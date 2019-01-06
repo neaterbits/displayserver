@@ -67,7 +67,7 @@ public class Errors {
         case IMPLEMENTATION: name = "Implementation"; break;
         
         default:
-            throw new UnsupportedOperationException();
+            throw new UnsupportedOperationException("Unknown error code " + errorCode.getValue());
         }
     
         return name;
