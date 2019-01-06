@@ -24,6 +24,7 @@ import com.neaterbits.displayserver.protocol.ByteBufferXWindowsProtocolInputStre
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolUtil;
 import com.neaterbits.displayserver.protocol.enums.Errors;
+import com.neaterbits.displayserver.protocol.enums.GrabPointerStatus;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
 import com.neaterbits.displayserver.protocol.enums.RevertTo;
 import com.neaterbits.displayserver.protocol.enums.VisualClass;
@@ -49,6 +50,7 @@ import com.neaterbits.displayserver.protocol.messages.replies.GetInputFocusReply
 import com.neaterbits.displayserver.protocol.messages.replies.GetKeyboardMappingReply;
 import com.neaterbits.displayserver.protocol.messages.replies.GetModifierMappingReply;
 import com.neaterbits.displayserver.protocol.messages.replies.GetSelectionOwnerReply;
+import com.neaterbits.displayserver.protocol.messages.replies.GrabPointerReply;
 import com.neaterbits.displayserver.protocol.messages.replies.InternAtomReply;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryPointerReply;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryResponseReply;
@@ -83,6 +85,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.GetProperty;
 import com.neaterbits.displayserver.protocol.messages.requests.GetSelectionOwner;
 import com.neaterbits.displayserver.protocol.messages.requests.GetWindowAttributes;
 import com.neaterbits.displayserver.protocol.messages.requests.GrabButton;
+import com.neaterbits.displayserver.protocol.messages.requests.GrabPointer;
 import com.neaterbits.displayserver.protocol.messages.requests.GrabServer;
 import com.neaterbits.displayserver.protocol.messages.requests.InternAtom;
 import com.neaterbits.displayserver.protocol.messages.requests.ListProperties;
@@ -634,6 +637,14 @@ public class XServer implements AutoCloseable {
             
             log(messageLength, opcode, sequenceNumber, ConvertSelection.decode(stream));
             
+            break;
+        }
+        
+        case OpCodes.GRAB_POINTER: {
+            
+            log(messageLength, opcode, sequenceNumber, GrabPointer.decode(stream));
+            
+            sendReply(client, new GrabPointerReply(sequenceNumber, GrabPointerStatus.Success));
             break;
         }
         

@@ -1,0 +1,45 @@
+package com.neaterbits.displayserver.protocol.messages.replies;
+
+import java.io.IOException;
+import java.util.Objects;
+
+import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
+import com.neaterbits.displayserver.protocol.messages.Reply;
+import com.neaterbits.displayserver.protocol.types.BYTE;
+import com.neaterbits.displayserver.protocol.types.CARD16;
+
+public final class GrabPointerReply extends Reply {
+
+    private final BYTE status;
+
+    public GrabPointerReply(CARD16 sequenceNumber, BYTE status) {
+        super(sequenceNumber);
+    
+        Objects.requireNonNull(status);
+        
+        this.status = status;
+    }
+
+    public BYTE getStatus() {
+        return status;
+    }
+    
+    @Override
+    public Object[] getDebugParams() {
+        return wrap("status", status);
+    }
+
+    @Override
+    public void encode(XWindowsProtocolOutputStream stream) throws IOException {
+
+        writeReplyHeader(stream);
+        
+        stream.writeBYTE(status);
+        
+        writeSequenceNumber(stream);
+        
+        writeReplyLength(stream, 0);
+        
+        stream.pad(24);
+    }
+}
