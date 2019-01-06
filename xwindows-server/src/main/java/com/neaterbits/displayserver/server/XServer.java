@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -275,8 +276,8 @@ public class XServer implements AutoCloseable {
 	    return new TIMESTAMP(diff + 1);
 	}
 	
-	public Client processConnection(SocketChannel socketChannel) {
-	    return new ConnectionState(XServer.this, socketChannel, connectionWriteLog, rendering) {
+	public Client processConnection(SocketChannel socketChannel, SelectionKey selectionKey) {
+	    return new ConnectionState(XServer.this, socketChannel, selectionKey, connectionWriteLog, rendering) {
 
             @Override
             public Integer getLengthOfMessage(ByteBuffer byteBuffer) {
@@ -314,11 +315,13 @@ public class XServer implements AutoCloseable {
 		public ConnectionState(
 		        XServer server,
 		        SocketChannel socketChannel,
+		        SelectionKey selectionKey,
 		        NonBlockingChannelWriterLog connectionWriteLog,
 		        XRendering rendering) {
 			super(
 			        server,
 			        socketChannel,
+			        selectionKey,
 			        resourceIdAllocator.allocateConnection(),
 			        connectionWriteLog,
 			        rendering);

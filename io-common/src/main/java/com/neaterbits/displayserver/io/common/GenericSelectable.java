@@ -33,13 +33,13 @@ final class GenericSelectable extends BaseSelectable {
 	}
 
 	@Override
-	int read(SelectionKey selectionKey, Selector selector, ByteBuffer buffer) throws IOException {
-		
-		return selectable.read(selectionKey, selector, buffer);
+	int read(SelectionKey selectionKey, ByteBuffer buffer) throws IOException {
+	    
+		return selectable.read(selectionKey, buffer);
 	}
 
 	@Override
-	void onWriteable(SelectionKey selectionKey, Selector selector) throws IOException {
-		selectable.onWriteable(selectionKey, selector);
+	boolean onChannelWriteable(SelectionKey selectionKey) throws IOException {
+		return selectable.onChannelWriteable(selectionKey);
 	}
 }

@@ -22,36 +22,54 @@ public abstract class NonBlockingChannelWriter implements NonBlockingWritable {
 	    this.writeBuffer = new WriteBuffer(10000);
     }
 	
-	protected abstract SocketChannel getChannel(SelectionKey selectionKey, Selector selector);
+	protected abstract SocketChannel getChannel();
 	
-	protected final int write(ByteOrder byteOrder, DataWriter writeData) {
+	protected abstract SelectionKey getSelectionKey();
+	
+	protected final int writeToOutputBuffer(ByteOrder byteOrder, DataWriter writeData) {
         
         final byte [] data = DataWriter.writeToBuf(byteOrder, writeData);
         
-        write(data, 0, data.length);
+        writeToOutputBuffer(data, 0, data.length);
+
+        if (data.length > 0) {
+            
+            // non blocking write so register interest in writes
+            final SelectionKey selectionKey = getSelectionKey();
+            
+            if (selectionKey != null) {
+                if ((selectionKey.interestOps() & SelectionKey.OP_WRITE) == 0) {
+                    selectionKey.interestOps(selectionKey.interestOps() | SelectionKey.OP_WRITE);
+                }
+            }
+        }
         
         return data.length;
     }
 
 	
-	protected final void write(byte [] data, int offset, int length) {
+	private final void writeToOutputBuffer(byte [] data, int offset, int length) {
 	    
 	    writeBuffer.write(data, offset, length, log);
 	    
 	}
 
-	
 	@Override
-	public final void onWriteable(SelectionKey selectionKey, Selector selector) throws IOException {
-		
-	    
-		final SocketChannel channel = getChannel(selectionKey, selector);
+	public final boolean onChannelWriteable(SelectionKey selectionKey) throws IOException {
+
+	    final SocketChannel channel = getChannel();
 		
 		if (channel.isBlocking()) {
 			throw new IllegalStateException();
 		}
 		
-		writeBuffer.onWriteable(channel::write, log);
-
+		final boolean allDataWritten = writeBuffer.onChannelWriteable(channel::write, log);
+		
+        if (allDataWritten) {
+            // Remove writeability until more data needs to be written
+            selectionKey.interestOps(selectionKey.interestOps() & ~SelectionKey.OP_WRITE);
+        }
+        
+        return allDataWritten;
 	}
 }

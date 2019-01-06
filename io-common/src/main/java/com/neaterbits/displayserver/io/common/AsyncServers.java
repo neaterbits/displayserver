@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 public class AsyncServers implements AutoCloseable {
 	
@@ -26,16 +26,22 @@ public class AsyncServers implements AutoCloseable {
 	
 	private final SelectorProvider selectorProvider;
 	private final AbstractSelector selector;
-	
+
 	public AsyncServers(AsyncServersLog log, SelectableLog connectionReadLog) throws IOException {
+	    this(log, connectionReadLog, SelectorProvider.provider());
+	}
+	
+	public AsyncServers(AsyncServersLog log, SelectableLog connectionReadLog, SelectorProvider selectorProvider) throws IOException {
 	    
+	    Objects.requireNonNull(selectorProvider);
+
 	    this.log = log;
 	    this.connectionReadLog = connectionReadLog;
 	    
 		this.servers = new ArrayList<>();
 		this.selectableBySelectorKey = new HashMap<>();
 		
-		this.selectorProvider = SelectorProvider.provider();
+		this.selectorProvider = selectorProvider;
 		this.selector = selectorProvider.openSelector();
 	}
 	
@@ -43,7 +49,7 @@ public class AsyncServers implements AutoCloseable {
 	public void addServer(
 			String name,
 			SocketAddress [] addresses,
-			Function<SocketChannel, Client> onClientConnect) throws IOException {
+			BiFunction<SocketChannel, SelectionKey, Client> onClientConnect) throws IOException {
 		
 		Objects.requireNonNull(name);
 		Objects.requireNonNull(addresses);
@@ -167,10 +173,13 @@ public class AsyncServers implements AutoCloseable {
                     // System.out.println("## onWritable");
                     
                     if (selectable != null) {
-                        selectable.onWriteable(selectionKey, selector);
+                        selectable.onChannelWriteable(selectionKey);
                     }
-    
-                    // iter.remove();
+                    else {
+                        throw new IllegalStateException();
+                    }
+
+                    iter.remove();
                 }
             }
         }
@@ -202,9 +211,9 @@ public class AsyncServers implements AutoCloseable {
 	    
 		socket.configureBlocking(false);
 		
-		socket.register(selector, SelectionKey.OP_READ|SelectionKey.OP_WRITE);
+		final SelectionKey selectionKey = socket.register(selector, SelectionKey.OP_READ|SelectionKey.OP_WRITE);
 		
-		final Client client = server.onClientConnect.apply(socket);
+		final Client client = server.onClientConnect.apply(socket, selectionKey);
 		
 		final ClientConnection clientConnection = new ClientConnection(socket, client, client, connectionReadLog);
 

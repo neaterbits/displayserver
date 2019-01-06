@@ -3,6 +3,7 @@ package com.neaterbits.displayserver.main;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.nio.channels.spi.SelectorProvider;
 import java.util.Arrays;
 
 import com.neaterbits.displayserver.driver.xwindows.common.XWindowsDriverConnection;
@@ -54,7 +55,9 @@ public class DisplayServerMain {
 	    
 	    final SelectableLog connectionReadLog = new SelectableLogImpl("Connectionread", DebugLevels.CONNECTION_READ);
 	    
-		try (AsyncServers asyncServers = new AsyncServers(asyncServersLog, connectionReadLog)) {
+	    final SelectorProvider selectorProvider = SelectorProvider.provider();
+	    
+		try (AsyncServers asyncServers = new AsyncServers(asyncServersLog, connectionReadLog, selectorProvider)) {
 		
 		    final NonBlockingChannelWriterLog driverWriteLog = new NonBlockingChannelWriterLogImpl(
 		            "Driverwrite",
@@ -149,7 +152,7 @@ public class DisplayServerMain {
                     new SocketAddress [] {
                         new InetSocketAddress("127.0.0.1", 6000 + display + 1)
                     },
-                    socketChannel -> server.processConnection(socketChannel));
+                    (socketChannel, selectionKey) -> server.processConnection(socketChannel, selectionKey));
         }
 	}
 }

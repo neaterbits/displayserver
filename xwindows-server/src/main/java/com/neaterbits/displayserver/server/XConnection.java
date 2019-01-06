@@ -2,7 +2,6 @@ package com.neaterbits.displayserver.server;
 
 import java.nio.ByteOrder;
 import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +29,7 @@ public class XConnection
 	}
 	
 	private final SocketChannel socketChannel;
+	private final SelectionKey selectionKey;
 	private final int connectionNo;
 	
 	private State state;
@@ -41,14 +41,17 @@ public class XConnection
 	
 	XConnection(
 	        SocketChannel socketChannel,
+	        SelectionKey selectionKey,
 	        int connectionNo,
 	        NonBlockingChannelWriterLog log) {
 	    
 	    super(log);
 	    
 		Objects.requireNonNull(socketChannel);
+		Objects.requireNonNull(selectionKey);
 		
 		this.socketChannel = socketChannel;
+		this.selectionKey = selectionKey;
 		this.connectionNo = connectionNo;
 		
 		this.state = State.CREATED;
@@ -101,7 +104,7 @@ public class XConnection
 
 	final void send(Encodeable message) {
 	    
-	    write(byteOrder, dataOutputStream -> {
+	    writeToOutputBuffer(byteOrder, dataOutputStream -> {
             final XWindowsProtocolOutputStream protocolOutputStream = new DataOutputXWindowsProtocolOutputStream(dataOutputStream);
             
             message.encode(protocolOutputStream);
@@ -109,11 +112,16 @@ public class XConnection
 	}
 	
     @Override
-    protected final SocketChannel getChannel(SelectionKey selectionKey, Selector selector) {
+    protected final SocketChannel getChannel() {
         return socketChannel;
     }
+    
+	@Override
+    protected final SelectionKey getSelectionKey() {
+	    return selectionKey;
+	}
 
-	void addEvent(Event event) {
+    void addEvent(Event event) {
 		Objects.requireNonNull(event);
 	
 		events.add(event);

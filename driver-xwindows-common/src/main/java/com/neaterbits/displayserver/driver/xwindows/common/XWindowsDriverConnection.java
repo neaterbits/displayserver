@@ -33,7 +33,10 @@ public final class XWindowsDriverConnection
 	private final XCBConnection xcbConnection;
 	private final XCBVisual xcbVisual;
 	
-	public XWindowsDriverConnection(int connectDisplay, NonBlockingChannelWriterLog writeLog, XWindowsClientProtocolLog protocolLog) throws IOException {
+	public XWindowsDriverConnection(
+	        int connectDisplay,
+	        NonBlockingChannelWriterLog writeLog,
+	        XWindowsClientProtocolLog protocolLog) throws IOException {
 
 	    this.connectDisplay = connectDisplay;
 	    

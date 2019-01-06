@@ -11,7 +11,7 @@ public interface Selectable extends NonBlockingWritable {
 
 	Set<SelectionKey> register(SelectorProvider selectorProvider, Selector selector) throws IOException;
 	
-	int read(SelectionKey selectionKey, Selector selector, ByteBuffer buffer) throws IOException;
+	int read(SelectionKey selectionKey, ByteBuffer buffer) throws IOException;
 
 	void unregister(SelectorProvider selectorProvider, Selector selector);
 	

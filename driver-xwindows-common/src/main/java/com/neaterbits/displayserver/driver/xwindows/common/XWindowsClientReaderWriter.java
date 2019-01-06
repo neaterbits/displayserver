@@ -11,7 +11,6 @@ abstract class XWindowsClientReaderWriter extends XWindowsChannelReaderWriter {
     XWindowsClientReaderWriter(int port, NonBlockingChannelWriterLog log) {
         super(port, log);
     }
-
     
     @Override
     public Integer getLengthOfMessage(ByteBuffer byteBuffer) {

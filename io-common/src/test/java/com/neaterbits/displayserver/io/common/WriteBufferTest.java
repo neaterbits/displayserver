@@ -26,7 +26,7 @@ public class WriteBufferTest {
         
         buffer.write(data, 0, data.length, null);
         
-        buffer.onWriteable(byteBuffer -> {
+        buffer.onChannelWriteable(byteBuffer -> {
             
             final int length = byteBuffer.remaining();
             
@@ -56,7 +56,7 @@ public class WriteBufferTest {
         
         buffer.write(data, 0, data.length, log);
         
-        buffer.onWriteable(byteBuffer -> {
+        buffer.onChannelWriteable(byteBuffer -> {
             
             final int length = byteBuffer.remaining();
             
@@ -90,7 +90,7 @@ public class WriteBufferTest {
         
         buffer.write(data, 10, 20, log);
         
-        buffer.onWriteable(byteBuffer -> {
+        buffer.onChannelWriteable(byteBuffer -> {
             
             final int length = byteBuffer.remaining();
             

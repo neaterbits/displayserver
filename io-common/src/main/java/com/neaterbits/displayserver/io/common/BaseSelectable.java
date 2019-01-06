@@ -13,10 +13,9 @@ abstract class BaseSelectable {
 
 	abstract MessageProcessor getMessageProcessor();
 	
-	abstract int read(SelectionKey selectionKey, Selector selector, ByteBuffer buffer) throws IOException;
+	abstract int read(SelectionKey selectionKey, ByteBuffer buffer) throws IOException;
 	
-	abstract void onWriteable(SelectionKey selectionKey, Selector selector) throws IOException;
-
+	abstract boolean onChannelWriteable(SelectionKey selectionKey) throws IOException;
 	
 	BaseSelectable(SelectableLog log) {
 	    
@@ -33,7 +32,7 @@ abstract class BaseSelectable {
 		        log.onTryReadEnter(readBuffer.limit(), readBuffer.remaining(), readBuffer.position());
 		    }
 
-			final int bytesRead = read(selectionKey, selector, readBuffer);
+			final int bytesRead = read(selectionKey, readBuffer);
 
 			if (bytesRead > 0) {
 

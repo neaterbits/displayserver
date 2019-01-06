@@ -36,9 +36,9 @@ final class ClientConnection extends BaseSelectable {
 	}
 
 	@Override
-	int read(SelectionKey selectionKey, Selector selector, ByteBuffer buffer) throws IOException {
+	int read(SelectionKey selectionKey, ByteBuffer buffer) throws IOException {
 		
-		if (!socket.keyFor(selector).equals(selectionKey)) {
+		if (!socket.keyFor(selectionKey.selector()).equals(selectionKey)) {
 			throw new IllegalArgumentException();
 		}
 		
@@ -46,7 +46,9 @@ final class ClientConnection extends BaseSelectable {
 	}
 
 	@Override
-	void onWriteable(SelectionKey selectionKey, Selector selector) throws IOException {
-	    nonBlockingWritable.onWriteable(selectionKey, selector);
+	boolean onChannelWriteable(SelectionKey selectionKey) throws IOException {
+	    final boolean allDataWritten = nonBlockingWritable.onChannelWriteable(selectionKey);
+	    
+	    return allDataWritten;
 	}
 }

@@ -1,17 +1,18 @@
 package com.neaterbits.displayserver.io.common;
 
 import java.io.IOException;
+import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 final class AsyncServer implements AutoCloseable {
 	private final String name;
 	
-	final Function<SocketChannel, Client> onClientConnect;
+	final BiFunction<SocketChannel, SelectionKey, Client> onClientConnect;
 	
 	final ServerSocketChannel [] socketChannels;
 
@@ -19,7 +20,7 @@ final class AsyncServer implements AutoCloseable {
 	
 	AsyncServer(
 			String name,
-			Function<SocketChannel, Client> onClientConnect,
+			BiFunction<SocketChannel, SelectionKey, Client> onClientConnect,
 			ServerSocketChannel [] socketChannels) throws IOException {
 		
 	    Objects.requireNonNull(onClientConnect);

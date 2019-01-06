@@ -54,22 +54,34 @@ final class WriteBuffer {
         int write(ByteBuffer byteBuffer) throws IOException;
     }
     
-    int onWriteable(Writer onWrite, NonBlockingChannelWriterLog log) throws IOException {
+    boolean onChannelWriteable(Writer onWrite, NonBlockingChannelWriterLog log) throws IOException {
         
         writeBuffer.flip();
-        
+    
         if (log != null) {
             log.onChannelWriteEnter(writeBuffer.limit(), writeBuffer.remaining(), writeBuffer.position());
         }
 
-        final int bytesWritten = onWrite.write(writeBuffer);
-
+        final int bytesWritten;
+        
+        final boolean allDataWritten;
+        
+        if (writeBuffer.hasRemaining()) {
+            bytesWritten = onWrite.write(writeBuffer);
+            
+            allDataWritten = writeBuffer.hasRemaining();
+        }
+        else {
+            allDataWritten = true;
+            bytesWritten = 0;
+        }
+    
         writeBuffer.compact();
 
         if (log != null) {
             log.onChannelWriteExit(bytesWritten, writeBuffer.limit(), writeBuffer.remaining(), writeBuffer.position());
         }
 
-        return bytesWritten;
+        return allDataWritten;
     }
 }

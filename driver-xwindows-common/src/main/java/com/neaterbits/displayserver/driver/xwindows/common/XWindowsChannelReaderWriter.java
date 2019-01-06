@@ -26,6 +26,8 @@ abstract class XWindowsChannelReaderWriter
     private final int port;
     
 	private SocketChannel socketChannel;
+	
+	private SelectionKey selectionKey;
 
 	protected abstract boolean receivedInitialMessage();
 	
@@ -52,7 +54,11 @@ abstract class XWindowsChannelReaderWriter
 
 		socketChannel.configureBlocking(false);
 		
-		final SelectionKey selectionKey = socketChannel.register(selector, SelectionKey.OP_READ|SelectionKey.OP_WRITE);
+		this.selectionKey = socketChannel.register(selector, SelectionKey.OP_READ|SelectionKey.OP_WRITE);
+		
+		if (this.selectionKey == null) {
+		    throw new IllegalStateException();
+		}
 		
 		set.add(selectionKey);
 		
@@ -60,9 +66,13 @@ abstract class XWindowsChannelReaderWriter
 	}
 	
 	@Override
-	public int read(SelectionKey selectionKey, Selector selector, ByteBuffer buffer) throws IOException {
+	public int read(SelectionKey selectionKey, ByteBuffer buffer) throws IOException {
 
-	    final SocketChannel channel = getChannel(selectionKey, selector);
+	    if (this.selectionKey != selectionKey) {
+	        throw new IllegalArgumentException();
+	    }
+	    
+	    final SocketChannel channel = getChannel();
 		final int bytesRead = channel.read(buffer);
 		
 		return bytesRead;
@@ -74,15 +84,16 @@ abstract class XWindowsChannelReaderWriter
 	}
 	
 	@Override
-	protected SocketChannel getChannel(SelectionKey selectionKey, Selector selector) {
-		if (!socketChannel.keyFor(selector).equals(selectionKey)) {
-			throw new IllegalArgumentException();
-		}
-
+	protected final SocketChannel getChannel() {
 		return socketChannel;
 	}
+	
+	@Override
+    protected final SelectionKey getSelectionKey() {
+        return selectionKey;
+    }
 
-	public void close() throws Exception {
+    public void close() throws Exception {
 		socketChannel.close();
 	}
 	
@@ -95,6 +106,6 @@ abstract class XWindowsChannelReaderWriter
 		
 		Objects.requireNonNull(encodeable);
 		
-		return write(byteOrder, Encodeable.makeDataWriter(encodeable));
+		return writeToOutputBuffer(byteOrder, Encodeable.makeDataWriter(encodeable));
 	}
 }

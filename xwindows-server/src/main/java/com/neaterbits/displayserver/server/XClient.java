@@ -1,5 +1,6 @@
 package com.neaterbits.displayserver.server;
 
+import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -80,9 +81,9 @@ public class XClient extends XConnection {
 
     private final Map<FONT, XFont> openFonts;
     
-    public XClient(XServer server, SocketChannel socketChannel, int connectionNo,
+    public XClient(XServer server, SocketChannel socketChannel, SelectionKey selectionKey, int connectionNo,
             NonBlockingChannelWriterLog log, XRendering rendering) {
-        super(socketChannel, connectionNo, log);
+        super(socketChannel, selectionKey, connectionNo, log);
 
         Objects.requireNonNull(server);
         Objects.requireNonNull(rendering);
