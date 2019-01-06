@@ -3,7 +3,6 @@ package com.neaterbits.displayserver.io.common;
 import java.io.IOException;
 import java.nio.ByteOrder;
 import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Objects;
 

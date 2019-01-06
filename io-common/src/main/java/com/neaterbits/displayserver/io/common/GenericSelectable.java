@@ -3,7 +3,6 @@ package com.neaterbits.displayserver.io.common;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
 import java.util.Objects;
 
 final class GenericSelectable extends BaseSelectable {
