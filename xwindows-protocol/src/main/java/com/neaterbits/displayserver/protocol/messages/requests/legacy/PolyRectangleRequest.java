@@ -27,12 +27,12 @@ public abstract class PolyRectangleRequest extends PolyRequest<RECTANGLE> {
         super(drawable, gc, rectangles);
     }
 
-    public RECTANGLE[] getRectangles() {
+    public final RECTANGLE[] getRectangles() {
         return getList();
     }
 
     @Override
-    public Object[] getDebugParams() {
+    public final Object[] getDebugParams() {
         return wrap(
                 "drawable", getDrawable(),
                 "gc", getGC(),
@@ -41,7 +41,7 @@ public abstract class PolyRectangleRequest extends PolyRequest<RECTANGLE> {
     }
 
     @Override
-    public void encode(XWindowsProtocolOutputStream stream) throws IOException {
+    public final void encode(XWindowsProtocolOutputStream stream) throws IOException {
 
         super.encode(stream, CARD32_PER_ENTRY);
         

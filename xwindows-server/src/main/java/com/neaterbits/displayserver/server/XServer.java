@@ -108,6 +108,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.legacy.OpenFont;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolyFillRectangle;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolyLine;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolyPoint;
+import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolyRectangle;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolySegment;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.QueryColors;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.QueryFont;
@@ -888,6 +889,13 @@ public class XServer implements AutoCloseable {
 		
 		    final PolyFillRectangle polyFillRectangle = log(messageLength, opcode, sequenceNumber, PolyFillRectangle.decode(stream));
 		    
+		    
+		    break;
+		}
+		
+		case OpCodes.POLY_RECTANGLE: {
+		    
+		    log(messageLength, opcode, sequenceNumber, PolyRectangle.decode(stream));
 		    
 		    break;
 		}

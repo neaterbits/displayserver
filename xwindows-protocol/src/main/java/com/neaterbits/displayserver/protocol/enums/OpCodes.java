@@ -55,6 +55,7 @@ public class OpCodes {
 	public static final int POLY_POINT = 64;
 	public static final int POLY_LINE = 65;
 	public static final int POLY_SEGMENT = 66;
+	public static final int POLY_RECTANGLE = 67;
 	public static final int POLY_FILL_RECTANGLE = 70;
 	
 	public static final int PUT_IMAGE = 72;
