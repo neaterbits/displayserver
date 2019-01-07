@@ -9,7 +9,6 @@ import com.neaterbits.displayserver.protocol.types.CARD32;
 
 public abstract class Reply extends ServerToClientMessage {
 
-
     public Reply(CARD16 sequenceNumber) {
         super(sequenceNumber);
     }

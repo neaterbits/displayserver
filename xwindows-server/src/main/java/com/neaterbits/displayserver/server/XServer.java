@@ -56,6 +56,7 @@ import com.neaterbits.displayserver.protocol.messages.replies.QueryPointerReply;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryResponseReply;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryTreeReply;
 import com.neaterbits.displayserver.protocol.messages.replies.legacy.AllocNamedColorReply;
+import com.neaterbits.displayserver.protocol.messages.replies.legacy.ListFontsReply;
 import com.neaterbits.displayserver.protocol.messages.replies.legacy.LookupColorReply;
 import com.neaterbits.displayserver.protocol.messages.replies.legacy.QueryColorsReply;
 import com.neaterbits.displayserver.protocol.messages.replies.legacy.RGB;
@@ -105,6 +106,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.legacy.CloseFont;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.CreateGlyphCursor;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.FreeCursor;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.ImageText16;
+import com.neaterbits.displayserver.protocol.messages.requests.legacy.ListFonts;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.LookupColor;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.OpenFont;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolyFillRectangle;
@@ -758,6 +760,20 @@ public class XServer implements AutoCloseable {
             break;
         }
 
+        case OpCodes.LIST_FONTS: {
+            
+            final ListFonts listFonts = log(messageLength, opcode, sequenceNumber, ListFonts.decode(stream));
+            
+            try {
+                final String [] matches = fonts.listFonts(listFonts.getPattern());
+                
+                sendReply(client, new ListFontsReply(sequenceNumber, matches));
+            } catch (ValueException ex) {
+                sendError(client, Errors.Value, sequenceNumber, ex.getValue(), opcode);
+            }
+            break;
+        }
+        
         case OpCodes.CREATE_PIXMAP: {
 		    final CreatePixmap createPixmap = log(messageLength, opcode, sequenceNumber, CreatePixmap.decode(stream));
 		    

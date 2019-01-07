@@ -28,4 +28,12 @@ public abstract class Message extends Encodeable {
     protected static void writeUnusedCARD16(XWindowsProtocolOutputStream stream) throws IOException {
         stream.writeCARD16(new CARD16(0));
     }
+
+    protected static void writeStrings(XWindowsProtocolOutputStream stream, String [] strings) throws IOException {
+        for (String string : strings) {
+            stream.writeSTRING8(string);
+            
+            stream.writeBYTE(new BYTE((byte)0));
+        }
+    }
 }

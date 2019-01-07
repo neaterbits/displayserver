@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.function.Function;
 
+import com.neaterbits.displayserver.protocol.exception.ValueException;
 import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.xwindows.fonts.FontCache;
 import com.neaterbits.displayserver.xwindows.fonts.FontLoader;
@@ -49,5 +50,9 @@ final class XFonts {
         if (referenced) {
             fontCache.remove(font.getName());
         }
+    }
+    
+    String [] listFonts(String pattern) throws ValueException {
+        return fontLoader.listFonts(pattern);
     }
 }

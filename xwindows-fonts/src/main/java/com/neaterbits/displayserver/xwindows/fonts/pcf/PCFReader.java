@@ -8,28 +8,41 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 import com.neaterbits.displayserver.protocol.enums.DrawDirection;
-import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.xwindows.fonts.model.DataLength;
 import com.neaterbits.displayserver.xwindows.fonts.model.FontBitmapFormat;
 import com.neaterbits.displayserver.xwindows.fonts.model.StoreOrder;
 import com.neaterbits.displayserver.xwindows.fonts.model.XFontCharacter;
 import com.neaterbits.displayserver.xwindows.fonts.model.XFontModel;
+import com.neaterbits.displayserver.xwindows.fonts.model.XFontProperty;
 
 public class PCFReader {
 
-    public static XFontModel read(InputStream inputStream, Function<String, ATOM> getAtom) throws IOException {
+    private static final boolean DEBUG = false;
     
-        final XFontPCFReaderListener listener = new XFontPCFReaderListener(getAtom);
+    public static XFontModel read(InputStream inputStream) throws IOException {
+    
+        final XFontPCFReaderListener listener = new XFontPCFReaderListener();
         
         read(inputStream, listener, null);
         
         return listener.getFontModel();
     }
     
+    public static List<XFontProperty> readProperties(InputStream inputStream) throws IOException {
+        final XFontPCFReaderListener listener = new XFontPCFReaderListener();
+        
+        read(inputStream, listener, null, TOCEntry.PROPERTIES);
+        
+        return listener.getProperties();
+    }
+    
     static <T> void read(InputStream inputStream, PCFReaderListener<T> listener, T data) throws IOException {
+        read(inputStream, listener, data, 0xFFFFFFFF);
+    }
+    
+    static <T> void read(InputStream inputStream, PCFReaderListener<T> listener, T data, int entriesToRead) throws IOException {
         
         final PCFStream dataInput = new PCFStream(inputStream);
         
@@ -39,15 +52,21 @@ public class PCFReader {
 
         int entryIdx = 0;
 
-        System.out.println("## cur offset " + curOffset);
-        
-        for (TOCEntry tocEntry : toc.getEntriesSorted()) {
-            System.out.println("TocEntry of type " + tocEntry.getType() + " at " + tocEntry.getOffset() + " of size " + tocEntry.getSize());
+        if (DEBUG) {
+            System.out.println("## cur offset " + curOffset);
+            
+            for (TOCEntry tocEntry : toc.getEntriesSorted()) {
+                System.out.println("TocEntry of type " + tocEntry.getType() + " at " + tocEntry.getOffset() + " of size " + tocEntry.getSize());
+            }
         }
+        
+        int readEntries = 0;
 
         for (TOCEntry tocEntry : toc.getEntriesSorted()) {
-            
-            System.out.println("## process of type " + tocEntry.getType() + ", stream offset = " + dataInput.getOffset() + ", curoffset=" + curOffset);
+         
+            if (DEBUG) {
+                System.out.println("## process of type " + tocEntry.getType() + ", stream offset = " + dataInput.getOffset() + ", curoffset=" + curOffset);
+            }
             
             if (tocEntry.getOffset() < curOffset) {
                 throw new IOException("Offset mismatch: " + tocEntry.getOffset() + "/" + curOffset + " at idx " + entryIdx);
@@ -61,8 +80,10 @@ public class PCFReader {
             
             curOffset += dataInput.skipBytes(toSkip);
 
-            System.out.println("## process of type after skip " + tocEntry.getType() + ", stream offset = " + dataInput.getOffset() + ", curoffset=" + curOffset);
-
+            if (DEBUG) {
+                System.out.println("## process of type after skip " + tocEntry.getType() + ", stream offset = " + dataInput.getOffset() + ", curoffset=" + curOffset);
+            }
+                
             switch (tocEntry.getType()) {
          
             case TOCEntry.PROPERTIES:
@@ -106,6 +127,12 @@ public class PCFReader {
                 break;
             }
             
+            readEntries |= tocEntry.getType();
+            
+            if ((readEntries & entriesToRead) == entriesToRead) {
+                break;
+            }
+            
             ++ entryIdx;
         }
     }
@@ -124,7 +151,9 @@ public class PCFReader {
         
         final int tableCount = dataInput.readInt(ByteOrder.LITTLE_ENDIAN);
         
-        System.out.format("## tableCount : %08x\n", tableCount);
+        if (DEBUG) {
+            System.out.format("## tableCount : %08x\n", tableCount);
+        }
         
         final List<TOCEntry> entries = new ArrayList<>(tableCount);
         
@@ -344,7 +373,9 @@ public class PCFReader {
         
         curOffset += 4;
 
-        System.out.format("## format: %08x\n", format);
+        if (DEBUG) {
+            System.out.format("## format: %08x\n", format);
+        }
         
         final ByteOrder byteOrder = getByteOrder(format);
         
@@ -454,7 +485,9 @@ public class PCFReader {
         
         final int format = dataInput.readInt(ByteOrder.LITTLE_ENDIAN);
         
-        System.out.format("## metrics format: %08x\n", format);
+        if (DEBUG) {
+            System.out.format("## metrics format: %08x\n", format);
+        }
         
         curOffset += 4;
         
@@ -477,8 +510,10 @@ public class PCFReader {
         }
         else {
             final int metricsCount = dataInput.readInt(byteOrder);
-            
-            System.out.format("## metrics count: %08x\n", metricsCount);
+         
+            if (DEBUG) {
+                System.out.format("## metrics count: %08x\n", metricsCount);
+            }
             
             onMetricsCount.onMetrics(data, metricsCount);
             
@@ -502,7 +537,9 @@ public class PCFReader {
         
         final int format = dataInput.readInt(ByteOrder.LITTLE_ENDIAN);
         
-        System.out.format("## bitmaps format: %08x\n", format);
+        if (DEBUG) {
+            System.out.format("## bitmaps format: %08x\n", format);
+        }
         
         curOffset += 4;
         
@@ -531,7 +568,9 @@ public class PCFReader {
 
         final int bitmapSize = bitmapSizes[format & 3];
         
-        System.out.println("## bitmap size " + bitmapSize);
+        if (DEBUG) {
+            System.out.println("## bitmap size " + bitmapSize);
+        }
         
         final FontBitmapFormat bitmapFormat = new FontBitmapFormat(
                 (format & 4) != 0 ? StoreOrder.LEAST_SIGNIFICANT_FIRST : StoreOrder.MOST_SIGNIFICANT_FIRST,
@@ -590,7 +629,9 @@ public class PCFReader {
         
         final int format = dataInput.readInt(ByteOrder.LITTLE_ENDIAN);
         
-        System.out.format("## encodings format: %08x\n", format);
+        if (DEBUG) {
+            System.out.format("## encodings format: %08x\n", format);
+        }
         
         curOffset += 4;
         
@@ -632,7 +673,9 @@ public class PCFReader {
         
         final int format = dataInput.readInt(ByteOrder.LITTLE_ENDIAN);
         
-        System.out.format("## scalable widths format: %08x\n", format);
+        if (DEBUG) {
+            System.out.format("## scalable widths format: %08x\n", format);
+        }
         
         curOffset += 4;
         
@@ -661,7 +704,9 @@ public class PCFReader {
         
         final int format = dataInput.readInt(ByteOrder.LITTLE_ENDIAN);
         
-        System.out.format("## scalable widths format: %08x\n", format);
+        if (DEBUG) {
+            System.out.format("## scalable widths format: %08x\n", format);
+        }
         
         curOffset += 4;
         

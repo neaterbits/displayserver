@@ -2,20 +2,18 @@ package com.neaterbits.displayserver.xwindows.fonts.model;
 
 import java.util.Objects;
 
-import com.neaterbits.displayserver.protocol.types.ATOM;
-
 public abstract class XFontProperty {
 
-    private final ATOM name;
+    private final String name;
 
-    public XFontProperty(ATOM name) {
+    public XFontProperty(String name) {
         
         Objects.requireNonNull(name);
         
         this.name = name;
     }
 
-    public final ATOM getName() {
+    public final String getName() {
         return name;
     }
 }

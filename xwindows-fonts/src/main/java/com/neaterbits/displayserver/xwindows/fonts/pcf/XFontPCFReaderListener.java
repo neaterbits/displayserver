@@ -3,9 +3,7 @@ package com.neaterbits.displayserver.xwindows.fonts.pcf;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 
-import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.xwindows.fonts.model.FontBitmapFormat;
 import com.neaterbits.displayserver.xwindows.fonts.model.XFontAccelerators;
 import com.neaterbits.displayserver.xwindows.fonts.model.XFontBitmaps;
@@ -18,8 +16,6 @@ import com.neaterbits.displayserver.xwindows.fonts.model.XFontStringProperty;
 
 final class XFontPCFReaderListener implements PCFReaderListener<Void> {
 
-    private final Function<String, ATOM> getAtom;
-    
     private List<XFontProperty> properties;
     private XFontAccelerators accelerators;
     private List<XFontCharacter> metrics;
@@ -36,10 +32,6 @@ final class XFontPCFReaderListener implements PCFReaderListener<Void> {
 
     private XFontAccelerators bdfAccelerators;
     
-    XFontPCFReaderListener(Function<String, ATOM> getAtom) {
-        this.getAtom = getAtom;
-    }
-
     @Override
     public void onProperties(Void data, int count) {
 
@@ -52,12 +44,12 @@ final class XFontPCFReaderListener implements PCFReaderListener<Void> {
 
     @Override
     public void onIntegerProperty(Void data, String name, int value) {
-        properties.add(new XFontIntegerProperty(getAtom.apply(name), value));
+        properties.add(new XFontIntegerProperty(name, value));
     }
 
     @Override
     public void onStringProperty(Void data, String name, String value) {
-        properties.add(new XFontStringProperty(getAtom.apply(name), value));
+        properties.add(new XFontStringProperty(name, value));
     }
 
     @Override
@@ -195,6 +187,10 @@ final class XFontPCFReaderListener implements PCFReaderListener<Void> {
                 inkMinbounds, inkMaxbounds);
     }
 
+    List<XFontProperty> getProperties() {
+        return properties;
+    }
+    
     XFontModel getFontModel() {
         return new XFontModel(
                 properties,
