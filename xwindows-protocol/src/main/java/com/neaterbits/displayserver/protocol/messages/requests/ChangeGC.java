@@ -7,6 +7,7 @@ import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
 import com.neaterbits.displayserver.protocol.messages.Request;
 import com.neaterbits.displayserver.protocol.types.GCONTEXT;
+import com.neaterbits.displayserver.util.logging.LogUtil;
 
 public final class ChangeGC extends Request {
 
@@ -27,6 +28,13 @@ public final class ChangeGC extends Request {
         return new ChangeGC(stream.readGCONTEXT(), GCAttributes.decode(stream));
     }
     
+    public Object[] getDebugParams() {
+        return wrap(
+                "gc", gc,
+                "attributes", LogUtil.outputParametersInBrackets(attributes.getDebugParams())
+        );
+    }
+
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
         
