@@ -1,6 +1,7 @@
 package com.neaterbits.displayserver.protocol.messages.requests;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
@@ -29,7 +30,7 @@ public final class SetClipRectangles extends Request {
         
         final CARD16 requestLength = readRequestLength(stream);
         
-        final int numRectangles = (requestLength.getValue() - 3);
+        final int numRectangles = (requestLength.getValue() - 3) / 2;
         
         return new SetClipRectangles(
                 ordering,
@@ -81,7 +82,7 @@ public final class SetClipRectangles extends Request {
                 "gc", gc,
                 "clipXOrigin", clipXOrigin,
                 "clipYOrigin", clipYOrigin,
-                "rectangles", rectangles
+                "rectangles", Arrays.toString(rectangles)
         );
     }
 
