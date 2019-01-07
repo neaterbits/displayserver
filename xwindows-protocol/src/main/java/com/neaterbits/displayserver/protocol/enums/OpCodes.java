@@ -66,6 +66,7 @@ public class OpCodes {
 	public static final int CREATE_COLOR_MAP = 78;
 	
 	public static final int ALLOC_COLOR = 84;
+	public static final int ALLOC_NAMED_COLOR = 85;
 	
 	public static final int FREE_COLORS = 88;
 	

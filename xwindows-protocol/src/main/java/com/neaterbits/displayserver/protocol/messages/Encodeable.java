@@ -21,6 +21,11 @@ public abstract class Encodeable {
 	}
 	
 	@FunctionalInterface
+	public interface EncodeFunction {
+	    void encode(XWindowsProtocolOutputStream stream) throws IOException;
+	}
+	
+	@FunctionalInterface
 	public interface DecodeArrayElement<T> {
 	    T decode(XWindowsProtocolInputStream stream) throws IOException;
 	}
@@ -72,7 +77,15 @@ public abstract class Encodeable {
        return sb.toString();
    }
 
-
+   protected final Object [] merge(Object [] objs1, Object [] objs2) {
+       
+       final Object [] merged = new Object[objs1.length + objs2.length];
+       
+       System.arraycopy(objs1, 0, merged, 0, objs1.length);
+       System.arraycopy(objs2, 0, merged, objs1.length, objs2.length);
+       
+       return merged;
+   }
    
    protected final Object [] wrap(Object ... objects) {
        return LogUtil.wrap(objects);

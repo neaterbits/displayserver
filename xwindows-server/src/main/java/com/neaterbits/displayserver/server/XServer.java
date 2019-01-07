@@ -55,6 +55,7 @@ import com.neaterbits.displayserver.protocol.messages.replies.InternAtomReply;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryPointerReply;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryResponseReply;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryTreeReply;
+import com.neaterbits.displayserver.protocol.messages.replies.legacy.AllocNamedColorReply;
 import com.neaterbits.displayserver.protocol.messages.replies.legacy.LookupColorReply;
 import com.neaterbits.displayserver.protocol.messages.replies.legacy.QueryColorsReply;
 import com.neaterbits.displayserver.protocol.messages.replies.legacy.RGB;
@@ -99,6 +100,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.RecolorCursor;
 import com.neaterbits.displayserver.protocol.messages.requests.SetCloseDownMode;
 import com.neaterbits.displayserver.protocol.messages.requests.SetInputFocus;
 import com.neaterbits.displayserver.protocol.messages.requests.UngrabServer;
+import com.neaterbits.displayserver.protocol.messages.requests.legacy.AllocNamedColor;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.CloseFont;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.CreateGlyphCursor;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.FreeCursor;
@@ -1005,6 +1007,50 @@ public class XServer implements AutoCloseable {
 		    catch (ColormapException ex) {
 		        sendError(client, Errors.Colormap, sequenceNumber, ex.getColormap().getValue(), opcode);
 		    }
+		    break;
+		}
+		
+		case OpCodes.ALLOC_NAMED_COLOR: {
+		    
+		    final AllocNamedColor allocNamedColor = log(
+		            messageLength,
+		            opcode,
+		            sequenceNumber,
+		            AllocNamedColor.decode(stream));
+		    
+            try {
+                final PixelFormat pixelFormat = getPixelFormat(allocNamedColor.getCmap());
+    
+                final XBuiltinColor builtinColor = builtinColors.getColor(allocNamedColor.getName());
+                
+                if (builtinColor == null) {
+                    sendError(client, Errors.Name, sequenceNumber, 0L, opcode);
+                }
+                else if (!allocNamedColor.getCmap().equals(COLORMAP.None)) {
+                    throw new UnsupportedOperationException("TODO");
+                }
+                else {
+                    final int pixel = pixelFormat.getPixel(
+                            builtinColor.getR(),
+                            builtinColor.getG(),
+                            builtinColor.getB());
+
+                    sendReply(client, new AllocNamedColorReply(
+                        sequenceNumber,
+                        
+                        new CARD32(pixel),
+                        new CARD16(builtinColor.getR() * 256),
+                        new CARD16(builtinColor.getG() * 256),
+                        new CARD16(builtinColor.getB() * 256),
+                        
+                        new CARD16(builtinColor.getR() * 256),
+                        new CARD16(builtinColor.getG() * 256),
+                        new CARD16(builtinColor.getB() * 256)));
+                }
+            }
+            catch (ColormapException ex) {
+                sendError(client, Errors.Colormap, sequenceNumber, ex.getColormap().getValue(), opcode);
+            }
 		    break;
 		}
 		
