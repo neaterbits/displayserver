@@ -511,7 +511,7 @@ public class XServer implements AutoCloseable {
             final XPixmap xPixmap;
             
             try {
-                if (null != (xWindow = state.getClientWindow(windowResource))) {
+                if (null != (xWindow = state.getClientOrRootWindow(windowResource))) {
                     root = state.findRootWindowOf(xWindow.getWINDOW()).getWINDOW();
                     depth = xWindow.getDepth();
                     x = xWindow.getX();

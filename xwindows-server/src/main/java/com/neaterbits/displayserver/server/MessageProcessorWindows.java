@@ -15,7 +15,7 @@ final class MessageProcessorWindows {
 
     static void getWindowAttributes(GetWindowAttributes getWindowAttributes, int opcode, CARD16 sequenceNumber, XClient client, XClientWindowsConstAccess xWindows, ServerToClient serverToClient) {
         
-        final XWindow window = xWindows.getClientWindow(getWindowAttributes.getWindow());
+        final XWindow window = xWindows.getClientOrRootWindow(getWindowAttributes.getWindow());
 
         if (window == null) {
             serverToClient.sendError(client, Errors.Window, sequenceNumber, getWindowAttributes.getWindow().getValue(), opcode);
