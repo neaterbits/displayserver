@@ -48,6 +48,8 @@ public class OpCodes {
     public static final int CREATE_GC = 55;
     public static final int CHANGE_GC = 56;
     
+    public static final int SET_CLIP_RECTANGLES = 59;
+    
     public static final int FREE_GC = 60;
 	
     public static final int CLEAR_AREA = 61;
