@@ -16,8 +16,6 @@ import com.neaterbits.displayserver.render.cairo.Cairo;
 import com.neaterbits.displayserver.render.cairo.CairoFormat;
 import com.neaterbits.displayserver.render.cairo.CairoImageSurface;
 import com.neaterbits.displayserver.render.cairo.CairoOperator;
-import com.neaterbits.displayserver.render.cairo.CairoPNGSurface;
-import com.neaterbits.displayserver.render.cairo.CairoStatus;
 import com.neaterbits.displayserver.render.cairo.CairoSurface;
 import com.neaterbits.displayserver.xwindows.model.XGC;
 import com.neaterbits.displayserver.xwindows.model.render.XLibRenderer;
@@ -29,7 +27,7 @@ final class CairoXLibRenderer implements XLibRenderer {
 
     private final Cairo cr;
     
-    private static int fileSequenceCounter = 0;
+    // private static int fileSequenceCounter = 0;
     
     CairoXLibRenderer(CairoSurface surface, PixelConversion pixelConversion) {
         
@@ -39,7 +37,7 @@ final class CairoXLibRenderer implements XLibRenderer {
         this.surface = surface;
         this.pixelConversion = pixelConversion;
         
-        this.cr = new Cairo(surface);
+        this.cr = surface.createContext();
     }
 
     private void applyGC(XGC gc) {
@@ -62,6 +60,8 @@ final class CairoXLibRenderer implements XLibRenderer {
             throw new UnsupportedOperationException();
         }
 
+        System.out.println("## set cairo operator " + operator);
+        
         cr.setOperator(operator);
 
         final CARD32 planeMask = XLibRenderer.getGCValue(gc, GCAttributes.PLANE_MASK, GCAttributes::getPlaneMask);
@@ -188,6 +188,8 @@ final class CairoXLibRenderer implements XLibRenderer {
 
         if (width != 0 && height != 0) {
             
+            System.out.println("## apply GC");
+            
             applyGC(gc);
             
             switch (format) {
@@ -222,7 +224,7 @@ final class CairoXLibRenderer implements XLibRenderer {
                     
                     final CairoImageSurface imageSurface = new CairoImageSurface(data, cairoFormat, width, height, stride);
 
-                    writeToPNG(imageSurface, "src");
+                    // final int sequenceNumber = writeToPNG(imageSurface, "src");
                     
                     try {
                         System.out.println("## write image surface to " + surface + " at "
@@ -234,13 +236,26 @@ final class CairoXLibRenderer implements XLibRenderer {
                         // cr.clip();
 
                         cr.setSourceSurface(imageSurface, dstX, dstY);
-                        cr.rectangle(dstX, dstY, width, height);
-                        cr.fill();
+                        // cr.rectangle(dstX, dstY, width, height);
+                        // cr.fill();
+                        
+                        surface.flush();
 
+                        cr.paint();
 
-                        // cr.paint();
-
-                        // writeToPNG(surface, "dst");
+                        /*
+                        new Thread(() -> {
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                            
+                            writeToPNG(surface, "dst", sequenceNumber);
+                        })
+                        .start();
+                        */
                     }
                     finally {
                         imageSurface.dispose();
@@ -252,16 +267,26 @@ final class CairoXLibRenderer implements XLibRenderer {
         }
     }
     
-    private void writeToPNG(CairoSurface surface, String suffix) {
+    /*
+    private int writeToPNG(CairoSurface surface, String suffix) {
         
-        final String fileName = System.getenv("HOME") + "/projects/displayserver/image" + (fileSequenceCounter ++) + "_" + suffix + ".png";
+        final int sequenceNumber = fileSequenceCounter ++;
+     
+        writeToPNG(surface, suffix, sequenceNumber);
+    
+        return sequenceNumber;
+    }
         
-        final CairoStatus status = CairoPNGSurface.writePNG(surface, fileName);
+    private void writeToPNG(CairoSurface surface, String suffix, int sequenceNumber) {
+        final String fileName = System.getenv("HOME") + "/projects/displayserver/image" + sequenceNumber + "_" + suffix + ".png";
+        
+        final CairoStatus status = surface.writeToPNG(fileName);
         
         if (status != CairoStatus.SUCCESS) {
             throw new IllegalStateException("status=" + status);
         }
     }
+    */
 
     @Override
     public void renderBitmap(XGC gc, Buffer buffer, int x, int y) {

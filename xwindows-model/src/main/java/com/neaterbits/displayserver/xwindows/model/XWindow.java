@@ -35,6 +35,8 @@ public class XWindow extends XDrawable {
     
     private WindowAttributes currentWindowAttributes;
     
+    private final BufferOperations bufferOperations;
+    
     private final Map<ATOM, Property> properties;
 
     // Root window
@@ -45,9 +47,10 @@ public class XWindow extends XDrawable {
             CARD16 borderWidth,
             CARD16 windowClass,
             WindowAttributes currentWindowAttributes,
-            XLibRenderer renderer) {
+            XLibRenderer renderer,
+            BufferOperations bufferOperations) {
         
-        this(window, windowResource, WINDOW.None, WINDOW.None, visual, borderWidth, windowClass, currentWindowAttributes, renderer, 0);
+        this(window, windowResource, WINDOW.None, WINDOW.None, visual, borderWidth, windowClass, currentWindowAttributes, renderer, bufferOperations, 0);
     }
 
     protected XWindow(
@@ -57,9 +60,10 @@ public class XWindow extends XDrawable {
             CARD16 borderWidth,
             CARD16 windowClass,
             WindowAttributes currentWindowAttributes,
-            XLibRenderer renderer) {
+            XLibRenderer renderer,
+            BufferOperations bufferOperations) {
         
-        this(window, windowResource, rootWindow, parentWindow, visual, borderWidth, windowClass, currentWindowAttributes, renderer, 0);
+        this(window, windowResource, rootWindow, parentWindow, visual, borderWidth, windowClass, currentWindowAttributes, renderer, bufferOperations, 0);
         
         if (rootWindow.equals(WINDOW.None)) {
             throw new IllegalArgumentException();
@@ -78,6 +82,7 @@ public class XWindow extends XDrawable {
             CARD16 windowClass,
             WindowAttributes currentWindowAttributes,
             XLibRenderer renderer,
+            BufferOperations bufferOperations,
             int disambiguate) {
         
         super(visual, renderer);
@@ -98,13 +103,17 @@ public class XWindow extends XDrawable {
         this.borderWidth = borderWidth;
         this.windowClass = windowClass;
         this.currentWindowAttributes = currentWindowAttributes;
+
+        Objects.requireNonNull(bufferOperations);
         
+        this.bufferOperations = bufferOperations;
+
         this.properties = new HashMap<>();
     }
     
     @Override
     public BufferOperations getBufferOperations() {
-        throw new UnsupportedOperationException("TODO");
+        return bufferOperations;
     }
 
     public final boolean isRootWindow() {

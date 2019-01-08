@@ -27,7 +27,9 @@ import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.protocol.types.WINGRAVITY;
 import com.neaterbits.displayserver.windows.DisplayArea;
-import com.neaterbits.displayserver.windows.DisplayAreaWindows;
+import com.neaterbits.displayserver.windows.WindowsDisplayArea;
+import com.neaterbits.displayserver.windows.WindowsDisplayAreas;
+import com.neaterbits.displayserver.windows.Window;
 import com.neaterbits.displayserver.xwindows.model.XScreen;
 import com.neaterbits.displayserver.xwindows.model.XScreenDepth;
 import com.neaterbits.displayserver.xwindows.model.XScreensAndVisuals;
@@ -57,18 +59,19 @@ class ScreensHelper {
 
     static XScreensAndVisuals getScreens(
             GraphicsDriver graphicsDriver,
-            List<DisplayAreaWindows> displayAreas,
+            WindowsDisplayAreas displayAreas,
             ServerResourceIdAllocator resourceIdAllocator,
             XRendering rendering,
             BiConsumer<Integer, XWindow> addRootWindow) {
         
-        final List<XScreen> screens = new ArrayList<>(displayAreas.size());
+        
+        final List<XScreen> screens = new ArrayList<>(displayAreas.getDisplayAreas().size());
         
         final Map<VISUALID, XVisual> visuals = new HashMap<>();
 
         int screenNo = 0;
         
-        for (DisplayAreaWindows displayArea : displayAreas) {
+        for (WindowsDisplayArea displayArea : displayAreas.getDisplayAreas()) {
             
             final int rootWindow = resourceIdAllocator.allocateRootWindowId();
             
@@ -88,16 +91,19 @@ class ScreensHelper {
 
             visuals.put(visualId, xVisual);
             
-            final BufferOperations bufferOperations = rendering.getCompositor().getBufferForWindow(displayArea.getRootWindow());
+            final BufferOperations bufferOperations = rendering.getCompositor().getSurfaceForRootWindow(displayArea.getRootWindow());
+            
+            final Window window = displayArea.getRootWindow();
             
             final XWindow xRootWindow = new XWindow(
-                    displayArea.getRootWindow(),
+                    window,
                     rootWindowResource,
                     visualId,
                     new CARD16(0),
                     WindowClass.InputOnly,
                     getRootWindowAttributes(displayArea),
-                    rendering.getRendererFactory().createRenderer(bufferOperations, pixelFormat));
+                    rendering.getRendererFactory().createRenderer(bufferOperations, pixelFormat),
+                    rendering.getCompositor().getSurfaceForRootWindow(window));
             
             addRootWindow.accept(screenNo, xRootWindow);
             

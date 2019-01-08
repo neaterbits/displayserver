@@ -3,29 +3,29 @@ package com.neaterbits.displayserver.xwindows.model;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.buffers.BufferOperations;
-import com.neaterbits.displayserver.buffers.OffscreenBuffer;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
+import com.neaterbits.displayserver.windows.compositor.OffscreenSurface;
 import com.neaterbits.displayserver.xwindows.model.render.XLibRenderer;
 
 public final class XPixmap extends XDrawable {
 
-    private final OffscreenBuffer offscreenBuffer;
+    private final OffscreenSurface offscreenSurface;
 
-    public XPixmap(VISUALID visual, OffscreenBuffer offscreenBuffer, XLibRenderer renderer) {
+    public XPixmap(VISUALID visual, OffscreenSurface offscreenSurface, XLibRenderer renderer) {
         
         super(visual, renderer);
         
-        Objects.requireNonNull(offscreenBuffer);
+        Objects.requireNonNull(offscreenSurface);
         
-        this.offscreenBuffer = offscreenBuffer;
+        this.offscreenSurface = offscreenSurface;
     }
 
-    public OffscreenBuffer getOffscreenBuffer() {
-        return offscreenBuffer;
+    public OffscreenSurface getOffscreenSurface() {
+        return offscreenSurface;
     }
 
     @Override
     public BufferOperations getBufferOperations() {
-        return offscreenBuffer;
+        return offscreenSurface;
     }
 }

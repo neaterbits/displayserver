@@ -13,11 +13,11 @@ import com.neaterbits.displayserver.layers.Layers;
 import com.neaterbits.displayserver.types.Position;
 import com.neaterbits.displayserver.types.Size;
 
-public class Windows {
+final class Windows {
 
 	private final WindowEventListener windowEventListener;
 	
-	private final DisplayAreaWindows displayArea;
+	private final WindowsDisplayArea displayArea;
 	
 	private final Layers layers;
 	
@@ -25,7 +25,7 @@ public class Windows {
 	
 	private final Map<Layer, Window> layerToWindow;
 	
-	Windows(DisplayAreaWindows displayArea, WindowEventListener windowEventListener) {
+	Windows(WindowsDisplayArea displayArea, WindowEventListener windowEventListener) {
 		
 	    Objects.requireNonNull(displayArea);
 	    Objects.requireNonNull(windowEventListener);

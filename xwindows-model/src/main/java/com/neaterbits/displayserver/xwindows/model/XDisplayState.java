@@ -9,7 +9,7 @@ import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.PIXMAP;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
-import com.neaterbits.displayserver.windows.DisplayAreaWindows;
+import com.neaterbits.displayserver.windows.WindowsDisplayArea;
 import com.neaterbits.displayserver.windows.Window;
 
 public class XDisplayState<W extends XWindow, WINDOWS extends XWindows<W>>
@@ -129,7 +129,7 @@ public class XDisplayState<W extends XWindow, WINDOWS extends XWindows<W>>
     }
 
     
-    public final DisplayAreaWindows findDisplayArea(DRAWABLE drawable) {
+    public final WindowsDisplayArea findDisplayArea(DRAWABLE drawable) {
         
         Objects.requireNonNull(drawable);
         

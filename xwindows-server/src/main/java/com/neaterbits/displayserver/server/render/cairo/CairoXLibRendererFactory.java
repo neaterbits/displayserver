@@ -1,5 +1,7 @@
 package com.neaterbits.displayserver.server.render.cairo;
 
+import java.util.Objects;
+
 import com.neaterbits.displayserver.buffers.BufferOperations;
 import com.neaterbits.displayserver.buffers.ImageBufferFormat;
 import com.neaterbits.displayserver.buffers.PixelConversion;
@@ -11,6 +13,10 @@ public final class CairoXLibRendererFactory implements XLibRendererFactory {
 
     @Override
     public XLibRenderer createRenderer(BufferOperations bufferOperations, PixelConversion pixelConversion) {
+        
+        Objects.requireNonNull(bufferOperations);
+        Objects.requireNonNull(pixelConversion);
+        
         return new CairoXLibRenderer(bufferOperations.createCairoSurface(), pixelConversion);
     }
 

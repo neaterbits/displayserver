@@ -1,24 +1,22 @@
 package com.neaterbits.displayserver.windows;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
 public class Display {
 
-    private final List<DisplayAreaWindows> displayAreas;
+    private final WindowsDisplayAreas displayAreas;
     
-    public Display(Collection<DisplayAreaWindows> displayAreas) {
+    public Display(WindowsDisplayAreas displayAreas) {
         
         Objects.requireNonNull(displayAreas);
         
-        this.displayAreas = new ArrayList<>(displayAreas);
+        this.displayAreas = displayAreas;
     }
     
     public Window createWindow(Window parentWindow, WindowParameters windowParameters, WindowAttributes windowAttributes) {
 
-        final DisplayAreaWindows displayArea = parentWindow.getDisplayArea();
+        final WindowsDisplayArea displayArea = parentWindow.getDisplayArea();
         
         if (!displayAreas.contains(displayArea)) {
             throw new IllegalArgumentException();

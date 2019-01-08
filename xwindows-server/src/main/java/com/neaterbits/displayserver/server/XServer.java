@@ -134,8 +134,9 @@ import com.neaterbits.displayserver.protocol.types.TIMESTAMP;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.server.XConnection.State;
 import com.neaterbits.displayserver.windows.Display;
-import com.neaterbits.displayserver.windows.DisplayAreaFinder;
-import com.neaterbits.displayserver.windows.DisplayAreaWindows;
+import com.neaterbits.displayserver.windows.DisplayAreas;
+import com.neaterbits.displayserver.windows.WindowsDisplayArea;
+import com.neaterbits.displayserver.windows.WindowsDisplayAreas;
 import com.neaterbits.displayserver.windows.Window;
 import com.neaterbits.displayserver.xwindows.fonts.NoSuchFontException;
 import com.neaterbits.displayserver.xwindows.fonts.model.XFont;
@@ -206,22 +207,13 @@ public class XServer implements AutoCloseable {
 
 		final XWindowsEventListener eventListener = new XWindowsEventListener(this);
 		
-		final DisplayAreaWindows displayArea = DisplayAreaFinder.makeDisplayArea(
-		        config.getDisplayAreaConfig(),
-		        hardware.getGraphicsDriver(),
-		        eventListener);
+		final DisplayAreas displayAreas = rendering.getDisplayAreas();
 		
-		if (displayArea == null) {
-		    throw new IllegalStateException();
-		}
-		
-		final List<DisplayAreaWindows> displayAreas = Arrays.asList(
-                displayArea
-        );
+		final WindowsDisplayAreas windowsDisplayAreas = displayAreas.toWindowsDisplayAreas(eventListener);
 
 		final XScreensAndVisuals screens = ScreensHelper.getScreens(
 		        hardware.getGraphicsDriver(),
-		        displayAreas,
+		        windowsDisplayAreas,
 		        resourceIdAllocator,
 		        rendering,
 		        (screenNo, window) -> rootWindows.put(window, screenNo));
@@ -230,7 +222,7 @@ public class XServer implements AutoCloseable {
 		
 		rootWindows.entrySet().forEach(entry -> state.addRootWindow(entry.getValue(), entry.getKey()));
 		
-		this.display = new Display(displayAreas);
+		this.display = new Display(windowsDisplayAreas);
 		
 		this.timeServerStarted = System.currentTimeMillis();
 		
@@ -275,7 +267,7 @@ public class XServer implements AutoCloseable {
 	    return state;
 	}
 	
-	DisplayAreaWindows findDisplayArea(DRAWABLE drawable) {
+	WindowsDisplayArea findDisplayArea(DRAWABLE drawable) {
 	    return state.findDisplayArea(drawable);
 	}
 	
@@ -528,11 +520,11 @@ public class XServer implements AutoCloseable {
                     final XWindow pixmapXWindow = state.findPixmapWindow(drawable.toPixmap());
                     
                     root = state.findRootWindowOf(pixmapXWindow.getWINDOW()).getWINDOW();
-                    depth = xPixmap.getOffscreenBuffer().getDepth();
+                    depth = xPixmap.getOffscreenSurface().getDepth();
                     x = 0;
                     y = 0;
-                    width = xPixmap.getOffscreenBuffer().getWidth();
-                    height = xPixmap.getOffscreenBuffer().getHeight();
+                    width = xPixmap.getOffscreenSurface().getWidth();
+                    height = xPixmap.getOffscreenSurface().getHeight();
                     borderWidth = 0;
                 }
                 else {
@@ -812,7 +804,7 @@ public class XServer implements AutoCloseable {
 
 	        final DRAWABLE pixmapDrawable = freePixmap.getPixmap().toDrawable();
 	        
-	        final DisplayAreaWindows displayArea = findDisplayArea(pixmapDrawable);
+	        final WindowsDisplayArea displayArea = findDisplayArea(pixmapDrawable);
 		    
 		    final XPixmap xPixmap = state.removePixmap(freePixmap.getPixmap());
 		    

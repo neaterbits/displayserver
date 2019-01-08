@@ -1,6 +1,6 @@
 package com.neaterbits.displayserver.render.cairo;
 
-public class CairoImageSurface extends CairoSurface {
+public class CairoImageSurface extends CairoSurfaceImpl {
 
     private final long mallocedDataReference;
     

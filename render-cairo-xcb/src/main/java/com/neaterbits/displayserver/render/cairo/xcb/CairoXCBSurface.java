@@ -3,14 +3,15 @@ package com.neaterbits.displayserver.render.cairo.xcb;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.render.cairo.CairoSurface;
+import com.neaterbits.displayserver.render.cairo.CairoSurfaceImpl;
 
-public final class CairoXCBSurface extends CairoSurface {
+public final class CairoXCBSurface extends CairoSurfaceImpl {
 
     private final XCBConnection connection;
     private final int drawable;
     private final DrawableType drawableType;
     
-    public static CairoXCBSurface create(XCBConnection connection, int drawable, DrawableType drawableType, XCBVisual visual, int width, int height) {
+    public static CairoSurface create(XCBConnection connection, int drawable, DrawableType drawableType, XCBVisual visual, int width, int height) {
 
         final long surface = XCBNative.cairo_create_xcb_surface(
                 connection.getXCBReference(),
@@ -35,6 +36,8 @@ public final class CairoXCBSurface extends CairoSurface {
     @Override
     public void flush() {
         super.flush();
+        
+        System.out.println("## flush connection");
         
         connection.flush();
     }

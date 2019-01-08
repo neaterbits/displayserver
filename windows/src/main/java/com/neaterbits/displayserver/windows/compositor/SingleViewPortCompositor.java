@@ -1,22 +1,59 @@
 package com.neaterbits.displayserver.windows.compositor;
 
 import java.util.List;
+import java.util.Objects;
 
 import com.neaterbits.displayserver.buffers.BufferOperations;
+import com.neaterbits.displayserver.windows.DisplayArea;
 import com.neaterbits.displayserver.windows.ViewPort;
 import com.neaterbits.displayserver.windows.Window;
 
-public final class SingleViewPortCompositor implements Compositor {
+public abstract class SingleViewPortCompositor implements Compositor {
 
-    @Override
-    public BufferOperations getBufferForWindow(Window window) {
+    private final DisplayArea displayArea;
+    private final ViewPort viewPort;
+    private final SurfaceWrapper rootSurface;
+    
+    SingleViewPortCompositor(DisplayArea displayArea) {
+        
+        Objects.requireNonNull(displayArea);
+        
+        this.displayArea = displayArea;
+    
+        this.viewPort = getSingleViewPort(displayArea);
 
-        final List<ViewPort> viewPorts = window.getDisplayArea().getViewPorts();
+        final CoordinateTranslator coordinateTranslator = new NoopCoordinateTranslator();
+        
+        this.rootSurface = new SurfaceWrapper(
+                viewPort.getFrameBuffer(),
+                coordinateTranslator,
+                viewPort.getFrameBuffer().getSize(),
+                viewPort.getFrameBuffer().getDepth());
+    }
+
+    final BufferOperations getRootFramebuffer() {
+        return viewPort.getFrameBuffer();
+    }
+
+    private static ViewPort getSingleViewPort(DisplayArea displayArea) {
+        final List<ViewPort> viewPorts = displayArea.getViewPorts();
         
         if (viewPorts.size() != 1) {
             throw new IllegalStateException();
         }
         
-        return viewPorts.get(0).getFrameBuffer();
+        final ViewPort viewPort = viewPorts.get(0);
+
+        return viewPort;
+    }
+    
+    @Override
+    public final Surface getSurfaceForRootWindow(Window window) {
+
+        if (!window.getDisplayArea().sameAs(displayArea)) {
+            throw new IllegalStateException();
+        }
+        
+        return rootSurface;
     }
 }

@@ -2,7 +2,7 @@ package com.neaterbits.displayserver.windows;
 
 import java.util.List;
 
-public interface DisplayAreaWindows extends DisplayArea {
+public interface WindowsDisplayArea extends DisplayArea {
 
     Window getRootWindow();
 

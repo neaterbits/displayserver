@@ -7,9 +7,11 @@ import java.util.Objects;
 import com.neaterbits.displayserver.buffers.PixelFormat;
 import com.neaterbits.displayserver.framebuffer.common.OffscreenBufferProvider;
 import com.neaterbits.displayserver.types.Size;
+import com.neaterbits.displayserver.windows.compositor.NoopCoordinateTranslator;
+import com.neaterbits.displayserver.windows.compositor.OffscreenSurface;
 import com.neaterbits.displayserver.windows.config.DisplayAreaConfig;
 
-public final class DisplayAreaImpl implements DisplayAreaWindows {
+public final class DisplayAreaImpl implements DisplayArea {
 
     private final DisplayAreaConfig config;
     private final Size size;
@@ -18,8 +20,6 @@ public final class DisplayAreaImpl implements DisplayAreaWindows {
     private final PixelFormat pixelFormat;
     private final OffscreenBufferProvider offscreenBufferProvider;
     private final List<ViewPort> viewPorts;
-    
-    private final Windows windows;
     
     public DisplayAreaConfig getConfig() {
         return config;
@@ -32,8 +32,7 @@ public final class DisplayAreaImpl implements DisplayAreaWindows {
             int depth,
             PixelFormat pixelFormat,
             List<ViewPort> viewPorts,
-            OffscreenBufferProvider offscreenBufferProvider,
-            WindowEventListener windowEventListener) {
+            OffscreenBufferProvider offscreenBufferProvider) {
         
         Objects.requireNonNull(config);
         Objects.requireNonNull(size);
@@ -53,8 +52,6 @@ public final class DisplayAreaImpl implements DisplayAreaWindows {
         this.pixelFormat = pixelFormat;
         this.viewPorts = viewPorts;
         this.offscreenBufferProvider = offscreenBufferProvider;
-        
-        this.windows = new Windows(this, windowEventListener);
     }
 
     @Override
@@ -81,30 +78,27 @@ public final class DisplayAreaImpl implements DisplayAreaWindows {
     public List<ViewPort> getViewPorts() {
         return Collections.unmodifiableList(viewPorts);
     }
-    
+
     @Override
-    public OffscreenBufferProvider getOffscreenBufferProvider() {
-        return offscreenBufferProvider;
+    public OffscreenSurface allocateOffscreenSurface(Size size, PixelFormat pixelFormat) {
+
+        return new OffscreenSurfaceWrapper(
+                offscreenBufferProvider.allocateOffscreenBuffer(size, pixelFormat),
+                new NoopCoordinateTranslator(),
+                size,
+                pixelFormat.getDepth());
     }
 
     @Override
-    public Window getRootWindow() {
-        return windows.getRootWindow();
-    }
-    
-    @Override
-    public Window createWindow(Window parentWindow, WindowParameters parameters, WindowAttributes attributes) {
-        return windows.createWindow(parentWindow, parameters, attributes);
-    }
-    
-    @Override
-    public void disposeWindow(Window window) {
-        windows.disposeWindow(window);
-    }
-    
-    @Override
-    public List<Window> getSubWindowsInOrder(Window window) {
-        return windows.getSubWindowsInOrder(window);
+    public void freeOffscreenSurface(OffscreenSurface surface) {
+
+        final OffscreenSurfaceWrapper offscreenSurfaceWrapper = (OffscreenSurfaceWrapper)surface;
+        
+        offscreenBufferProvider.freeOffscreenBuffer(offscreenSurfaceWrapper.getOffscreenBuffer());
     }
 
+    @Override
+    public boolean sameAs(DisplayArea other) {
+        return this == other;
+    }
 }

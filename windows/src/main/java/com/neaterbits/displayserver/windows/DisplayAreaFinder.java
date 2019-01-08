@@ -18,29 +18,27 @@ import com.neaterbits.displayserver.windows.config.DisplayConfig;
 
 public class DisplayAreaFinder {
 
-    public static DisplayAreaWindows makeDisplayArea(
+    public static DisplayArea makeDisplayArea(
             DisplayAreaConfig config,
-            GraphicsDriver graphicsDriver,
-            WindowEventListener windowEventListener) {
+            GraphicsDriver graphicsDriver) {
         
         final List<Output> outputs = findMostViableOutputCombination(graphicsDriver);
         
-        final DisplayAreaWindows displayArea;
+        final DisplayArea displayArea;
         
         if (outputs == null) {
             displayArea = null;
         }
         else {
-            displayArea = computeDisplayArea(config, outputs, windowEventListener);
+            displayArea = computeDisplayArea(config, outputs);
         }
         
         return displayArea;
     }
 
-    private static DisplayAreaWindows computeDisplayArea(
+    private static DisplayArea computeDisplayArea(
             DisplayAreaConfig config,
-            List<Output> outputs,
-            WindowEventListener windowEventListener) {
+            List<Output> outputs) {
         
         if (outputs.isEmpty()) {
             throw new IllegalArgumentException();
@@ -165,8 +163,7 @@ public class DisplayAreaFinder {
                 
                 depth, pixelFormat,
                 viewPorts,
-                offscreenBufferProvider,
-                windowEventListener);
+                offscreenBufferProvider);
     }
     
     

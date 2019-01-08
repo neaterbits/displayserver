@@ -12,7 +12,7 @@ import com.neaterbits.displayserver.types.Size;
 
 public final class Window {
 
-    private final DisplayAreaWindows displayArea;
+    private final WindowsDisplayArea displayArea;
 	private final Window parentWindow;
 	
 	private final WindowParameters parameters;
@@ -23,7 +23,7 @@ public final class Window {
 	private final List<Window> subWindows;
 	
 	Window(
-	        DisplayAreaWindows displayArea,
+	        WindowsDisplayArea displayArea,
 	        Window parentWindow,
 	        WindowParameters parameters,
 	        WindowAttributes attributes,
@@ -67,7 +67,7 @@ public final class Window {
         return attributes;
     }
 
-    public DisplayAreaWindows getDisplayArea() {
+    public WindowsDisplayArea getDisplayArea() {
 	    return displayArea;
 	}
     

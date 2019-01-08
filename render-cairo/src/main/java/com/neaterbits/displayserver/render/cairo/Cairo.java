@@ -1,79 +1,39 @@
 package com.neaterbits.displayserver.render.cairo;
 
-public class Cairo extends CairoReference {
+import com.neaterbits.displayserver.util.Disposable;
 
-    public Cairo(CairoSurface surface) {
-        super(CairoNative.cairo_create(surface.getCairoReference()));
-    }
-
-    public void setOperator(CairoOperator operator) {
-        CairoNative.cairo_set_operator(getCairoReference(), operator.getCairoValue());
-    }
+public interface Cairo extends Disposable {
     
-    public void setSourceRGB(double red, double green, double blue) {
-        CairoNative.cairo_set_source_rgb(getCairoReference(), red, green, blue);
-    }
+    void setOperator(CairoOperator operator);
     
-    public void setSourceSurface(CairoSurface surface, double x, double y) {
-        CairoNative.cairo_set_source_surface(getCairoReference(), surface.getCairoReference(), x, y);
-    }
+    void setSourceRGB(double red, double green, double blue);
     
-    public void setFillRule(CairoFillRule fillRule) {
-        CairoNative.cairo_set_fill_rule(getCairoReference(), fillRule.getCairoFillRule());
-    }
+    void setSourceSurface(CairoSurface surface, double x, double y);
     
-    public void clip() {
-        CairoNative.cairo_clip(getCairoReference());
-    }
+    void setFillRule(CairoFillRule fillRule);
     
-    public void fill() {
-        CairoNative.cairo_fill(getCairoReference());
-    }
+    void clip();
     
-    public void maskSurface(CairoSurface surface, double surfaceX, double surfaceY) {
-        CairoNative.cairo_mask_surface(getCairoReference(), surface.getCairoReference(), surfaceX, surfaceY);
-    }
+    void fill();
     
-    public void paint() {
-        CairoNative.cairo_paint(getCairoReference());
-    }
+    void maskSurface(CairoSurface surface, double surfaceX, double surfaceY);
     
-    public void stroke() {
-        CairoNative.cairo_stroke(getCairoReference());
-    }
+    void paint();
     
-    public void strokePreserve() {
-        CairoNative.cairo_stroke_preserve(getCairoReference());
-    }
+    void stroke();
+    
+    void strokePreserve();
     
     // Path
+    void newPath();
     
-    public void newPath() {
-        CairoNative.cairo_new_path(getCairoReference());
-    }
+    void moveTo(double x, double y);
     
-    public void moveTo(double x, double y) {
-        CairoNative.cairo_move_to(getCairoReference(), x, y);
-    }
+    void relMoveTo(double dx, double dy);
     
-    public void relMoveTo(double dx, double dy) {
-        CairoNative.cairo_rel_move_to(getCairoReference(), dx, dy);
-    }
+    void lineTo(double x, double y);
     
-    public void lineTo(double x, double y) {
-        CairoNative.cairo_line_to(getCairoReference(), x, y);
-    }
+    void relLineTo(double dx, double dy);
     
-    public void relLineTo(double dx, double dy) {
-        CairoNative.cairo_rel_line_to(getCairoReference(), dx, dy);
-    }
-    
-    public void rectangle(double x, double y, double width, double height) {
-        CairoNative.cairo_rectangle(getCairoReference(), x, y, width, height);
-    }
-    
-    @Override
-    public void dispose() {
-        CairoNative.cairo_destroy(getCairoReference());
-    }
+    void rectangle(double x, double y, double width, double height);
 }

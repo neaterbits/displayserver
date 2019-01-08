@@ -29,8 +29,9 @@ import com.neaterbits.displayserver.server.XServer;
 import com.neaterbits.displayserver.server.render.cairo.CairoFontBufferFactory;
 import com.neaterbits.displayserver.server.render.cairo.CairoXLibRendererFactory;
 import com.neaterbits.displayserver.util.logging.DebugLevel;
+import com.neaterbits.displayserver.windows.DisplayAreas;
 import com.neaterbits.displayserver.windows.compositor.Compositor;
-import com.neaterbits.displayserver.windows.compositor.SingleViewPortCompositor;
+import com.neaterbits.displayserver.windows.compositor.SingleViewPortDirectCompositor;
 import com.neaterbits.displayserver.windows.config.DisplayAreaConfig;
 import com.neaterbits.displayserver.windows.config.DisplayConfig;
 import com.neaterbits.displayserver.xwindows.fonts.model.StoreOrder;
@@ -86,6 +87,7 @@ public class DisplayServerMain {
 		}
 	}
 	
+	
 	private static XHardware initDriver(AsyncServers asyncServers, XWindowsDriverConnection driverConnection, DisplayDeviceId displayDeviceId) throws IOException {
 
         while (driverConnection.getServerMessage() == null) {
@@ -109,21 +111,34 @@ public class DisplayServerMain {
 	private static void initXWindows(int display, AsyncServers asyncServers, DisplayDeviceId displayDeviceId, XHardware hardware) throws Exception {
 
         final DisplayConfig displayConfig = new DisplayConfig(displayDeviceId, Alignment.CENTER);
-        
         final DisplayAreaConfig displayAreaConfig = new DisplayAreaConfig(
                 1, Arrays.asList(displayConfig));
+
+        final DisplayAreas displayAreas = DisplayAreas.from(displayAreaConfig, hardware.getGraphicsDriver());
+        
+        if (displayAreas.getDisplayAreas().size() != 1) {
+            throw new IllegalStateException();
+        }
+        
+        final Compositor compositor = new SingleViewPortDirectCompositor(displayAreas.getDisplayAreas().get(0));
 
         final XConfig config = new XConfig(
                 displayAreaConfig,
                 Arrays.asList("/usr/share/fonts/X11/misc"),
                 "/usr/share/X11/rgb.txt");
                 
-        startXServer(display, asyncServers, hardware, config);
+        startXServer(display, asyncServers, hardware, config, displayAreas, compositor);
     
         asyncServers.waitForIO();
 	}
 	
-	private static void startXServer(int display, AsyncServers asyncServers, XHardware hardware, XConfig config) throws IOException, Exception {
+	private static void startXServer(
+	        int display,
+	        AsyncServers asyncServers,
+	        XHardware hardware,
+	        XConfig config,
+	        DisplayAreas displayAreas,
+	        Compositor compositor) throws IOException, Exception {
 	    
         final NonBlockingChannelWriterLog connectionWriteLog = new NonBlockingChannelWriterLogImpl(
                 "Connectionwrite",
@@ -131,11 +146,11 @@ public class DisplayServerMain {
         
         final XWindowsServerProtocolLog protocolLog = new XWindowsServerProtocolLogImpl("XWindowsProtocol", DebugLevels.XWINDOWS_PROTOCOL);
 
-        final Compositor compositor = new SingleViewPortCompositor();
         
         final StoreOrder nativeOrder = StoreOrder.getNativeOrder();
         
         final XRendering rendering = new XRendering(
+                displayAreas,
                 compositor,
                 new CairoXLibRendererFactory(),
                 new CairoFontBufferFactory(nativeOrder));

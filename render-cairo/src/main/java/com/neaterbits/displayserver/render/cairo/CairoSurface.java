@@ -1,21 +1,13 @@
 package com.neaterbits.displayserver.render.cairo;
 
-public class CairoSurface extends CairoReference {
+import com.neaterbits.displayserver.util.Disposable;
 
-    protected CairoSurface(long reference) {
-        super(reference);
-    }
+public interface CairoSurface extends Disposable {
+    
+    void flush();
 
-    public int getReferenceCount() {
-        return CairoNative.cairo_surface_get_reference_count(getCairoReference());
-    }
+    Cairo createContext();
+
+    CairoStatus writeToPNG(String fileName);
     
-    public void flush() {
-        CairoNative.cairo_surface_flush(getCairoReference());
-    }
-    
-    @Override
-    public void dispose() {
-        CairoNative.cairo_surface_destroy(getReference());
-    }
 }
