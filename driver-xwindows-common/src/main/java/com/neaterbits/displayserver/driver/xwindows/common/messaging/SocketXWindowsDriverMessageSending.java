@@ -1,4 +1,4 @@
-package com.neaterbits.displayserver.driver.xwindows.common;
+package com.neaterbits.displayserver.driver.xwindows.common.messaging;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -9,24 +9,33 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
+import com.neaterbits.displayserver.driver.xwindows.common.ReplyListener;
+import com.neaterbits.displayserver.driver.xwindows.common.XWindowsMessageListener;
+import com.neaterbits.displayserver.driver.xwindows.common.XWindowsMessaging;
+import com.neaterbits.displayserver.driver.xwindows.common.XWindowsNetwork;
+import com.neaterbits.displayserver.driver.xwindows.common.XWindowsNetworkFactory;
+import com.neaterbits.displayserver.io.common.MessageProcessor;
+import com.neaterbits.displayserver.io.common.DataWriter;
 import com.neaterbits.displayserver.protocol.ByteBufferXWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
 import com.neaterbits.displayserver.protocol.logging.XWindowsClientProtocolLog;
+import com.neaterbits.displayserver.protocol.messages.Encodeable;
 import com.neaterbits.displayserver.protocol.messages.Error;
 import com.neaterbits.displayserver.protocol.messages.Reply;
 import com.neaterbits.displayserver.protocol.messages.Request;
 import com.neaterbits.displayserver.protocol.messages.ServerToClientMessage;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ClientConnectionError;
+import com.neaterbits.displayserver.protocol.messages.protocolsetup.ClientMessage;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ServerMessage;
 import com.neaterbits.displayserver.protocol.messages.replies.GetImageReply;
 import com.neaterbits.displayserver.protocol.messages.replies.GetKeyboardMappingReply;
 import com.neaterbits.displayserver.protocol.messages.replies.GetModifierMappingReply;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 
-class XWindowsDriverMessageProcessing {
-    
-    private final XWindowsClientProtocolLog protocolLog;
+public class SocketXWindowsDriverMessageSending implements XWindowsMessaging {
+
+    private final XWindowsNetwork network;
 
     private final ByteOrder byteOrder;
 
@@ -35,45 +44,61 @@ class XWindowsDriverMessageProcessing {
     private int sequenceNumber;
     private final List<RequestWithReply> requestsWithReply;
 
-    XWindowsDriverMessageProcessing(XWindowsClientProtocolLog protocolLog) {
-        
-        Objects.requireNonNull(protocolLog);
+    private final XWindowsClientProtocolLog protocolLog;
     
+    public SocketXWindowsDriverMessageSending(
+            int port,
+            XWindowsNetworkFactory networkFactory,
+            XWindowsMessageListener messageListener,
+            XWindowsClientProtocolLog protocolLog) throws IOException {
+        
+        Objects.requireNonNull(networkFactory);
+        Objects.requireNonNull(messageListener);
+
+        this.network = networkFactory.create(new MessageProcessor() {
+            
+            @Override
+            public void onMessage(ByteBuffer byteBuffer, int messageLength) {
+                final ServerMessage initialMessage = SocketXWindowsDriverMessageSending.this.onMessage(byteBuffer, messageLength);
+                
+                if (initialMessage != null) {
+                    
+                    SocketXWindowsDriverMessageSending.this.serverMessage = serverMessage;
+                    
+                    messageListener.onInitialMessage(serverMessage);
+                }
+                
+            }
+            
+            @Override
+            public Integer getLengthOfMessage(ByteBuffer byteBuffer) {
+                return XWindowsNetwork.getLengthOfMessage(byteBuffer, receivedInitialMessage());
+            }
+        });
         
         this.protocolLog = protocolLog;
-        
+
         this.byteOrder = ByteOrder.BIG_ENDIAN;
 
         this.sequenceNumber = 1;
         this.requestsWithReply = new ArrayList<>();
+
     }
 
-    ByteOrder getByteOrder() {
-        return byteOrder;
+    @Override
+    public int sendInitialMessage(ClientMessage initialMessage) throws IOException {
+        return writeEncodeableToOutputBuffer(initialMessage, byteOrder);
     }
 
-    void sendRequest(Request request, XWindowsChannelReaderWriter readerWriter) {
-        sendRequestWithSequenceNumber(request, readerWriter);
-    }
-
-    void sendRequestWaitReply(Request request, ReplyListener replyListener, XWindowsChannelReaderWriter readerWriter) {
-
-        final int seq = this.sequenceNumber;
-        
-        requestsWithReply.add(new RequestWithReply(seq, request.getOpCode(), replyListener));
-
-        sendRequestWithSequenceNumber(request, readerWriter);
-    }
-
-    ServerMessage getServerMessage() {
+    public ServerMessage getServerMessage() {
         return serverMessage;
     }
 
-    boolean receivedInitialMessage() {
-        return getServerMessage() != null;
+    private boolean receivedInitialMessage() {
+        return serverMessage != null;
     }
-
-    ServerMessage onMessage(ByteBuffer byteBuffer, int messageLength) {
+    
+    private ServerMessage onMessage(ByteBuffer byteBuffer, int messageLength) {
 
         ServerMessage initialMessage = null;
         
@@ -107,7 +132,6 @@ class XWindowsDriverMessageProcessing {
                     System.out.println("## received servermessage depths " + serverMessage.getScreens()[0].getAllowedDepths().length);
                     
                     initialMessage = serverMessage;
-                    
                 }
                 else {
                     final ServerToClientMessage message = processResponseMessage(
@@ -260,19 +284,47 @@ class XWindowsDriverMessageProcessing {
         return error;
     }
 
-    private void sendRequestWithSequenceNumber(Request request, XWindowsChannelReaderWriter readerWriter) {
+    private void sendRequestWithSequenceNumber(Request request) {
         try {
-            final int messageLength = readerWriter.writeRequest(request, byteOrder);
+            final int messageLength = writeRequestToOutputBuffer(request, byteOrder);
             
             if (protocolLog != null) {
                 protocolLog.onSendRequest(messageLength, sequenceNumber, request);
             }
         }
-        catch (IOException ex) {
-            throw new IllegalStateException(ex);
-        }
         finally {
             ++ sequenceNumber;
         }
+    }
+    
+    private int writeRequestToOutputBuffer(Request request, ByteOrder byteOrder) {
+        return writeEncodeableToOutputBuffer(request, byteOrder);
+    }
+
+    private int writeEncodeableToOutputBuffer(Encodeable encodeable, ByteOrder byteOrder) {
+        
+        final DataWriter dataWriter = Encodeable.makeDataWriter(encodeable);
+        
+        return network.sendRequest(dataWriter, byteOrder);
+    }
+    
+    @Override
+    public void sendRequest(Request request) {
+        sendRequestWithSequenceNumber(request);
+    }
+
+    @Override
+    public void sendRequestWaitReply(Request request, ReplyListener replyListener) {
+
+        final int seq = this.sequenceNumber;
+        
+        requestsWithReply.add(new RequestWithReply(seq, request.getOpCode(), replyListener));
+
+        sendRequestWithSequenceNumber(request);
+    }
+
+    @Override
+    public void close() throws Exception {
+        network.close();
     }
 }

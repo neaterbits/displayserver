@@ -1,6 +1,8 @@
-package com.neaterbits.displayserver.driver.xwindows.common;
+package com.neaterbits.displayserver.driver.xwindows.common.messaging;
 
 import java.util.Objects;
+
+import com.neaterbits.displayserver.driver.xwindows.common.ReplyListener;
 
 final class RequestWithReply {
     

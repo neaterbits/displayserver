@@ -1,11 +1,10 @@
 package com.neaterbits.displayserver.driver.xwindows.common;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
+import java.util.Objects;
+
 import com.neaterbits.displayserver.driver.common.Listeners;
-import com.neaterbits.displayserver.io.common.MessageProcessor;
-import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLog;
-import com.neaterbits.displayserver.io.common.Selectable;
+import com.neaterbits.displayserver.driver.xwindows.common.messaging.SocketXWindowsDriverMessageSending;
 import com.neaterbits.displayserver.protocol.logging.XWindowsClientProtocolLog;
 import com.neaterbits.displayserver.protocol.messages.Request;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ClientMessage;
@@ -21,49 +20,43 @@ public final class XWindowsDriverConnection
 
     private final int connectDisplay;
     
-	private final XWindowsChannelReaderWriter readerWriter;
+	private final XWindowsMessaging messaging;
 	
 	private final Listeners<XWindowsReplyListener> replyListeners;
-	private final Listeners<XWindowsEventListener> eventListeners;
+	private final Listeners<XWindowsMessageListener> eventListeners;
 	
 	private ClientResourceIdAllocator clientResourceIdAllocator;
-	
-	private final XWindowsDriverMessageProcessing messageProcessing;
 	
 	private final XCBConnection xcbConnection;
 	private final XCBVisual xcbVisual;
 	
 	public XWindowsDriverConnection(
 	        int connectDisplay,
-	        NonBlockingChannelWriterLog writeLog,
+	        XWindowsNetworkFactory networkFactory,
 	        XWindowsClientProtocolLog protocolLog) throws IOException {
 
+	    Objects.requireNonNull(networkFactory);
+	    
 	    this.connectDisplay = connectDisplay;
 	    
-	    final int port = 6000 + connectDisplay;
-	    
-	    this.messageProcessing = new XWindowsDriverMessageProcessing(protocolLog);
-	    
-		this.readerWriter = new XWindowsClientReaderWriter(port, writeLog) {
-		    
-		    @Override
-            protected boolean receivedInitialMessage() {
-                return messageProcessing.receivedInitialMessage();
-            }
+        final int port = 6000 + connectDisplay;
 
+        final XWindowsMessageListener messageListener = new XWindowsMessageListener() {
+            
             @Override
-		    public void onMessage(ByteBuffer byteBuffer, int messageLength) {
-                final ServerMessage initialMessage = messageProcessing.onMessage(byteBuffer, messageLength);
-                
-                if (initialMessage != null) {
-                    clientResourceIdAllocator = new ClientResourceIdAllocator(
-                            initialMessage.getResourceIdBase().getValue(),
-                            initialMessage.getResourceIdMask().getValue());
-                    
-                }
-		    }
-		};
-		
+            public void onInitialMessage(ServerMessage initialMessage) {
+                clientResourceIdAllocator = new ClientResourceIdAllocator(
+                        initialMessage.getResourceIdBase().getValue(),
+                        initialMessage.getResourceIdMask().getValue());
+            }
+        };
+        
+	    this.messaging = new SocketXWindowsDriverMessageSending(
+	            port,
+	            networkFactory,
+	            messageListener,
+	            protocolLog);
+	    
 		this.replyListeners = new Listeners<>();
 		this.eventListeners = new Listeners<>();
 		
@@ -82,7 +75,7 @@ public final class XWindowsDriverConnection
 		        xAuthForTCPConnection != null ? xAuthForTCPConnection.getAuthorizationProtocol() : "",
 		        xAuthForTCPConnection != null ? xAuthForTCPConnection.getAuthorizationData() : "".getBytes());
 		
-		readerWriter.writeEncodeable(clientMessage, messageProcessing.getByteOrder());
+		messaging.sendInitialMessage(clientMessage);
 		
 		this.xcbConnection = XCBConnection.connect(
 		        ":" + connectDisplay,
@@ -110,12 +103,12 @@ public final class XWindowsDriverConnection
 
     @Override
     public void sendRequest(Request request) {
-	    messageProcessing.sendRequest(request, readerWriter);
+	    messaging.sendRequest(request);
     }
 
     @Override
     public void sendRequestWaitReply(Request request, ReplyListener replyListener) {
-        messageProcessing.sendRequestWaitReply(request, replyListener, readerWriter);
+        messaging.sendRequestWaitReply(request, replyListener);
     }
 
     public int getConnectDisplay() {
@@ -123,7 +116,7 @@ public final class XWindowsDriverConnection
     }
 	
 	public ServerMessage getServerMessage() {
-        return messageProcessing.getServerMessage();
+        return messaging.getServerMessage();
     }
 	
 	public int allocateResourceId() {
@@ -142,24 +135,16 @@ public final class XWindowsDriverConnection
         replyListeners.deregisterListener(replyListener);
     }
 	
-    public void registerEventListener(XWindowsEventListener eventListener) {
+    public void registerEventListener(XWindowsMessageListener eventListener) {
         eventListeners.registerListener(eventListener);
     }
 
-    public void deregisterEventListener(XWindowsEventListener eventListener) {
+    public void deregisterEventListener(XWindowsMessageListener eventListener) {
         eventListeners.deregisterListener(eventListener);
     }
-    
-	public Selectable getSelectable() {
-		return readerWriter;
-	}
 
-	public MessageProcessor getMessageProcessor() {
-		return readerWriter;
-	}
-	
-	@Override
+    @Override
 	public void close() throws Exception {
-		readerWriter.close();
+		messaging.close();
 	}
 }

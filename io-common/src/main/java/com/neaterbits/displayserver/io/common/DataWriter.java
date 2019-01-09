@@ -8,9 +8,10 @@ import java.nio.ByteOrder;
 
 @FunctionalInterface
 public interface DataWriter {
+    
     void writeData(DataOutput dataOutputStream) throws IOException;
     
-    public static byte [] writeToBuf(ByteOrder byteOrder, DataWriter writeData) {
+    public static byte [] writeToBuf(DataWriter writeData, ByteOrder byteOrder) {
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final DataOutput dataOutputStream;

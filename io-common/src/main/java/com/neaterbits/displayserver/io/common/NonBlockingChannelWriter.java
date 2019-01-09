@@ -25,9 +25,9 @@ public abstract class NonBlockingChannelWriter implements NonBlockingWritable {
 	
 	protected abstract SelectionKey getSelectionKey();
 	
-	protected final int writeToOutputBuffer(ByteOrder byteOrder, DataWriter writeData) {
+	public final int writeToOutputBuffer(ByteOrder byteOrder, DataWriter writeData) {
         
-        final byte [] data = DataWriter.writeToBuf(byteOrder, writeData);
+        final byte [] data = DataWriter.writeToBuf(writeData, byteOrder);
         
         writeToOutputBuffer(data, 0, data.length);
 

@@ -52,7 +52,7 @@ public abstract class Encodeable {
     }
 
    protected final byte [] writeToBuf(ByteOrder byteOrder) {
-       return DataWriter.writeToBuf(byteOrder, makeDataWriter(this));
+       return DataWriter.writeToBuf(makeDataWriter(this), byteOrder);
    }
    
    public Object [] getDebugParams() {

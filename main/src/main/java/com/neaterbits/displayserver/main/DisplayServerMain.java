@@ -7,6 +7,9 @@ import java.nio.channels.spi.SelectorProvider;
 import java.util.Arrays;
 
 import com.neaterbits.displayserver.driver.xwindows.common.XWindowsDriverConnection;
+import com.neaterbits.displayserver.driver.xwindows.common.XWindowsNetwork;
+import com.neaterbits.displayserver.driver.xwindows.common.XWindowsNetworkFactory;
+import com.neaterbits.displayserver.driver.xwindows.common.messaging.NonBlockingXWindowsNetwork;
 import com.neaterbits.displayserver.events.xwindows.XWindowsInputDriver;
 import com.neaterbits.displayserver.framebuffer.common.Alignment;
 import com.neaterbits.displayserver.framebuffer.common.DisplayDeviceId;
@@ -14,6 +17,7 @@ import com.neaterbits.displayserver.framebuffer.xwindows.XWindowsGraphicsDriver;
 import com.neaterbits.displayserver.io.common.AsyncServers;
 import com.neaterbits.displayserver.io.common.AsyncServersLog;
 import com.neaterbits.displayserver.io.common.AsyncServersLogImpl;
+import com.neaterbits.displayserver.io.common.MessageProcessor;
 import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLog;
 import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLogImpl;
 import com.neaterbits.displayserver.io.common.SelectableLog;
@@ -64,17 +68,34 @@ public class DisplayServerMain {
 		            "Driverwrite",
 		            DebugLevels.DRIVER_WRITE);
 		    
+		    final InetSocketAddress socketAddress = new InetSocketAddress("127.0.0.1", 6000 + display);
+		    
+		    final XWindowsNetworkFactory xWindowsNetworkFactory = new XWindowsNetworkFactory() {
+                @Override
+                public XWindowsNetwork create(MessageProcessor listener) throws IOException {
+                    
+                    
+                    final NonBlockingXWindowsNetwork network = new NonBlockingXWindowsNetwork(socketAddress, driverWriteLog, listener);
+                
+                    final String name = "Driverevents";
+                    
+                    asyncServers.addSelectable(
+                               name,
+                               network.getSelectable(),
+                               network.getMessageProcessor(),
+                               new SelectableLogImpl(name, DebugLevels.DRIVER_READ));
+                    
+                    return network;
+                }
+            };
+		    
 		    final XWindowsClientProtocolLog driverProtocolLog = new XWindowsClientProtocolLogImpl("driver", DebugLevel.DEBUG);
 		    
-			try (XWindowsDriverConnection driverConnection = new XWindowsDriverConnection(display, driverWriteLog, driverProtocolLog)) {
+			try (XWindowsDriverConnection driverConnection = new XWindowsDriverConnection(
+			        display,
+			        xWindowsNetworkFactory,
+			        driverProtocolLog)) {
 
-			    final String name = "Driverevents";
-			    
-	             asyncServers.addSelectable(
-	                        name,
-	                        driverConnection.getSelectable(),
-	                        driverConnection.getMessageProcessor(),
-	                        new SelectableLogImpl(name, DebugLevels.DRIVER_READ));
 
 	             System.out.println("## start check for IO");
 

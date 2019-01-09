@@ -1,23 +1,19 @@
 package com.neaterbits.displayserver.driver.xwindows.common;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
 
-import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLog;
+import com.neaterbits.displayserver.io.common.DataWriter;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolUtil;
 
-abstract class XWindowsClientReaderWriter extends XWindowsChannelReaderWriter {
+public interface XWindowsNetwork {
 
-    XWindowsClientReaderWriter(int port, NonBlockingChannelWriterLog log) {
-        super(port, log);
-    }
-    
-    @Override
-    public Integer getLengthOfMessage(ByteBuffer byteBuffer) {
+    public static Integer getLengthOfMessage(ByteBuffer byteBuffer, boolean receivedInitialMessage) {
 
         final Integer length;
         
-        if (receivedInitialMessage()) {
+        if (receivedInitialMessage) {
             length = XWindowsProtocolUtil.getReplyOrEventLength(byteBuffer);
         }
         else {
@@ -66,4 +62,7 @@ abstract class XWindowsClientReaderWriter extends XWindowsChannelReaderWriter {
         return length;
     }
 
+    int sendRequest(DataWriter request, ByteOrder byteOrder);
+
+    void close() throws Exception;
 }
