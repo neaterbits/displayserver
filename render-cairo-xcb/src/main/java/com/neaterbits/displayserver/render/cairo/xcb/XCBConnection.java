@@ -29,6 +29,27 @@ public class XCBConnection extends XCBReference implements AutoCloseable {
         
         return setup != 0L ? new XCBSetup(setup) : null;
     }
+
+    public int sendRequest(byte [] data, int opcode, boolean isvoid) {
+
+        final int sequenceNumber = XCBNative.xcb_send_request(
+            getXCBReference(),
+            data,
+            opcode,
+            isvoid);
+    
+        if (sequenceNumber == 0) {
+            throw new IllegalStateException();
+        }
+        
+        return sequenceNumber;
+    }
+    
+    public byte [] waitForReply(int sequenceNumber) {
+
+        return XCBNative.xcb_wait_reply(getXCBReference(), sequenceNumber);
+    }
+    
     
     public void flush() {
         XCBNative.xcb_flush(getXCBReference());

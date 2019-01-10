@@ -20,19 +20,19 @@ public final class ServerMessage extends Encodeable {
 	private final CARD16 protocolMajorVersion;
 	private final CARD16 protocolMinorVersion;
 	
-	private final CARD16 length;
+	// private final CARD16 length;
 	
 	private final CARD32 releaseNumber;
 	private final CARD32 resourceIdBase;
 	private final CARD32 resourceIdMask;
 	private final CARD32 motionBufferSize;
 	
-	private final CARD16 vendorLength;
+	// private final CARD16 vendorLength;
 	private final CARD16 maximumRequestLength;
 	
-	private final CARD8 numberOfScreens;
+	// private final CARD8 numberOfScreens;
 	
-	private final CARD8 numberOfFormats;
+	// private final CARD8 numberOfFormats;
 	
 	private final BYTE imageByteOrder;
 	private final BYTE bitmapFormatBitOrder;
@@ -58,7 +58,7 @@ public final class ServerMessage extends Encodeable {
 	    final CARD16 protocolMajorVersion = stream.readCARD16();
 	    final CARD16 protocolMinorVersion = stream.readCARD16();
 	    
-	    final CARD16 length = stream.readCARD16();
+	    /* final CARD16 length =  */ stream.readCARD16();
 	    
 	    final CARD32 releaseNumber = stream.readCARD32();
 	    final CARD32 resourceIdBase = stream.readCARD32();
@@ -103,13 +103,10 @@ public final class ServerMessage extends Encodeable {
 	    return new ServerMessage(
 	            success,
 	            protocolMajorVersion, protocolMinorVersion,
-	            length,
 	            releaseNumber,
 	            resourceIdBase, resourceIdMask,
 	            motionBufferSize,
-	            vendorLength,
 	            maximumRequestLength,
-	            numberOfScreens, numberOfFormats,
 	            imageByteOrder, bitmapFormatBitOrder, bitmapFormatScanlineUnit, bitmapFormatScanlinePad,
 	            minKeyCode, maxKeyCode,
 	            vendor,
@@ -123,17 +120,17 @@ public final class ServerMessage extends Encodeable {
 			CARD16 protocolMajorVersion,
 			CARD16 protocolMinorVersion,
 			
-			CARD16 length,
+			// CARD16 length,
 			CARD32 releaseNumber,
 			
 			CARD32 resourceIdBase,
 			CARD32 resourceIdMask,
 			CARD32 motionBufferSize,
 			
-			CARD16 vendorLength,
+			// CARD16 vendorLength,
 			CARD16 maximumRequestLength,
-			CARD8 numberOfScreens,
-			CARD8 numberOfFormats,
+			// CARD8 numberOfScreens,
+			// CARD8 numberOfFormats,
 			BYTE imageByteOrder,
 			BYTE bitmapFormatBitOrder,
 			CARD8 bitmapFormatScanlineUnit,
@@ -148,15 +145,15 @@ public final class ServerMessage extends Encodeable {
 		this.success = success;
 		this.protocolMajorVersion = protocolMajorVersion;
 		this.protocolMinorVersion = protocolMinorVersion;
-		this.length = length;
+		// this.length = length;
 		this.releaseNumber = releaseNumber;
 		this.resourceIdBase = resourceIdBase;
 		this.resourceIdMask = resourceIdMask;
 		this.motionBufferSize = motionBufferSize;
-		this.vendorLength = vendorLength;
+		// this.vendorLength = vendorLength;
 		this.maximumRequestLength = maximumRequestLength;
-		this.numberOfScreens = numberOfScreens;
-		this.numberOfFormats = numberOfFormats;
+		// this.numberOfScreens = numberOfScreens;
+		// this.numberOfFormats = numberOfFormats;
 		this.imageByteOrder = imageByteOrder;
 		this.bitmapFormatBitOrder = bitmapFormatBitOrder;
 		this.bitmapFormatScanlineUnit = bitmapFormatScanlineUnit;
@@ -180,9 +177,11 @@ public final class ServerMessage extends Encodeable {
 		return protocolMinorVersion;
 	}
 
+	/*
 	public CARD16 getLength() {
 		return length;
 	}
+	*/
 
 	public CARD32 getReleaseNumber() {
 		return releaseNumber;
@@ -200,14 +199,17 @@ public final class ServerMessage extends Encodeable {
 		return motionBufferSize;
 	}
 
+	/*
 	public CARD16 getVendorLength() {
 		return vendorLength;
 	}
+	*/
 
 	public CARD16 getMaximumRequestLength() {
 		return maximumRequestLength;
 	}
 
+	/*
 	public CARD8 getNumberOfScreens() {
 		return numberOfScreens;
 	}
@@ -215,6 +217,7 @@ public final class ServerMessage extends Encodeable {
 	public CARD8 getNumberOfFormats() {
 		return numberOfFormats;
 	}
+	*/
 
 	public BYTE getImageByteOrder() {
 		return imageByteOrder;
@@ -261,18 +264,29 @@ public final class ServerMessage extends Encodeable {
 		stream.writeCARD16(protocolMajorVersion);
 		stream.writeCARD16(protocolMinorVersion);
 		
-		stream.writeCARD16(length);
+        final int vendorAndScreenBytes = 
+                vendor.length()
+              + XWindowsProtocolUtil.getPadding(vendor.length())
+              + length(screens);
+        
+        final int length = 
+                  8 
+                + 2 * pixmapFormats.length
+                + (vendorAndScreenBytes / 4);
+
+		stream.writeCARD16(new CARD16(length));
 		
 		stream.writeCARD32(releaseNumber);
 		stream.writeCARD32(resourceIdBase);
 		stream.writeCARD32(resourceIdMask);
 		stream.writeCARD32(motionBufferSize);
 
-		stream.writeCARD16(vendorLength);
+		stream.writeCARD16(new CARD16(vendor.length()));
 		stream.writeCARD16(maximumRequestLength);
 		
-		stream.writeCARD8(numberOfScreens);
-		stream.writeCARD8(numberOfFormats);
+		
+		stream.writeCARD8(new CARD8((short)screens.length));
+		stream.writeCARD8(new CARD8((short)pixmapFormats.length));
 		
 		stream.writeBYTE(imageByteOrder);
 		stream.writeBYTE(bitmapFormatBitOrder);
@@ -292,14 +306,36 @@ public final class ServerMessage extends Encodeable {
 		encodeArray(screens, stream);
 	}
 
+    private static int length(SCREEN [] screens) {
+        
+        int length = 0;
+        
+        for (SCREEN screen : screens) {
+            length += 40 + length(screen.getAllowedDepths());
+        }
+        
+        return length;
+    }
+    
+    private static int length(DEPTH [] depths) {
+
+        int length = 0;
+
+        for (DEPTH depth : depths) {
+            length += 8 + depth.getVisuals().length * 24;
+        }
+    
+        return length;
+    }
+
     @Override
     public String toString() {
         return "ServerMessage [success=" + success + ", protocolMajorVersion=" + protocolMajorVersion
-                + ", protocolMinorVersion=" + protocolMinorVersion + ", length=" + length + ", releaseNumber="
+                + ", protocolMinorVersion=" + protocolMinorVersion + /* ", length=" + length + */ ", releaseNumber="
                 + releaseNumber + ", resourceIdBase=" + hex(resourceIdBase) + ", resourceIdMask=" + hex(resourceIdMask)
-                + ", motionBufferSize=" + motionBufferSize + ", vendorLength=" + vendorLength
-                + ", maximumRequestLength=" + maximumRequestLength + ", numberOfScreens=" + numberOfScreens
-                + ", numberOfFormats=" + numberOfFormats + ", imageByteOrder=" + imageByteOrder
+                + ", motionBufferSize=" + motionBufferSize /* + ", vendorLength=" + vendorLength */
+                + ", maximumRequestLength=" + maximumRequestLength + /* ", numberOfScreens=" + numberOfScreens */
+                /* + ", numberOfFormats=" + numberOfFormats + */ ", imageByteOrder=" + imageByteOrder
                 + ", bitmapFormatBitOrder=" + bitmapFormatBitOrder + ", bitmapFormatScanlineUnit="
                 + bitmapFormatScanlineUnit + ", bitmapFormatScanlinePad=" + bitmapFormatScanlinePad + ", minKeyCode="
                 + minKeyCode + ", maxKeyCode=" + maxKeyCode + ", vendor=" + vendor + ", pixmapFormats="

@@ -8,7 +8,7 @@ public abstract class XCBReference extends NativeReference {
         super(reference);
     }
 
-    final long getXCBReference() {
+    public final long getXCBReference() {
         return getReference();
     }
 }

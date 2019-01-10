@@ -6,6 +6,7 @@ import java.util.Objects;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
+import com.neaterbits.displayserver.protocol.messages.Reply;
 import com.neaterbits.displayserver.protocol.messages.Request;
 import com.neaterbits.displayserver.protocol.types.BOOL;
 import com.neaterbits.displayserver.protocol.types.BYTE;
@@ -114,5 +115,10 @@ public final class GrabKey extends Request {
     @Override
     public int getOpCode() {
         return OpCodes.GRAB_KEY;
+    }
+
+    @Override
+    public Class<? extends Reply> getReplyClass() {
+        return null;
     }
 }

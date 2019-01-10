@@ -18,4 +18,9 @@ final class RequestWithReply {
         this.opCode = opCode;
         this.listener = listener;
     }
+
+    @Override
+    public String toString() {
+        return "RequestWithReply [sequenceNumber=" + sequenceNumber + ", opCode=" + opCode + "]";
+    }
 }

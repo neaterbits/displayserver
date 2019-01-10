@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
+import com.neaterbits.displayserver.protocol.messages.Reply;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.GCONTEXT;
@@ -22,5 +23,10 @@ public final class PolyLine extends PolyPointRequest {
     @Override
     public int getOpCode() {
         return OpCodes.POLY_LINE;
+    }
+
+    @Override
+    public Class<? extends Reply> getReplyClass() {
+        return null;
     }
 }

@@ -7,6 +7,7 @@ import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
 import com.neaterbits.displayserver.protocol.messages.Event;
+import com.neaterbits.displayserver.protocol.messages.Reply;
 import com.neaterbits.displayserver.protocol.messages.Request;
 import com.neaterbits.displayserver.protocol.types.BOOL;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
@@ -91,5 +92,10 @@ public final class SendEvent extends Request {
     @Override
     public int getOpCode() {
         return OpCodes.SEND_EVENT;
+    }
+
+    @Override
+    public Class<? extends Reply> getReplyClass() {
+        return null;
     }
 }

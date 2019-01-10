@@ -1,5 +1,6 @@
 package com.neaterbits.displayserver.framebuffer.xwindows;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.buffers.BufferOperations;
@@ -131,8 +132,9 @@ abstract class XWindowsBaseBuffer implements BufferOperations {
             }
         }
         
-        throw new IllegalStateException();
+        throw new IllegalStateException("No format of depth " + depth + " in " + Arrays.toString(serverMessage.getPixmapFormats()));
     }
+    
     private VISUALTYPE getVisual(ServerMessage serverMessage, VISUALID visual) {
         
         final SCREEN [] screens = serverMessage.getScreens();

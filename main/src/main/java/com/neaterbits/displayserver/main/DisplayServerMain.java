@@ -9,7 +9,7 @@ import java.util.Arrays;
 import com.neaterbits.displayserver.driver.xwindows.common.XWindowsDriverConnection;
 import com.neaterbits.displayserver.driver.xwindows.common.XWindowsNetwork;
 import com.neaterbits.displayserver.driver.xwindows.common.XWindowsNetworkFactory;
-import com.neaterbits.displayserver.driver.xwindows.common.messaging.NonBlockingXWindowsNetwork;
+import com.neaterbits.displayserver.driver.xwindows.common.messaging.XCBXWindowsNetwork;
 import com.neaterbits.displayserver.events.xwindows.XWindowsInputDriver;
 import com.neaterbits.displayserver.framebuffer.common.Alignment;
 import com.neaterbits.displayserver.framebuffer.common.DisplayDeviceId;
@@ -26,6 +26,7 @@ import com.neaterbits.displayserver.protocol.logging.XWindowsClientProtocolLog;
 import com.neaterbits.displayserver.protocol.logging.XWindowsClientProtocolLogImpl;
 import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLog;
 import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLogImpl;
+import com.neaterbits.displayserver.render.cairo.xcb.XCBConnection;
 import com.neaterbits.displayserver.server.XConfig;
 import com.neaterbits.displayserver.server.XHardware;
 import com.neaterbits.displayserver.server.XRendering;
@@ -40,6 +41,7 @@ import com.neaterbits.displayserver.windows.config.DisplayAreaConfig;
 import com.neaterbits.displayserver.windows.config.DisplayConfig;
 import com.neaterbits.displayserver.xwindows.fonts.model.StoreOrder;
 import com.neaterbits.displayserver.xwindows.util.JNIBindings;
+import com.neaterbits.displayserver.xwindows.util.XAuth;
 
 public class DisplayServerMain {
 
@@ -63,19 +65,31 @@ public class DisplayServerMain {
 	    final SelectorProvider selectorProvider = SelectorProvider.provider();
 	    
 		try (AsyncServers asyncServers = new AsyncServers(asyncServersLog, connectionReadLog, selectorProvider)) {
-		
-		    final NonBlockingChannelWriterLog driverWriteLog = new NonBlockingChannelWriterLogImpl(
-		            "Driverwrite",
-		            DebugLevels.DRIVER_WRITE);
 		    
-		    final InetSocketAddress socketAddress = new InetSocketAddress("127.0.0.1", 6000 + display);
-		    
+	        final XAuth xAuthForTCPConnection = XAuth.getXAuthInfo(display, "MIT-MAGIC-COOKIE-1");
+
+	        final XCBConnection xcbConnection = XCBConnection.connect(
+	                ":" + display,
+	                xAuthForTCPConnection.getAuthorizationProtocol(),
+	                xAuthForTCPConnection.getAuthorizationData());
+	        
+	        /*
+            final NonBlockingChannelWriterLog driverWriteLog = new NonBlockingChannelWriterLogImpl(
+                    "Driverwrite",
+                    DebugLevels.DRIVER_WRITE);
+
+            final InetSocketAddress socketAddress = new InetSocketAddress("127.0.0.1", 6000 + display);
+
 		    final XWindowsNetworkFactory xWindowsNetworkFactory = new XWindowsNetworkFactory() {
                 @Override
-                public XWindowsNetwork create(MessageProcessor listener) throws IOException {
+                public XWindowsNetwork connect(MessageProcessor listener) throws IOException {
                     
+                    final NonBlockingXWindowsNetwork network = new NonBlockingXWindowsNetwork(
+                            socketAddress,
+                            xAuthForTCPConnection,
+                            driverWriteLog,
+                            listener);
                     
-                    final NonBlockingXWindowsNetwork network = new NonBlockingXWindowsNetwork(socketAddress, driverWriteLog, listener);
                 
                     final String name = "Driverevents";
                     
@@ -88,14 +102,24 @@ public class DisplayServerMain {
                     return network;
                 }
             };
+            */
+            
+            final XWindowsNetworkFactory xcbNetworkFactory = new XWindowsNetworkFactory() {
+                
+                @Override
+                public XWindowsNetwork connect(MessageProcessor listener) throws IOException {
+                    return new XCBXWindowsNetwork(xcbConnection);
+                }
+            };
 		    
 		    final XWindowsClientProtocolLog driverProtocolLog = new XWindowsClientProtocolLogImpl("driver", DebugLevel.DEBUG);
 		    
 			try (XWindowsDriverConnection driverConnection = new XWindowsDriverConnection(
 			        display,
-			        xWindowsNetworkFactory,
+			        xcbConnection,
+			        // xWindowsNetworkFactory,
+			        xcbNetworkFactory,
 			        driverProtocolLog)) {
-
 
 	             System.out.println("## start check for IO");
 

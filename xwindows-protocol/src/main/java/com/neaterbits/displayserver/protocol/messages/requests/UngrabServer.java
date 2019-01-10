@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
+import com.neaterbits.displayserver.protocol.messages.Reply;
 import com.neaterbits.displayserver.protocol.messages.Request;
 
 public final class UngrabServer extends Request {
@@ -31,5 +32,10 @@ public final class UngrabServer extends Request {
     @Override
     public int getOpCode() {
         return OpCodes.UNGRAB_SERVER;
+    }
+
+    @Override
+    public Class<? extends Reply> getReplyClass() {
+        return null;
     }
 }

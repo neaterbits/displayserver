@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import com.neaterbits.displayserver.buffers.ImageBufferFormat;
 import com.neaterbits.displayserver.buffers.PixelFormat;
-import com.neaterbits.displayserver.protocol.XWindowsProtocolUtil;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.DEPTH;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.FORMAT;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.SCREEN;
@@ -104,7 +103,6 @@ class InitialServerMessageHelper {
                 
                 final DEPTH depth = new DEPTH(
                         new CARD8((short)xScreenDepth.getDepth()),
-                        new CARD16(1),
                         visualTypes.toArray(new VISUALTYPE[visualTypes.size()]));
 
                 depths.add(depth);
@@ -121,32 +119,19 @@ class InitialServerMessageHelper {
                     xWindowsScreen.getRootVisual(),
                     new BYTE((byte)0), new BOOL((byte)0),
                     new CARD8((short)xWindowsScreen.getDisplayArea().getDepth()),
-                    new CARD8((short)depths.size()),
                     depths.toArray(new DEPTH[depths.size()]));
          
             screens[i] = screen;
         }
         
-        final int vendorAndScreenBytes = 
-                vendor.length()
-              + XWindowsProtocolUtil.getPadding(vendor.length())
-              + length(screens);
-        
-        final int length = 
-                  8 
-                + 2 * formats.length
-                + (vendorAndScreenBytes / 4);
-        
         final ServerMessage serverMessage = new ServerMessage(
                 new BYTE((byte)1),
                 new CARD16((short)11), new CARD16((short)0),
-                new CARD16(length),
                 new CARD32(1),
                 new CARD32(resourceBase),
                 new CARD32(resourceMask),
                 new CARD32(0),
-                new CARD16(vendor.length()), new CARD16((1 << 15) - 1),
-                new CARD8((short)screens.length), new CARD8((short)formats.length),
+                new CARD16((1 << 15) - 1),
                 new BYTE((byte)0), new BYTE((byte)0), new CARD8((byte)32), new CARD8((byte)32),
                 new KEYCODE((short)8), new KEYCODE((short)105),
                 vendor,
@@ -155,27 +140,5 @@ class InitialServerMessageHelper {
         
 
         return serverMessage;
-    }
-    
-    private static int length(SCREEN [] screens) {
-        
-        int length = 0;
-        
-        for (SCREEN screen : screens) {
-            length += 40 + length(screen.getAllowedDepths());
-        }
-        
-        return length;
-    }
-    
-    private static int length(DEPTH [] depths) {
-
-        int length = 0;
-
-        for (DEPTH depth : depths) {
-            length += 8 + depth.getVisuals().length * 24;
-        }
-    
-        return length;
     }
 }

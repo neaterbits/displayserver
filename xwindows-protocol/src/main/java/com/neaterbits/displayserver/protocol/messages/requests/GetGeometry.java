@@ -6,7 +6,9 @@ import java.util.Objects;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
+import com.neaterbits.displayserver.protocol.messages.Reply;
 import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.messages.replies.GetGeometryReply;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 
 public final class GetGeometry extends Request {
@@ -56,5 +58,10 @@ public final class GetGeometry extends Request {
     @Override
     public int getOpCode() {
         return OpCodes.GET_GEOMETRY;
+    }
+
+    @Override
+    public Class<? extends Reply> getReplyClass() {
+        return GetGeometryReply.class;
     }
 }

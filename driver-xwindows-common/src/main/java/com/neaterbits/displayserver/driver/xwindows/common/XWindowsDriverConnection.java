@@ -4,16 +4,12 @@ import java.io.IOException;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.driver.common.Listeners;
-import com.neaterbits.displayserver.driver.xwindows.common.messaging.SocketXWindowsDriverMessageSending;
+import com.neaterbits.displayserver.driver.xwindows.common.messaging.XWindowsDriverMessageSending;
 import com.neaterbits.displayserver.protocol.logging.XWindowsClientProtocolLog;
 import com.neaterbits.displayserver.protocol.messages.Request;
-import com.neaterbits.displayserver.protocol.messages.protocolsetup.ClientMessage;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ServerMessage;
-import com.neaterbits.displayserver.protocol.types.CARD16;
-import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.render.cairo.xcb.XCBConnection;
 import com.neaterbits.displayserver.render.cairo.xcb.XCBVisual;
-import com.neaterbits.displayserver.xwindows.util.XAuth;
 
 public final class XWindowsDriverConnection
 		implements AutoCloseable, XWindowsRequestSender {
@@ -32,15 +28,16 @@ public final class XWindowsDriverConnection
 	
 	public XWindowsDriverConnection(
 	        int connectDisplay,
+	        XCBConnection xcbConnection,
 	        XWindowsNetworkFactory networkFactory,
 	        XWindowsClientProtocolLog protocolLog) throws IOException {
 
 	    Objects.requireNonNull(networkFactory);
+	    Objects.requireNonNull(xcbConnection);
 	    
 	    this.connectDisplay = connectDisplay;
+	    this.xcbConnection = xcbConnection;
 	    
-        final int port = 6000 + connectDisplay;
-
         final XWindowsMessageListener messageListener = new XWindowsMessageListener() {
             
             @Override
@@ -51,36 +48,13 @@ public final class XWindowsDriverConnection
             }
         };
         
-	    this.messaging = new SocketXWindowsDriverMessageSending(
-	            port,
+        this.messaging = new XWindowsDriverMessageSending(
 	            networkFactory,
 	            messageListener,
 	            protocolLog);
 	    
 		this.replyListeners = new Listeners<>();
 		this.eventListeners = new Listeners<>();
-		
-		final XAuth xAuthForTCPConnection = XAuth.getXAuthInfo(connectDisplay, "MIT-MAGIC-COOKIE-1");
-		
-		/*
-		if (xAuthForTCPConnection == null) {
-		    throw new IllegalStateException();
-		}
-		*/
-		
-		final ClientMessage clientMessage = new ClientMessage(
-		        new CARD8((short)'B'),
-		        new CARD16(11),
-		        new CARD16(0),
-		        xAuthForTCPConnection != null ? xAuthForTCPConnection.getAuthorizationProtocol() : "",
-		        xAuthForTCPConnection != null ? xAuthForTCPConnection.getAuthorizationData() : "".getBytes());
-		
-		messaging.sendInitialMessage(clientMessage);
-		
-		this.xcbConnection = XCBConnection.connect(
-		        ":" + connectDisplay,
-		        xAuthForTCPConnection.getAuthorizationProtocol(),
-		        xAuthForTCPConnection.getAuthorizationData());
 		
 		this.xcbVisual = xcbConnection.getSetup().getScreens()
 	            .get(0)

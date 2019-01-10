@@ -10,30 +10,28 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import com.neaterbits.displayserver.driver.xwindows.common.ReplyListener;
+import com.neaterbits.displayserver.driver.xwindows.common.SentRequest;
 import com.neaterbits.displayserver.driver.xwindows.common.XWindowsMessageListener;
 import com.neaterbits.displayserver.driver.xwindows.common.XWindowsMessaging;
 import com.neaterbits.displayserver.driver.xwindows.common.XWindowsNetwork;
 import com.neaterbits.displayserver.driver.xwindows.common.XWindowsNetworkFactory;
 import com.neaterbits.displayserver.io.common.MessageProcessor;
-import com.neaterbits.displayserver.io.common.DataWriter;
 import com.neaterbits.displayserver.protocol.ByteBufferXWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
 import com.neaterbits.displayserver.protocol.logging.XWindowsClientProtocolLog;
-import com.neaterbits.displayserver.protocol.messages.Encodeable;
 import com.neaterbits.displayserver.protocol.messages.Error;
 import com.neaterbits.displayserver.protocol.messages.Reply;
 import com.neaterbits.displayserver.protocol.messages.Request;
 import com.neaterbits.displayserver.protocol.messages.ServerToClientMessage;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ClientConnectionError;
-import com.neaterbits.displayserver.protocol.messages.protocolsetup.ClientMessage;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ServerMessage;
 import com.neaterbits.displayserver.protocol.messages.replies.GetImageReply;
 import com.neaterbits.displayserver.protocol.messages.replies.GetKeyboardMappingReply;
 import com.neaterbits.displayserver.protocol.messages.replies.GetModifierMappingReply;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 
-public class SocketXWindowsDriverMessageSending implements XWindowsMessaging {
+public class XWindowsDriverMessageSending implements XWindowsMessaging {
 
     private final XWindowsNetwork network;
 
@@ -41,53 +39,57 @@ public class SocketXWindowsDriverMessageSending implements XWindowsMessaging {
 
     private ServerMessage serverMessage;
 
-    private int sequenceNumber;
     private final List<RequestWithReply> requestsWithReply;
 
     private final XWindowsClientProtocolLog protocolLog;
     
-    public SocketXWindowsDriverMessageSending(
-            int port,
+    private final MessageProcessor messageProcessor;
+    
+    public XWindowsDriverMessageSending(
             XWindowsNetworkFactory networkFactory,
             XWindowsMessageListener messageListener,
             XWindowsClientProtocolLog protocolLog) throws IOException {
         
         Objects.requireNonNull(networkFactory);
         Objects.requireNonNull(messageListener);
-
-        this.network = networkFactory.create(new MessageProcessor() {
+        
+        this.messageProcessor = new MessageProcessor() {
             
             @Override
             public void onMessage(ByteBuffer byteBuffer, int messageLength) {
-                final ServerMessage initialMessage = SocketXWindowsDriverMessageSending.this.onMessage(byteBuffer, messageLength);
+                final ServerMessage initialMessage = XWindowsDriverMessageSending.this.onMessage(byteBuffer, messageLength);
                 
                 if (initialMessage != null) {
                     
-                    SocketXWindowsDriverMessageSending.this.serverMessage = serverMessage;
+                    XWindowsDriverMessageSending.this.serverMessage = serverMessage;
                     
                     messageListener.onInitialMessage(serverMessage);
                 }
-                
             }
             
             @Override
             public Integer getLengthOfMessage(ByteBuffer byteBuffer) {
                 return XWindowsNetwork.getLengthOfMessage(byteBuffer, receivedInitialMessage());
             }
-        });
+        };
+        
+        this.network = networkFactory.connect(messageProcessor);
+
+        // may return null depending on implementation
+        // if null, will receive message in onMessage()
+        this.serverMessage = network.getInitialMessage();
+        
+        System.out.println("## initial server message " + serverMessage);
+        
+        if (serverMessage != null) {
+            messageListener.onInitialMessage(serverMessage);
+        }
         
         this.protocolLog = protocolLog;
 
-        this.byteOrder = ByteOrder.BIG_ENDIAN;
+        this.byteOrder = network.getByteOrder();
 
-        this.sequenceNumber = 1;
         this.requestsWithReply = new ArrayList<>();
-
-    }
-
-    @Override
-    public int sendInitialMessage(ClientMessage initialMessage) throws IOException {
-        return writeEncodeableToOutputBuffer(initialMessage, byteOrder);
     }
 
     public ServerMessage getServerMessage() {
@@ -146,7 +148,6 @@ public class SocketXWindowsDriverMessageSending implements XWindowsMessaging {
                     if (requestWithReply != null) {
                         requestWithReply.listener.onReply((Reply)message);
                     }
-
                 }
             }
             catch (IOException ex) {
@@ -219,6 +220,8 @@ public class SocketXWindowsDriverMessageSending implements XWindowsMessaging {
 
     private int getRequestOpCodeFor(int sequenceNumber) {
         
+        System.out.println("## getRequestOpCodeFor " + sequenceNumber + " from " + requestsWithReply);
+        
         for (RequestWithReply requestWithReply : requestsWithReply) {
             if (requestWithReply.sequenceNumber == sequenceNumber) {
                 return requestWithReply.opCode;
@@ -284,28 +287,25 @@ public class SocketXWindowsDriverMessageSending implements XWindowsMessaging {
         return error;
     }
 
-    private void sendRequestWithSequenceNumber(Request request) {
-        try {
-            final int messageLength = writeRequestToOutputBuffer(request, byteOrder);
-            
-            if (protocolLog != null) {
-                protocolLog.onSendRequest(messageLength, sequenceNumber, request);
-            }
+    private SentRequest sendRequestWithSequenceNumber(Request request) {
+        
+        final SentRequest sentRequest;
+        
+        if (protocolLog != null) {
+            protocolLog.onSendRequest(request);
         }
-        finally {
-            ++ sequenceNumber;
+        
+        sentRequest = writeRequestToOutputBuffer(request, byteOrder);
+        
+        if (protocolLog != null) {
+            protocolLog.onSentRequest(sentRequest.getLength(), sentRequest.getSequenceNumber(), request);
         }
+        
+        return sentRequest;
     }
     
-    private int writeRequestToOutputBuffer(Request request, ByteOrder byteOrder) {
-        return writeEncodeableToOutputBuffer(request, byteOrder);
-    }
-
-    private int writeEncodeableToOutputBuffer(Encodeable encodeable, ByteOrder byteOrder) {
-        
-        final DataWriter dataWriter = Encodeable.makeDataWriter(encodeable);
-        
-        return network.sendRequest(dataWriter, byteOrder);
+    private SentRequest writeRequestToOutputBuffer(Request request, ByteOrder byteOrder) {
+        return network.sendRequest(request, byteOrder);
     }
     
     @Override
@@ -316,11 +316,22 @@ public class SocketXWindowsDriverMessageSending implements XWindowsMessaging {
     @Override
     public void sendRequestWaitReply(Request request, ReplyListener replyListener) {
 
-        final int seq = this.sequenceNumber;
-        
-        requestsWithReply.add(new RequestWithReply(seq, request.getOpCode(), replyListener));
+        final SentRequest sentRequest = sendRequestWithSequenceNumber(request);
 
-        sendRequestWithSequenceNumber(request);
+        requestsWithReply.add(new RequestWithReply(sentRequest.getSequenceNumber(), request.getOpCode(), replyListener));
+
+        if (sentRequest.getReply() != null) {
+            
+            // reply received synchronously
+            
+            final Integer messageLength = messageProcessor.getLengthOfMessage(sentRequest.getReply());
+            
+            if (messageLength == null) {
+                throw new IllegalStateException();
+            }
+            
+            messageProcessor.onMessage(sentRequest.getReply(), messageLength);
+        }
     }
 
     @Override

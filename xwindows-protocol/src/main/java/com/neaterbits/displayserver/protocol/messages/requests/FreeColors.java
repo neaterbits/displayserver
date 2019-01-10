@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
+import com.neaterbits.displayserver.protocol.messages.Reply;
 import com.neaterbits.displayserver.protocol.messages.Request;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD32;
@@ -84,5 +85,10 @@ public final class FreeColors extends Request {
     @Override
     public int getOpCode() {
         return OpCodes.FREE_COLORS;
+    }
+
+    @Override
+    public Class<? extends Reply> getReplyClass() {
+        return null;
     }
 }

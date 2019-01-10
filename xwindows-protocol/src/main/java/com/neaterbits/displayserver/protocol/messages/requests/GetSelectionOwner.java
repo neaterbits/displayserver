@@ -6,7 +6,9 @@ import java.util.Objects;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
+import com.neaterbits.displayserver.protocol.messages.Reply;
 import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.messages.replies.GetSelectionOwnerReply;
 import com.neaterbits.displayserver.protocol.types.ATOM;
 
 public final class GetSelectionOwner extends Request {
@@ -53,5 +55,10 @@ public final class GetSelectionOwner extends Request {
     @Override
     public int getOpCode() {
         return OpCodes.GET_SELECTION_OWNER;
+    }
+
+    @Override
+    public Class<? extends Reply> getReplyClass() {
+        return GetSelectionOwnerReply.class;
     }
 }

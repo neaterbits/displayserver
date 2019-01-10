@@ -10,14 +10,14 @@ import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 
-public final class QueryResponseReply extends Reply {
+public final class QueryExtensionReply extends Reply {
 
     private final BOOL present;
     private final CARD8 majorOpCode;
     private final CARD8 firstEvent;
     private final CARD8 firstError;
     
-    public QueryResponseReply(CARD16 sequenceNumber, BOOL present, CARD8 majorOpCode, CARD8 firstEvent,
+    public QueryExtensionReply(CARD16 sequenceNumber, BOOL present, CARD8 majorOpCode, CARD8 firstEvent,
             CARD8 firstError) {
         super(sequenceNumber);
         this.present = present;

@@ -49,10 +49,282 @@ JNIEXPORT jlong JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNa
 
 /*
  * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    setup_status
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1status
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    setup_protocol_major_version
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1protocol_1major_1version
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    setup_protocol_minor_version
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1protocol_1minor_1version
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    setup_release_number
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1release_1number
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    setup_resource_id_base
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1resource_1id_1base
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    setup_resource_id_mask
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1resource_1id_1mask
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    setup_motion_buffer_size
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1motion_1buffer_1size
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    setup_vendor
+ * Signature: (J)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1vendor
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    setup_maximum_request_length
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1maximum_1request_1length
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    setup_image_byte_order
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1image_1byte_1order
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    setup_bitmap_format_bit_order
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1bitmap_1format_1bit_1order
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    setup_bitmap_format_scanline_unit
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1bitmap_1format_1scanline_1unit
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    setup_bitmap_format_scanline_pad
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1bitmap_1format_1scanline_1pad
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    setup_min_keycode
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1min_1keycode
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    setup_max_keycode
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1max_1keycode
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    setup_get_formats
+ * Signature: (J)[J
+ */
+JNIEXPORT jlongArray JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1get_1formats
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    format_depth
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_format_1depth
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    format_bits_per_pixel
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_format_1bits_1per_1pixel
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    format_scanline_pad
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_format_1scanline_1pad
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
  * Method:    setup_get_screens
  * Signature: (J)[J
  */
 JNIEXPORT jlongArray JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1get_1screens
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    screen_root
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1root
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    screen_default_colormap
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1default_1colormap
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    screen_white_pixel
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1white_1pixel
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    screen_black_pixel
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1black_1pixel
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    screen_current_input_masks
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1current_1input_1masks
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    screen_width_in_pixels
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1width_1in_1pixels
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    screen_height_in_pixels
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1height_1in_1pixels
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    screen_width_in_millimeters
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1width_1in_1millimeters
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    screen_height_in_millimeters
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1height_1in_1millimeters
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    screen_min_installed_maps
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1min_1installed_1maps
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    screen_max_installed_maps
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1max_1installed_1maps
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    screen_root_visual
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1root_1visual
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    screen_backing_stores
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1backing_1stores
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    screen_save_unders
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1save_1unders
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    screen_root_depth
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1root_1depth
   (JNIEnv *, jclass, jlong);
 
 /*
@@ -142,6 +414,22 @@ JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNat
  */
 JNIEXPORT jlong JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_cairo_1create_1xcb_1surface
   (JNIEnv *, jclass, jlong, jint, jlong, jint, jint);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    xcb_send_request
+ * Signature: (J[BIZ)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_xcb_1send_1request
+  (JNIEnv *, jclass, jlong, jbyteArray, jint, jboolean);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    xcb_wait_reply
+ * Signature: (JI)[B
+ */
+JNIEXPORT jbyteArray JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_xcb_1wait_1reply
+  (JNIEnv *, jclass, jlong, jint);
 
 #ifdef __cplusplus
 }

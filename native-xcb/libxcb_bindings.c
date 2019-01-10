@@ -1,11 +1,13 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include <jni.h>
 #include <jni_md.h>
 
 #include <xcb/xcb.h>
+#include <xcb/xcbext.h>
 #include <cairo/cairo-xcb.h>
 
 #include "com_neaterbits_displayserver_render_cairo_xcb_XCBNative.h"
@@ -28,7 +30,6 @@ JNIEXPORT jlong JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNa
 	(*env)->ReleaseStringUTFChars(env, display, native_display);
 
 	return connection_reference;
-
 }
 
 JNIEXPORT jlong JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_xcb_1connect_1display
@@ -154,14 +155,6 @@ JNIEXPORT jlongArray JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_
 	return result;
 }
 
-JNIEXPORT jbyte JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_depth_1get_1depth
-  (JNIEnv *env, jclass cl, jlong depth_reference) {
-
-	xcb_depth_t *depth = (xcb_depth_t *)depth_reference;
-
-	return depth->depth;
-}
-
 
 JNIEXPORT jlongArray JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_depth_1get_1visuals
   (JNIEnv *env, jclass cl, jlong depth_reference) {
@@ -186,6 +179,308 @@ JNIEXPORT jlongArray JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_
 	}
 
 	return result;
+}
+
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1status
+  (JNIEnv *env, jclass cl, jlong setup_reference) {
+
+	xcb_setup_t *setup = (xcb_setup_t *)setup_reference;
+
+	return setup->status;
+}
+
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1protocol_1major_1version
+  (JNIEnv *env, jclass cl, jlong setup_reference) {
+
+	xcb_setup_t *setup = (xcb_setup_t *)setup_reference;
+
+	return setup->protocol_major_version;
+}
+
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1protocol_1minor_1version
+  (JNIEnv *env, jclass cl, jlong setup_reference) {
+
+	xcb_setup_t *setup = (xcb_setup_t *)setup_reference;
+
+	return setup->protocol_minor_version;
+}
+
+JNIEXPORT jlong JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1release_1number
+  (JNIEnv *env, jclass cl, jlong setup_reference) {
+
+	xcb_setup_t *setup = (xcb_setup_t *)setup_reference;
+
+	return setup->release_number;
+}
+
+JNIEXPORT jlong JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1resource_1id_1base
+  (JNIEnv *env, jclass cl, jlong setup_reference) {
+
+	xcb_setup_t *setup = (xcb_setup_t *)setup_reference;
+
+	return setup->resource_id_base;
+}
+
+JNIEXPORT jlong JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1resource_1id_1mask
+  (JNIEnv *env, jclass cl, jlong setup_reference) {
+
+	xcb_setup_t *setup = (xcb_setup_t *)setup_reference;
+
+	return setup->resource_id_mask;
+}
+
+JNIEXPORT jlong JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1motion_1buffer_1size
+  (JNIEnv *env, jclass cl, jlong setup_reference) {
+
+	xcb_setup_t *setup = (xcb_setup_t *)setup_reference;
+
+	return setup->motion_buffer_size;
+}
+
+JNIEXPORT jstring JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1vendor
+  (JNIEnv *env, jclass cl, jlong setup_reference) {
+
+	xcb_setup_t *setup = (xcb_setup_t *)setup_reference;
+
+	char vendor[setup->vendor_len + 1];
+
+	strncpy(vendor, xcb_setup_vendor(setup), sizeof vendor);
+
+	vendor[sizeof vendor - 1] = 0;
+
+	return (*env)->NewStringUTF(env, vendor);
+}
+
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1maximum_1request_1length
+  (JNIEnv *env, jclass cl, jlong setup_reference) {
+
+	xcb_setup_t *setup = (xcb_setup_t *)setup_reference;
+
+	return setup->maximum_request_length;
+}
+
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1image_1byte_1order
+  (JNIEnv *env, jclass cl, jlong setup_reference) {
+
+	xcb_setup_t *setup = (xcb_setup_t *)setup_reference;
+
+	return setup->image_byte_order;
+}
+
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1bitmap_1format_1bit_1order
+  (JNIEnv *env, jclass cl, jlong setup_reference) {
+
+	xcb_setup_t *setup = (xcb_setup_t *)setup_reference;
+
+	return setup->bitmap_format_bit_order;
+}
+
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1bitmap_1format_1scanline_1unit
+  (JNIEnv *env, jclass cl, jlong setup_reference) {
+
+	xcb_setup_t *setup = (xcb_setup_t *)setup_reference;
+
+	return setup->bitmap_format_scanline_unit;
+}
+
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1bitmap_1format_1scanline_1pad
+  (JNIEnv *env, jclass cl, jlong setup_reference) {
+
+	xcb_setup_t *setup = (xcb_setup_t *)setup_reference;
+
+	return setup->bitmap_format_scanline_pad;
+}
+
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1min_1keycode
+  (JNIEnv *env, jclass cl, jlong setup_reference) {
+
+	xcb_setup_t *setup = (xcb_setup_t *)setup_reference;
+
+	return setup->min_keycode;
+}
+
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1max_1keycode
+  (JNIEnv *env, jclass cl, jlong setup_reference) {
+
+	xcb_setup_t *setup = (xcb_setup_t *)setup_reference;
+
+	return setup->max_keycode;
+}
+
+JNIEXPORT jlongArray JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_setup_1get_1formats
+  (JNIEnv *env, jclass cl, jlong setup_reference) {
+
+	xcb_setup_t *setup = (xcb_setup_t *)setup_reference;
+
+	xcb_format_iterator_t iterator = xcb_setup_pixmap_formats_iterator(setup);
+
+	int num_formats = xcb_setup_pixmap_formats_length(setup);
+
+	jlongArray result = (*env)->NewLongArray(env, num_formats);
+
+	for (int dst_idx = 0; dst_idx < num_formats; ++ dst_idx) {
+		jlong value = (jlong)iterator.data;
+
+		(*env)->SetLongArrayRegion(env, result, dst_idx, 1, &value);
+
+		if (iterator.rem > 0) {
+			xcb_format_next(&iterator);
+		}
+	}
+
+	return result;
+}
+
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_format_1depth
+  (JNIEnv *env, jclass cl, jlong format_reference) {
+
+	xcb_format_t *format = (xcb_format_t *)format_reference;
+
+	return format->depth;
+}
+
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_format_1bits_1per_1pixel
+  (JNIEnv *env, jclass cl, jlong format_reference) {
+
+	xcb_format_t *format = (xcb_format_t *)format_reference;
+
+	return format->bits_per_pixel;
+}
+
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_format_1scanline_1pad
+  (JNIEnv *env, jclass cl, jlong format_reference) {
+
+	xcb_format_t *format = (xcb_format_t *)format_reference;
+
+	return format->scanline_pad;
+}
+
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1root
+  (JNIEnv *env, jclass cl, jlong screen_reference) {
+
+	xcb_screen_t *screen = (xcb_screen_t *)screen_reference;
+
+	return screen->root;
+}
+
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1default_1colormap
+  (JNIEnv *env, jclass cl, jlong screen_reference) {
+
+	xcb_screen_t *screen = (xcb_screen_t *)screen_reference;
+
+	return screen->default_colormap;
+}
+
+JNIEXPORT jlong JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1white_1pixel
+  (JNIEnv *env, jclass cl, jlong screen_reference) {
+
+	xcb_screen_t *screen = (xcb_screen_t *)screen_reference;
+
+	return screen->white_pixel;
+}
+
+JNIEXPORT jlong JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1black_1pixel
+  (JNIEnv *env, jclass cl, jlong screen_reference) {
+
+	xcb_screen_t *screen = (xcb_screen_t *)screen_reference;
+
+	return screen->black_pixel;
+}
+
+JNIEXPORT jlong JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1current_1input_1masks
+  (JNIEnv *env, jclass cl, jlong screen_reference) {
+
+	xcb_screen_t *screen = (xcb_screen_t *)screen_reference;
+
+	return screen->current_input_masks;
+}
+
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1width_1in_1pixels
+  (JNIEnv *env, jclass cl, jlong screen_reference) {
+
+	xcb_screen_t *screen = (xcb_screen_t *)screen_reference;
+
+	return screen->width_in_pixels;
+}
+
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1height_1in_1pixels
+  (JNIEnv *env, jclass cl, jlong screen_reference) {
+
+	xcb_screen_t *screen = (xcb_screen_t *)screen_reference;
+
+	return screen->height_in_pixels;
+}
+
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1width_1in_1millimeters
+  (JNIEnv *env, jclass cl, jlong screen_reference) {
+
+	xcb_screen_t *screen = (xcb_screen_t *)screen_reference;
+
+	return screen->width_in_millimeters;
+}
+
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1height_1in_1millimeters
+  (JNIEnv *env, jclass cl, jlong screen_reference) {
+
+	xcb_screen_t *screen = (xcb_screen_t *)screen_reference;
+
+	return screen->height_in_millimeters;
+}
+
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1min_1installed_1maps
+  (JNIEnv *env, jclass cl, jlong screen_reference) {
+
+	xcb_screen_t *screen = (xcb_screen_t *)screen_reference;
+
+	return screen->min_installed_maps;
+}
+
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1max_1installed_1maps
+  (JNIEnv *env, jclass cl, jlong screen_reference) {
+
+	xcb_screen_t *screen = (xcb_screen_t *)screen_reference;
+
+	return screen->max_installed_maps;
+}
+
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1root_1visual
+  (JNIEnv *env, jclass cl, jlong screen_reference) {
+
+	xcb_screen_t *screen = (xcb_screen_t *)screen_reference;
+
+	return screen->root_visual;
+}
+
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1backing_1stores
+  (JNIEnv *env, jclass cl, jlong screen_reference) {
+
+	xcb_screen_t *screen = (xcb_screen_t *)screen_reference;
+
+	return screen->backing_stores;
+}
+
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1save_1unders
+  (JNIEnv *env, jclass cl, jlong screen_reference) {
+
+	xcb_screen_t *screen = (xcb_screen_t *)screen_reference;
+
+	return screen->save_unders;
+}
+
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_screen_1root_1depth
+  (JNIEnv *env, jclass cl, jlong screen_reference) {
+
+	xcb_screen_t *screen = (xcb_screen_t *)screen_reference;
+
+	return screen->root_depth;
+}
+
+JNIEXPORT jbyte JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_depth_1get_1depth
+  (JNIEnv *env, jclass cl, jlong depth_reference) {
+
+	xcb_depth_t *depth = (xcb_depth_t *)depth_reference;
+
+	return depth->depth;
 }
 
 JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_visual_1get_1visual_1id
@@ -257,4 +552,75 @@ JNIEXPORT jlong JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNa
 			visual,
 			width,
 			height);
+}
+
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_xcb_1send_1request
+  (JNIEnv *env, jclass cl, jlong connection_reference, jbyteArray vector, jint opcode, jboolean isvoid) {
+
+	xcb_connection_t *connection = (xcb_connection_t *)connection_reference;
+
+	jbyte *native_vector = (*env)->GetByteArrayElements(env, vector, NULL);
+
+	int length = (*env)->GetArrayLength(env, vector);
+
+	xcb_protocol_request_t request = {
+		1,
+		NULL,
+		opcode,
+		isvoid
+	};
+
+	struct iovec io [] = {
+		{ NULL, 0 },
+		{ NULL, 0 },
+		{
+			native_vector,
+			length
+		}
+	};
+
+	jint sequence_number = xcb_send_request(
+			connection,
+			XCB_REQUEST_CHECKED,
+			&io[2],
+			&request);
+
+	xcb_flush(connection);
+
+	(*env)->ReleaseByteArrayElements(env, vector, native_vector, 0);
+
+	return sequence_number;
+}
+
+
+JNIEXPORT jbyteArray JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_xcb_1wait_1reply
+  (JNIEnv *env, jclass cl, jlong connection_reference, jint sequence_number) {
+
+	xcb_connection_t *connection = (xcb_connection_t *)connection_reference;
+
+	xcb_generic_error_t *error;
+
+	void *reply = xcb_wait_for_reply(connection, sequence_number, &error);
+
+	jbyteArray result;
+
+	if (reply == NULL) {
+		fprintf(stderr, "## got reply error %d %08x\n", error->error_code, error->resource_id);
+
+		free(error);
+
+		result = NULL;
+	}
+	else {
+
+		int size = 32 + ((uint32_t *)reply)[1] * 4;
+
+		result = (*env)->NewByteArray(env, size);
+
+		(*env)->SetByteArrayRegion(env, result, 0, size, reply);
+
+		free(reply);
+	}
+
+	return result;
 }

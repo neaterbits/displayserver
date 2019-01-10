@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
+import com.neaterbits.displayserver.protocol.messages.Reply;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.GCONTEXT;
 import com.neaterbits.displayserver.protocol.types.RECTANGLE;
@@ -21,5 +22,10 @@ public final class PolyFillRectangle extends PolyRectangleRequest {
     @Override
     public int getOpCode() {
         return OpCodes.POLY_FILL_RECTANGLE;
+    }
+
+    @Override
+    public Class<? extends Reply> getReplyClass() {
+        return null;
     }
 }

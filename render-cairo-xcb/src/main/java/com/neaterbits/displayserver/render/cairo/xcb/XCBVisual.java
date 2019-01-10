@@ -26,7 +26,7 @@ public final class XCBVisual extends XCBReference {
         return XCBNative.visual_get_red_mask(getXCBReference());
     }
     
-    public int getFreenMask() {
+    public int getGreenMask() {
         return XCBNative.visual_get_green_mask(getXCBReference());
     }
     
@@ -43,7 +43,7 @@ public final class XCBVisual extends XCBReference {
     public String toString() {
         return "XCBVisual [getVisualId()=" + getVisualId() + ", getVisualClass()=" + getVisualClass()
                 + ", getBitsPerRGBValue()=" + getBitsPerRGBValue() + ", getColormapEntries()=" + getColormapEntries()
-                + ", getRedMask()=" + getRedMask() + ", getFreenMask()=" + getFreenMask() + ", getBlueMask()="
+                + ", getRedMask()=" + getRedMask() + ", getFreenMask()=" + getGreenMask() + ", getBlueMask()="
                 + getBlueMask() + "]";
     }
 }

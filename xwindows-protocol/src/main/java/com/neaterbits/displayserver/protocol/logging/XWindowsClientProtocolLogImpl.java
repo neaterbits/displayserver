@@ -13,7 +13,6 @@ public final class XWindowsClientProtocolLogImpl extends BaseLogImpl implements 
         super(prefix, debugLevel);
     }
 
-
     @Override
     public void onInitialMessageError(byte errorCode, int sequenceNumber, String reason) {
         
@@ -26,8 +25,15 @@ public final class XWindowsClientProtocolLogImpl extends BaseLogImpl implements 
     }
 
     @Override
-    public void onSendRequest(int messageLength, int sequenceNumber, Request request) {
+    public void onSendRequest(Request request) {
         debug("onSendRequest",
+                "opcode", request.getOpCode(),
+                "request", request.toDebugString());
+    }
+
+    @Override
+    public void onSentRequest(int messageLength, int sequenceNumber, Request request) {
+        debug("onSentRequest",
                 "messageLength", messageLength,
                 "opcode", request.getOpCode(),
                 "seq", sequenceNumber,

@@ -87,7 +87,7 @@ public class XWindowsProtocolUtil {
             length = byteBuffer.remaining() >= 32 ? 32 : null;
         }
         else if (byteBuffer.get(byteBuffer.position()) == 1) {
-            // System.out.println("## standard message " + byteBuffer.remaining() + "/" + byteBuffer.limit() + "/" + byteBuffer.position());
+            // System.out.println("## reply message " + byteBuffer.remaining() + "/" + byteBuffer.limit() + "/" + byteBuffer.position());
             
             if (byteBuffer.remaining() >= 4) {
 

@@ -11,6 +11,8 @@ public abstract class Request extends Message {
 
     public abstract int getOpCode();
     
+    public abstract Class<? extends Reply> getReplyClass();
+    
     protected final void writeOpCode(XWindowsProtocolOutputStream stream) throws IOException {
         stream.writeBYTE(new BYTE((byte)getOpCode()));
     }

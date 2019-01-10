@@ -53,7 +53,7 @@ import com.neaterbits.displayserver.protocol.messages.replies.GetSelectionOwnerR
 import com.neaterbits.displayserver.protocol.messages.replies.GrabPointerReply;
 import com.neaterbits.displayserver.protocol.messages.replies.InternAtomReply;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryPointerReply;
-import com.neaterbits.displayserver.protocol.messages.replies.QueryResponseReply;
+import com.neaterbits.displayserver.protocol.messages.replies.QueryExtensionReply;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryTreeReply;
 import com.neaterbits.displayserver.protocol.messages.replies.legacy.AllocNamedColorReply;
 import com.neaterbits.displayserver.protocol.messages.replies.legacy.ListFontsReply;
@@ -1185,7 +1185,7 @@ public class XServer implements AutoCloseable {
             log(messageLength, opcode, sequenceNumber, QueryExtension.decode(stream));
         
             sendReply(client, 
-                    new QueryResponseReply(
+                    new QueryExtensionReply(
                             sequenceNumber,
                             new BOOL((byte)0),
                             new CARD8((byte)0),

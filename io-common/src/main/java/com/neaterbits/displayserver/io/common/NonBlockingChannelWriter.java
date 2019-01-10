@@ -28,6 +28,11 @@ public abstract class NonBlockingChannelWriter implements NonBlockingWritable {
 	public final int writeToOutputBuffer(ByteOrder byteOrder, DataWriter writeData) {
         
         final byte [] data = DataWriter.writeToBuf(writeData, byteOrder);
+     
+        return writeToOutputBuffer(data);
+	}
+
+    public final int writeToOutputBuffer(byte [] data) {
         
         writeToOutputBuffer(data, 0, data.length);
 

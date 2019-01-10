@@ -13,7 +13,7 @@ import com.neaterbits.displayserver.protocol.types.CARD8;
 public final class DEPTH extends Encodeable {
 
     private final CARD8 depth;
-    private final CARD16 numberOfVisualTypes;
+    // private final CARD16 numberOfVisualTypes;
     private final VISUALTYPE [] visuals;
     
     public static DEPTH decode(XWindowsProtocolInputStream stream) throws IOException {
@@ -32,12 +32,12 @@ public final class DEPTH extends Encodeable {
             visualTypes[i] = VISUALTYPE.decode(stream);
         }
         
-        return new DEPTH(depth, numberOfVisualTypes, visualTypes);
+        return new DEPTH(depth, /* numberOfVisualTypes, */ visualTypes);
     }
     
-    public DEPTH(CARD8 depth, CARD16 numberOfVisualTypes, VISUALTYPE[] visuals) {
+    public DEPTH(CARD8 depth, /* CARD16 numberOfVisualTypes, */ VISUALTYPE[] visuals) {
         this.depth = depth;
-        this.numberOfVisualTypes = numberOfVisualTypes;
+        // this.numberOfVisualTypes = numberOfVisualTypes;
         this.visuals = visuals;
     }
     
@@ -45,9 +45,11 @@ public final class DEPTH extends Encodeable {
         return depth;
     }
     
+    /*
     public CARD16 getNumberOfVisualTypes() {
         return numberOfVisualTypes;
     }
+    */
 
     public VISUALTYPE[] getVisuals() {
         return visuals;
@@ -58,7 +60,7 @@ public final class DEPTH extends Encodeable {
 
         stream.writeCARD8(depth);
         stream.writeCARD8(new CARD8((byte)0));
-        stream.writeCARD16(numberOfVisualTypes);
+        stream.writeCARD16(new CARD16(visuals.length));
         
         stream.writeCARD32(new CARD32(0));
         
@@ -67,7 +69,7 @@ public final class DEPTH extends Encodeable {
 
     @Override
     public String toString() {
-        return "DEPTH [depth=" + depth + ", numberOfVisualTypes=" + numberOfVisualTypes + ", visuals="
+        return "DEPTH [depth=" + depth + /* ", numberOfVisualTypes=" + numberOfVisualTypes + */ ", visuals="
                 + Arrays.toString(visuals) + "]";
     }
 }

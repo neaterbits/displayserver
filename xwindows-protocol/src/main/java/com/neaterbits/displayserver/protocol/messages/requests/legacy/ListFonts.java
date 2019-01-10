@@ -7,7 +7,9 @@ import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolUtil;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
+import com.neaterbits.displayserver.protocol.messages.Reply;
 import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.messages.replies.legacy.ListFontsReply;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 
 public final class ListFonts extends Request {
@@ -86,5 +88,10 @@ public final class ListFonts extends Request {
     @Override
     public int getOpCode() {
         return OpCodes.LIST_FONTS;
+    }
+
+    @Override
+    public Class<? extends Reply> getReplyClass() {
+        return ListFontsReply.class;
     }
 }

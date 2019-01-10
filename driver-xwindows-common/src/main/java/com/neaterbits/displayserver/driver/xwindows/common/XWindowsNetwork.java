@@ -4,8 +4,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
 
-import com.neaterbits.displayserver.io.common.DataWriter;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolUtil;
+import com.neaterbits.displayserver.protocol.messages.Encodeable;
+import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.messages.protocolsetup.ServerMessage;
 
 public interface XWindowsNetwork {
 
@@ -61,8 +63,14 @@ public interface XWindowsNetwork {
         
         return length;
     }
-
-    int sendRequest(DataWriter request, ByteOrder byteOrder);
+    
+    ByteOrder getByteOrder();
+    
+    ServerMessage getInitialMessage();
+    
+    SentRequest sendRequest(Request request, ByteOrder byteOrder);
+    
+    int send(Encodeable message, ByteOrder byteOrder);
 
     void close() throws Exception;
 }

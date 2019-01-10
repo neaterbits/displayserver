@@ -39,7 +39,7 @@ public final class SCREEN extends Encodeable {
     private final BYTE backingStores;
     private final BOOL saveUnders;
     private final CARD8 rootDepth;
-    private final CARD8 numberOfDepths;
+    // private final CARD8 numberOfDepths;
     private final DEPTH [] allowedDepths;
 
     public static SCREEN decode(XWindowsProtocolInputStream stream) throws IOException {
@@ -85,7 +85,8 @@ public final class SCREEN extends Encodeable {
                 rootVisual,
                 backingStores, saveUnders,
                 rootDepth,
-                numberOfDepths, allowedDepths);
+                // numberOfDepths,
+                allowedDepths);
     }
     
     public SCREEN(
@@ -111,7 +112,7 @@ public final class SCREEN extends Encodeable {
             BOOL saveUnders,
             
             CARD8 rootDepth,
-            CARD8 numberOfDepths,
+            // CARD8 numberOfDepths,
             DEPTH[] allowedDepths) {
 
         this.root = root;
@@ -129,7 +130,7 @@ public final class SCREEN extends Encodeable {
         this.backingStores = backingStores;
         this.saveUnders = saveUnders;
         this.rootDepth = rootDepth;
-        this.numberOfDepths = numberOfDepths;
+        // this.numberOfDepths = numberOfDepths;
         this.allowedDepths = allowedDepths;
     }
 
@@ -193,9 +194,11 @@ public final class SCREEN extends Encodeable {
         return rootDepth;
     }
     
+    /*
     public CARD8 getNumberOfDepths() {
         return numberOfDepths;
     }
+    */
     
     public DEPTH[] getAllowedDepths() {
         return allowedDepths;
@@ -219,7 +222,7 @@ public final class SCREEN extends Encodeable {
         stream.writeBYTE(backingStores);
         stream.writeBOOL(saveUnders);
         stream.writeCARD8(rootDepth);
-        stream.writeCARD8(numberOfDepths);
+        stream.writeCARD8(new CARD8((short)allowedDepths.length));
         encodeArray(allowedDepths, stream);
     }
 
@@ -230,7 +233,7 @@ public final class SCREEN extends Encodeable {
                 + widthInPixels + ", heightInPixels=" + heightInPixels + ", widthInMillimiters=" + widthInMillimiters
                 + ", heightInMillimiters=" + heightInMillimiters + ", minInstalledMaps=" + minInstalledMaps
                 + ", maxInstalledMaps=" + maxInstalledMaps + ", rootVisual=" + rootVisual + ", backingStores="
-                + backingStores + ", saveUnders=" + saveUnders + ", rootDepth=" + rootDepth + ", numberOfDepths="
-                + numberOfDepths + ", allowedDepths=" + Arrays.toString(allowedDepths) + "]";
+                + backingStores + ", saveUnders=" + saveUnders + ", rootDepth=" + rootDepth + /* ", numberOfDepths="
+                + numberOfDepths + */ ", allowedDepths=" + Arrays.toString(allowedDepths) + "]";
     }
 }

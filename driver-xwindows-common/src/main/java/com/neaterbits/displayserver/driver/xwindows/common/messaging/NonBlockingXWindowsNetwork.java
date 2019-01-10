@@ -5,10 +5,18 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Objects;
 
+import com.neaterbits.displayserver.driver.xwindows.common.SentRequest;
 import com.neaterbits.displayserver.driver.xwindows.common.XWindowsNetwork;
 import com.neaterbits.displayserver.io.common.NonBlockingChannelReaderWriter;
 import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLog;
 import com.neaterbits.displayserver.io.common.Selectable;
+import com.neaterbits.displayserver.protocol.messages.Encodeable;
+import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.messages.protocolsetup.ClientMessage;
+import com.neaterbits.displayserver.protocol.messages.protocolsetup.ServerMessage;
+import com.neaterbits.displayserver.protocol.types.CARD16;
+import com.neaterbits.displayserver.protocol.types.CARD8;
+import com.neaterbits.displayserver.xwindows.util.XAuth;
 import com.neaterbits.displayserver.io.common.DataWriter;
 import com.neaterbits.displayserver.io.common.MessageProcessor;
 
@@ -16,7 +24,13 @@ public class NonBlockingXWindowsNetwork implements XWindowsNetwork {
 
     private final NonBlockingChannelReaderWriter readerWriter;
     
-    public NonBlockingXWindowsNetwork(InetSocketAddress socketAddress, NonBlockingChannelWriterLog log, MessageProcessor listener) {
+    private int sequenceNumber;
+
+    public NonBlockingXWindowsNetwork(
+            InetSocketAddress socketAddress,
+            XAuth xAuth,
+            NonBlockingChannelWriterLog log,
+            MessageProcessor listener) {
 
         Objects.requireNonNull(listener);
         
@@ -31,8 +45,20 @@ public class NonBlockingXWindowsNetwork implements XWindowsNetwork {
                 listener.onMessage(byteBuffer, messageLength);
             }
         };
+
+        this.sequenceNumber = 1;
+
+        final ClientMessage clientMessage = new ClientMessage(
+                new CARD8((short)'B'),
+                new CARD16(11),
+                new CARD16(0),
+                xAuth != null ? xAuth.getAuthorizationProtocol() : "",
+                xAuth != null ? xAuth.getAuthorizationData() : "".getBytes());
+
+        send(clientMessage, ByteOrder.BIG_ENDIAN);
     }
 
+    
     public Selectable getSelectable() {
         return readerWriter;
     }
@@ -40,10 +66,42 @@ public class NonBlockingXWindowsNetwork implements XWindowsNetwork {
     public MessageProcessor getMessageProcessor() {
         return readerWriter;
     }
-    
+
     @Override
-    public int sendRequest(DataWriter request, ByteOrder byteOrder) {
-        return readerWriter.writeToOutputBuffer(byteOrder, request);
+    public ByteOrder getByteOrder() {
+        return ByteOrder.BIG_ENDIAN;
+    }
+
+    @Override
+    public ServerMessage getInitialMessage() {
+        return null;
+    }
+
+    @Override
+    public SentRequest sendRequest(Request request, ByteOrder byteOrder) {
+
+        final DataWriter dataWriter = Encodeable.makeDataWriter(request);
+
+        final SentRequest sentRequest;
+        
+        try {
+            final int messageLength = readerWriter.writeToOutputBuffer(byteOrder, dataWriter);
+            
+            sentRequest = new SentRequest(sequenceNumber, messageLength, null);
+        }
+        finally {
+            ++ sequenceNumber;
+        }
+        
+        return sentRequest;
+    }
+
+    @Override
+    public int send(Encodeable message, ByteOrder byteOrder) {
+        
+        final DataWriter dataWriter = Encodeable.makeDataWriter(message);
+
+        return readerWriter.writeToOutputBuffer(byteOrder, dataWriter);
     }
 
     @Override
