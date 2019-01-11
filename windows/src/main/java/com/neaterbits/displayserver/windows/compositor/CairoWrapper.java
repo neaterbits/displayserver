@@ -5,6 +5,7 @@ import java.util.Objects;
 import com.neaterbits.displayserver.render.cairo.Cairo;
 import com.neaterbits.displayserver.render.cairo.CairoFillRule;
 import com.neaterbits.displayserver.render.cairo.CairoOperator;
+import com.neaterbits.displayserver.render.cairo.CairoStatus;
 import com.neaterbits.displayserver.render.cairo.CairoSurface;
 
 final class CairoWrapper implements Cairo {
@@ -23,6 +24,12 @@ final class CairoWrapper implements Cairo {
         
         this.cr = cr;
         this.cairoSurface = cairoSurface;
+    }
+
+    
+    @Override
+    public CairoStatus getStatus() {
+        return cr.getStatus();
     }
 
     @Override

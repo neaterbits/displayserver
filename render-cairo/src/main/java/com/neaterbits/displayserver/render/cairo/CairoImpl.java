@@ -5,6 +5,11 @@ final class CairoImpl extends CairoReference implements Cairo {
     CairoImpl(CairoSurfaceImpl surface) {
         super(CairoNative.cairo_create(surface.getCairoReference()));
     }
+    
+    @Override
+    public CairoStatus getStatus() {
+        return CairoStatus.fromCairoValue(CairoNative.cairo_status(getCairoReference()));
+    }
 
     @Override
     public void setOperator(CairoOperator operator) {

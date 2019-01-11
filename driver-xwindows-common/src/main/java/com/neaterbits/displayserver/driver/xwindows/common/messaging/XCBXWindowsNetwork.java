@@ -43,10 +43,19 @@ public class XCBXWindowsNetwork implements XWindowsNetwork {
         this.xcbConnection = xcbConnection;
     }
     
-    
     @Override
     public ByteOrder getByteOrder() {
         return ByteOrder.LITTLE_ENDIAN;
+    }
+    
+    @Override
+    public int generateResourceId() {
+        return xcbConnection.generateId();
+    }
+    
+    @Override
+    public void freeResourceId(int resourceId) {
+        
     }
 
     @Override

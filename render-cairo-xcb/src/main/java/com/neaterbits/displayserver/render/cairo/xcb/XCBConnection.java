@@ -23,6 +23,10 @@ public class XCBConnection extends XCBReference implements AutoCloseable {
         this.display = display;
     }
 
+    public int generateId() {
+        return XCBNative.xcb_generate_id(getXCBReference());
+    }
+    
     public XCBSetup getSetup() {
         
         final long setup = XCBNative.xcb_get_setup(getXCBReference());

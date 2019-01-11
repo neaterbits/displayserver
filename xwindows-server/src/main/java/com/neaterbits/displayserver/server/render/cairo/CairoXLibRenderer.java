@@ -16,6 +16,7 @@ import com.neaterbits.displayserver.render.cairo.Cairo;
 import com.neaterbits.displayserver.render.cairo.CairoFormat;
 import com.neaterbits.displayserver.render.cairo.CairoImageSurface;
 import com.neaterbits.displayserver.render.cairo.CairoOperator;
+import com.neaterbits.displayserver.render.cairo.CairoStatus;
 import com.neaterbits.displayserver.render.cairo.CairoSurface;
 import com.neaterbits.displayserver.xwindows.model.XGC;
 import com.neaterbits.displayserver.xwindows.model.render.XLibRenderer;
@@ -27,7 +28,7 @@ final class CairoXLibRenderer implements XLibRenderer {
 
     private final Cairo cr;
     
-    // private static int fileSequenceCounter = 0;
+    private static int fileSequenceCounter = 0;
     
     CairoXLibRenderer(CairoSurface surface, PixelConversion pixelConversion) {
         
@@ -224,38 +225,39 @@ final class CairoXLibRenderer implements XLibRenderer {
                     
                     final CairoImageSurface imageSurface = new CairoImageSurface(data, cairoFormat, width, height, stride);
 
-                    // final int sequenceNumber = writeToPNG(imageSurface, "src");
+                    final int sequenceNumber = writeToPNG(imageSurface, "src");
                     
                     try {
-                        System.out.println("## write image surface to " + surface + " at "
+                        System.out.println("## write image surface " + sequenceNumber + " to " + surface + " at "
                                     + "(" + dstX + ", " + dstY + "), size "
                                     + "(" + width + ", " + height + ")");
                         
 
+                        cr.setSourceSurface(imageSurface, dstX, dstY);
+                        
                         // cr.rectangle(dstX, dstY, width, height);
                         // cr.clip();
 
-                        cr.setSourceSurface(imageSurface, dstX, dstY);
-                        // cr.rectangle(dstX, dstY, width, height);
-                        // cr.fill();
-                        
+                        // cr.setSourceRGB(1.0, 1.0, 0.5);
+
+                        // cr.paint();
+
+
+                        cr.rectangle(dstX, dstY, width, height);
+                        cr.fill();
+
                         surface.flush();
 
-                        cr.paint();
-
                         /*
-                        new Thread(() -> {
-                            try {
-                                Thread.sleep(1000);
-                            } catch (InterruptedException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                            }
-                            
-                            writeToPNG(surface, "dst", sequenceNumber);
-                        })
-                        .start();
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
                         */
+                        
+                        writeToPNG(surface, "dst", sequenceNumber);
                     }
                     finally {
                         imageSurface.dispose();
@@ -267,7 +269,6 @@ final class CairoXLibRenderer implements XLibRenderer {
         }
     }
     
-    /*
     private int writeToPNG(CairoSurface surface, String suffix) {
         
         final int sequenceNumber = fileSequenceCounter ++;
@@ -286,7 +287,6 @@ final class CairoXLibRenderer implements XLibRenderer {
             throw new IllegalStateException("status=" + status);
         }
     }
-    */
 
     @Override
     public void renderBitmap(XGC gc, Buffer buffer, int x, int y) {

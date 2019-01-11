@@ -5,6 +5,11 @@ import com.neaterbits.displayserver.protocol.messages.protocolsetup.ServerMessag
 public interface XWindowsMessaging extends XWindowsRequestSender {
 
     ServerMessage getServerMessage();
+
+    int allocateResourceId();
+
+    void freeResourceId(int resourceId);
+
     
     void close() throws Exception;
 }

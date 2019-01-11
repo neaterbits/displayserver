@@ -95,6 +95,15 @@ public class XWindowsDriverMessageSending implements XWindowsMessaging {
     public ServerMessage getServerMessage() {
         return serverMessage;
     }
+    
+    public int allocateResourceId() {
+        return network.generateResourceId();
+    }
+
+    public void freeResourceId(int resourceId) {
+        network.freeResourceId(resourceId);
+    }
+
 
     private boolean receivedInitialMessage() {
         return serverMessage != null;

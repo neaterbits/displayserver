@@ -25,6 +25,14 @@ JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNativ
 
 /*
  * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
+ * Method:    cairo_status
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1status
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
  * Method:    cairo_set_operator
  * Signature: (JI)V
  */

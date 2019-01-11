@@ -23,6 +23,14 @@ JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNativ
 	cairo_destroy((cairo_t *)cr);
 }
 
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1status
+  (JNIEnv *env, jclass cl, jlong cairo_reference) {
+
+	cairo_t *cr = (cairo_t *)cairo_reference;
+
+	return cairo_status(cr);
+}
+
 JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1set_1operator
   (JNIEnv *env, jclass cl, jlong cairo_reference, jint operator) {
 

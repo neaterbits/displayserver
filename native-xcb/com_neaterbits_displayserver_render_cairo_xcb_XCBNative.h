@@ -33,6 +33,14 @@ JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNat
 
 /*
  * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    xcb_generate_id
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_xcb_1generate_1id
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
  * Method:    xcb_flush
  * Signature: (J)V
  */

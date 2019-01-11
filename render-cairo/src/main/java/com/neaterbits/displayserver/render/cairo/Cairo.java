@@ -4,6 +4,8 @@ import com.neaterbits.displayserver.util.Disposable;
 
 public interface Cairo extends Disposable {
     
+    CairoStatus getStatus();
+    
     void setOperator(CairoOperator operator);
     
     void setSourceRGB(double red, double green, double blue);

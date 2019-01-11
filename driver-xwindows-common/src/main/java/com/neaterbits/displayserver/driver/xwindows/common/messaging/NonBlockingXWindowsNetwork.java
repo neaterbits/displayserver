@@ -1,15 +1,19 @@
 package com.neaterbits.displayserver.driver.xwindows.common.messaging;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Objects;
 
+import com.neaterbits.displayserver.driver.xwindows.common.ClientResourceIdAllocator;
 import com.neaterbits.displayserver.driver.xwindows.common.SentRequest;
 import com.neaterbits.displayserver.driver.xwindows.common.XWindowsNetwork;
 import com.neaterbits.displayserver.io.common.NonBlockingChannelReaderWriter;
 import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLog;
 import com.neaterbits.displayserver.io.common.Selectable;
+import com.neaterbits.displayserver.protocol.ByteBufferXWindowsProtocolInputStream;
+import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.messages.Encodeable;
 import com.neaterbits.displayserver.protocol.messages.Request;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ClientMessage;
@@ -25,6 +29,9 @@ public class NonBlockingXWindowsNetwork implements XWindowsNetwork {
     private final NonBlockingChannelReaderWriter readerWriter;
     
     private int sequenceNumber;
+    private ClientResourceIdAllocator clientResourceIdAllocator;
+    
+    private ServerMessage initialMessage;
 
     public NonBlockingXWindowsNetwork(
             InetSocketAddress socketAddress,
@@ -42,6 +49,34 @@ public class NonBlockingXWindowsNetwork implements XWindowsNetwork {
 
             @Override
             public void onMessage(ByteBuffer byteBuffer, int messageLength) {
+                
+                if (initialMessage == null) {
+                    
+                    final int numBytes = byteBuffer.remaining();
+                    
+                    final byte [] bytes = new byte[numBytes];
+                    
+                    for (int i = 0; i < numBytes; ++ i) {
+                        bytes[i] = byteBuffer.get(byteBuffer.position() + i);
+                    }
+                    
+                    final ByteBuffer buffer = ByteBuffer.wrap(bytes);
+                    
+                    buffer.order(getByteOrder());
+                    
+                    final XWindowsProtocolInputStream stream = new ByteBufferXWindowsProtocolInputStream(buffer);
+                    
+                    try {
+                        initialMessage = ServerMessage.decode(stream);
+                    } catch (IOException ex) {
+                        throw new IllegalStateException(ex);
+                    }
+                    
+                    clientResourceIdAllocator = new ClientResourceIdAllocator(
+                            initialMessage.getResourceIdBase().getValue(),
+                            initialMessage.getResourceIdMask().getValue());
+                }
+                
                 listener.onMessage(byteBuffer, messageLength);
             }
         };
@@ -72,6 +107,16 @@ public class NonBlockingXWindowsNetwork implements XWindowsNetwork {
         return ByteOrder.BIG_ENDIAN;
     }
 
+    @Override
+    public int generateResourceId() {
+        return clientResourceIdAllocator.allocateResourceId();
+    }
+
+    @Override
+    public void freeResourceId(int resourceId) {
+        clientResourceIdAllocator.freeResourceId(resourceId);
+    }
+    
     @Override
     public ServerMessage getInitialMessage() {
         return null;

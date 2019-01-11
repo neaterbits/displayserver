@@ -21,8 +21,6 @@ public final class XWindowsDriverConnection
 	private final Listeners<XWindowsReplyListener> replyListeners;
 	private final Listeners<XWindowsMessageListener> eventListeners;
 	
-	private ClientResourceIdAllocator clientResourceIdAllocator;
-	
 	private final XCBConnection xcbConnection;
 	private final XCBVisual xcbVisual;
 	
@@ -42,9 +40,7 @@ public final class XWindowsDriverConnection
             
             @Override
             public void onInitialMessage(ServerMessage initialMessage) {
-                clientResourceIdAllocator = new ClientResourceIdAllocator(
-                        initialMessage.getResourceIdBase().getValue(),
-                        initialMessage.getResourceIdMask().getValue());
+
             }
         };
         
@@ -94,11 +90,11 @@ public final class XWindowsDriverConnection
     }
 	
 	public int allocateResourceId() {
-	    return clientResourceIdAllocator.allocateResourceId();
+	    return messaging.allocateResourceId();
 	}
 
 	public void freeResourceId(int resourceId) {
-	    clientResourceIdAllocator.freeResourceId(resourceId);
+	    messaging.freeResourceId(resourceId);
 	}
 
     public void registerReplyListener(XWindowsReplyListener replyListener) {

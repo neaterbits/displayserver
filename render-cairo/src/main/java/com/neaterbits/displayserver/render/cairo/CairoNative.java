@@ -6,6 +6,8 @@ public class CairoNative {
     static native long cairo_create(long surface);
     
     static native void cairo_destroy(long cr);
+
+    static native int cairo_status(long cr);
     
     static native void cairo_set_operator(long cr, int operator);
     

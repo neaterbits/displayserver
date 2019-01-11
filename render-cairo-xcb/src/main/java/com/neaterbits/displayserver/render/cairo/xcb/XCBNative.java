@@ -8,6 +8,8 @@ public class XCBNative {
     
     static native void xcb_disconnect(long connection);
 
+    static native int xcb_generate_id(long connection);
+    
     static native void xcb_flush(long connection);
     
     static native long xcb_get_setup(long connection);

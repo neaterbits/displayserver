@@ -66,6 +66,10 @@ public interface XWindowsNetwork {
     
     ByteOrder getByteOrder();
     
+    int generateResourceId();
+    
+    void freeResourceId(int resourceId);
+    
     ServerMessage getInitialMessage();
     
     SentRequest sendRequest(Request request, ByteOrder byteOrder);

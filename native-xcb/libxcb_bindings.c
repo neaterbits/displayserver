@@ -77,6 +77,14 @@ JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNat
 	xcb_disconnect((xcb_connection_t *)connection);
 }
 
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_xcb_1generate_1id
+  (JNIEnv *env, jclass cl, jlong connection_reference) {
+
+	xcb_connection_t *connection = (xcb_connection_t *)connection_reference;
+
+	return xcb_generate_id(connection);
+}
+
 JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_xcb_1flush
   (JNIEnv *env, jclass cl, jlong connection_reference) {
 
@@ -557,7 +565,25 @@ JNIEXPORT jlong JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNa
 JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_xcb_1send_1request
   (JNIEnv *env, jclass cl, jlong connection_reference, jbyteArray vector, jint opcode, jboolean isvoid) {
 
+
 	xcb_connection_t *connection = (xcb_connection_t *)connection_reference;
+
+	xcb_generic_event_t *event;
+
+	while (NULL != (event = xcb_poll_for_event(connection))) {
+		printf("## got event %d\n", event->response_type);
+
+		if (event->response_type == 0) {
+			xcb_generic_error_t *error = (xcb_generic_error_t *)event;
+
+			printf("## error %d %d %d %d %08x\n",
+					error->error_code,
+					error->sequence,
+					error->major_code,
+					error->minor_code,
+					error->resource_id);
+		}
+	}
 
 	jbyte *native_vector = (*env)->GetByteArrayElements(env, vector, NULL);
 
