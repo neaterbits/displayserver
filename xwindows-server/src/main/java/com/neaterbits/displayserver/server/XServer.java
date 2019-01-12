@@ -482,8 +482,13 @@ public class XServer implements AutoCloseable {
 
 		case OpCodes.CONFIGURE_WINDOW: {
 		    
-		    log(messageLength, opcode, sequenceNumber, ConfigureWindow.decode(stream));
+		    final ConfigureWindow configureWindow = log(messageLength, opcode, sequenceNumber, ConfigureWindow.decode(stream));
 		    
+		    try {
+                client.configureWindow(configureWindow);
+            } catch (WindowException ex) {
+                sendError(client, Errors.Window, sequenceNumber, ex.getWindow().getValue(), opcode);
+            }
 		    break;
 		}
 		

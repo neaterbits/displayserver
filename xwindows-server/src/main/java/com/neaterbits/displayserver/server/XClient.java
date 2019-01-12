@@ -27,6 +27,7 @@ import com.neaterbits.displayserver.protocol.messages.replies.GetImageReply;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeGC;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeWindowAttributes;
 import com.neaterbits.displayserver.protocol.messages.requests.ClearArea;
+import com.neaterbits.displayserver.protocol.messages.requests.ConfigureWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.CopyArea;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateCursor;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateGC;
@@ -39,6 +40,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.GCAttributes;
 import com.neaterbits.displayserver.protocol.messages.requests.GetImage;
 import com.neaterbits.displayserver.protocol.messages.requests.PutImage;
 import com.neaterbits.displayserver.protocol.messages.requests.WindowAttributes;
+import com.neaterbits.displayserver.protocol.messages.requests.WindowConfiguration;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.CloseFont;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.ImageText16;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.OpenFont;
@@ -58,6 +60,7 @@ import com.neaterbits.displayserver.protocol.types.RESOURCE;
 import com.neaterbits.displayserver.protocol.types.STRING16;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
+import com.neaterbits.displayserver.types.Position;
 import com.neaterbits.displayserver.types.Size;
 import com.neaterbits.displayserver.windows.Display;
 import com.neaterbits.displayserver.windows.DisplayArea;
@@ -220,6 +223,72 @@ public class XClient extends XConnection {
         
         return xWindow;
     }
+
+    final void configureWindow(ConfigureWindow configureWindow) throws WindowException {
+     
+        final XWindow xWindow = server.getWindows().getClientWindow(configureWindow.getWindow());
+        
+        if (xWindow == null) {
+            throw new WindowException("No such window", configureWindow.getWindow());
+        }
+        
+        Integer updatedX = null;
+        Integer updatedY = null;
+        
+        Integer updatedWidth = null;
+        Integer updatedHeight = null;
+        
+        final WindowConfiguration windowConfiguration = configureWindow.getConfiguration();
+        
+        if (windowConfiguration.isSet(WindowConfiguration.X)) {
+            updatedX = (int)windowConfiguration.getX().getValue();
+        }
+        
+        if (windowConfiguration.isSet(WindowConfiguration.Y)) {
+            updatedY = (int)windowConfiguration.getY().getValue();
+        }
+        
+        if (windowConfiguration.isSet(WindowConfiguration.WIDTH)) {
+            updatedWidth = (int)windowConfiguration.getWidth().getValue();
+        }
+        
+        if (windowConfiguration.isSet(WindowConfiguration.HEIGHT)) {
+            updatedHeight = (int)windowConfiguration.getHeight().getValue();
+        }
+        
+        final Window window = xWindow.getWindow();
+        
+        if (updatedX != null || updatedY != null) {
+        
+            final Position position = window.getPosition();
+            
+            final Position updatedPosition = new Position(
+                    updatedX != null ? updatedX : position.getLeft(),
+                    updatedY != null ? updatedY : position.getTop());
+            
+            
+            window.setPosition(updatedPosition);
+        }
+        
+        if (updatedWidth != null || updatedHeight != null) {
+            
+            final Size size = window.getSize();
+        
+            final Size updatedSize = new Size(
+                    updatedWidth != null ? updatedWidth : size.getWidth(),
+                    updatedHeight != null ? updatedHeight : size.getHeight());
+        
+            window.setSize(updatedSize);
+        }
+        
+        if (windowConfiguration.isSet(WindowConfiguration.BORDER_WIDTH)) {
+            
+            xWindow.setBorderWidth(windowConfiguration.getBorderWidth());
+            
+            System.out.println("TODO - configure borderwidth");
+        }
+    }
+    
     
     private void renderWindowBackground(WindowAttributes windowAttributes, Window window, XLibRenderer renderer, BufferOperations windowBuffer) {
         

@@ -59,10 +59,18 @@ public final class Window {
 	    return layer.getPosition();
 	}
 	
-	public Size getSize() {
+    public void setPosition(Position position) {
+        layer.setPosition(position);
+    }
+
+    public Size getSize() {
 	    return layer.getSize();
 	}
 
+    public void setSize(Size size) {
+        layer.setSize(size);
+    }
+    
 	WindowAttributes getAttributes() {
         return attributes;
     }

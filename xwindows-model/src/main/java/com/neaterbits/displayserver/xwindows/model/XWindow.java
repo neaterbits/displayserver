@@ -30,7 +30,7 @@ public class XWindow extends XDrawable {
     private final WINDOW rootWindow;
     private final WINDOW parentWindow;
     
-    private final CARD16 borderWidth;
+    private CARD16 borderWidth;
     private final CARD16 windowClass;
     
     private WindowAttributes currentWindowAttributes;
@@ -165,6 +165,13 @@ public class XWindow extends XDrawable {
         return borderWidth;
     }
     
+    public void setBorderWidth(CARD16 borderWidth) {
+        
+        Objects.requireNonNull(borderWidth);
+        
+        this.borderWidth = borderWidth;
+    }
+
     public final CARD16 getWindowClass() {
         return windowClass;
     }

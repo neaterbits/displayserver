@@ -29,6 +29,14 @@ public final class ConfigureWindow extends Request {
         this.configuration = configuration;
     }
     
+    public WINDOW getWindow() {
+        return window;
+    }
+
+    public WindowConfiguration getConfiguration() {
+        return configuration;
+    }
+
     @Override
     public Object[] getDebugParams() {
         return wrap(

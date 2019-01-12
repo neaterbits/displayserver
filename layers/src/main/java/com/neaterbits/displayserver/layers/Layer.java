@@ -56,7 +56,7 @@ public final class Layer {
 		return found;
 	}
 	
-	void setPosition(Position position) {
+	public void setPosition(Position position) {
 		
 		Objects.requireNonNull(position);
 		
@@ -67,7 +67,7 @@ public final class Layer {
 		return size;
 	}
 
-	void setSize(Size size) {
+	public void setSize(Size size) {
 		
 		Objects.requireNonNull(size);
 		
