@@ -342,6 +342,12 @@ abstract class XWindowsBaseBuffer implements BufferOperations {
                         new CARD16(width), new CARD16(height)));
     }
 
+    
+    @Override
+    public void flush() {
+        driverConnection.flush();
+    }
+
     @Override
     public void writeTestImage(int x, int y, int width, int height) {
         
@@ -354,8 +360,6 @@ abstract class XWindowsBaseBuffer implements BufferOperations {
                         new CARD16(width),
                         new CARD16(height))
         }));
-        
-        
     }
 
     private static int getPixel(byte [] data, int index, PixelFormat format) {

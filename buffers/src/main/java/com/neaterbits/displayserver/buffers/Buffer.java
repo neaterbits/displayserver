@@ -16,4 +16,5 @@ public interface Buffer {
         return getSize().getHeight();
     }
 
+    void flush();
 }

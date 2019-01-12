@@ -63,6 +63,10 @@ public final class XWindowsDriverConnection
 	            .get(0);
 	}
 
+	public void flush() {
+	    xcbConnection.flush();
+	}
+	
 	public XCBConnection getXCBConnection() {
         return xcbConnection;
     }

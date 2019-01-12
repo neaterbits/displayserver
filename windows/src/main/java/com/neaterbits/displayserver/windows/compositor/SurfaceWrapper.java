@@ -119,6 +119,11 @@ public class SurfaceWrapper implements Surface {
         return depth;
     }
     
+    @Override
+    public void flush() {
+        bufferOperations.flush();
+    }
+
     protected final BufferOperations getBuffer() {
         return bufferOperations;
     }

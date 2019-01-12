@@ -7,6 +7,7 @@ import com.neaterbits.displayserver.buffers.PixelFormat;
 import com.neaterbits.displayserver.driver.xwindows.common.XWindowsDriverConnection;
 import com.neaterbits.displayserver.framebuffer.common.BufferUpdate;
 import com.neaterbits.displayserver.framebuffer.common.FrameBuffer;
+import com.neaterbits.displayserver.protocol.messages.requests.DestroyWindow;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.render.cairo.xcb.DrawableType;

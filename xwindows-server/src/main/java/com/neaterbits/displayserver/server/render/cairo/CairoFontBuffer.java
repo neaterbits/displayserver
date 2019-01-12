@@ -27,6 +27,11 @@ public final class CairoFontBuffer implements FontBuffer {
     }
 
     @Override
+    public void flush() {
+        surface.flush();
+    }
+
+    @Override
     public void dispose() {
         surface.dispose();
     }

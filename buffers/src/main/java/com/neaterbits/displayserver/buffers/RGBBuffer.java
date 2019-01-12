@@ -44,6 +44,11 @@ public final class RGBBuffer extends InMemoryBuffer {
     public void copyArea(BufferOperations src, int srcX, int srcY, int dstX, int dstY, int width, int height) {
         throw new UnsupportedOperationException("TODO");
     }
+    
+    @Override
+    public void flush() {
+        
+    }
 
     @Override
     public void writeTestImage(int x, int y, int width, int height) {
