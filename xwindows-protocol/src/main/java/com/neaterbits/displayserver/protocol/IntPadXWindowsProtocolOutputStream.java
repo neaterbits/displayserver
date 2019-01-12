@@ -53,25 +53,18 @@ public class IntPadXWindowsProtocolOutputStream implements XWindowsProtocolOutpu
         delegate.pad(num);
     }
     
-    private <T> void writeWithPadding(T value, int size, FieldWriter<T> writer) throws IOException {
-        
-        if (size > 4) {
-            throw new IllegalArgumentException();
-        }
-        
-        pad(4 - size);
-        
-        writer.write(value);
+    private <T> void writeWithPadding(int value) throws IOException {
+        delegate.writeCARD32(new CARD32(value));
     }
     
     @Override
     public void writeINT8(INT8 value) throws IOException {
-        writeWithPadding(value, 1, delegate::writeINT8);
+        writeWithPadding(value.getValue());
     }
 
     @Override
     public void writeINT16(INT16 value) throws IOException {
-        writeWithPadding(value, 2, delegate::writeINT16);
+        writeWithPadding(value.getValue());
     }
 
     @Override
@@ -81,12 +74,12 @@ public class IntPadXWindowsProtocolOutputStream implements XWindowsProtocolOutpu
 
     @Override
     public void writeCARD8(CARD8 value) throws IOException {
-        writeWithPadding(value, 1, delegate::writeCARD8);
+        writeWithPadding(value.getValue());
     }
 
     @Override
     public void writeCARD16(CARD16 value) throws IOException {
-        writeWithPadding(value, 2, delegate::writeCARD16);
+        writeWithPadding(value.getValue());
     }
 
     public void writeCARD32(CARD32 value) throws IOException {
@@ -95,19 +88,18 @@ public class IntPadXWindowsProtocolOutputStream implements XWindowsProtocolOutpu
 
     @Override
     public void writeBYTE(BYTE value) throws IOException {
-        writeWithPadding(value, 1, delegate::writeBYTE);
+        writeWithPadding(value.getValue());
     }
 
     @Override
     public void writeBOOL(BOOL value) throws IOException {
-        writeWithPadding(value, 1, delegate::writeBOOL);
+        writeWithPadding(value.getValue());
     }
 
     @Override
     public void writeSTRING8(String value) throws IOException {
         throw new UnsupportedOperationException();
     }
-    
     
     @Override
     public void writeSTRING16(STRING16 value) throws IOException {
@@ -121,7 +113,7 @@ public class IntPadXWindowsProtocolOutputStream implements XWindowsProtocolOutpu
 
     @Override
     public void writeKEYCODE(KEYCODE value) throws IOException {
-        writeWithPadding(value, 1, delegate::writeKEYCODE);
+        writeWithPadding(value.getValue());
     }
 
     @Override
@@ -131,7 +123,7 @@ public class IntPadXWindowsProtocolOutputStream implements XWindowsProtocolOutpu
 
     @Override
     public void writeBUTTON(BUTTON value) throws IOException {
-        writeWithPadding(value, 1, delegate::writeBUTTON);
+        writeWithPadding(value.getValue());
     }
 
     @Override
@@ -186,12 +178,12 @@ public class IntPadXWindowsProtocolOutputStream implements XWindowsProtocolOutpu
     
     @Override
     public void writeBITGRAVITY(BITGRAVITY value) throws IOException {
-        delegate.writeBITGRAVITY(value);
+        writeWithPadding(value.getValue());
     }
 
     @Override
     public void writeWINGRAVITY(WINGRAVITY value) throws IOException {
-        delegate.writeWINGRAVITY(value);
+        writeWithPadding(value.getValue());
     }
 
     @Override
@@ -221,17 +213,17 @@ public class IntPadXWindowsProtocolOutputStream implements XWindowsProtocolOutpu
     
     @Override
     public void writeSETofPOINTEREVENT(SETofPOINTEREVENT value) throws IOException {
-        writeWithPadding(value, 2, delegate::writeSETofPOINTEREVENT);
+        writeWithPadding(value.getValue());
     }
 
     @Override
     public void writeSETofKEYBUTMASK(SETofKEYBUTMASK value) throws IOException {
-        writeWithPadding(value, 2, delegate::writeSETofKEYBUTMASK);
+        writeWithPadding(value.getValue());
     }
 
     @Override
     public void writeSETofKEYMASK(SETofKEYMASK value) throws IOException {
-        writeWithPadding(value, 2, delegate::writeSETofKEYMASK);
+        writeWithPadding(value.getValue());
     }
 
     @Override

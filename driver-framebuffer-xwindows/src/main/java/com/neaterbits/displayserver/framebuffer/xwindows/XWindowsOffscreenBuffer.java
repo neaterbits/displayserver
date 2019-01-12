@@ -19,7 +19,6 @@ final class XWindowsOffscreenBuffer extends XWindowsBaseBuffer implements Offscr
 
     private final int screen;
     private final PIXMAP pixmap;
-    private final WINDOW window;
     
     XWindowsOffscreenBuffer(XWindowsDriverConnection driverConnection, int screen, WINDOW window, Size size, int depth) throws IOException {
     
@@ -27,8 +26,6 @@ final class XWindowsOffscreenBuffer extends XWindowsBaseBuffer implements Offscr
         
         this.screen = screen;
         this.pixmap = new PIXMAP(driverConnection.allocateResourceId());
-        
-        this.window = window;
         
         final CreatePixmap createPixmap = new CreatePixmap(
                 new CARD8((byte)depth),

@@ -73,7 +73,7 @@ public class DisplayServerMain {
 	                xAuthForTCPConnection.getAuthorizationProtocol(),
 	                xAuthForTCPConnection.getAuthorizationData());
 	        
-	        /*
+            /*
             final NonBlockingChannelWriterLog driverWriteLog = new NonBlockingChannelWriterLogImpl(
                     "Driverwrite",
                     DebugLevels.DRIVER_WRITE);
@@ -103,7 +103,7 @@ public class DisplayServerMain {
                 }
             };
             */
-            
+
             final XWindowsNetworkFactory xcbNetworkFactory = new XWindowsNetworkFactory() {
                 
                 @Override

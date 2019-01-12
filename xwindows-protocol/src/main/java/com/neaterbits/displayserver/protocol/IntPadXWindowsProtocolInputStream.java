@@ -44,29 +44,21 @@ public class IntPadXWindowsProtocolInputStream implements XWindowsProtocolInputS
         this.delegate = delegate;
     }
 
-    private <T> T readWithPadding(int size, FieldReader<T> reader) throws IOException {
+    private <T> int readWithPadding() throws IOException {
         
-        if (size > 4) {
-            throw new IllegalArgumentException();
-        }
+        final CARD32 integer = delegate.readCARD32();
         
-        final int pad = 4 - size;
-        
-        for (int i = 0; i < pad; ++ i) {
-            delegate.readBYTE();
-        }
-        
-        return reader.read();
+        return (int)integer.getValue();
     }
 
     @Override
     public INT8 readINT8() throws IOException {
-        return readWithPadding(1, delegate::readINT8);
+        return new INT8((byte)readWithPadding());
     }
 
     @Override
     public INT16 readINT16() throws IOException {
-        return readWithPadding(2, delegate::readINT16);
+        return new INT16((short)readWithPadding());
     }
 
     @Override
@@ -76,12 +68,12 @@ public class IntPadXWindowsProtocolInputStream implements XWindowsProtocolInputS
 
     @Override
     public CARD8 readCARD8() throws IOException {
-        return readWithPadding(1, delegate::readCARD8);
+        return new CARD8((short)readWithPadding());
     }
 
     @Override
     public CARD16 readCARD16() throws IOException {
-        return readWithPadding(2, delegate::readCARD16);
+        return new CARD16(readWithPadding());
     }
 
     @Override
@@ -91,12 +83,12 @@ public class IntPadXWindowsProtocolInputStream implements XWindowsProtocolInputS
 
     @Override
     public BYTE readBYTE() throws IOException {
-        return readWithPadding(1, delegate::readBYTE);
+        return new BYTE((byte)readWithPadding());
     }
 
     @Override
     public BOOL readBOOL() throws IOException {
-        return readWithPadding(1, delegate::readBOOL);
+        return new BOOL((byte)readWithPadding());
     }
 
     @Override
@@ -116,7 +108,7 @@ public class IntPadXWindowsProtocolInputStream implements XWindowsProtocolInputS
 
     @Override
     public KEYCODE readKEYCODE() throws IOException {
-        return readWithPadding(1, delegate::readKEYCODE);
+        return new KEYCODE((short)readWithPadding());
     }
 
     @Override
@@ -126,7 +118,7 @@ public class IntPadXWindowsProtocolInputStream implements XWindowsProtocolInputS
 
     @Override
     public BUTTON readBUTTON() throws IOException {
-        return readWithPadding(1, delegate::readBUTTON);
+        return new BUTTON((short)readWithPadding());
     }
 
     @Override
@@ -181,12 +173,12 @@ public class IntPadXWindowsProtocolInputStream implements XWindowsProtocolInputS
 
     @Override
     public BITGRAVITY readBITGRAVITY() throws IOException {
-        return readWithPadding(1, delegate::readBITGRAVITY);
+        return new BITGRAVITY((byte)readWithPadding());
     }
 
     @Override
     public WINGRAVITY readWINGRAVITY() throws IOException {
-        return readWithPadding(1, delegate::readWINGRAVITY);
+        return new WINGRAVITY((byte)readWithPadding());
     }
 
     @Override
@@ -216,17 +208,17 @@ public class IntPadXWindowsProtocolInputStream implements XWindowsProtocolInputS
 
     @Override
     public SETofPOINTEREVENT readSETofPOINTEREVENT() throws IOException {
-        return readWithPadding(2, delegate::readSETofPOINTEREVENT);
+        return new SETofPOINTEREVENT(readWithPadding());
     }
 
     @Override
     public SETofKEYBUTMASK readSETofKEYBUTMASK() throws IOException {
-        return readWithPadding(2, delegate::readSETofKEYBUTMASK);
+        return new SETofKEYBUTMASK((short)readWithPadding());
     }
     
     @Override
     public SETofKEYMASK readSETofKEYMASK() throws IOException {
-        return readWithPadding(2, delegate::readSETofKEYMASK);
+        return new SETofKEYMASK((short)readWithPadding());
     }
 
     @Override

@@ -52,7 +52,26 @@ public class XCBTest {
             
             System.out.println("Visuals: " + visuals);
         }
+    }
+
+    @Test
+    public void testWindowRender() throws Exception {
         
+        final int display = 2;
+        
+        // final XAuth xAuth = XAuth.getXAuthInfo(display, "MIT-MAGIC-COOKIE-1");
+
+        // final XCBConnection connection = XCBConnection.connect(":" + display, xAuth.getAuthorizationProtocol(), xAuth.getAuthorizationData());
+        final XCBConnection connection = XCBConnection.connect(":" + display);
+        
+        assertThat(connection).isNotNull();
+
+        System.out.println("## call test");
+        
+        XCBNative.test(connection.getXCBReference());
+        
+        System.out.println("## test done");
+
         connection.close();
     }
 }

@@ -14,6 +14,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.WindowAttributes;
 import com.neaterbits.displayserver.protocol.types.BITMASK;
 import com.neaterbits.displayserver.protocol.types.BOOL;
 import com.neaterbits.displayserver.protocol.types.CARD16;
+import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.GCONTEXT;
 import com.neaterbits.displayserver.protocol.types.INT16;
@@ -79,9 +80,9 @@ class XWindowsClientHelper {
                 gc,
                 window.toDrawable(),
                 new GCAttributes(
-                        new BITMASK(GCAttributes.FUNCTION|GCAttributes.GRAPHICS_EXPOSURES),
+                        new BITMASK(GCAttributes.FUNCTION|GCAttributes.PLANE_MASK|GCAttributes.GRAPHICS_EXPOSURES),
                         Function.Copy,
-                        null,
+                        new CARD32(0xFFFFFFFFL),
                         null,   
                         null,
                         null,

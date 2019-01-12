@@ -20,12 +20,14 @@ import com.neaterbits.displayserver.protocol.messages.replies.GetImageReply;
 import com.neaterbits.displayserver.protocol.messages.requests.CopyArea;
 import com.neaterbits.displayserver.protocol.messages.requests.GetImage;
 import com.neaterbits.displayserver.protocol.messages.requests.PutImage;
+import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolyFillRectangle;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.GCONTEXT;
 import com.neaterbits.displayserver.protocol.types.INT16;
+import com.neaterbits.displayserver.protocol.types.RECTANGLE;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.render.cairo.CairoSurface;
 import com.neaterbits.displayserver.render.cairo.xcb.CairoXCBSurface;
@@ -338,6 +340,22 @@ abstract class XWindowsBaseBuffer implements BufferOperations {
                         new INT16((short)srcX), new INT16((short)srcY),
                         new INT16((short)dstX), new INT16((short)dstY),
                         new CARD16(width), new CARD16(height)));
+    }
+
+    @Override
+    public void writeTestImage(int x, int y, int width, int height) {
+        
+        final DRAWABLE dstDrawable = getDrawable();
+
+        driverConnection.sendRequest(new PolyFillRectangle(dstDrawable, gc, new RECTANGLE[] {
+                new RECTANGLE(
+                        new INT16((short)x),
+                        new INT16((short)y),
+                        new CARD16(width),
+                        new CARD16(height))
+        }));
+        
+        
     }
 
     private static int getPixel(byte [] data, int index, PixelFormat format) {

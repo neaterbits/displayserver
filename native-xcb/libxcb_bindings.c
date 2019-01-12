@@ -631,7 +631,7 @@ JNIEXPORT jbyteArray JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_
 	jbyteArray result;
 
 	if (reply == NULL) {
-		fprintf(stderr, "## got reply error %d %08x\n", error->error_code, error->resource_id);
+		printf("## got reply error %d %08x\n", error->error_code, error->resource_id);
 
 		free(error);
 
@@ -650,3 +650,131 @@ JNIEXPORT jbyteArray JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_
 
 	return result;
 }
+
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_xcb_1wait_1for_1event
+  (JNIEnv *env, jclass cl, jlong connection_reference) {
+
+	xcb_connection_t *connection = (xcb_connection_t *)connection_reference;
+
+	xcb_generic_event_t *event = xcb_wait_for_event(connection);
+
+	int response_type = event->response_type;
+
+	free(event);
+
+	return response_type;
+}
+
+
+JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_test
+  (JNIEnv *env, jclass cl, jlong connection_reference) {
+
+	xcb_connection_t *connection = (xcb_connection_t *)connection_reference;
+
+	int wid = xcb_generate_id(connection);
+
+	const xcb_setup_t *setup = xcb_get_setup(connection);
+
+	int window_depth = 24;
+
+	xcb_screen_iterator_t iterator = xcb_setup_roots_iterator(setup);
+
+	int num_screens = xcb_setup_roots_length(setup);
+
+	const xcb_screen_t *screen = NULL;
+
+	for (int dst_idx = 0; dst_idx < num_screens; ++ dst_idx) {
+
+		if (iterator.data->root_depth == window_depth) {
+			screen = iterator.data;
+			break;
+		}
+
+		if (iterator.rem > 0) {
+			xcb_screen_next(&iterator);
+		}
+	}
+
+	xcb_create_window_value_list_t window_attributes;
+
+	uint32_t window_mask = XCB_CW_BACKING_STORE | XCB_CW_EVENT_MASK;
+
+	// window_attributes.background_pixel = 0xFFFFFF;
+	window_attributes.backing_store = XCB_BACKING_STORE_ALWAYS;
+	window_attributes.event_mask = XCB_EVENT_MASK_EXPOSURE|XCB_EVENT_MASK_STRUCTURE_NOTIFY;
+
+	// void *window_attrs;
+
+	// xcb_create_window_value_list_serialize(&window_attrs, window_mask, &window_attributes);
+
+	printf("## create window\n");
+
+	xcb_create_window_aux(
+			connection,
+			screen->root_depth,
+			wid,
+			screen->root,
+			150, 150,
+			1024, 768,
+			0,
+			XCB_WINDOW_CLASS_INPUT_OUTPUT,
+			screen->root_visual,
+			window_mask,
+			&window_attributes);
+
+
+	xcb_map_window(connection, wid);
+
+	int gc = xcb_generate_id(connection);
+
+	xcb_create_gc_value_list_t value_list;
+
+	value_list.function = XCB_GX_COPY;
+	value_list.plane_mask = 0xFFFFFFFF;
+	value_list.foreground = 0xAAAAAA;
+	value_list.fill_style = XCB_FILL_STYLE_SOLID;
+	value_list.graphics_exposures = 0;
+
+
+	int value_mask = XCB_GC_FUNCTION|XCB_GC_PLANE_MASK|XCB_GC_FOREGROUND
+			| XCB_GC_FILL_STYLE
+			// |XCB_GC_GRAPHICS_EXPOSURES
+			;
+
+	printf("## create gc\n");
+	xcb_create_gc_aux(connection, gc, wid, value_mask, &value_list);
+
+	xcb_rectangle_t rectangle = {
+			250, 250,
+			300, 300
+	};
+
+	xcb_flush(connection);
+
+	xcb_generic_event_t *event;
+
+	printf("## events\n");
+
+	while (NULL != (event = xcb_wait_for_event(connection))) {
+		printf("## response code %d\n", event->response_type);
+
+		switch (event->response_type & ~0x80) {
+		case XCB_EXPOSE:
+
+			printf("## render rectangle\n");
+			fflush(stdout);
+			xcb_poly_fill_rectangle(connection, wid, gc, 1, &rectangle);
+
+			xcb_flush(connection);
+			break;
+
+		case XCB_DESTROY_NOTIFY:
+			free(event);
+			return;
+		}
+
+		free(event);
+	}
+
+}
+

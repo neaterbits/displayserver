@@ -76,6 +76,12 @@ public class SurfaceWrapper implements Surface {
                 width, height);
     }
     
+    
+    @Override
+    public void writeTestImage(int x, int y, int width, int height) {
+        bufferOperations.writeTestImage(x, y, width, height);
+    }
+
     @Override
     public final CairoSurface createCairoSurface() {
         final CairoSurface cairoSurface = bufferOperations.createCairoSurface();

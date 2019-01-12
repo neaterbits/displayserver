@@ -73,4 +73,8 @@ public class XCBNative {
     static native int xcb_send_request(long connection, byte [] vector, int opcode, boolean isvoid);
 
     static native byte [] xcb_wait_reply(long connection, int sequence_number);
+
+    static native int xcb_wait_for_event(long connection);
+    
+    static native void test(long connect);
 }

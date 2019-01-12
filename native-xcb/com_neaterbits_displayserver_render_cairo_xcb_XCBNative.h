@@ -439,6 +439,30 @@ JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNat
 JNIEXPORT jbyteArray JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_xcb_1wait_1reply
   (JNIEnv *, jclass, jlong, jint);
 
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    get_xcb_event_enum_value
+ * Signature: (Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_get_1xcb_1event_1enum_1value
+  (JNIEnv *, jclass, jstring);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    xcb_wait_for_event
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_xcb_1wait_1for_1event
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_xcb_XCBNative
+ * Method:    test
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_test
+  (JNIEnv *, jclass, jlong);
+
 #ifdef __cplusplus
 }
 #endif

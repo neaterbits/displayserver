@@ -10,5 +10,7 @@ public interface BufferOperations extends Buffer {
     
     void copyArea(BufferOperations src, int srcX, int srcY, int dstX, int dstY, int width, int height);
     
+    void writeTestImage(int x, int y, int width, int height);
+    
     CairoSurface createCairoSurface();
 }
