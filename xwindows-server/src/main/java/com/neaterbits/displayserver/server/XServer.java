@@ -461,8 +461,13 @@ public class XServer implements AutoCloseable {
 		
 		case OpCodes.MAP_WINDOW: {
 		    
-		    log(messageLength, opcode, sequenceNumber, MapWindow.decode(stream));
+		    final MapWindow mapWindow = log(messageLength, opcode, sequenceNumber, MapWindow.decode(stream));
 		    
+		    try {
+                client.mapWindow(mapWindow);
+            } catch (WindowException ex) {
+                sendError(client, Errors.Window, sequenceNumber, ex.getWindow().getValue(), opcode);
+            }
 		    break;
 		}
 		

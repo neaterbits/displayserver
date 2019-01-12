@@ -29,13 +29,15 @@ public class XWindow extends XDrawable {
     private final WINDOW windowResource;
     private final WINDOW rootWindow;
     private final WINDOW parentWindow;
+
+    private final BufferOperations bufferOperations;
     
     private CARD16 borderWidth;
     private final CARD16 windowClass;
     
     private WindowAttributes currentWindowAttributes;
     
-    private final BufferOperations bufferOperations;
+    private boolean mapped;
     
     private final Map<ATOM, Property> properties;
 
@@ -51,6 +53,8 @@ public class XWindow extends XDrawable {
             BufferOperations bufferOperations) {
         
         this(window, windowResource, WINDOW.None, WINDOW.None, visual, borderWidth, windowClass, currentWindowAttributes, renderer, bufferOperations, 0);
+    
+        this.mapped = true;
     }
 
     protected XWindow(
@@ -185,6 +189,14 @@ public class XWindow extends XDrawable {
         Objects.requireNonNull(currentWindowAttributes);
         
         this.currentWindowAttributes = currentWindowAttributes;
+    }
+
+    public boolean isMapped() {
+        return mapped;
+    }
+
+    public void setMapped(boolean mapped) {
+        this.mapped = mapped;
     }
 
     public final Property getProperty(ATOM property) {

@@ -30,7 +30,11 @@ public final class MapWindow extends Request {
         this.window = window;
     }
 
-	@Override
+	public WINDOW getWindow() {
+        return window;
+    }
+
+    @Override
     public Object[] getDebugParams() {
 	    return wrap("window", window);
     }
