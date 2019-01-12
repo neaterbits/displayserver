@@ -12,6 +12,7 @@ import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.POINT;
 import com.neaterbits.displayserver.protocol.types.RECTANGLE;
+import com.neaterbits.displayserver.protocol.types.SEGMENT;
 import com.neaterbits.displayserver.render.cairo.Cairo;
 import com.neaterbits.displayserver.render.cairo.CairoFormat;
 import com.neaterbits.displayserver.render.cairo.CairoImageSurface;
@@ -166,6 +167,24 @@ final class CairoXLibRenderer implements XLibRenderer {
         }
     }
 
+    
+    @Override
+    public void polySegment(XGC gc, SEGMENT[] segments) {
+
+        if (segments.length != 0) {
+            
+            applyGC(gc);
+            
+            for (SEGMENT segment : segments) {
+                
+                cr.newPath();
+                
+                cr.moveTo(segment.getX1().getValue(), segment.getY1().getValue());
+                cr.lineTo(segment.getX2().getValue(), segment.getY2().getValue());
+            }
+        }
+    }
+
     @Override
     public void polyFillRectangle(XGC gc, RECTANGLE[] rectangles) {
 
@@ -175,6 +194,25 @@ final class CairoXLibRenderer implements XLibRenderer {
 
             for (RECTANGLE rectangle : rectangles) {
                 fillRectangle(
+                        rectangle.getX().getValue(),
+                        rectangle.getY().getValue(),
+                        rectangle.getWidth().getValue(),
+                        rectangle.getHeight().getValue());
+            }
+        }
+    }
+    
+
+    @Override
+    public void polyRectangle(XGC gc, RECTANGLE[] rectangles) {
+
+        if (rectangles.length != 0) {
+            
+            applyGC(gc);
+            
+            for (RECTANGLE rectangle : rectangles) {
+            
+                cr.rectangle(
                         rectangle.getX().getValue(),
                         rectangle.getY().getValue(),
                         rectangle.getWidth().getValue(),

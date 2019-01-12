@@ -7,6 +7,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.GCAttributes;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.POINT;
 import com.neaterbits.displayserver.protocol.types.RECTANGLE;
+import com.neaterbits.displayserver.protocol.types.SEGMENT;
 import com.neaterbits.displayserver.util.Disposable;
 import com.neaterbits.displayserver.xwindows.model.XGC;
 
@@ -37,8 +38,12 @@ public interface XLibRenderer extends Disposable {
 
     void polyLine(XGC gc, BYTE coordinateMode, POINT [] points);
     
+    void polySegment(XGC gc, SEGMENT [] segments);
+    
     void polyFillRectangle(XGC gc, RECTANGLE [] rectangles);
     
+    void polyRectangle(XGC gc, RECTANGLE [] rectangles);
+
     void putImage(XGC gc, int format, int width, int height, int dstX, int dstY, int leftPad, int depth, byte [] data);
 
     void renderBitmap(XGC gc, Buffer buffer, int x, int y);

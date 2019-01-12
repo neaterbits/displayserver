@@ -48,6 +48,8 @@ import com.neaterbits.displayserver.protocol.messages.requests.legacy.OpenFont;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolyFillRectangle;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolyLine;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolyPoint;
+import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolyRectangle;
+import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolySegment;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.QueryFont;
 import com.neaterbits.displayserver.protocol.types.BITMASK;
 import com.neaterbits.displayserver.protocol.types.CARD16;
@@ -634,6 +636,18 @@ public class XClient extends XConnection {
         renderer.flush();
     }
 
+    final void polySegment(PolySegment polySegment) throws DrawableException, GContextException {
+        
+        final XDrawable xDrawable = findDrawable(polySegment.getDrawable());
+        final XGC gc = getGC(polySegment.getGC());
+        
+        final XLibRenderer renderer = xDrawable.getRenderer();
+
+        renderer.polySegment(gc, polySegment.getSegments());
+        
+        renderer.flush();
+    }
+
     final void polyFillRectangle(PolyFillRectangle polyFillRectangle) throws DrawableException, GContextException {
         
         final XDrawable xDrawable = findDrawable(polyFillRectangle.getDrawable());
@@ -642,6 +656,18 @@ public class XClient extends XConnection {
         final XLibRenderer renderer = xDrawable.getRenderer();
 
         renderer.polyFillRectangle(gc, polyFillRectangle.getRectangles());
+        
+        renderer.flush();
+    }
+
+    final void polyRectangle(PolyRectangle polyRectangle) throws DrawableException, GContextException {
+        
+        final XDrawable xDrawable = findDrawable(polyRectangle.getDrawable());
+        final XGC gc = getGC(polyRectangle.getGC());
+        
+        final XLibRenderer renderer = xDrawable.getRenderer();
+
+        renderer.polyRectangle(gc, polyRectangle.getRectangles());
         
         renderer.flush();
     }

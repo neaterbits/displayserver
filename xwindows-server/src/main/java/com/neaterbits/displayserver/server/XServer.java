@@ -923,28 +923,47 @@ public class XServer implements AutoCloseable {
 		
 		case OpCodes.POLY_SEGMENT: {
 		    
-		    log(messageLength, opcode, sequenceNumber, PolySegment.decode(stream));
+		    final PolySegment polySegment = log(messageLength, opcode, sequenceNumber, PolySegment.decode(stream));
 		    
+		    try {
+		        client.polySegment(polySegment);
+            } catch (DrawableException ex) {
+                sendError(client, Errors.Drawable, sequenceNumber, ex.getDrawable().getValue(), opcode);
+            } catch (GContextException ex) {
+                sendError(client, Errors.GContext, sequenceNumber, ex.getGContext().getValue(), opcode);
+            }
 		    break;
 		}
-		
 		
 		case OpCodes.POLY_FILL_RECTANGLE: {
 		
 		    final PolyFillRectangle polyFillRectangle = log(messageLength, opcode, sequenceNumber, PolyFillRectangle.decode(stream));
 		    
-		    
+            try {
+                client.polyFillRectangle(polyFillRectangle);
+            } catch (DrawableException ex) {
+                sendError(client, Errors.Drawable, sequenceNumber, ex.getDrawable().getValue(), opcode);
+            } catch (GContextException ex) {
+                sendError(client, Errors.GContext, sequenceNumber, ex.getGContext().getValue(), opcode);
+            }
 		    break;
 		}
 		
 		case OpCodes.POLY_RECTANGLE: {
 		    
-		    log(messageLength, opcode, sequenceNumber, PolyRectangle.decode(stream));
+		    final PolyRectangle polyRectangle = log(messageLength, opcode, sequenceNumber, PolyRectangle.decode(stream));
 		    
+            try {
+                client.polyRectangle(polyRectangle);
+            } catch (DrawableException ex) {
+                sendError(client, Errors.Drawable, sequenceNumber, ex.getDrawable().getValue(), opcode);
+            } catch (GContextException ex) {
+                sendError(client, Errors.GContext, sequenceNumber, ex.getGContext().getValue(), opcode);
+            }
 		    break;
 		}
 		    
-		case OpCodes.PUT_IMAGE: {
+		case OpCodes  .PUT_IMAGE: {
 		    final PutImage putImage = log(messageLength, opcode, sequenceNumber, PutImage.decode(stream));
 
 		    try {
