@@ -445,6 +445,11 @@ public final class XLFD {
         String asString() {
             return isAsterisk ? "*" : (value != null ? getValueString() : "");
         }
+
+        @Override
+        public String toString() {
+            return asString();
+        }
     }
     
     private static class IntegerValue extends Value<Integer> {

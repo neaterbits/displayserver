@@ -98,13 +98,54 @@ public final class FontLoader {
         return fontNames.toArray(new String[fontNames.size()]);
     }
     
+    private static boolean lookupFromAliasFile(XLFD xlfd, String aliasFile, List<String> fontNames) {
+        
+        final boolean fontsLookedUp;
+        
+        if (aliasFile != null) {
+            
+            final File file = new File(aliasFile);
+            
+            if (file.exists() && file.canRead()) {
+            
+                FontAliases fontAliases = null;
+                
+                try (FileInputStream inputStream = new FileInputStream(file)) {
+                    fontAliases = FontAliasFileReader.read(inputStream);
+                }
+                catch (Exception ex) {
+                    
+                }
+                
+                if (fontAliases != null) {
+                    fontAliases.getFontNamesForXLFD(xlfd, fontNames);
+                    
+                    fontsLookedUp = true;
+                }
+                else {
+                    fontsLookedUp = false;
+                }
+            }
+            else {
+                fontsLookedUp = false;
+            }
+        }
+        else {
+            fontsLookedUp = false;
+        }
+        
+        return fontsLookedUp;
+    }
+    
     private List<String> getFontNamesByXLFD(XLFD xlfd) throws ValueException {
     
         Objects.requireNonNull(xlfd);
         
         final List<String> fontNames = new ArrayList<>();
         
-        iterateFontFiles(
+        if (!lookupFromAliasFile(xlfd, config.getBaseFontsAliasFile(), fontNames)) {
+        
+            iterateFontFiles(
                 file -> {
                     final List<XFontProperty> properties = readProperties(file);
                     
@@ -119,7 +160,7 @@ public final class FontLoader {
                     return null;
                 },
                 null);
-        
+        }
 
         return fontNames;
     }
@@ -162,6 +203,7 @@ public final class FontLoader {
     }
     
     private <T> T iterateFontFiles(FontFileIterator<T> processFile, FilenameFilter filenameFilter) {
+        
         for (File path : config.getFontPaths()) {
 
             if (path.exists() && path.isDirectory()) {
