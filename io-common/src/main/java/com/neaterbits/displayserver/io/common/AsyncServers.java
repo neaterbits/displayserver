@@ -109,19 +109,43 @@ public class AsyncServers implements AutoCloseable {
 		}
 	}
 	
-	public void waitForIO() throws IOException {
+	public void waitForIO(long timeout) throws IOException {
 
 		for (;;) {
-		    checkForIO();
+		    final boolean timedOut = checkForIO(timeout);
+		    
+		    if (timedOut) {
+		        break;
+		    }
 		}
 	}
 	
-	public void checkForIO() throws IOException {
+	public boolean checkForIO(long timeout) throws IOException {
 	    
-        final int numUpdated = selector.select(1000L);
+	    final boolean timedOut;
+	    
+        final int numUpdated;
         
-        if (numUpdated > 0) {
+        if (timeout == -1L) {
+            numUpdated = selector.select();
+        }
+        else if (timeout == 0L) {
+            numUpdated = selector.selectNow();
+        }
+        else if (timeout > 0L) {
+            numUpdated = selector.select(timeout);
+        }
+        else {
+            throw new IllegalArgumentException();
+        }
         
+        if (numUpdated == 0) {
+            timedOut = true;
+        }
+        else if (numUpdated > 0) {
+        
+            timedOut = false;
+            
             if (log != null) {
                 log.onSelectUpdated(numUpdated);
             }
@@ -183,6 +207,11 @@ public class AsyncServers implements AutoCloseable {
                 }
             }
         }
+        else {
+            throw new IllegalStateException();
+        }
+
+        return timedOut;
 	}
 	
 	private AsyncServer findAsyncServer(ServerSocketChannel socketChannel) {

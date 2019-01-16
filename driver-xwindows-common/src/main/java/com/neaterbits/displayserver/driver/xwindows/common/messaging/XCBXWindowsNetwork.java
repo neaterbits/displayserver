@@ -79,9 +79,8 @@ public class XCBXWindowsNetwork implements XWindowsNetwork {
         
         if (hasReply) {
             final byte [] reply = xcbConnection.waitForReply(sequenceNumber);
-            byteBuffer = ByteBuffer.wrap(reply);
-            
-            byteBuffer.order(getByteOrder());
+        
+            byteBuffer = getByteBuffer(reply);
             
             System.out.println("## reply length: " + reply.length);
         }
@@ -95,6 +94,39 @@ public class XCBXWindowsNetwork implements XWindowsNetwork {
     @Override
     public int send(Encodeable message, ByteOrder byteOrder) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isPolling() {
+        return true;
+    }
+
+    @Override
+    public ByteBuffer pollForEvent() {
+        final byte [] event = xcbConnection.pollForEvent();
+        
+        final ByteBuffer byteBuffer;
+        
+        if (event != null) {
+            
+            byteBuffer = getByteBuffer(event);
+            
+            System.out.println("## event length " + event.length);
+        }
+        else {
+            byteBuffer = null;
+        }
+
+        return byteBuffer;
+    }
+    
+    private ByteBuffer getByteBuffer(byte [] data) {
+        
+        final ByteBuffer byteBuffer = ByteBuffer.wrap(data);
+        
+        byteBuffer.order(getByteOrder());
+
+        return byteBuffer;
     }
 
     @Override

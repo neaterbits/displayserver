@@ -66,6 +66,8 @@ public interface XWindowsNetwork {
     
     ByteOrder getByteOrder();
     
+    boolean isPolling();
+
     int generateResourceId();
     
     void freeResourceId(int resourceId);
@@ -75,6 +77,8 @@ public interface XWindowsNetwork {
     SentRequest sendRequest(Request request, ByteOrder byteOrder);
     
     int send(Encodeable message, ByteOrder byteOrder);
-
+    
+    ByteBuffer pollForEvent();
+    
     void close() throws Exception;
 }

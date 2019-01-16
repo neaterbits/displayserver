@@ -4,6 +4,8 @@ import com.neaterbits.displayserver.driver.common.Driver;
 
 public interface InputDriver extends Driver {
     
+    void pollForEvents();
+    
     ModifierScancodes getModifierScancodes();
     
     KeyboardMapping getKeyboardMapping();

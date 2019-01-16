@@ -565,25 +565,7 @@ JNIEXPORT jlong JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNa
 JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_xcb_1send_1request
   (JNIEnv *env, jclass cl, jlong connection_reference, jbyteArray vector, jint opcode, jboolean isvoid) {
 
-
 	xcb_connection_t *connection = (xcb_connection_t *)connection_reference;
-
-	xcb_generic_event_t *event;
-
-	while (NULL != (event = xcb_poll_for_event(connection))) {
-		printf("## got event %d\n", event->response_type);
-
-		if (event->response_type == 0) {
-			xcb_generic_error_t *error = (xcb_generic_error_t *)event;
-
-			printf("## error %d %d %d %d %08x\n",
-					error->error_code,
-					error->sequence,
-					error->major_code,
-					error->minor_code,
-					error->resource_id);
-		}
-	}
 
 	jbyte *native_vector = (*env)->GetByteArrayElements(env, vector, NULL);
 
@@ -665,6 +647,76 @@ JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNat
 	return response_type;
 }
 
+
+JNIEXPORT jbyteArray JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_xcb_1poll_1for_1event
+  (JNIEnv *env, jclass cl, jlong connection_reference) {
+
+	xcb_connection_t *connection = (xcb_connection_t *)connection_reference;
+
+	xcb_generic_event_t *event = xcb_poll_for_event(connection);
+
+	jbyteArray result = NULL;
+
+	printf("## poll for event %p\n", event);
+
+	if (event == NULL) {
+		result = NULL;
+	}
+	else {
+
+		printf("## got event %d\n", event->response_type);
+
+		if (event->response_type == 0) {
+			xcb_generic_error_t *error = (xcb_generic_error_t *)event;
+
+			printf("## error %d %d %d %d %08x\n",
+					error->error_code,
+					error->sequence,
+					error->major_code,
+					error->minor_code,
+					error->resource_id);
+		}
+
+		int response_type = event->response_type;
+		int size;
+
+		switch (response_type) {
+		case XCB_EXPOSE:
+			size = sizeof(xcb_expose_event_t);
+			break;
+
+		case XCB_BUTTON_PRESS:
+			size = sizeof(xcb_button_press_event_t);
+			break;
+
+		case XCB_BUTTON_RELEASE:
+			size = sizeof(xcb_button_release_event_t);
+			break;
+
+		case XCB_MOTION_NOTIFY:
+			size = sizeof(xcb_motion_notify_event_t);
+			break;
+
+		default:
+			fprintf(stderr, "Unknown event type %d\n", response_type);
+			size = 0;
+			break;
+		}
+
+		if (size == 0) {
+			result = NULL;
+		}
+		else {
+			result = (*env)->NewByteArray(env, size);
+
+			(*env)->SetByteArrayRegion(env, result, 0, size, (const jbyte *)event);
+		}
+
+		free(event);
+	}
+
+	return result;
+}
 
 JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_XCBNative_test
   (JNIEnv *env, jclass cl, jlong connection_reference) {

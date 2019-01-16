@@ -63,6 +63,14 @@ public final class XWindowsDriverConnection
 	            .get(0);
 	}
 
+	public boolean isPolling() {
+	    return messaging.isPolling();
+	}
+	
+	public void pollForEvents() {
+	    messaging.pollForEvents();
+	}
+	
 	public void flush() {
 	    xcbConnection.flush();
 	}

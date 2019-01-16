@@ -51,6 +51,11 @@ public final class XWindowsInputDriver extends BaseInputDriver implements InputD
     }
 
     @Override
+    public void pollForEvents() {
+        driverConnection.pollForEvents();
+    }
+
+    @Override
     public ModifierScancodes getModifierScancodes() {
         
         if (!isInitialized()) {

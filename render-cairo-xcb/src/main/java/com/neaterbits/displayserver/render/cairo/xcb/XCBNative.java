@@ -75,6 +75,8 @@ public class XCBNative {
     static native byte [] xcb_wait_reply(long connection, int sequence_number);
 
     static native int xcb_wait_for_event(long connection);
-    
+
+    static native byte [] xcb_poll_for_event(long connection);
+
     static native void test(long connect);
 }

@@ -17,6 +17,7 @@ import com.neaterbits.displayserver.driver.xwindows.common.XWindowsNetwork;
 import com.neaterbits.displayserver.driver.xwindows.common.XWindowsNetworkFactory;
 import com.neaterbits.displayserver.io.common.MessageProcessor;
 import com.neaterbits.displayserver.protocol.ByteBufferXWindowsProtocolInputStream;
+import com.neaterbits.displayserver.protocol.Events;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
 import com.neaterbits.displayserver.protocol.logging.XWindowsClientProtocolLog;
@@ -103,7 +104,6 @@ public class XWindowsDriverMessageSending implements XWindowsMessaging {
     public void freeResourceId(int resourceId) {
         network.freeResourceId(resourceId);
     }
-
 
     private boolean receivedInitialMessage() {
         return serverMessage != null;
@@ -340,6 +340,34 @@ public class XWindowsDriverMessageSending implements XWindowsMessaging {
             }
             
             messageProcessor.onMessage(sentRequest.getReply(), messageLength);
+        }
+    }
+
+    @Override
+    public boolean isPolling() {
+        return network.isPolling();
+    }
+    
+    @Override
+    public void pollForEvents() {
+
+        final ByteBuffer byteBuffer = network.pollForEvent();
+
+        System.out.println("## received event " + byteBuffer);
+        
+        if (byteBuffer != null) {
+            final XWindowsProtocolInputStream stream = new ByteBufferXWindowsProtocolInputStream(byteBuffer);
+            
+            final int eventCode = byteBuffer.get();
+            
+            switch (eventCode) {
+            case Events.EXPOSE:
+                System.out.println("## received expose event");
+                break;
+                
+            default:
+                throw new UnsupportedOperationException("Unknown event code " + eventCode);
+            }
         }
     }
 

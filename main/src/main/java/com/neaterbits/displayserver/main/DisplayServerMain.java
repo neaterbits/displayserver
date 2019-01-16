@@ -127,16 +127,19 @@ public class DisplayServerMain {
 
 	             final XHardware hardware = initDriver(asyncServers, driverConnection, displayDeviceId);
 			    
-	             initXWindows(display, asyncServers, displayDeviceId, hardware);
+	             initXWindows(display, asyncServers, displayDeviceId, driverConnection, hardware);
 			}
 		}
 	}
 	
 	
-	private static XHardware initDriver(AsyncServers asyncServers, XWindowsDriverConnection driverConnection, DisplayDeviceId displayDeviceId) throws IOException {
+	private static XHardware initDriver(
+	        AsyncServers asyncServers,
+	        XWindowsDriverConnection driverConnection,
+	        DisplayDeviceId displayDeviceId) throws IOException {
 
         while (driverConnection.getServerMessage() == null) {
-            asyncServers.checkForIO();
+            asyncServers.checkForIO(-1L);
         }
 
         System.out.println("## done check for IO");
@@ -145,7 +148,7 @@ public class DisplayServerMain {
         final XWindowsGraphicsDriver graphicsDriver = new XWindowsGraphicsDriver(driverConnection, displayDeviceId);
 	 
         while (!inputDriver.isInitialized() || !graphicsDriver.isInitialized()) {
-            asyncServers.checkForIO();
+            asyncServers.checkForIO(-1L);
         }
 
         final XHardware hardware = new XHardware(inputDriver, graphicsDriver);
@@ -153,7 +156,12 @@ public class DisplayServerMain {
         return hardware;
 	}
 	
-	private static void initXWindows(int display, AsyncServers asyncServers, DisplayDeviceId displayDeviceId, XHardware hardware) throws Exception {
+	private static void initXWindows(
+	        int display,
+	        AsyncServers asyncServers,
+	        DisplayDeviceId displayDeviceId,
+	        XWindowsDriverConnection driverConnection,
+	        XHardware hardware) throws Exception {
 
         final DisplayConfig displayConfig = new DisplayConfig(displayDeviceId, Alignment.CENTER);
         final DisplayAreaConfig displayAreaConfig = new DisplayAreaConfig(
@@ -174,7 +182,16 @@ public class DisplayServerMain {
                 
         startXServer(display, asyncServers, hardware, config, displayAreas, compositor);
     
-        asyncServers.waitForIO();
+        if (driverConnection.isPolling()) {
+            for (;;) {
+                asyncServers.waitForIO(100L);
+                
+                hardware.getInputDriver().pollForEvents();
+            }
+        }
+        else {
+            asyncServers.waitForIO(-1L);
+        }
 	}
 	
 	private static void startXServer(

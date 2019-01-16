@@ -148,6 +148,16 @@ public class NonBlockingXWindowsNetwork implements XWindowsNetwork {
 
         return readerWriter.writeToOutputBuffer(byteOrder, dataWriter);
     }
+    
+    @Override
+    public boolean isPolling() {
+        return false;
+    }
+
+    public ByteBuffer pollForEvent() {
+        throw new UnsupportedOperationException();
+    }
+
 
     @Override
     public void close() throws Exception {

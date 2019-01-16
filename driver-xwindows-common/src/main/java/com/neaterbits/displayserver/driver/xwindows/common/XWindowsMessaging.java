@@ -10,6 +10,9 @@ public interface XWindowsMessaging extends XWindowsRequestSender {
 
     void freeResourceId(int resourceId);
 
+    boolean isPolling();
+    
+    void pollForEvents();
     
     void close() throws Exception;
 }

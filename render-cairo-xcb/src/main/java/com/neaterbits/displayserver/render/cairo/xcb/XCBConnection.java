@@ -57,6 +57,10 @@ public class XCBConnection extends XCBReference implements AutoCloseable {
         return XCBNative.xcb_wait_for_event(getXCBReference());
     }
     
+    public byte [] pollForEvent() {
+        return XCBNative.xcb_poll_for_event(getXCBReference());
+    }
+    
     public void flush() {
         XCBNative.xcb_flush(getXCBReference());
     }

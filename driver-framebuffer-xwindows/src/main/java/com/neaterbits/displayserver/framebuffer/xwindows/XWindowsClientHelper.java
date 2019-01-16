@@ -18,6 +18,7 @@ import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.GCONTEXT;
 import com.neaterbits.displayserver.protocol.types.INT16;
+import com.neaterbits.displayserver.protocol.types.SETofEVENT;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.types.Position;
 import com.neaterbits.displayserver.types.Size;
@@ -42,7 +43,7 @@ class XWindowsClientHelper {
                 new CARD16(1),
                 screen.getRootVisual(),
                 new WindowAttributes(
-                        new BITMASK(WindowAttributes.BACKING_STORE),
+                        new BITMASK(WindowAttributes.BACKING_STORE|WindowAttributes.EVENT_MASK),
                         null,
                         null,
                         null,
@@ -54,7 +55,13 @@ class XWindowsClientHelper {
                         null,
                         null,
                         null,
-                        null,
+                        new SETofEVENT(
+                                  SETofEVENT.KEY_PRESS
+                                | SETofEVENT.KEY_RELEASE
+                                | SETofEVENT.BUTTON_PRESS
+                                | SETofEVENT.BUTTON_RELEASE
+                                | SETofEVENT.POINTER_MOTION
+                                | SETofEVENT.STRUCTURE_NOTIFY),
                         null,
                         null,
                         null));
