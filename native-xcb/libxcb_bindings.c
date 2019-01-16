@@ -657,7 +657,7 @@ JNIEXPORT jbyteArray JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_
 
 	jbyteArray result = NULL;
 
-	printf("## poll for event %p\n", event);
+	// printf("## poll for event %p\n", event);
 
 	if (event == NULL) {
 		result = NULL;

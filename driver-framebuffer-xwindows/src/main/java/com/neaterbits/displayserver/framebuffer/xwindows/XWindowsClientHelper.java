@@ -43,7 +43,10 @@ class XWindowsClientHelper {
                 new CARD16(1),
                 screen.getRootVisual(),
                 new WindowAttributes(
-                        new BITMASK(WindowAttributes.BACKING_STORE|WindowAttributes.EVENT_MASK),
+                        new BITMASK(
+                                  WindowAttributes.BACKING_STORE
+                        //        | WindowAttributes.EVENT_MASK
+                        ),
                         null,
                         null,
                         null,
