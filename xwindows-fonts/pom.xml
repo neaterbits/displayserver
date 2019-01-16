@@ -9,22 +9,7 @@
   <dependencies>
   	<dependency>
   		<groupId>${project.groupId}</groupId>
-  		<artifactId>io-common</artifactId>
-  		<version>${project.version}</version>
-  	</dependency>
-    <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>driver-events-common</artifactId>
-        <version>${project.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>driver-framebuffer-common</artifactId>
-        <version>${project.version}</version>
-    </dependency>
-  	<dependency>
-  		<groupId>${project.groupId}</groupId>
-  		<artifactId>xwindows-protocol</artifactId>
+  		<artifactId>buffers</artifactId>
   		<version>${project.version}</version>
   	</dependency>
     <dependency>
@@ -34,13 +19,8 @@
     </dependency>
     <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>buffers</artifactId>
+        <artifactId>xwindows-protocol</artifactId>
         <version>${project.version}</version>
     </dependency>
-  	<dependency>
-  		<groupId>${project.groupId}</groupId>
-  		<artifactId>windows</artifactId>
-  		<version>${project.version}</version>
-  	</dependency>
   </dependencies>
 </project>
