@@ -1,13 +1,11 @@
 package com.neaterbits.displayserver.server;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.function.Function;
 
 import com.neaterbits.displayserver.protocol.exception.ValueException;
-import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.xwindows.fonts.FontCache;
 import com.neaterbits.displayserver.xwindows.fonts.FontLoader;
+import com.neaterbits.displayserver.xwindows.fonts.FontLoaderConfig;
 import com.neaterbits.displayserver.xwindows.fonts.NoSuchFontException;
 import com.neaterbits.displayserver.xwindows.fonts.model.XFont;
 import com.neaterbits.displayserver.xwindows.fonts.render.FontBufferFactory;
@@ -17,9 +15,9 @@ final class XFonts {
     private final FontLoader fontLoader;
     private final FontCache fontCache;
     
-    XFonts(List<String> fontPaths, Function<String, ATOM> getAtom) {
+    XFonts(FontLoaderConfig config) {
         
-        this.fontLoader = new FontLoader(fontPaths, getAtom);
+        this.fontLoader = new FontLoader(config);
         this.fontCache = new FontCache();
     }
     

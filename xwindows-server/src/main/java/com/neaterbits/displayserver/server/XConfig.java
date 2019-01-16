@@ -1,25 +1,24 @@
 package com.neaterbits.displayserver.server;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.windows.config.DisplayAreaConfig;
+import com.neaterbits.displayserver.xwindows.fonts.FontLoaderConfig;
 
 public final class XConfig {
 
     private final DisplayAreaConfig displayAreaConfig;
-    private final List<String> fontPaths;
+    private final FontLoaderConfig fontConfig;
     private final String colorsFile;
 
-    public XConfig(DisplayAreaConfig displayAreaConfig, List<String> fontPaths, String colorsFile) {
+    public XConfig(DisplayAreaConfig displayAreaConfig, FontLoaderConfig fontConfig, String colorsFile) {
         
         Objects.requireNonNull(displayAreaConfig);
-        Objects.requireNonNull(fontPaths);
+        Objects.requireNonNull(fontConfig);
         Objects.requireNonNull(colorsFile);
         
         this.displayAreaConfig = displayAreaConfig;
-        this.fontPaths = Collections.unmodifiableList(fontPaths);
+        this.fontConfig = fontConfig;
         this.colorsFile = colorsFile;
     }
 
@@ -27,8 +26,8 @@ public final class XConfig {
         return displayAreaConfig;
     }
 
-    List<String> getFontPaths() {
-        return fontPaths;
+    FontLoaderConfig getFontConfig() {
+        return fontConfig;
     }
 
     String getColorsFile() {

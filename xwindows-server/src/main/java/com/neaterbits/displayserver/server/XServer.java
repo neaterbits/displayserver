@@ -199,7 +199,7 @@ public class XServer implements AutoCloseable {
 		
 		this.atoms = new Atoms();
 
-		this.fonts = new XFonts(config.getFontPaths(), atoms::addIfNotExists);
+		this.fonts = new XFonts(config.getFontConfig());
 		
 		this.colormaps = new XColorMaps();
 		

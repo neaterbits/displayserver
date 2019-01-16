@@ -7,16 +7,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.neaterbits.displayserver.protocol.exception.MatchException;
-import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.xwindows.fonts.FontLoader;
+import com.neaterbits.displayserver.xwindows.fonts.FontLoaderConfig;
 import com.neaterbits.displayserver.xwindows.fonts.NoSuchFontException;
 import com.neaterbits.displayserver.xwindows.fonts.model.StoreOrder;
 import com.neaterbits.displayserver.xwindows.util.JNIBindings;
 
 public class CairoFontBufferTest {
 
-    private int atomSequence = 1;
-    
     @Before
     public void loadJNI() {
         JNIBindings.load();
@@ -25,10 +23,8 @@ public class CairoFontBufferTest {
     @Test
     public void testPrintCairoFont() throws IOException, NoSuchFontException, MatchException {
         
-        
         final FontLoader fontLoader = new FontLoader(
-                Arrays.asList("/usr/share/fonts/X11/misc"),
-                name -> new ATOM(atomSequence ++));
+                new FontLoaderConfig(Arrays.asList("/usr/share/fonts/X11/misc")));
 
         fontLoader.loadFont("7x14", new CairoFontBufferFactory(StoreOrder.getNativeOrder()));
     }

@@ -7,14 +7,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 import com.neaterbits.displayserver.protocol.exception.ValueException;
-import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.xwindows.fonts.model.XFont;
 import com.neaterbits.displayserver.xwindows.fonts.model.XFontCharacter;
 import com.neaterbits.displayserver.xwindows.fonts.model.XFontModel;
@@ -25,16 +22,13 @@ import com.neaterbits.displayserver.xwindows.fonts.render.FontBufferFactory;
 
 public final class FontLoader {
 
-    private final Function<String, ATOM> getAtom;
-    private final List<File> fontPaths;
+    private final FontLoaderConfig config;
     
-    public FontLoader(List<String> fontPaths, Function<String, ATOM> getAtom) {
+    public FontLoader(FontLoaderConfig config) {
+
+        Objects.requireNonNull(config);
         
-        this.getAtom = getAtom;
-        
-        this.fontPaths = fontPaths.stream()
-                .map(string -> new File(string))
-                .collect(Collectors.toList());
+        this.config = config;
     }
     
     public XFont loadFont(String fontName, FontBufferFactory fontBufferFactory) throws IOException, NoSuchFontException {
@@ -168,7 +162,7 @@ public final class FontLoader {
     }
     
     private <T> T iterateFontFiles(FontFileIterator<T> processFile, FilenameFilter filenameFilter) {
-        for (File path : fontPaths) {
+        for (File path : config.getFontPaths()) {
 
             if (path.exists() && path.isDirectory()) {
                 

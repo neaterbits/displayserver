@@ -39,6 +39,7 @@ import com.neaterbits.displayserver.windows.compositor.Compositor;
 import com.neaterbits.displayserver.windows.compositor.SingleViewPortDirectCompositor;
 import com.neaterbits.displayserver.windows.config.DisplayAreaConfig;
 import com.neaterbits.displayserver.windows.config.DisplayConfig;
+import com.neaterbits.displayserver.xwindows.fonts.FontLoaderConfig;
 import com.neaterbits.displayserver.xwindows.fonts.model.StoreOrder;
 import com.neaterbits.displayserver.xwindows.util.JNIBindings;
 import com.neaterbits.displayserver.xwindows.util.XAuth;
@@ -177,7 +178,7 @@ public class DisplayServerMain {
 
         final XConfig config = new XConfig(
                 displayAreaConfig,
-                Arrays.asList("/usr/share/fonts/X11/misc"),
+                new FontLoaderConfig(Arrays.asList("/usr/share/fonts/X11/misc")),
                 "/usr/share/X11/rgb.txt");
                 
         startXServer(display, asyncServers, hardware, config, displayAreas, compositor);
