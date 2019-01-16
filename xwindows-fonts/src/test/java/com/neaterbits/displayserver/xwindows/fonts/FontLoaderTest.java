@@ -15,10 +15,10 @@ public class FontLoaderTest extends BaseFontTest {
 
         final FontLoader fontLoader = getFontLoader(true);
         
-        final String [] fonts = fontLoader.listFonts(xlfd);
+        final FontDescriptor [] fonts = fontLoader.listFonts(xlfd);
         
         assertThat(fonts).isNotNull();
         assertThat(fonts.length).isEqualTo(1);
-        assertThat(fonts[0]).isEqualTo("9x15");
+        assertThat(fonts[0].getFontName()).isEqualTo("9x15");
     }
 }

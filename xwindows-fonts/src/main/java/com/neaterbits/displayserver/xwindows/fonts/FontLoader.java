@@ -77,7 +77,7 @@ public final class FontLoader {
         return name;
     }
     
-    public String [] listFonts(String pattern) throws ValueException {
+    public FontDescriptor [] listFonts(String pattern) throws ValueException {
         
         XLFD xlfd = null;
         
@@ -86,7 +86,7 @@ public final class FontLoader {
         } catch (XFLDException ex) {
         }
 
-        final List<String> fontNames;
+        final List<FontDescriptor> fontNames;
         
         if (xlfd != null) {
             fontNames = getFontNamesByXLFD(xlfd);
@@ -95,10 +95,10 @@ public final class FontLoader {
             fontNames = getFontNamesByName(pattern);
         }
         
-        return fontNames.toArray(new String[fontNames.size()]);
+        return fontNames.toArray(new FontDescriptor[fontNames.size()]);
     }
     
-    private static boolean lookupFromAliasFile(XLFD xlfd, String aliasFile, List<String> fontNames) {
+    private static boolean lookupFromAliasFile(XLFD xlfd, String aliasFile, List<FontDescriptor> fontNames) {
         
         final boolean fontsLookedUp;
         
@@ -137,11 +137,11 @@ public final class FontLoader {
         return fontsLookedUp;
     }
     
-    private List<String> getFontNamesByXLFD(XLFD xlfd) throws ValueException {
+    private List<FontDescriptor> getFontNamesByXLFD(XLFD xlfd) throws ValueException {
     
         Objects.requireNonNull(xlfd);
         
-        final List<String> fontNames = new ArrayList<>();
+        final List<FontDescriptor> fontNames = new ArrayList<>();
         
         if (!lookupFromAliasFile(xlfd, config.getBaseFontsAliasFile(), fontNames)) {
         
@@ -153,7 +153,10 @@ public final class FontLoader {
                         final XLFD fontXlfd = XLFD.fromFontProperties(properties);
                         
                         if (xlfd.matchesFont(fontXlfd)) {
-                            fontNames.add(getFontName(file));
+                            
+                            final String fontName = getFontName(file);
+                            
+                            fontNames.add(new FontDescriptor(fontName, fontXlfd));
                         }
                     }
 
@@ -234,7 +237,7 @@ public final class FontLoader {
         return null;
     }
     
-    private List<String> getFontNamesByName(String pattern) throws ValueException {
+    private List<FontDescriptor> getFontNamesByName(String pattern) throws ValueException {
 
         final Pattern regexPattern = FontMatchUtil.getFontMatchGlobPattern(pattern);
         
@@ -249,10 +252,10 @@ public final class FontLoader {
             }
         };
 
-        final List<String> fontNames = new ArrayList<>();
+        final List<FontDescriptor> fontNames = new ArrayList<>();
         
         iterateFontFiles(
-                file -> fontNames.add(getFontName(file)),
+                file -> fontNames.add(new FontDescriptor(getFontName(file))),
                 filenameFilter);
 
         

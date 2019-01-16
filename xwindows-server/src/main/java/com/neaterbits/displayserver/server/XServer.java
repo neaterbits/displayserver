@@ -138,6 +138,7 @@ import com.neaterbits.displayserver.windows.DisplayAreas;
 import com.neaterbits.displayserver.windows.WindowsDisplayArea;
 import com.neaterbits.displayserver.windows.WindowsDisplayAreas;
 import com.neaterbits.displayserver.windows.Window;
+import com.neaterbits.displayserver.xwindows.fonts.FontDescriptor;
 import com.neaterbits.displayserver.xwindows.fonts.NoSuchFontException;
 import com.neaterbits.displayserver.xwindows.fonts.model.XFont;
 import com.neaterbits.displayserver.xwindows.model.Atoms;
@@ -784,9 +785,29 @@ public class XServer implements AutoCloseable {
             final ListFonts listFonts = log(messageLength, opcode, sequenceNumber, ListFonts.decode(stream));
             
             try {
-                final String [] matches = fonts.listFonts(listFonts.getPattern());
+                final FontDescriptor [] matches = fonts.listFonts(listFonts.getPattern());
                 
-                sendReply(client, new ListFontsReply(sequenceNumber, matches));
+                final int numToSend = Math.min(matches.length, listFonts.getMaxNames().getValue());
+                
+                final String [] stringMatches = new String[numToSend];
+                
+                for (int i = 0; i < numToSend; ++ i) {
+                    
+                    final FontDescriptor fontDescriptor = matches[i];
+                    
+                    final String match;
+                    
+                    if (fontDescriptor.getXlfd() != null) {
+                        match = fontDescriptor.getXlfd().asString();
+                    }
+                    else {
+                        match = fontDescriptor.getFontName();
+                    }
+                    
+                    stringMatches[i] = match;
+                }
+                
+                sendReply(client, new ListFontsReply(sequenceNumber, stringMatches));
             } catch (ValueException ex) {
                 sendError(client, Errors.Value, sequenceNumber, ex.getValue(), opcode);
             }

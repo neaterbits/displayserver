@@ -18,7 +18,7 @@ final class FontAliases {
         this.xlfdAliases = xlfdAliases;
     }
 
-    void getFontNamesForXLFD(XLFD xlfd, List<String> fontNames) {
+    void getFontNamesForXLFD(XLFD xlfd, List<FontDescriptor> fontNames) {
         
         getFontNameForXLFDFromMap(xlfd, fontNames);
         
@@ -29,7 +29,7 @@ final class FontAliases {
         }
     }
 
-    private void getFontNameForXLFDFromMap(XLFD xlfd, List<String> fontNames) {
+    private void getFontNameForXLFDFromMap(XLFD xlfd, List<FontDescriptor> fontNames) {
 
         for (Map.Entry<String, XLFD> entry : fontNameToXLFD.entrySet()) {
             if (xlfd.matchesFont(entry.getValue())) {
@@ -37,7 +37,7 @@ final class FontAliases {
                 final String fontName = entry.getKey();
                 
                 if (!fontNames.contains(fontName)) {
-                    fontNames.add(fontName);
+                    fontNames.add(new FontDescriptor(fontName, entry.getValue()));
                 }
             }
         }

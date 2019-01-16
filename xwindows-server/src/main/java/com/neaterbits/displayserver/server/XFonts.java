@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.neaterbits.displayserver.protocol.exception.ValueException;
 import com.neaterbits.displayserver.xwindows.fonts.FontCache;
+import com.neaterbits.displayserver.xwindows.fonts.FontDescriptor;
 import com.neaterbits.displayserver.xwindows.fonts.FontLoader;
 import com.neaterbits.displayserver.xwindows.fonts.FontLoaderConfig;
 import com.neaterbits.displayserver.xwindows.fonts.NoSuchFontException;
@@ -50,7 +51,7 @@ final class XFonts {
         }
     }
     
-    String [] listFonts(String pattern) throws ValueException {
+    FontDescriptor [] listFonts(String pattern) throws ValueException {
         return fontLoader.listFonts(pattern);
     }
 }
