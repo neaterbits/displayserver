@@ -640,7 +640,7 @@ public class XServer implements AutoCloseable {
         
         case OpCodes.GET_SELECTION_OWNER: {
             
-            final GetSelectionOwner getSelectionOwner = log(messageLength, opcode, sequenceNumber, GetSelectionOwner.decode(stream));
+            log(messageLength, opcode, sequenceNumber, GetSelectionOwner.decode(stream));
             
             sendReply(client, new GetSelectionOwnerReply(sequenceNumber, WINDOW.None));
             break;

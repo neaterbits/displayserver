@@ -1,6 +1,5 @@
 package com.neaterbits.displayserver.layers;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,11 +82,11 @@ public class Layers {
 		
 		final Map<Layer, Region> regions = new HashMap<>(subToParent.size() + 1);
 		
+        /*
 		final List<Layer> stack = new ArrayList<>();
 
 		final List<Rectangle> stillVisibleRectangles = new ArrayList<>();
 
-		/*
 		recomputeOneLayer(rootLayer, regions, stack, stillVisibleRectangles);
 		
 		recomputeSubLayers(rootLayer, regions, stack, stillVisibleRectangles);

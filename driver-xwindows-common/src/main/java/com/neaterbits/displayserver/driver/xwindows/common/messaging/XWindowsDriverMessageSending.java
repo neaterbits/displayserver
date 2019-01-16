@@ -356,7 +356,7 @@ public class XWindowsDriverMessageSending implements XWindowsMessaging {
         // System.out.println("## received event " + byteBuffer);
         
         if (byteBuffer != null) {
-            final XWindowsProtocolInputStream stream = new ByteBufferXWindowsProtocolInputStream(byteBuffer);
+            // final XWindowsProtocolInputStream stream = new ByteBufferXWindowsProtocolInputStream(byteBuffer);
             
             final int eventCode = byteBuffer.get();
             
