@@ -93,7 +93,15 @@ public final class FontLoader {
         try {
             xlfd = XLFD.decode(pattern, true);
         } catch (XFLDException ex) {
+            
         }
+        
+        final List<FontDescriptor> fontNames = listFonts(pattern, xlfd);
+        
+        return fontNames.toArray(new FontDescriptor[fontNames.size()]);
+    }
+
+    private List<FontDescriptor> listFonts(String pattern, XLFD xlfd) throws ValueException {
 
         final List<FontDescriptor> fontNames;
         
@@ -103,8 +111,8 @@ public final class FontLoader {
         else {
             fontNames = getFontNamesByName(pattern);
         }
-        
-        return fontNames.toArray(new FontDescriptor[fontNames.size()]);
+    
+        return fontNames;
     }
 
     public XNamedFontModel [] listFontsWithInfo(String pattern) throws ValueException {

@@ -749,7 +749,7 @@ public class XServer implements AutoCloseable {
                 
                 client.openFont(openFont, font);
                 
-            } catch (NoSuchFontException ex) {
+            } catch (NoSuchFontException|ValueException ex) {
                 sendError(client, Errors.Name, sequenceNumber, openFont.getFid().getValue(), opcode);
             } catch (IDChoiceException ex) {
                 sendError(client, Errors.IDChoice, sequenceNumber, ex.getResource().getValue(), opcode);

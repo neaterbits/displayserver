@@ -18,26 +18,38 @@ final class XFonts {
     private final FontCache fontCache;
     
     XFonts(FontLoaderConfig config) {
-        
         this.fontLoader = new FontLoader(config);
         this.fontCache = new FontCache();
     }
     
-    XFont openFont(String fontName, FontBufferFactory fontBufferFactory) throws NoSuchFontException, IOException {
+    XFont openFont(String pattern, FontBufferFactory fontBufferFactory) throws NoSuchFontException, IOException, ValueException {
+
+        final FontDescriptor [] fonts = fontLoader.listFonts(pattern);
+
+        XFont font;
         
-        XFont font = fontCache.getFont(fontName);
-        
-        if (font == null) {
-            font = fontLoader.loadFont(fontName, fontBufferFactory);
+        if (fonts.length > 0) {
+            
+            final String fontName = fonts[0].getFontName();
+            
+            font = fontCache.getFont(fontName);
             
             if (font == null) {
-                throw new IllegalStateException(); // Exception if font not found
+                
+                font = fontLoader.loadFont(fontName, fontBufferFactory);
+                
+                if (font == null) {
+                    throw new IllegalStateException(); // Exception if font not found
+                }
+                
+                fontCache.add(fontName, font);
             }
-            
-            fontCache.add(fontName, font);
+            else {
+                font.addRef();
+            }
         }
         else {
-            font.addRef();
+            throw new NoSuchFontException("No such font");
         }
         
         return font;
