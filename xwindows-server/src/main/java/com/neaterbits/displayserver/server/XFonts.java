@@ -9,6 +9,7 @@ import com.neaterbits.displayserver.xwindows.fonts.FontLoader;
 import com.neaterbits.displayserver.xwindows.fonts.FontLoaderConfig;
 import com.neaterbits.displayserver.xwindows.fonts.NoSuchFontException;
 import com.neaterbits.displayserver.xwindows.fonts.model.XFont;
+import com.neaterbits.displayserver.xwindows.fonts.model.XNamedFontModel;
 import com.neaterbits.displayserver.xwindows.fonts.render.FontBufferFactory;
 
 final class XFonts {
@@ -53,5 +54,9 @@ final class XFonts {
     
     FontDescriptor [] listFonts(String pattern) throws ValueException {
         return fontLoader.listFonts(pattern);
+    }
+
+    XNamedFontModel [] listFontsWithInfo(String pattern) throws ValueException {
+        return fontLoader.listFontsWithInfo(pattern);
     }
 }

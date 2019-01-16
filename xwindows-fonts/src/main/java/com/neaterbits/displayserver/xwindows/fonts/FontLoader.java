@@ -2,6 +2,7 @@ package com.neaterbits.displayserver.xwindows.fonts;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import com.neaterbits.displayserver.xwindows.fonts.model.XFont;
 import com.neaterbits.displayserver.xwindows.fonts.model.XFontCharacter;
 import com.neaterbits.displayserver.xwindows.fonts.model.XFontModel;
 import com.neaterbits.displayserver.xwindows.fonts.model.XFontProperty;
+import com.neaterbits.displayserver.xwindows.fonts.model.XNamedFontModel;
 import com.neaterbits.displayserver.xwindows.fonts.pcf.PCFReader;
 import com.neaterbits.displayserver.xwindows.fonts.render.FontBuffer;
 import com.neaterbits.displayserver.xwindows.fonts.render.FontBufferFactory;
@@ -31,8 +33,8 @@ public final class FontLoader {
         this.config = config;
     }
     
-    public XFont loadFont(String fontName, FontBufferFactory fontBufferFactory) throws IOException, NoSuchFontException {
-
+    private XFontModel loadFontModel(String fontName) throws FileNotFoundException, IOException, NoSuchFontException {
+        
         final File file = findFontFile(fontName);
         
         final XFontModel fontModel;
@@ -47,6 +49,13 @@ public final class FontLoader {
         else {
             throw new NoSuchFontException("Unknown font " + fontName);
         }
+
+        return fontModel;
+    }
+    
+    public XFont loadFont(String fontName, FontBufferFactory fontBufferFactory) throws IOException, NoSuchFontException {
+        
+        final XFontModel fontModel = loadFontModel(fontName);
         
         return new XFont(fontName, fontModel, createRenderBitmaps(fontModel, fontBufferFactory));
     }
@@ -97,7 +106,32 @@ public final class FontLoader {
         
         return fontNames.toArray(new FontDescriptor[fontNames.size()]);
     }
-    
+
+    public XNamedFontModel [] listFontsWithInfo(String pattern) throws ValueException {
+
+        final FontDescriptor [] fontDescriptors = listFonts(pattern);
+        
+        final List<XNamedFontModel> fonts = new ArrayList<>(fontDescriptors.length);
+        
+        for (FontDescriptor fontDescriptor : fontDescriptors) {
+            
+            final String fontName = fontDescriptor.getFontName();
+            
+            XFontModel fontModel = null;
+            
+            try {
+                fontModel = loadFontModel(fontName);
+            } catch (IOException | NoSuchFontException ex) {
+            }
+            
+            if (fontModel != null) {
+                fonts.add(new XNamedFontModel(fontName, fontModel));
+            }
+        }
+        
+        return fonts.toArray(new XNamedFontModel[fonts.size()]);
+    }
+
     private static boolean lookupFromAliasFile(XLFD xlfd, String aliasFile, List<FontDescriptor> fontNames) {
         
         final boolean fontsLookedUp;

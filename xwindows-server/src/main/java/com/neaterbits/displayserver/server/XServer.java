@@ -110,6 +110,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.legacy.CreateGlyp
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.FreeCursor;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.ImageText16;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.ListFonts;
+import com.neaterbits.displayserver.protocol.messages.requests.legacy.ListFontsWithInfo;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.LookupColor;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.OpenFont;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolyFillRectangle;
@@ -141,6 +142,7 @@ import com.neaterbits.displayserver.windows.Window;
 import com.neaterbits.displayserver.xwindows.fonts.FontDescriptor;
 import com.neaterbits.displayserver.xwindows.fonts.NoSuchFontException;
 import com.neaterbits.displayserver.xwindows.fonts.model.XFont;
+import com.neaterbits.displayserver.xwindows.fonts.model.XNamedFontModel;
 import com.neaterbits.displayserver.xwindows.model.Atoms;
 import com.neaterbits.displayserver.xwindows.model.XBuiltinColor;
 import com.neaterbits.displayserver.xwindows.model.XBuiltinColors;
@@ -808,6 +810,21 @@ public class XServer implements AutoCloseable {
                 }
                 
                 sendReply(client, new ListFontsReply(sequenceNumber, stringMatches));
+            } catch (ValueException ex) {
+                sendError(client, Errors.Value, sequenceNumber, ex.getValue(), opcode);
+            }
+            break;
+        }
+        
+        case OpCodes.LIST_FONTS_WITH_INFO: {
+            
+            final ListFontsWithInfo listFontsWithInfo = log(messageLength, opcode, sequenceNumber, ListFontsWithInfo.decode(stream));
+            
+            try {
+                final XNamedFontModel [] matches = fonts.listFontsWithInfo(listFontsWithInfo.getPattern());
+
+                MessageProcessorFonts.listFontsWithInfoReply(listFontsWithInfo, sequenceNumber, client, matches, serverToClient);
+                
             } catch (ValueException ex) {
                 sendError(client, Errors.Value, sequenceNumber, ex.getValue(), opcode);
             }

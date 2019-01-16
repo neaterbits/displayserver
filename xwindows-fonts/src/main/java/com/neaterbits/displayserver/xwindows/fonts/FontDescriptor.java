@@ -16,6 +16,9 @@ public final class FontDescriptor {
     }
 
     public FontDescriptor(String fontName, XLFD xlfd) {
+        
+        Objects.requireNonNull(fontName);
+
         this.fontName = fontName;
         this.xlfd = xlfd;
     }

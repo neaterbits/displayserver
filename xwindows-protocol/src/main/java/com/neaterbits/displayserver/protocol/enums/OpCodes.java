@@ -46,6 +46,7 @@ public class OpCodes {
     public static final int CLOSE_FONT = 46;
     public static final int QUERY_FONT = 47;
     public static final int LIST_FONTS = 49;
+    public static final int LIST_FONTS_WITH_INFO = 50;
     
 	public static final int CREATE_PIXMAP = 53;
     public static final int FREE_PIXMAP = 54;
