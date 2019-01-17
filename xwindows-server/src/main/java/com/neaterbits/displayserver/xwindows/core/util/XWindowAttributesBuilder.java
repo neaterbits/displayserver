@@ -51,6 +51,26 @@ public final class XWindowAttributesBuilder extends XAttributesBuilder {
     
         return this;
     }
+
+    public XWindowAttributesBuilder setOverrideRedirect(BOOL value) {
+        
+        Objects.requireNonNull(value);
+        
+        addFlag(XWindowAttributes.OVERRIDE_REDIRECT);
+        
+        this.overrideRedirect = value;
+        
+        return this;
+    }
+    
+    public XWindowAttributesBuilder setEventMask(int eventMask) {
+        
+        addFlag(XWindowAttributes.EVENT_MASK);
+        
+        this.eventMask = new SETofEVENT(eventMask);
+        
+        return this;
+    }
     
     public XWindowAttributes build() {
         

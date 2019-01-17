@@ -97,6 +97,7 @@ public class XServer implements AutoCloseable {
                 state.getVisuals(),
                 state.getWindows(),
                 state.getPixmaps(),
+                state.getEventSubscriptions(),
                 rendering.getCompositor(),
                 rendering.getRendererFactory(),
                 rendering.getFontBufferFactory(),

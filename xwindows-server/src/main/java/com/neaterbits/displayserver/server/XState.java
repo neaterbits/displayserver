@@ -4,6 +4,7 @@ import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.xwindows.model.XDisplayState;
 import com.neaterbits.displayserver.xwindows.model.XScreensAndVisuals;
 import com.neaterbits.displayserver.xwindows.model.XWindow;
+import com.neaterbits.displayserver.xwindows.processing.XClientOps;
 
 final class XState extends XDisplayState<XClientWindow, XClientWindows> implements
     XClientsConstAccess,
@@ -26,6 +27,10 @@ final class XState extends XDisplayState<XClientWindow, XClientWindows> implemen
         return clients.getClients();
     }
     
+    XEventSubscriptions getEventSubscriptions() {
+        return eventSubscriptions;
+    }
+
     void addRootWindow(int screen, XWindow window) {
         getWindows().addRootWindow(screen, window);
     }
@@ -44,7 +49,12 @@ final class XState extends XDisplayState<XClientWindow, XClientWindows> implemen
     }
     
     @Override
-    public Iterable<XClient> getClientsInterestedInEvent(XWindow window, int event) {
+    public Iterable<XClientOps> getClientsInterestedInEvent(WINDOW window, int event) {
         return eventSubscriptions.getClientsInterestedInEvent(window, event);
+    }
+
+    @Override
+    public XClientOps getSingleClientInterestedInEvent(WINDOW window, int event) {
+        return eventSubscriptions.getSingleClientInterestedInEvent(window, event);
     }
 }

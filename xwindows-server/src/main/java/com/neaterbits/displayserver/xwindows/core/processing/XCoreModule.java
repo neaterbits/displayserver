@@ -9,6 +9,7 @@ import com.neaterbits.displayserver.events.common.InputDriver;
 import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLog;
 import com.neaterbits.displayserver.server.XClientWindows;
 import com.neaterbits.displayserver.server.XConfig;
+import com.neaterbits.displayserver.server.XEventSubscriptions;
 import com.neaterbits.displayserver.server.XTimestampGenerator;
 import com.neaterbits.displayserver.windows.WindowManagement;
 import com.neaterbits.displayserver.windows.compositor.Compositor;
@@ -29,6 +30,7 @@ public class XCoreModule extends XModule {
             XVisualsConstAccess visuals,
             XClientWindows windows,
             XPixmaps pixmaps,
+            XEventSubscriptions eventSubscriptions,
             Compositor compositor,
             XLibRendererFactory rendererFactory,
             FontBufferFactory fontBufferFactory,
@@ -43,6 +45,7 @@ public class XCoreModule extends XModule {
                 visuals,
                 windows,
                 pixmaps,
+                eventSubscriptions,
                 compositor,
                 rendererFactory,
                 fontBufferFactory,
@@ -58,6 +61,7 @@ public class XCoreModule extends XModule {
             XVisualsConstAccess visuals,
             XClientWindows windows,
             XPixmaps pixmaps,
+            XEventSubscriptions eventSubscriptions,
             Compositor compositor,
             XLibRendererFactory rendererFactory,
             FontBufferFactory fontBufferFactory,
@@ -72,6 +76,7 @@ public class XCoreModule extends XModule {
                         windowManagement,
                         windows,
                         pixmaps,
+                        eventSubscriptions,
                         compositor,
                         rendererFactory),
                 

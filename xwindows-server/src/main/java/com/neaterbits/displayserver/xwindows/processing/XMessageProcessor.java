@@ -54,7 +54,7 @@ public abstract class XMessageProcessor {
             protocolLog.onSendEvent(event);
         }
         
-        client.send(event);
+        client.sendEvent(event);
     }
 
     protected final void sendReply(XClientOps client, Reply reply) {
@@ -63,7 +63,7 @@ public abstract class XMessageProcessor {
             protocolLog.onSendReply(reply);
         }
         
-        client.send(reply);
+        client.sendReply(reply);
     }
 
     protected final void sendError(XClientOps client, BYTE errorCode, CARD16 sequenceNumber, long value, int opcode) {
@@ -74,6 +74,6 @@ public abstract class XMessageProcessor {
             protocolLog.onSendError(error);
         }
         
-        client.send(error);
+        client.sendError(error);
     }
 }

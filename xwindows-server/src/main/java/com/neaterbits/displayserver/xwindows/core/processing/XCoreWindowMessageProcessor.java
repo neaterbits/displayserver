@@ -12,11 +12,14 @@ import com.neaterbits.displayserver.protocol.enums.Errors;
 import com.neaterbits.displayserver.protocol.enums.MapState;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
 import com.neaterbits.displayserver.protocol.enums.WindowClass;
+import com.neaterbits.displayserver.protocol.exception.AccessException;
 import com.neaterbits.displayserver.protocol.exception.DrawableException;
 import com.neaterbits.displayserver.protocol.exception.IDChoiceException;
 import com.neaterbits.displayserver.protocol.exception.ValueException;
 import com.neaterbits.displayserver.protocol.exception.WindowException;
 import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLog;
+import com.neaterbits.displayserver.protocol.messages.events.MapNotify;
+import com.neaterbits.displayserver.protocol.messages.events.MapRequest;
 import com.neaterbits.displayserver.protocol.messages.replies.GetGeometryReply;
 import com.neaterbits.displayserver.protocol.messages.replies.GetWindowAttributesReply;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryTreeReply;
@@ -43,6 +46,7 @@ import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.server.XClientWindow;
 import com.neaterbits.displayserver.server.XClientWindows;
+import com.neaterbits.displayserver.server.XEventSubscriptions;
 import com.neaterbits.displayserver.types.Position;
 import com.neaterbits.displayserver.types.Size;
 import com.neaterbits.displayserver.windows.Window;
@@ -64,18 +68,25 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
     private final WindowManagement windowManagement;
     private final XClientWindows xWindows;
     private final XPixmaps xPixmaps;
+    private final XEventSubscriptions eventSubscriptions;
     private final Compositor compositor;
     private final XLibRendererFactory rendererFactory;
     
     public XCoreWindowMessageProcessor(
-            XWindowsServerProtocolLog protocolLog, WindowManagement windowManagement, XClientWindows windows,
-            XPixmaps pixmaps, Compositor compositor, XLibRendererFactory rendererFactory) {
+            XWindowsServerProtocolLog protocolLog,
+            WindowManagement windowManagement,
+            XClientWindows windows,
+            XPixmaps pixmaps,
+            XEventSubscriptions eventSubscriptions,
+            Compositor compositor,
+            XLibRendererFactory rendererFactory) {
         
         super(protocolLog);
         
         this.windowManagement = windowManagement;
         this.xWindows = windows;
         this.xPixmaps = pixmaps;
+        this.eventSubscriptions = eventSubscriptions;
         this.compositor = compositor;
         this.rendererFactory = rendererFactory;
     }
@@ -130,9 +141,11 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
             final ChangeWindowAttributes changeWindowAttributes = log(messageLength, opcode, sequenceNumber, ChangeWindowAttributes.decode(stream));
             
             try {
-                changeWindowAttributes(changeWindowAttributes);
+                changeWindowAttributes(changeWindowAttributes, client);
             } catch (WindowException ex) {
                 sendError(client, Errors.Window, sequenceNumber, ex.getWindow().getValue(), opcode);
+            } catch (AccessException ex) {
+                sendError(client, Errors.Acess, sequenceNumber, 0L, opcode);
             }
             break;
         }
@@ -354,13 +367,15 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
         return xWindowsWindow;
     }
 
-    private void changeWindowAttributes(ChangeWindowAttributes changeWindowAttributes) throws WindowException {
+    private void changeWindowAttributes(ChangeWindowAttributes changeWindowAttributes, XClientOps client) throws WindowException, AccessException {
         
         final XWindow xWindow = findClientOrRootWindow(xWindows, changeWindowAttributes.getWindow());
      
         final XWindowAttributes currentAttributes = xWindow.getCurrentWindowAttributes();
 
-        final XWindowAttributes updatedAttributes = currentAttributes.applyImmutably(changeWindowAttributes.getAttributes());
+        final XWindowAttributes requestAttributes = changeWindowAttributes.getAttributes();
+        
+        final XWindowAttributes updatedAttributes = currentAttributes.applyImmutably(requestAttributes);
         
         xWindow.setCurrentWindowAttributes(updatedAttributes);
         
@@ -369,6 +384,9 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
                 updatedAttributes.getValueMask(),
                 XWindowAttributes.BACKGROUND_PIXEL|XWindowAttributes.BACKGROUND_PIXMAP);
 
+        if (requestAttributes.isSet(XWindowAttributes.EVENT_MASK)) {
+            eventSubscriptions.setEventMapping(xWindow, requestAttributes.getEventMask(), client);
+        }
         
         if (xWindow.isMapped()) {
         
@@ -441,11 +459,67 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
         final XWindow xWindow = findClientWindow(xWindows, mapWindow.getWindow());
         
         if (!xWindow.isMapped()) {
-            renderWindowBackground(
-                    xWindow.getCurrentWindowAttributes(),
-                    xWindow.getWindow(),
-                    xWindow.getRenderer(),
-                    xWindow.getSurface());
+        
+            final XWindowAttributes windowAttributes = xWindow.getCurrentWindowAttributes();
+            
+            final BOOL overrideRedirect;
+            
+            if (windowAttributes.isSet(XWindowAttributes.OVERRIDE_REDIRECT)) {
+                overrideRedirect = windowAttributes.getOverrideRedirect();
+            }
+            else {
+                overrideRedirect = BOOL.False;
+            }
+            
+            boolean sentMapRequest = false;
+            
+            if (!xWindow.isRootWindow()) {
+            
+                final XClientOps client = eventSubscriptions.getSingleClientInterestedInEvent(
+                        xWindow.getParentWINDOW(),
+                        SETofEVENT.SUBSTRUCTURE_REDIRECT);
+            
+                if (client != null && !overrideRedirect.isSet()) {
+                    
+                    final MapRequest mapRequest = new MapRequest(
+                            client.getSequenceNumber(),
+                            xWindow.getParentWINDOW(),
+                            xWindow.getWINDOW());
+                    
+                    client.sendEvent(mapRequest);
+                    
+                    sentMapRequest = true;
+                }
+            }
+            
+            if (!sentMapRequest) {
+
+                renderWindowBackground(
+                        xWindow.getCurrentWindowAttributes(),
+                        xWindow.getWindow(),
+                        xWindow.getRenderer(),
+                        xWindow.getSurface());
+                
+                eventSubscriptions.sendEventToSubscribing(xWindow, SETofEVENT.STRUCTURE_NOTIFY,
+                        clientOps -> new MapNotify(
+                                clientOps.getSequenceNumber(),
+                                xWindow.getWINDOW(),
+                                xWindow.getWINDOW(),
+                                overrideRedirect));
+                
+                if (!xWindow.isRootWindow()) {
+                    eventSubscriptions.sendEventToSubscribing(
+                            xWindow.getParentWINDOW(), 
+                            SETofEVENT.SUBSTRUCTURE_NOTIFY,
+                            clientOps -> new MapNotify(
+                                    clientOps.getSequenceNumber(),
+                                    xWindow.getParentWINDOW(),
+                                    xWindow.getWINDOW(),
+                                    overrideRedirect));
+                }
+
+                xWindow.setMapped(true);
+            }
         }
     }
     

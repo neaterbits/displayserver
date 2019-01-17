@@ -3,8 +3,6 @@ package com.neaterbits.displayserver.server;
 import java.nio.ByteOrder;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.io.common.NonBlockingChannelWriter;
@@ -13,7 +11,9 @@ import com.neaterbits.displayserver.io.common.NonBlockingWritable;
 import com.neaterbits.displayserver.protocol.DataOutputXWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.messages.Encodeable;
+import com.neaterbits.displayserver.protocol.messages.Error;
 import com.neaterbits.displayserver.protocol.messages.Event;
+import com.neaterbits.displayserver.protocol.messages.Reply;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.xwindows.processing.XConnectionOps;
 
@@ -36,8 +36,6 @@ public class XConnection
 	private State state;
 	private ByteOrder byteOrder;
 	
-	private final List<Event> events;
-	
 	private int sequenceNumber;
 	
 	XConnection(
@@ -57,8 +55,6 @@ public class XConnection
 		
 		this.state = State.CREATED;
 		
-		this.events = new ArrayList<>();
-		
 		this.sequenceNumber = 0;
 	}
 	
@@ -73,7 +69,8 @@ public class XConnection
 	    return new CARD16(sequenceNumber);
 	}
 	
-	final CARD16 getSequenceNumber() {
+	@Override
+	public final CARD16 getSequenceNumber() {
 	    return new CARD16(sequenceNumber);
 	}
 	
@@ -103,8 +100,7 @@ public class XConnection
         this.state = state;
     }
 
-    @Override
-	public final void send(Encodeable message) {
+	final void send(Encodeable message) {
 	    
 	    writeToOutputBuffer(byteOrder, dataOutputStream -> {
             final XWindowsProtocolOutputStream protocolOutputStream = new DataOutputXWindowsProtocolOutputStream(dataOutputStream);
@@ -114,6 +110,21 @@ public class XConnection
 	}
 	
     @Override
+    public final void sendReply(Reply reply) {
+        send(reply);
+    }
+    
+    @Override
+    public final void sendError(Error error) {
+        send(error);
+    }
+
+    @Override
+    public final void sendEvent(Event event) {
+        send(event);
+    }
+
+    @Override
     protected final SocketChannel getChannel() {
         return socketChannel;
     }
@@ -121,12 +132,6 @@ public class XConnection
 	@Override
     protected final SelectionKey getSelectionKey() {
 	    return selectionKey;
-	}
-
-    void addEvent(Event event) {
-		Objects.requireNonNull(event);
-	
-		events.add(event);
 	}
 
     @Override

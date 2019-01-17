@@ -9,9 +9,9 @@ import com.neaterbits.displayserver.protocol.enums.BackingStore;
 import com.neaterbits.displayserver.protocol.enums.WindowClass;
 import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLogImpl;
 import com.neaterbits.displayserver.protocol.messages.Encodeable;
+import com.neaterbits.displayserver.protocol.messages.Event;
 import com.neaterbits.displayserver.protocol.messages.Reply;
 import com.neaterbits.displayserver.protocol.messages.Request;
-import com.neaterbits.displayserver.protocol.messages.ServerToClientMessage;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.DestroyWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.XWindowAttributes;
@@ -25,6 +25,7 @@ import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.server.XClientWindows;
 import com.neaterbits.displayserver.server.XConfig;
+import com.neaterbits.displayserver.server.XEventSubscriptions;
 import com.neaterbits.displayserver.server.XTimestampGenerator;
 import com.neaterbits.displayserver.types.Position;
 import com.neaterbits.displayserver.types.Size;
@@ -64,7 +65,6 @@ import java.util.List;
 public abstract class BaseXCoreTest {
 
     private final XCoreModule coreModule;
-    
     private final XScreen screen;
     
     private final WindowManagement windowManagement;
@@ -104,7 +104,7 @@ public abstract class BaseXCoreTest {
                 "/usr/share/X11/rgb.txt");
     
         this.resourceIds = 1;
-        this.sequenceNumber = 1;
+        this.sequenceNumber = 0;
         
         this.rootWindow = new WINDOW(allocateResourceId());
     
@@ -182,6 +182,7 @@ public abstract class BaseXCoreTest {
                 new XVisuals(Collections.emptyMap()),
                 windows,
                 pixmaps,
+                new XEventSubscriptions(),
                 compositor,
                 rendererFactory,
                 fontBufferFactory,
@@ -236,7 +237,7 @@ public abstract class BaseXCoreTest {
                     stream,
                     encoded.length,
                     request.getOpCode(),
-                    new CARD16(sequenceNumber ++),
+                    new CARD16(++ sequenceNumber),
                     client);
         } catch (IOException ex) {
             throw new IllegalStateException(ex);
@@ -293,17 +294,29 @@ public abstract class BaseXCoreTest {
         return window;
     }
 
-    private final <T extends ServerToClientMessage> T expectMessage(Class<T> messageClass) {
-
-        final ArgumentCaptor<T> argumentCaptor = ArgumentCaptor.forClass(messageClass);
-                
-        Mockito.verify(client).send(argumentCaptor.capture());
+    protected final <T extends Reply> T expectReply(Class<T> replyClass) {
+        
+        final ArgumentCaptor<T> argumentCaptor = ArgumentCaptor.forClass(replyClass);
+        
+        Mockito.verify(client).sendReply(argumentCaptor.capture());
     
         return argumentCaptor.getValue();
     }
 
-    protected final <T extends Reply> T expectReply(Class<T> replyClass) {
-        return expectMessage(replyClass);
+    protected final <T extends Event> void whenEvent(Class<T> eventClass) {
+        
+        Mockito.when(client.getSequenceNumber()).thenReturn(new CARD16(sequenceNumber));
+        
+    }
+
+    protected final <T extends Event> T expectEvent(Class<T> eventClass) {
+
+        final ArgumentCaptor<T> argumentCaptor = ArgumentCaptor.forClass(eventClass);
+
+        Mockito.verify(client).getSequenceNumber();
+        Mockito.verify(client).sendEvent(argumentCaptor.capture());
+    
+        return argumentCaptor.getValue();
     }
 
     protected final void closeWindow(WINDOW window) {

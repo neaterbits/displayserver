@@ -1,13 +1,11 @@
 package com.neaterbits.displayserver.server;
 
 import java.util.Objects;
-import java.util.function.Function;
 
 import com.neaterbits.displayserver.layers.Rectangle;
 import com.neaterbits.displayserver.layers.Region;
 import com.neaterbits.displayserver.protocol.Events;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
-import com.neaterbits.displayserver.protocol.messages.Event;
 import com.neaterbits.displayserver.protocol.messages.events.GraphicsExposure;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD8;
@@ -47,7 +45,10 @@ final class XWindowsEventListener implements WindowEventListener {
             
             final int c = count;
             
-            sendEventToSubscribing(xWindow, Events.GRAPHICS_EXPOSURE, client ->
+            server.getEventSubscriptions().sendEventToSubscribing(
+                    xWindow,
+                    Events.GRAPHICS_EXPOSURE,
+                    client ->
             
                 new GraphicsExposure(
                     client.getSequenceNumber(),
@@ -59,15 +60,6 @@ final class XWindowsEventListener implements WindowEventListener {
                 );
 
             
-        }
-    }
-    
-    private void sendEventToSubscribing(XWindow xWindow, int eventCode, Function<XClient, Event> makeEvent) {
-        for (XClient client : server.getEventSubscriptions().getClientsInterestedInEvent(xWindow, eventCode)) {
-            
-            final Event event = makeEvent.apply(client);
-            
-            client.addEvent(event);
         }
     }
 }

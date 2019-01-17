@@ -13,17 +13,20 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import com.neaterbits.displayserver.protocol.exception.IDChoiceException;
+import com.neaterbits.displayserver.protocol.messages.requests.ChangeWindowAttributes;
+import com.neaterbits.displayserver.protocol.messages.requests.XWindowAttributes;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.types.Position;
 import com.neaterbits.displayserver.types.Size;
 import com.neaterbits.displayserver.windows.Window;
 import com.neaterbits.displayserver.windows.compositor.Surface;
+import com.neaterbits.displayserver.xwindows.core.util.XWindowAttributesBuilder;
 import com.neaterbits.displayserver.xwindows.model.render.XLibRenderer;
 
 public abstract class BaseXCoreWindowTest extends BaseXCoreTest {
 
     static class WindowState {
-        private final WINDOW windowResource;
+        final WINDOW windowResource;
         private final Window window;
         private final Surface surface;
         private final XLibRenderer renderer;
@@ -36,7 +39,30 @@ public abstract class BaseXCoreWindowTest extends BaseXCoreTest {
             this.renderer = renderer;
         }
     }
-    
+
+    protected final WindowState checkCreateWindow() {
+        
+        final Position position = new Position(150, 150);
+        final Size size = new Size(350, 350);
+
+        final WindowState window = checkCreateWindow(position, size);
+
+        return window;
+    }
+
+    protected final void subscribeEvents(WINDOW window, int events) {
+        
+        final XWindowAttributes windowAttributes = new XWindowAttributesBuilder()
+                .setEventMask(events)
+                .build();
+        
+        final ChangeWindowAttributes changeWindowAttributes = new ChangeWindowAttributes(window, windowAttributes);
+        
+        sendRequest(changeWindowAttributes);
+
+        verifyNoMoreInteractions();
+    }
+
     protected final WindowState checkCreateWindow(Position position, Size size) {
 
         final Surface surface = mock(Surface.class);
