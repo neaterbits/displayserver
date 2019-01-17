@@ -169,7 +169,9 @@ public final class PutImage extends Request {
         stream.writeCARD8(leftPad);
         stream.writeCARD8(depth);
         
-        stream.writeData(data, dataOffset, dataLength);
+        writeUnusedCARD16(stream);
+        
+        stream.writeData(data, dataOffset, this.dataLength);
         
         stream.pad(pad);
     }

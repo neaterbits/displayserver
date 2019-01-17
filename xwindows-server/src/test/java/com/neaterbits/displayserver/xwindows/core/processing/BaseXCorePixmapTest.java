@@ -24,9 +24,9 @@ public abstract class BaseXCorePixmapTest extends BaseXCoreWindowTest {
 
     static class PixmapState {
         
-        private final PIXMAP pixmapResource;
-        private final OffscreenSurface surface;
-        private final XLibRenderer renderer;
+        final PIXMAP pixmapResource;
+        final OffscreenSurface surface;
+        final XLibRenderer renderer;
 
         public PixmapState(PIXMAP pixmapResource, OffscreenSurface surface, XLibRenderer renderer) {
 

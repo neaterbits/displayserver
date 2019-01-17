@@ -24,13 +24,13 @@ public final class GetImageReply extends Reply {
         final CARD8 depth = stream.readCARD8();
         final CARD16 sequenceNumber = stream.readCARD16();
         
-        final CARD32 requestLength = stream.readCARD32();
+        final CARD32 replyLength = readReplyLength(stream);
         
         final VISUALID visual = stream.readVISUALID();
         
         stream.readPad(20);
         
-        final byte [] data = stream.readData((int)(requestLength.getValue() * 4));
+        final byte [] data = stream.readData((int)(replyLength.getValue() * 4));
         
         return new GetImageReply(sequenceNumber, depth, visual, data);
     }

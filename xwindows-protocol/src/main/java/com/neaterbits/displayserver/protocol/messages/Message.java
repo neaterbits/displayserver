@@ -6,6 +6,7 @@ import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
+import com.neaterbits.displayserver.protocol.types.CARD32;
 
 public abstract class Message extends Encodeable {
     
@@ -21,8 +22,8 @@ public abstract class Message extends Encodeable {
         stream.readCARD16();
     }
 
-    protected static void readReplyLength(XWindowsProtocolInputStream stream) throws IOException {
-        stream.readCARD16();
+    protected static CARD32 readReplyLength(XWindowsProtocolInputStream stream) throws IOException {
+        return stream.readCARD32();
     }
 
     protected static void writeUnusedCARD16(XWindowsProtocolOutputStream stream) throws IOException {
