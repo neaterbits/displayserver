@@ -67,8 +67,8 @@ final class Windows {
 		final Layer layer = layers.createLayer(
 				new Position(parameters.getX(), parameters.getY()),
 				new Size(
-						parameters.getWidth() + parameters.getBorderWidth(),
-						parameters.getHeight() + parameters.getBorderWidth()));
+						parameters.getWidth() + parameters.getBorderWidth() * 2,
+						parameters.getHeight() + parameters.getBorderWidth() * 2));
 		
 		final LayerRegions toUpdate = layers.addLayer(parentLayer, layer);
 		

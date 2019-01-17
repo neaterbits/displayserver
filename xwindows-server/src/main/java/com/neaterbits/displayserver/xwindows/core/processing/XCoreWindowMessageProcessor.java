@@ -18,6 +18,7 @@ import com.neaterbits.displayserver.protocol.exception.IDChoiceException;
 import com.neaterbits.displayserver.protocol.exception.ValueException;
 import com.neaterbits.displayserver.protocol.exception.WindowException;
 import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLog;
+import com.neaterbits.displayserver.protocol.messages.events.CreateNotify;
 import com.neaterbits.displayserver.protocol.messages.events.MapNotify;
 import com.neaterbits.displayserver.protocol.messages.events.MapRequest;
 import com.neaterbits.displayserver.protocol.messages.replies.GetGeometryReply;
@@ -296,7 +297,6 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
 
         
         }
-        
     }
     
     private XWindow createWindow(CreateWindow createWindow, XWindow parentWindow, XClientOps client) throws ValueException, IDChoiceException {
@@ -351,7 +351,7 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
         
         final XLibRenderer renderer = rendererFactory.createRenderer(windowSurface, window.getPixelFormat());
         
-        final XWindow xWindowsWindow = new XClientWindow(
+        final XWindow xWindow = new XClientWindow(
                 client,
                 window,
                 createWindow.getWid(),
@@ -363,8 +363,22 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
                 XWindowAttributes.DEFAULT_ATTRIBUTES.applyImmutably(createWindow.getAttributes()),
                 renderer,
                 windowSurface);
+
+        eventSubscriptions.sendEventToSubscribing(
+                createWindow.getParent(),
+                SETofEVENT.SUBSTRUCTURE_NOTIFY,
+                clientOps -> new CreateNotify(
+                        clientOps.getSequenceNumber(),
+                        createWindow.getParent(),
+                        createWindow.getWid(),
+                        createWindow.getX(),
+                        createWindow.getY(),
+                        createWindow.getWidth(),
+                        createWindow.getHeight(),
+                        createWindow.getBorderWidth(),
+                        getOverrideRedirect(createWindow.getAttributes())));
         
-        return xWindowsWindow;
+        return xWindow;
     }
 
     private void changeWindowAttributes(ChangeWindowAttributes changeWindowAttributes, XClientOps client) throws WindowException, AccessException {
@@ -454,6 +468,20 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
         return xWindow;
     }
 
+    private static BOOL getOverrideRedirect(XWindowAttributes windowAttributes) {
+        
+        final BOOL overrideRedirect;
+        
+        if (windowAttributes.isSet(XWindowAttributes.OVERRIDE_REDIRECT)) {
+            overrideRedirect = windowAttributes.getOverrideRedirect();
+        }
+        else {
+            overrideRedirect = BOOL.False;
+        }
+
+        return overrideRedirect;
+    }
+    
     private void mapWindow(MapWindow mapWindow) throws WindowException {
         
         final XWindow xWindow = findClientWindow(xWindows, mapWindow.getWindow());
@@ -462,14 +490,7 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
         
             final XWindowAttributes windowAttributes = xWindow.getCurrentWindowAttributes();
             
-            final BOOL overrideRedirect;
-            
-            if (windowAttributes.isSet(XWindowAttributes.OVERRIDE_REDIRECT)) {
-                overrideRedirect = windowAttributes.getOverrideRedirect();
-            }
-            else {
-                overrideRedirect = BOOL.False;
-            }
+            final BOOL overrideRedirect = getOverrideRedirect(windowAttributes);
             
             boolean sentMapRequest = false;
             

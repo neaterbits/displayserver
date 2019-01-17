@@ -64,6 +64,15 @@ public abstract class BaseXCoreWindowTest extends BaseXCoreTest {
     }
 
     protected final WindowState checkCreateWindow(Position position, Size size) {
+        return checkCreateWindow(position, size, 0, null, true);
+    }
+
+    protected final WindowState checkCreateWindow(
+            Position position,
+            Size size,
+            int borderWidth,
+            XWindowAttributes windowAttributes,
+            boolean verifyNoMoreInteractions) {
 
         final Surface surface = mock(Surface.class);
         final XLibRenderer xlibRenderer = mock(XLibRenderer.class);
@@ -72,7 +81,7 @@ public abstract class BaseXCoreWindowTest extends BaseXCoreTest {
         when(rendererFactory.createRenderer(isNotNull(), any()))
             .thenReturn(xlibRenderer);
         
-        final WINDOW window = createWindow(position, size);
+        final WINDOW window = createWindow(position, size, borderWidth, windowAttributes);
         
         final ArgumentCaptor<Window> surfaceWindow = ArgumentCaptor.forClass(Window.class);
         
@@ -88,13 +97,16 @@ public abstract class BaseXCoreWindowTest extends BaseXCoreTest {
 
         assertThat(window).isNotNull();
         
-        verifyNoMoreInteractions();
+        if (verifyNoMoreInteractions) {
+            verifyNoMoreInteractions();
+        }
+        
         Mockito.verifyNoMoreInteractions(surface, xlibRenderer);
         
         final Window w = surfaceWindow.getValue();
         
         assertThat(w.getPosition()).isEqualTo(position);
-        assertThat(w.getSize()).isEqualTo(size);
+        assertThat(w.getSize()).isEqualTo(new Size(size.getWidth() + borderWidth * 2, size.getHeight() + borderWidth * 2));
 
         return new WindowState(window, w, surface, xlibRenderer);
     }

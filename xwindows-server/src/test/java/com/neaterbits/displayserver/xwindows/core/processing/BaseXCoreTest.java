@@ -5,7 +5,6 @@ import com.neaterbits.displayserver.events.common.InputDriver;
 import com.neaterbits.displayserver.io.common.DataWriter;
 import com.neaterbits.displayserver.protocol.ByteBufferXWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
-import com.neaterbits.displayserver.protocol.enums.BackingStore;
 import com.neaterbits.displayserver.protocol.enums.WindowClass;
 import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLogImpl;
 import com.neaterbits.displayserver.protocol.messages.Encodeable;
@@ -20,7 +19,6 @@ import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.INT16;
-import com.neaterbits.displayserver.protocol.types.SETofEVENT;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.server.XClientWindows;
@@ -244,12 +242,11 @@ public abstract class BaseXCoreTest {
         }
     }
     
-    protected final WINDOW createWindow(Position position, Size size) {
-        
-        return createWindow(position.getLeft(), position.getTop(), size.getWidth(), size.getHeight());
+    protected final WINDOW createWindow(Position position, Size size, int borderWidth) {
+        return createWindow(position, size, borderWidth, null);
     }
 
-    protected final WINDOW createWindow(int x, int y, int width, int height) {
+    protected final WINDOW createWindow(Position position, Size size, int borderWidth, XWindowAttributes windowAttributes) {
 
         final WINDOW window = new WINDOW(allocateResourceId());
         
@@ -257,34 +254,25 @@ public abstract class BaseXCoreTest {
                 new CARD8((short)0),
                 window,
                 screen.getRootWINDOW(),
-                new INT16((short)x), new INT16((short)y),
-                new CARD16(width), new CARD16(height),
-                new CARD16(0),
-                new CARD16(1),
+                new INT16((short)position.getLeft()), new INT16((short)position.getTop()),
+                new CARD16(size.getWidth()), new CARD16(size.getHeight()),
+                new CARD16(borderWidth),
+                WindowClass.InputOutput,
                 screen.getRootVisual(),
-                new XWindowAttributes(
-                        new BITMASK(
-                                  XWindowAttributes.BACKING_STORE
-                        //        | WindowAttributes.EVENT_MASK
-                        ),
+                windowAttributes != null ? windowAttributes : new XWindowAttributes(
+                        new BITMASK(0),
                         null,
                         null,
                         null,
                         null,
                         null,
                         null,
-                        BackingStore.WhenMapped,
                         null,
                         null,
                         null,
                         null,
-                        new SETofEVENT(
-                                  SETofEVENT.KEY_PRESS
-                                | SETofEVENT.KEY_RELEASE
-                                | SETofEVENT.BUTTON_PRESS
-                                | SETofEVENT.BUTTON_RELEASE
-                                | SETofEVENT.POINTER_MOTION
-                                | SETofEVENT.STRUCTURE_NOTIFY),
+                        null,
+                        null,
                         null,
                         null,
                         null));
