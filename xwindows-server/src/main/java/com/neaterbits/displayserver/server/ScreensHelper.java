@@ -14,6 +14,7 @@ import com.neaterbits.displayserver.protocol.enums.VisualClass;
 import com.neaterbits.displayserver.protocol.enums.WindowClass;
 import com.neaterbits.displayserver.protocol.messages.requests.XWindowAttributes;
 import com.neaterbits.displayserver.protocol.types.BITGRAVITY;
+import com.neaterbits.displayserver.protocol.types.BITMASK;
 import com.neaterbits.displayserver.protocol.types.BOOL;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
@@ -41,7 +42,7 @@ class ScreensHelper {
     private static XWindowAttributes getRootWindowAttributes(DisplayArea displayArea) {
         
         return new XWindowAttributes(
-                XWindowAttributes.ALL,
+                new BITMASK(XWindowAttributes.ALL_VALUE_MASK & ~XWindowAttributes.BACKGROUND_PIXEL),
                 PIXMAP.None,
                 new CARD32(0),
                 PIXMAP.None, new CARD32(0),
@@ -63,7 +64,6 @@ class ScreensHelper {
             ServerResourceIdAllocator resourceIdAllocator,
             XRendering rendering,
             BiConsumer<Integer, XWindow> addRootWindow) {
-        
         
         final List<XScreen> screens = new ArrayList<>(displayAreas.getDisplayAreas().size());
         

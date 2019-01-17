@@ -9,6 +9,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.function.Consumer;
+
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
@@ -28,16 +30,27 @@ public abstract class BaseXCoreWindowTest extends BaseXCoreTest {
     static class WindowState {
         final WINDOW windowResource;
         private final Window window;
-        private final Surface surface;
-        private final XLibRenderer renderer;
+        final Surface surface;
+        final XLibRenderer renderer;
 
-        public WindowState(WINDOW windowResource, Window window, Surface surface, XLibRenderer renderer) {
+        WindowState(WINDOW windowResource, Window window, Surface surface, XLibRenderer renderer) {
 
             this.windowResource = windowResource;
             this.window = window;
             this.surface = surface;
             this.renderer = renderer;
         }
+        
+        private void verifyNoMoreInteractions() {
+            Mockito.verifyNoMoreInteractions(surface, renderer);
+        }
+    }
+
+    protected final void verifyNoMoreInteractions(WindowState windowState) {
+        
+        verifyNoMoreInteractions();
+        
+        Mockito.verifyNoMoreInteractions(windowState.surface, windowState.renderer);
     }
 
     protected final WindowState checkCreateWindow() {
@@ -51,20 +64,40 @@ public abstract class BaseXCoreWindowTest extends BaseXCoreTest {
     }
 
     protected final void subscribeEvents(WINDOW window, int events) {
-        
-        final XWindowAttributes windowAttributes = new XWindowAttributesBuilder()
-                .setEventMask(events)
-                .build();
-        
-        final ChangeWindowAttributes changeWindowAttributes = new ChangeWindowAttributes(window, windowAttributes);
-        
-        sendRequest(changeWindowAttributes);
-
-        verifyNoMoreInteractions();
+        changeWindowAttributes(window, b -> b.setEventMask(events));
     }
 
+    protected final void changeWindowAttributes(WindowState windowState, Consumer<XWindowAttributesBuilder> builder) {
+        changeWindowAttributes(windowState.windowResource, builder);
+    }
+
+    protected final void changeWindowAttributes(WINDOW window, Consumer<XWindowAttributesBuilder> builder) {
+        final XWindowAttributesBuilder xWindowAttributesBuilder = new XWindowAttributesBuilder();
+        
+        builder.accept(xWindowAttributesBuilder);
+        
+        final XWindowAttributes windowAttributes = xWindowAttributesBuilder.build();
+    
+        final ChangeWindowAttributes changeWindowAttributes = new ChangeWindowAttributes(
+                window,
+                windowAttributes);
+    
+        sendRequest(changeWindowAttributes);
+        
+        verifyNoMoreInteractions();
+    }
+    
     protected final WindowState checkCreateWindow(Position position, Size size) {
         return checkCreateWindow(position, size, 0, null, true);
+    }
+
+    protected final WindowState checkCreateWindow(
+            Position position,
+            Size size,
+            int borderWidth,
+            XWindowAttributes windowAttributes) {
+        
+        return checkCreateWindow(position, size, borderWidth, windowAttributes, true);
     }
 
     protected final WindowState checkCreateWindow(
@@ -120,6 +153,6 @@ public abstract class BaseXCoreWindowTest extends BaseXCoreTest {
         verify(window.renderer).dispose();
         
         verifyNoMoreInteractions();
-        Mockito.verifyNoMoreInteractions(window.surface, window.renderer);
+        window.verifyNoMoreInteractions();
     }
 }

@@ -5,18 +5,28 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
+
 import com.neaterbits.displayserver.protocol.exception.IDChoiceException;
 import com.neaterbits.displayserver.protocol.messages.events.MapNotify;
 import com.neaterbits.displayserver.protocol.messages.events.MapRequest;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeWindowAttributes;
+import com.neaterbits.displayserver.protocol.messages.requests.ClearArea;
 import com.neaterbits.displayserver.protocol.messages.requests.MapWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.XWindowAttributes;
 import com.neaterbits.displayserver.protocol.types.BOOL;
+import com.neaterbits.displayserver.protocol.types.CARD16;
+import com.neaterbits.displayserver.protocol.types.INT16;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
+import com.neaterbits.displayserver.types.Position;
+import com.neaterbits.displayserver.types.Size;
 import com.neaterbits.displayserver.xwindows.core.util.XWindowAttributesBuilder;
 
-public class XCoreWindowMapWindowTest extends BaseXCoreWindowTest {
+public class XCoreWindowMapWindowTest extends BaseXCorePixmapTest {
 
     private void setOverrideRedirect(WINDOW window, BOOL value) {
         
@@ -190,4 +200,174 @@ public class XCoreWindowMapWindowTest extends BaseXCoreWindowTest {
         verifyNoMoreInteractions();
     }
     
+    @Test
+    public void testWindowBackgroundPixel() {
+        
+        final Position position = new Position(250, 150);
+        final Size size = new Size(450, 350);
+        
+        XWindowAttributes windowAttributes = new XWindowAttributesBuilder()
+                .setBackgroundPixel(0x102030)
+                .build();
+        
+        final WindowState window = checkCreateWindow(position, size, 0, windowAttributes);
+        
+        final MapWindow mapWindow = new MapWindow(window.windowResource);
+        
+        Mockito.reset(displayArea);
+
+        when(displayArea.getPixelFormat()).thenReturn(rootPixelFormat);
+        
+        sendRequest(mapWindow);
+
+        verify(displayArea).getPixelFormat();
+        verify(window.renderer).fillRectangle(
+                eq(0),
+                eq(0),
+                eq(size.getWidth()),
+                eq(size.getHeight()),
+                eq(0x10),
+                eq(0x20),
+                eq(0x30));
+        
+        verify(window.renderer).flush();
+        
+        verifyNoMoreInteractions(window);
+        
+        final PixmapState pixmap = checkCreatePixmap(
+                rootPixelFormat.getDepth(),
+                window.windowResource.toDrawable(),
+                new Size(100, 100));
+        
+        // Change to pixmap but pixel has precedence
+
+        changeWindowAttributes(window, b -> b.setBackgroundPixmap(pixmap.pixmapResource));
+
+        pixmap.verifyNoMoreInteractions();
+
+        Mockito.reset(displayArea);
+        Mockito.reset(window.renderer);
+        
+        final ClearArea clearArea = new ClearArea(
+                BOOL.False,
+                window.windowResource,
+                new INT16((short)0),
+                new INT16((short)0),
+                new CARD16(0),
+                new CARD16(0));
+        
+        when(displayArea.getPixelFormat()).thenReturn(rootPixelFormat);
+
+        sendRequest(clearArea);
+
+        // Should still render background pixel
+
+        verify(displayArea).getPixelFormat();
+        verify(window.renderer).fillRectangle(
+                eq(0),
+                eq(0),
+                eq(size.getWidth()),
+                eq(size.getHeight()),
+                eq(0x10),
+                eq(0x20),
+                eq(0x30));
+
+        verify(window.renderer).flush();
+
+        verifyNoMoreInteractions(window);
+        Mockito.verifyNoMoreInteractions(pixmap.surface, pixmap.renderer);
+    }
+
+    @Test
+    public void testWindowBackgroundPixmap() {
+
+        final Size pixmapSize = new Size(100, 120);
+        
+        final PixmapState pixmap = checkCreatePixmap(
+                rootPixelFormat.getDepth(),
+                rootWindow.toDrawable(),
+                pixmapSize);
+
+        Mockito.reset(rendererFactory);
+        
+        final Position position = new Position(450, 350);
+        final Size size = new Size(250, 150);
+        
+        XWindowAttributes windowAttributes = new XWindowAttributesBuilder()
+                .setBackgroundPixmap(pixmap.pixmapResource)
+                .build();
+        
+        final WindowState window = checkCreateWindow(position, size, 0, windowAttributes);
+        
+        final MapWindow mapWindow = new MapWindow(window.windowResource);
+
+        when(pixmap.surface.getWidth()).thenReturn(pixmapSize.getWidth());
+        when(pixmap.surface.getHeight()).thenReturn(pixmapSize.getHeight());
+        
+        sendRequest(mapWindow);
+
+        verify(pixmap.surface).getWidth();
+        verify(pixmap.surface).getHeight();
+        
+        checkRenderPixmapBackground(window, pixmap);
+        
+        verifyNoMoreInteractions(window);
+        
+        // Try to render by ClearArea too
+        
+        Mockito.reset(window.surface);
+
+        final ClearArea clearArea = new ClearArea(
+                BOOL.False,
+                window.windowResource,
+                new INT16((short)0),
+                new INT16((short)0),
+                new CARD16(0),
+                new CARD16(0));
+
+        sendRequest(clearArea);
+
+        checkRenderPixmapBackground(window, pixmap);
+        
+        verifyNoMoreInteractions(window);
+    }
+    
+    private void checkRenderPixmapBackground(WindowState window, PixmapState pixmap) {
+        
+        verify(window.surface).copyArea(
+                same(pixmap.surface),
+                eq(0), eq(0),
+                eq(0), eq(0),
+                eq(100), eq(120));
+
+        verify(window.surface).copyArea(
+                same(pixmap.surface),
+                eq(0), eq(0),
+                eq(100), eq(0),
+                eq(100), eq(120));
+
+        verify(window.surface).copyArea(
+                same(pixmap.surface),
+                eq(0), eq(0),
+                eq(200), eq(0),
+                eq(50), eq(120));
+
+        verify(window.surface).copyArea(
+                same(pixmap.surface),
+                eq(0), eq(0),
+                eq(0), eq(120),
+                eq(100), eq(30));
+
+        verify(window.surface).copyArea(
+                same(pixmap.surface),
+                eq(0), eq(0),
+                eq(100), eq(120),
+                eq(100), eq(30));
+
+        verify(window.surface).copyArea(
+                same(pixmap.surface),
+                eq(0), eq(0),
+                eq(200), eq(120),
+                eq(50), eq(30));
+    }
 }

@@ -40,23 +40,24 @@ public final class XWindowAttributes extends XAttributes {
     public static final int COLOR_MAP           = 0x00002000;
     public static final int CURSOR              = 0x00004000;
 
-    public static final BITMASK ALL = new BITMASK(
-              BACKGROUND_PIXMAP
-            | BACKGROUND_PIXEL
-            | BORDER_PIXMAP
-            | BORDER_PIXEL
-            | BIT_GRAVITY
-            | WIN_GRAVITY
-            | BACKING_STORE
-            | BACKING_PLANES
-            | BACKING_PIXEL
-            | OVERRIDE_REDIRECT
-            | SAVE_UNDER
-            | EVENT_MASK
-            | DO_NOT_PROPAGATE_MASK
-            | COLOR_MAP
-            | CURSOR
-    );
+    public static final int ALL_VALUE_MASK =
+            BACKGROUND_PIXMAP
+          | BACKGROUND_PIXEL
+          | BORDER_PIXMAP
+          | BORDER_PIXEL
+          | BIT_GRAVITY
+          | WIN_GRAVITY
+          | BACKING_STORE
+          | BACKING_PLANES
+          | BACKING_PIXEL
+          | OVERRIDE_REDIRECT
+          | SAVE_UNDER
+          | EVENT_MASK
+          | DO_NOT_PROPAGATE_MASK
+          | COLOR_MAP
+          | CURSOR;
+
+    public static final BITMASK ALL = new BITMASK(ALL_VALUE_MASK);
     
     private final PIXMAP backgroundPixmap;
     private final CARD32 backgroundPixel;

@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import com.neaterbits.displayserver.buffers.BufferOperations;
-import com.neaterbits.displayserver.buffers.PixelFormat;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.enums.Errors;
 import com.neaterbits.displayserver.protocol.enums.MapState;
@@ -35,13 +33,11 @@ import com.neaterbits.displayserver.protocol.messages.requests.MapWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.QueryTree;
 import com.neaterbits.displayserver.protocol.messages.requests.XWindowAttributes;
 import com.neaterbits.displayserver.protocol.messages.requests.XWindowConfiguration;
-import com.neaterbits.displayserver.protocol.types.BITMASK;
 import com.neaterbits.displayserver.protocol.types.BOOL;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.INT16;
-import com.neaterbits.displayserver.protocol.types.PIXMAP;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
@@ -54,7 +50,6 @@ import com.neaterbits.displayserver.windows.Window;
 import com.neaterbits.displayserver.windows.WindowManagement;
 import com.neaterbits.displayserver.windows.WindowParameters;
 import com.neaterbits.displayserver.windows.compositor.Compositor;
-import com.neaterbits.displayserver.windows.compositor.OffscreenSurface;
 import com.neaterbits.displayserver.windows.compositor.Surface;
 import com.neaterbits.displayserver.xwindows.model.XPixmap;
 import com.neaterbits.displayserver.xwindows.model.XPixmaps;
@@ -62,9 +57,8 @@ import com.neaterbits.displayserver.xwindows.model.XWindow;
 import com.neaterbits.displayserver.xwindows.model.render.XLibRenderer;
 import com.neaterbits.displayserver.xwindows.model.render.XLibRendererFactory;
 import com.neaterbits.displayserver.xwindows.processing.XClientOps;
-import com.neaterbits.displayserver.xwindows.processing.XOpCodeProcessor;
 
-public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
+public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor {
 
     private final WindowManagement windowManagement;
     private final XClientWindows xWindows;
@@ -76,17 +70,17 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
     public XCoreWindowMessageProcessor(
             XWindowsServerProtocolLog protocolLog,
             WindowManagement windowManagement,
-            XClientWindows windows,
-            XPixmaps pixmaps,
+            XClientWindows xWindows,
+            XPixmaps xPixmaps,
             XEventSubscriptions eventSubscriptions,
             Compositor compositor,
             XLibRendererFactory rendererFactory) {
         
-        super(protocolLog);
+        super(protocolLog, xPixmaps);
         
         this.windowManagement = windowManagement;
-        this.xWindows = windows;
-        this.xPixmaps = pixmaps;
+        this.xWindows = xWindows;
+        this.xPixmaps = xPixmaps;
         this.eventSubscriptions = eventSubscriptions;
         this.compositor = compositor;
         this.rendererFactory = rendererFactory;
@@ -393,17 +387,20 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
         
         xWindow.setCurrentWindowAttributes(updatedAttributes);
         
-        final boolean sameBgMask = BITMASK.isSameMask(
-                currentAttributes.getValueMask(),
-                updatedAttributes.getValueMask(),
-                XWindowAttributes.BACKGROUND_PIXEL|XWindowAttributes.BACKGROUND_PIXMAP);
 
         if (requestAttributes.isSet(XWindowAttributes.EVENT_MASK)) {
             eventSubscriptions.setEventMapping(xWindow, requestAttributes.getEventMask(), client);
         }
-        
+
+        /*
+
         if (xWindow.isMapped()) {
-        
+
+            final boolean sameBgMask = BITMASK.isSameMask(
+                currentAttributes.getValueMask(),
+                updatedAttributes.getValueMask(),
+                XWindowAttributes.BACKGROUND_PIXEL|XWindowAttributes.BACKGROUND_PIXMAP);
+
             if (    !sameBgMask
                  || (    updatedAttributes.isSet(XWindowAttributes.BACKGROUND_PIXEL)
                       && !updatedAttributes.getBackgroundPixel().equals(currentAttributes.getBackgroundPixel()))
@@ -416,6 +413,7 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
                 renderWindowBackground(updatedAttributes, xWindow.getWindow(), xWindow.getRenderer(), windowBuffer);
             }
         }
+        */
     }
 
     void getWindowAttributes(GetWindowAttributes getWindowAttributes, int opcode, CARD16 sequenceNumber, XClientOps client) {
@@ -515,11 +513,7 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
             
             if (!sentMapRequest) {
 
-                renderWindowBackground(
-                        xWindow.getCurrentWindowAttributes(),
-                        xWindow.getWindow(),
-                        xWindow.getRenderer(),
-                        xWindow.getSurface());
+                renderWindowBackground(xWindow);
                 
                 eventSubscriptions.sendEventToSubscribing(xWindow, SETofEVENT.STRUCTURE_NOTIFY,
                         clientOps -> new MapNotify(
@@ -602,58 +596,6 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
             xWindow.setBorderWidth(windowConfiguration.getBorderWidth());
             
             System.out.println("TODO - configure borderwidth");
-        }
-    }
-
-    
-    private void renderWindowBackground(XWindowAttributes windowAttributes, Window window, XLibRenderer renderer, BufferOperations windowBuffer) {
-        
-        if (    windowAttributes.isSet(XWindowAttributes.BACKGROUND_PIXMAP)
-            && !windowAttributes.getBackgroundPixmap().equals(PIXMAP.None)) {
-
-            final PIXMAP pixmapResource = windowAttributes.getBackgroundPixmap();
-
-            final XPixmap xPixmap = xPixmaps.getPixmap(pixmapResource);
-
-            if (xPixmap != null) {
-
-                final OffscreenSurface src = xPixmap.getOffscreenSurface();
-
-                System.out.println("## render to window of size " + window.getSize() + " from " + src.getWidth() + "/"
-                        + src.getHeight() + " src " + src);
-
-                final Size windowSize = window.getSize();
-
-                for (int dstY = 0; dstY < windowSize.getHeight();) {
-
-                    final int height = Math.min(src.getHeight(), windowSize.getHeight() - dstY);
-
-                    for (int dstX = 0; dstX < windowSize.getWidth();) {
-
-                        final int width = Math.min(src.getWidth(), windowSize.getWidth() - dstX);
-
-                        windowBuffer.copyArea(src, 0, 0, dstX, dstY, width, height);
-
-                        dstX += width;
-                    }
-
-                    dstY += height;
-                }
-            }
-        } else if (windowAttributes.isSet(XWindowAttributes.BACKGROUND_PIXEL)) {
-        
-            final int bgPixel = (int)windowAttributes.getBackgroundPixel().getValue();
-            
-            final PixelFormat pixelFormat = window.getPixelFormat();
-            
-            renderer.fillRectangle(
-                    window.getPosition().getLeft(), window.getPosition().getTop(),
-                    window.getSize().getWidth(), window.getSize().getHeight(),
-                    pixelFormat.getRed(bgPixel),
-                    pixelFormat.getGreen(bgPixel),
-                    pixelFormat.getBlue(bgPixel));
-            
-            renderer.flush();
         }
     }
 }

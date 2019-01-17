@@ -34,6 +34,10 @@ public abstract class BaseXCorePixmapTest extends BaseXCoreWindowTest {
             this.surface = surface;
             this.renderer = renderer;
         }
+        
+        void verifyNoMoreInteractions() {
+            Mockito.verifyNoMoreInteractions(surface, renderer);
+        }
     }
 
     protected final PixmapState checkCreatePixmap(int depth, DRAWABLE drawable, Size size) {
