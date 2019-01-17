@@ -14,9 +14,9 @@ import com.neaterbits.displayserver.protocol.messages.Encodeable;
 import com.neaterbits.displayserver.protocol.messages.Request;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateGC;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateWindow;
-import com.neaterbits.displayserver.protocol.messages.requests.GCAttributes;
+import com.neaterbits.displayserver.protocol.messages.requests.XGCAttributes;
 import com.neaterbits.displayserver.protocol.messages.requests.MapWindow;
-import com.neaterbits.displayserver.protocol.messages.requests.WindowAttributes;
+import com.neaterbits.displayserver.protocol.messages.requests.XWindowAttributes;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolyFillRectangle;
 import com.neaterbits.displayserver.protocol.types.BITMASK;
 import com.neaterbits.displayserver.protocol.types.BOOL;
@@ -64,11 +64,11 @@ public class XWindowsTest {
                     new CARD16(0),
                     WindowClass.InputOutput,
                     new VISUALID(screen.getRootVisual()),
-                    new WindowAttributes(
+                    new XWindowAttributes(
                             new BITMASK(
                                     // WindowAttributes.BACKGROUND_PIXEL
-                                    WindowAttributes.BACKING_STORE
-                                    |WindowAttributes.EVENT_MASK
+                                    XWindowAttributes.BACKING_STORE
+                                    |XWindowAttributes.EVENT_MASK
                                     ),
                             null,
                             new CARD32(0xAAAAAA),
@@ -92,8 +92,8 @@ public class XWindowsTest {
 
             final GCONTEXT cid = new GCONTEXT(connection.generateId());
             
-            final CreateGC createGC = new CreateGC(cid, wid.toDrawable(), new GCAttributes(
-                    new BITMASK(GCAttributes.FUNCTION|GCAttributes.PLANE_MASK|GCAttributes.FOREGROUND),
+            final CreateGC createGC = new CreateGC(cid, wid.toDrawable(), new XGCAttributes(
+                    new BITMASK(XGCAttributes.FUNCTION|XGCAttributes.PLANE_MASK|XGCAttributes.FOREGROUND),
                     Function.Copy,
                     new CARD32(0xFFFFFFFFL),
                     new CARD32(0xAAAAAA),

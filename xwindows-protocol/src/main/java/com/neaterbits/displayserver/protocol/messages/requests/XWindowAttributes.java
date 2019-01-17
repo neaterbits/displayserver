@@ -22,7 +22,7 @@ import com.neaterbits.displayserver.protocol.types.SETofEVENT;
 import com.neaterbits.displayserver.protocol.types.WINGRAVITY;
 import com.neaterbits.displayserver.util.logging.LogUtil;
 
-public final class WindowAttributes extends Attributes {
+public final class XWindowAttributes extends XAttributes {
 
     public static final int BACKGROUND_PIXMAP   = 0x00000001;
     public static final int BACKGROUND_PIXEL    = 0x00000002;
@@ -74,7 +74,7 @@ public final class WindowAttributes extends Attributes {
     private final COLORMAP colormap;
     private final CURSOR cursor;
     
-    public static WindowAttributes DEFAULT_ATTRIBUTES = new WindowAttributes(
+    public static XWindowAttributes DEFAULT_ATTRIBUTES = new XWindowAttributes(
             new BITMASK(ALL.getValue() & ~(BACKGROUND_PIXEL|BORDER_PIXEL)),
             PIXMAP.None, null,
             PIXMAP.None, new CARD32(0),
@@ -88,11 +88,11 @@ public final class WindowAttributes extends Attributes {
             COLORMAP.CopyFromParent,
             com.neaterbits.displayserver.protocol.types.CURSOR.None);
     
-    public WindowAttributes applyImmutably(WindowAttributes other) {
-        return new WindowAttributes(this, other);
+    public XWindowAttributes applyImmutably(XWindowAttributes other) {
+        return new XWindowAttributes(this, other);
     }
     
-    private WindowAttributes(WindowAttributes existing, WindowAttributes toApply) {
+    private XWindowAttributes(XWindowAttributes existing, XWindowAttributes toApply) {
         
         super(existing.getValueMask().bitwiseOr(toApply.getValueMask()));
         
@@ -117,7 +117,7 @@ public final class WindowAttributes extends Attributes {
     }
     
     
-    public WindowAttributes(BITMASK valueMask, PIXMAP backgroundPixmap, CARD32 backgroundPixel, PIXMAP borderPixmap,
+    public XWindowAttributes(BITMASK valueMask, PIXMAP backgroundPixmap, CARD32 backgroundPixel, PIXMAP borderPixmap,
             CARD32 borderPixel, BITGRAVITY bitGravity, WINGRAVITY winGravity, BYTE backingStore, CARD32 backingPlanes,
             CARD32 backingPixel, BOOL overrideRedirect, BOOL saveUnder, SETofEVENT eventMask,
             SETofDEVICEEVENT doNotPropagateMask, COLORMAP colormap, CURSOR cursor) {
@@ -140,13 +140,13 @@ public final class WindowAttributes extends Attributes {
         this.cursor = cursor;
     }
 
-    public static WindowAttributes decode(XWindowsProtocolInputStream stream) throws IOException {
+    public static XWindowAttributes decode(XWindowsProtocolInputStream stream) throws IOException {
         
         final BITMASK bitmask = stream.readBITMASK();
 
         final IntPadXWindowsProtocolInputStream padStream = new IntPadXWindowsProtocolInputStream(stream);
 
-        return new WindowAttributes(
+        return new XWindowAttributes(
                 bitmask,
                 readIfSet(bitmask, BACKGROUND_PIXMAP,   padStream::readPIXMAP),
                 readIfSet(bitmask, BACKGROUND_PIXEL,    padStream::readCARD32),

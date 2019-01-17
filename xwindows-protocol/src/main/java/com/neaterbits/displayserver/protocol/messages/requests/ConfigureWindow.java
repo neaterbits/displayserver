@@ -13,7 +13,7 @@ import com.neaterbits.displayserver.util.logging.LogUtil;
 public final class ConfigureWindow extends Request {
 
     private final WINDOW window;
-    private final WindowConfiguration configuration;
+    private final XWindowConfiguration configuration;
 
     public static ConfigureWindow decode(XWindowsProtocolInputStream stream) throws IOException {
         
@@ -21,10 +21,10 @@ public final class ConfigureWindow extends Request {
         
         readRequestLength(stream);
         
-        return new ConfigureWindow(stream.readWINDOW(), WindowConfiguration.decode(stream));
+        return new ConfigureWindow(stream.readWINDOW(), XWindowConfiguration.decode(stream));
     }
     
-    public ConfigureWindow(WINDOW window, WindowConfiguration configuration) {
+    public ConfigureWindow(WINDOW window, XWindowConfiguration configuration) {
         this.window = window;
         this.configuration = configuration;
     }
@@ -33,7 +33,7 @@ public final class ConfigureWindow extends Request {
         return window;
     }
 
-    public WindowConfiguration getConfiguration() {
+    public XWindowConfiguration getConfiguration() {
         return configuration;
     }
 

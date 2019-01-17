@@ -3,7 +3,7 @@ package com.neaterbits.displayserver.xwindows.model.render;
 import java.util.function.Function;
 
 import com.neaterbits.displayserver.buffers.Buffer;
-import com.neaterbits.displayserver.protocol.messages.requests.GCAttributes;
+import com.neaterbits.displayserver.protocol.messages.requests.XGCAttributes;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.POINT;
 import com.neaterbits.displayserver.protocol.types.RECTANGLE;
@@ -13,7 +13,7 @@ import com.neaterbits.displayserver.xwindows.model.XGC;
 
 public interface XLibRenderer extends Disposable {
 
-    public static <T> T getGCValue(XGC gc, int flag, Function<GCAttributes, T> getValue) {
+    public static <T> T getGCValue(XGC gc, int flag, Function<XGCAttributes, T> getValue) {
         
         final T value;
         
@@ -21,11 +21,11 @@ public interface XLibRenderer extends Disposable {
             value = getValue.apply(gc.getAttributes());
         }
         else {
-            if (!GCAttributes.DEFAULT_ATTRIBUTES.isSet(flag)) {
+            if (!XGCAttributes.DEFAULT_ATTRIBUTES.isSet(flag)) {
                 throw new IllegalArgumentException();
             }
             
-            value = getValue.apply(GCAttributes.DEFAULT_ATTRIBUTES);
+            value = getValue.apply(XGCAttributes.DEFAULT_ATTRIBUTES);
         }
         
         

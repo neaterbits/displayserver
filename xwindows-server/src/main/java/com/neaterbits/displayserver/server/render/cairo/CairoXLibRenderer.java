@@ -7,7 +7,7 @@ import com.neaterbits.displayserver.buffers.PixelConversion;
 import com.neaterbits.displayserver.protocol.enums.CoordinateMode;
 import com.neaterbits.displayserver.protocol.enums.ImageFormat;
 import com.neaterbits.displayserver.protocol.enums.gc.Function;
-import com.neaterbits.displayserver.protocol.messages.requests.GCAttributes;
+import com.neaterbits.displayserver.protocol.messages.requests.XGCAttributes;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.POINT;
@@ -43,7 +43,7 @@ final class CairoXLibRenderer implements XLibRenderer {
 
     private void applyGC(XGC gc) {
         
-        final BYTE function = XLibRenderer.getGCValue(gc, GCAttributes.FUNCTION, GCAttributes::getFunction);
+        final BYTE function = XLibRenderer.getGCValue(gc, XGCAttributes.FUNCTION, XGCAttributes::getFunction);
         
         final CairoOperator operator;
         
@@ -65,13 +65,13 @@ final class CairoXLibRenderer implements XLibRenderer {
         
         cr.setOperator(operator);
 
-        final CARD32 planeMask = XLibRenderer.getGCValue(gc, GCAttributes.PLANE_MASK, GCAttributes::getPlaneMask);
+        final CARD32 planeMask = XLibRenderer.getGCValue(gc, XGCAttributes.PLANE_MASK, XGCAttributes::getPlaneMask);
         
         if (planeMask.getValue() != 0xFFFFFFFFL) {
             throw new UnsupportedOperationException();
         }
         
-        final int foreground = (int)XLibRenderer.getGCValue(gc, GCAttributes.FOREGROUND, GCAttributes::getForeground).getValue();
+        final int foreground = (int)XLibRenderer.getGCValue(gc, XGCAttributes.FOREGROUND, XGCAttributes::getForeground).getValue();
         
         cr.setSourceRGB(
                 pixelConversion.getRed(foreground),

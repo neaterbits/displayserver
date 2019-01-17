@@ -13,9 +13,9 @@ import com.neaterbits.displayserver.util.logging.LogUtil;
 public final class ChangeGC extends Request {
 
     private final GCONTEXT gc;
-    private final GCAttributes attributes;
+    private final XGCAttributes attributes;
     
-    public ChangeGC(GCONTEXT gc, GCAttributes attributes) {
+    public ChangeGC(GCONTEXT gc, XGCAttributes attributes) {
         this.gc = gc;
         this.attributes = attributes;
     }
@@ -26,7 +26,7 @@ public final class ChangeGC extends Request {
         
         readRequestLength(stream);
         
-        return new ChangeGC(stream.readGCONTEXT(), GCAttributes.decode(stream));
+        return new ChangeGC(stream.readGCONTEXT(), XGCAttributes.decode(stream));
     }
     
     public Object[] getDebugParams() {
@@ -59,7 +59,7 @@ public final class ChangeGC extends Request {
         return gc;
     }
 
-    public GCAttributes getAttributes() {
+    public XGCAttributes getAttributes() {
         return attributes;
     }
 

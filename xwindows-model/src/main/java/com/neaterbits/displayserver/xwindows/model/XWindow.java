@@ -11,7 +11,7 @@ import com.neaterbits.displayserver.protocol.enums.Mode;
 import com.neaterbits.displayserver.protocol.exception.AtomException;
 import com.neaterbits.displayserver.protocol.exception.MatchException;
 import com.neaterbits.displayserver.protocol.exception.ValueException;
-import com.neaterbits.displayserver.protocol.messages.requests.WindowAttributes;
+import com.neaterbits.displayserver.protocol.messages.requests.XWindowAttributes;
 import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
@@ -35,7 +35,7 @@ public class XWindow extends XDrawable {
     private CARD16 borderWidth;
     private final CARD16 windowClass;
     
-    private WindowAttributes currentWindowAttributes;
+    private XWindowAttributes currentWindowAttributes;
     
     private boolean mapped;
     
@@ -48,7 +48,7 @@ public class XWindow extends XDrawable {
             VISUALID visual,
             CARD16 borderWidth,
             CARD16 windowClass,
-            WindowAttributes currentWindowAttributes,
+            XWindowAttributes currentWindowAttributes,
             XLibRenderer renderer,
             Surface surface) {
         
@@ -63,7 +63,7 @@ public class XWindow extends XDrawable {
             VISUALID visual,
             CARD16 borderWidth,
             CARD16 windowClass,
-            WindowAttributes currentWindowAttributes,
+            XWindowAttributes currentWindowAttributes,
             XLibRenderer renderer,
             Surface surface) {
         
@@ -84,7 +84,7 @@ public class XWindow extends XDrawable {
             VISUALID visual,
             CARD16 borderWidth,
             CARD16 windowClass,
-            WindowAttributes currentWindowAttributes,
+            XWindowAttributes currentWindowAttributes,
             XLibRenderer renderer,
             Surface surface,
             int disambiguate) {
@@ -180,11 +180,11 @@ public class XWindow extends XDrawable {
         return windowClass;
     }
 
-    public final WindowAttributes getCurrentWindowAttributes() {
+    public final XWindowAttributes getCurrentWindowAttributes() {
         return currentWindowAttributes;
     }
     
-    public final void setCurrentWindowAttributes(WindowAttributes currentWindowAttributes) {
+    public final void setCurrentWindowAttributes(XWindowAttributes currentWindowAttributes) {
         
         Objects.requireNonNull(currentWindowAttributes);
         

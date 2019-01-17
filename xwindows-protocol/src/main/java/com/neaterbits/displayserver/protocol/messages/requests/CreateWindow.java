@@ -34,7 +34,7 @@ public final class CreateWindow extends Request {
 	
 	private final VISUALID visual;
 	
-	private final WindowAttributes attributes;
+	private final XWindowAttributes attributes;
 
    public static CreateWindow decode(XWindowsProtocolInputStream stream) throws IOException {
         
@@ -66,7 +66,7 @@ public final class CreateWindow extends Request {
                 borderWidth,
                 windowClass,
                 visual,
-                WindowAttributes.decode(stream));
+                XWindowAttributes.decode(stream));
    }
 
 	public CreateWindow(
@@ -77,7 +77,7 @@ public final class CreateWindow extends Request {
 			CARD16 borderWidth,
 			CARD16 windowClass,
 			VISUALID visual,
-			WindowAttributes attributes) {
+			XWindowAttributes attributes) {
 
 	    Objects.requireNonNull(attributes);
 	    
@@ -184,7 +184,7 @@ public final class CreateWindow extends Request {
 		return visual;
 	}
 
-	public WindowAttributes getAttributes() {
+	public XWindowAttributes getAttributes() {
 		return attributes;
 	}
 

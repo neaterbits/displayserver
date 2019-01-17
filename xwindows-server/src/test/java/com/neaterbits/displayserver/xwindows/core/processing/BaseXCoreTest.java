@@ -12,7 +12,7 @@ import com.neaterbits.displayserver.protocol.messages.Encodeable;
 import com.neaterbits.displayserver.protocol.messages.Request;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.DestroyWindow;
-import com.neaterbits.displayserver.protocol.messages.requests.WindowAttributes;
+import com.neaterbits.displayserver.protocol.messages.requests.XWindowAttributes;
 import com.neaterbits.displayserver.protocol.types.BITMASK;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
@@ -127,7 +127,7 @@ public abstract class BaseXCoreTest {
         
         this.windowManagement = windowsDisplayArea;
         
-        final WindowAttributes windowAttributes = new WindowAttributes(
+        final XWindowAttributes windowAttributes = new XWindowAttributes(
                 new BITMASK(0),
                 null,
                 null,
@@ -249,9 +249,9 @@ public abstract class BaseXCoreTest {
                 new CARD16(0),
                 new CARD16(1),
                 screen.getRootVisual(),
-                new WindowAttributes(
+                new XWindowAttributes(
                         new BITMASK(
-                                  WindowAttributes.BACKING_STORE
+                                  XWindowAttributes.BACKING_STORE
                         //        | WindowAttributes.EVENT_MASK
                         ),
                         null,

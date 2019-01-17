@@ -26,7 +26,7 @@ import com.neaterbits.displayserver.protocol.types.FONT;
 import com.neaterbits.displayserver.protocol.types.INT16;
 import com.neaterbits.displayserver.protocol.types.PIXMAP;
 
-public final class GCAttributes extends Attributes {
+public final class XGCAttributes extends XAttributes {
 	
 	public static final int FUNCTION   = 0x00000001;
 	public static final int PLANE_MASK = 0x00000002;
@@ -116,7 +116,7 @@ public final class GCAttributes extends Attributes {
 	
 	private final BYTE arcMode;
 
-	public static final GCAttributes DEFAULT_ATTRIBUTES = new GCAttributes(
+	public static final XGCAttributes DEFAULT_ATTRIBUTES = new XGCAttributes(
 	        new BITMASK(ALL.getValue() & ~FONT),
 	        Function.Copy,
 	        new CARD32(0xFFFFFFFFL),
@@ -133,11 +133,11 @@ public final class GCAttributes extends Attributes {
 	        new CARD16(0), new CARD8((short)(4 << 4 | 4)),
 	        ArcMode.PieSlice);
 	
-    public GCAttributes applyImmutably(GCAttributes other) {
-        return new GCAttributes(this, other);
+    public XGCAttributes applyImmutably(XGCAttributes other) {
+        return new XGCAttributes(this, other);
     }
     
-    private GCAttributes(GCAttributes existing, GCAttributes toApply) {
+    private XGCAttributes(XGCAttributes existing, XGCAttributes toApply) {
         super(existing.getValueMask().bitwiseOr(toApply.getValueMask()));
         
         final BITMASK e = existing.getValueMask();
@@ -169,7 +169,7 @@ public final class GCAttributes extends Attributes {
     }
 
 	
-	public GCAttributes(BITMASK valueMask, BYTE function, CARD32 planeMask, CARD32 foreground, CARD32 background,
+	public XGCAttributes(BITMASK valueMask, BYTE function, CARD32 planeMask, CARD32 foreground, CARD32 background,
 			CARD16 lineWidth, BYTE lineStyle, BYTE capStyle, BYTE joinStyle, BYTE fillStyle, BYTE fillRule, PIXMAP tile,
 			PIXMAP stipple, INT16 tileStippleXOrigin, INT16 tileStippleYOrigin, FONT font, BYTE subwindowMode,
 			BOOL graphicsExposures, INT16 clipXOrigin, INT16 clipYOrigin, PIXMAP clipMask, CARD16 dashOffset,
@@ -202,13 +202,13 @@ public final class GCAttributes extends Attributes {
 		this.arcMode = arcMode;
 	}
 
-    public static GCAttributes decode(XWindowsProtocolInputStream stream) throws IOException {
+    public static XGCAttributes decode(XWindowsProtocolInputStream stream) throws IOException {
         
         final BITMASK bitmask = stream.readBITMASK();
 
         final IntPadXWindowsProtocolInputStream padStream = new IntPadXWindowsProtocolInputStream(stream);
     
-        return new GCAttributes(
+        return new XGCAttributes(
                 bitmask,
                 readIfSet(bitmask, FUNCTION,            padStream::readBYTE),
                 readIfSet(bitmask, PLANE_MASK,          padStream::readCARD32),

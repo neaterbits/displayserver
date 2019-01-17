@@ -15,7 +15,7 @@ import com.neaterbits.displayserver.protocol.exception.IDChoiceException;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeGC;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateGC;
 import com.neaterbits.displayserver.protocol.messages.requests.FreeGC;
-import com.neaterbits.displayserver.protocol.messages.requests.GCAttributes;
+import com.neaterbits.displayserver.protocol.messages.requests.XGCAttributes;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.CloseFont;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.OpenFont;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.QueryFont;
@@ -129,12 +129,12 @@ public class XClient extends XConnection implements XClientOps {
             throw new IDChoiceException("ID already added", createGC.getCid());
         }
         
-        final GCAttributes attributes = GCAttributes.DEFAULT_ATTRIBUTES.applyImmutably(createGC.getAttributes());
+        final XGCAttributes attributes = XGCAttributes.DEFAULT_ATTRIBUTES.applyImmutably(createGC.getAttributes());
 
         addGC(createGC.getCid(), attributes);
     }
     
-    private void addGC(GCONTEXT context, GCAttributes attributes) {
+    private void addGC(GCONTEXT context, XGCAttributes attributes) {
         
         Objects.requireNonNull(context);
         Objects.requireNonNull(attributes);
@@ -148,7 +148,7 @@ public class XClient extends XConnection implements XClientOps {
         gcs.put(context, xgc);
     }
     
-    private void changeGC(GCONTEXT context, GCAttributes attributes) {
+    private void changeGC(GCONTEXT context, XGCAttributes attributes) {
         
         Objects.requireNonNull(context);
         Objects.requireNonNull(attributes);

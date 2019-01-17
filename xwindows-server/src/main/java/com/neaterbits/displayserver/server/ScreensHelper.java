@@ -12,7 +12,7 @@ import com.neaterbits.displayserver.buffers.PixelFormat;
 import com.neaterbits.displayserver.framebuffer.common.GraphicsDriver;
 import com.neaterbits.displayserver.protocol.enums.VisualClass;
 import com.neaterbits.displayserver.protocol.enums.WindowClass;
-import com.neaterbits.displayserver.protocol.messages.requests.WindowAttributes;
+import com.neaterbits.displayserver.protocol.messages.requests.XWindowAttributes;
 import com.neaterbits.displayserver.protocol.types.BITGRAVITY;
 import com.neaterbits.displayserver.protocol.types.BOOL;
 import com.neaterbits.displayserver.protocol.types.BYTE;
@@ -38,10 +38,10 @@ import com.neaterbits.displayserver.xwindows.model.XWindow;
 
 class ScreensHelper {
 
-    private static WindowAttributes getRootWindowAttributes(DisplayArea displayArea) {
+    private static XWindowAttributes getRootWindowAttributes(DisplayArea displayArea) {
         
-        return new WindowAttributes(
-                WindowAttributes.ALL,
+        return new XWindowAttributes(
+                XWindowAttributes.ALL,
                 PIXMAP.None,
                 new CARD32(0),
                 PIXMAP.None, new CARD32(0),

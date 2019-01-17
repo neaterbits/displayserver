@@ -14,7 +14,7 @@ import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.INT16;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 
-public final class WindowConfiguration extends Attributes {
+public final class XWindowConfiguration extends XAttributes {
     
     public static final int X               = 0x0001;
     public static final int Y               = 0x0002;
@@ -32,7 +32,7 @@ public final class WindowConfiguration extends Attributes {
     private final WINDOW sibling;
     private final BYTE stackMode;
 
-    public static WindowConfiguration decode(XWindowsProtocolInputStream stream) throws IOException {
+    public static XWindowConfiguration decode(XWindowsProtocolInputStream stream) throws IOException {
         
         final BITMASK bitmask = stream.readBITMASK16();
         
@@ -40,7 +40,7 @@ public final class WindowConfiguration extends Attributes {
 
         final IntPadXWindowsProtocolInputStream padStream = new IntPadXWindowsProtocolInputStream(stream);
         
-        return new WindowConfiguration(bitmask,
+        return new XWindowConfiguration(bitmask,
                 readIfSet(bitmask, X,               padStream::readINT16),
                 readIfSet(bitmask, Y,               padStream::readINT16),
                 readIfSet(bitmask, WIDTH,           padStream::readCARD16),
@@ -51,7 +51,7 @@ public final class WindowConfiguration extends Attributes {
 
     }
     
-    public WindowConfiguration(
+    public XWindowConfiguration(
             BITMASK valueMask,
             INT16 x, INT16 y,
             CARD16 width, CARD16 height,

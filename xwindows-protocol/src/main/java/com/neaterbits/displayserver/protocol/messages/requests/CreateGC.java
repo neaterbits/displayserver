@@ -17,7 +17,7 @@ public final class CreateGC extends Request {
 	private final GCONTEXT cid;
 	private final DRAWABLE drawable;
 	
-	private final GCAttributes attributes;
+	private final XGCAttributes attributes;
 
 	public static CreateGC decode(XWindowsProtocolInputStream stream) throws IOException {
 	    
@@ -28,12 +28,12 @@ public final class CreateGC extends Request {
 	    final GCONTEXT cid = stream.readGCONTEXT();
 	    final DRAWABLE drawable = stream.readDRAWABLE();
 	    
-	    final GCAttributes attributes = GCAttributes.decode(stream);
+	    final XGCAttributes attributes = XGCAttributes.decode(stream);
 	    
 	    return new CreateGC(cid, drawable, attributes);
 	}
 	
-	public CreateGC(GCONTEXT cid, DRAWABLE drawable, GCAttributes attributes) {
+	public CreateGC(GCONTEXT cid, DRAWABLE drawable, XGCAttributes attributes) {
 	    
 	    Objects.requireNonNull(cid);
 	    Objects.requireNonNull(drawable);
@@ -52,7 +52,7 @@ public final class CreateGC extends Request {
 		return drawable;
 	}
 
-	public GCAttributes getAttributes() {
+	public XGCAttributes getAttributes() {
 		return attributes;
 	}
 

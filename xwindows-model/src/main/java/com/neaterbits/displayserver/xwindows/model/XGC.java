@@ -2,20 +2,20 @@ package com.neaterbits.displayserver.xwindows.model;
 
 import java.util.Objects;
 
-import com.neaterbits.displayserver.protocol.messages.requests.GCAttributes;
+import com.neaterbits.displayserver.protocol.messages.requests.XGCAttributes;
 
 public final class XGC {
 
-    private GCAttributes attributes;
+    private XGCAttributes attributes;
 
-    public XGC(GCAttributes attributes) {
+    public XGC(XGCAttributes attributes) {
 
         Objects.requireNonNull(attributes);
         
         this.attributes = attributes;
     }
 
-    public GCAttributes getAttributes() {
+    public XGCAttributes getAttributes() {
         return attributes;
     }
 }

@@ -10,11 +10,11 @@ import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.messages.Encodeable;
 import com.neaterbits.displayserver.protocol.types.BITMASK;
 
-public abstract class Attributes extends Encodeable {
+public abstract class XAttributes extends Encodeable {
 
     private final BITMASK valueMask;
 
-    public Attributes(BITMASK valueMask) {
+    public XAttributes(BITMASK valueMask) {
         
         Objects.requireNonNull(valueMask);
         

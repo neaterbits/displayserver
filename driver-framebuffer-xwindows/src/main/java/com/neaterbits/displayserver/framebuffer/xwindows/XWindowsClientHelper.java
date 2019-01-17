@@ -8,9 +8,9 @@ import com.neaterbits.displayserver.protocol.enums.gc.Function;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.SCREEN;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateGC;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateWindow;
-import com.neaterbits.displayserver.protocol.messages.requests.GCAttributes;
+import com.neaterbits.displayserver.protocol.messages.requests.XGCAttributes;
 import com.neaterbits.displayserver.protocol.messages.requests.MapWindow;
-import com.neaterbits.displayserver.protocol.messages.requests.WindowAttributes;
+import com.neaterbits.displayserver.protocol.messages.requests.XWindowAttributes;
 import com.neaterbits.displayserver.protocol.types.BITMASK;
 import com.neaterbits.displayserver.protocol.types.BOOL;
 import com.neaterbits.displayserver.protocol.types.CARD16;
@@ -42,9 +42,9 @@ class XWindowsClientHelper {
                 new CARD16(0),
                 new CARD16(1),
                 screen.getRootVisual(),
-                new WindowAttributes(
+                new XWindowAttributes(
                         new BITMASK(
-                                  WindowAttributes.BACKING_STORE
+                                  XWindowAttributes.BACKING_STORE
                         //        | WindowAttributes.EVENT_MASK
                         ),
                         null,
@@ -89,8 +89,8 @@ class XWindowsClientHelper {
         final CreateGC createGC = new CreateGC(
                 gc,
                 window.toDrawable(),
-                new GCAttributes(
-                        new BITMASK(GCAttributes.FUNCTION|GCAttributes.PLANE_MASK|GCAttributes.GRAPHICS_EXPOSURES),
+                new XGCAttributes(
+                        new BITMASK(XGCAttributes.FUNCTION|XGCAttributes.PLANE_MASK|XGCAttributes.GRAPHICS_EXPOSURES),
                         Function.Copy,
                         new CARD32(0xFFFFFFFFL),
                         null,   

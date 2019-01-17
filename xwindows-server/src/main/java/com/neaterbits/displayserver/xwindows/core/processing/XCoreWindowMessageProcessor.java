@@ -29,8 +29,8 @@ import com.neaterbits.displayserver.protocol.messages.requests.GetWindowAttribut
 import com.neaterbits.displayserver.protocol.messages.requests.MapSubwindows;
 import com.neaterbits.displayserver.protocol.messages.requests.MapWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.QueryTree;
-import com.neaterbits.displayserver.protocol.messages.requests.WindowAttributes;
-import com.neaterbits.displayserver.protocol.messages.requests.WindowConfiguration;
+import com.neaterbits.displayserver.protocol.messages.requests.XWindowAttributes;
+import com.neaterbits.displayserver.protocol.messages.requests.XWindowConfiguration;
 import com.neaterbits.displayserver.protocol.types.BITMASK;
 import com.neaterbits.displayserver.protocol.types.BOOL;
 import com.neaterbits.displayserver.protocol.types.CARD16;
@@ -347,7 +347,7 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
                 parentWindow.getVisual(),
                 createWindow.getBorderWidth(),
                 createWindow.getWindowClass(),
-                WindowAttributes.DEFAULT_ATTRIBUTES.applyImmutably(createWindow.getAttributes()),
+                XWindowAttributes.DEFAULT_ATTRIBUTES.applyImmutably(createWindow.getAttributes()),
                 renderer,
                 windowSurface);
         
@@ -358,24 +358,24 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
         
         final XWindow xWindow = findClientOrRootWindow(xWindows, changeWindowAttributes.getWindow());
      
-        final WindowAttributes currentAttributes = xWindow.getCurrentWindowAttributes();
+        final XWindowAttributes currentAttributes = xWindow.getCurrentWindowAttributes();
 
-        final WindowAttributes updatedAttributes = currentAttributes.applyImmutably(changeWindowAttributes.getAttributes());
+        final XWindowAttributes updatedAttributes = currentAttributes.applyImmutably(changeWindowAttributes.getAttributes());
         
         xWindow.setCurrentWindowAttributes(updatedAttributes);
         
         final boolean sameBgMask = BITMASK.isSameMask(
                 currentAttributes.getValueMask(),
                 updatedAttributes.getValueMask(),
-                WindowAttributes.BACKGROUND_PIXEL|WindowAttributes.BACKGROUND_PIXMAP);
+                XWindowAttributes.BACKGROUND_PIXEL|XWindowAttributes.BACKGROUND_PIXMAP);
 
         
         if (xWindow.isMapped()) {
         
             if (    !sameBgMask
-                 || (    updatedAttributes.isSet(WindowAttributes.BACKGROUND_PIXEL)
+                 || (    updatedAttributes.isSet(XWindowAttributes.BACKGROUND_PIXEL)
                       && !updatedAttributes.getBackgroundPixel().equals(currentAttributes.getBackgroundPixel()))
-                 || (    updatedAttributes.isSet(WindowAttributes.BACKGROUND_PIXMAP)
+                 || (    updatedAttributes.isSet(XWindowAttributes.BACKGROUND_PIXMAP)
                       && !updatedAttributes.getBackgroundPixmap().equals(currentAttributes.getBackgroundPixmap()))
              ) {
     
@@ -394,7 +394,7 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
             sendError(client, Errors.Window, sequenceNumber, getWindowAttributes.getWindow().getValue(), opcode);
         }
         else {
-            final WindowAttributes curAttributes = window.getCurrentWindowAttributes();
+            final XWindowAttributes curAttributes = window.getCurrentWindowAttributes();
             
             final GetWindowAttributesReply reply = new GetWindowAttributesReply(
                     sequenceNumber,
@@ -459,21 +459,21 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
         Integer updatedWidth = null;
         Integer updatedHeight = null;
         
-        final WindowConfiguration windowConfiguration = configureWindow.getConfiguration();
+        final XWindowConfiguration windowConfiguration = configureWindow.getConfiguration();
         
-        if (windowConfiguration.isSet(WindowConfiguration.X)) {
+        if (windowConfiguration.isSet(XWindowConfiguration.X)) {
             updatedX = (int)windowConfiguration.getX().getValue();
         }
         
-        if (windowConfiguration.isSet(WindowConfiguration.Y)) {
+        if (windowConfiguration.isSet(XWindowConfiguration.Y)) {
             updatedY = (int)windowConfiguration.getY().getValue();
         }
         
-        if (windowConfiguration.isSet(WindowConfiguration.WIDTH)) {
+        if (windowConfiguration.isSet(XWindowConfiguration.WIDTH)) {
             updatedWidth = (int)windowConfiguration.getWidth().getValue();
         }
         
-        if (windowConfiguration.isSet(WindowConfiguration.HEIGHT)) {
+        if (windowConfiguration.isSet(XWindowConfiguration.HEIGHT)) {
             updatedHeight = (int)windowConfiguration.getHeight().getValue();
         }
         
@@ -502,7 +502,7 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
             window.setSize(updatedSize);
         }
         
-        if (windowConfiguration.isSet(WindowConfiguration.BORDER_WIDTH)) {
+        if (windowConfiguration.isSet(XWindowConfiguration.BORDER_WIDTH)) {
             
             xWindow.setBorderWidth(windowConfiguration.getBorderWidth());
             
@@ -511,9 +511,9 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
     }
 
     
-    private void renderWindowBackground(WindowAttributes windowAttributes, Window window, XLibRenderer renderer, BufferOperations windowBuffer) {
+    private void renderWindowBackground(XWindowAttributes windowAttributes, Window window, XLibRenderer renderer, BufferOperations windowBuffer) {
         
-        if (    windowAttributes.isSet(WindowAttributes.BACKGROUND_PIXMAP)
+        if (    windowAttributes.isSet(XWindowAttributes.BACKGROUND_PIXMAP)
             && !windowAttributes.getBackgroundPixmap().equals(PIXMAP.None)) {
 
             final PIXMAP pixmapResource = windowAttributes.getBackgroundPixmap();
@@ -545,7 +545,7 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
                     dstY += height;
                 }
             }
-        } else if (windowAttributes.isSet(WindowAttributes.BACKGROUND_PIXEL)) {
+        } else if (windowAttributes.isSet(XWindowAttributes.BACKGROUND_PIXEL)) {
         
             final int bgPixel = (int)windowAttributes.getBackgroundPixel().getValue();
             

@@ -14,7 +14,7 @@ import com.neaterbits.displayserver.util.logging.LogUtil;
 public final class ChangeWindowAttributes extends Request {
 
     private final WINDOW window;
-    private final WindowAttributes attributes;
+    private final XWindowAttributes attributes;
 
     public static ChangeWindowAttributes decode(XWindowsProtocolInputStream stream) throws IOException {
         
@@ -22,10 +22,10 @@ public final class ChangeWindowAttributes extends Request {
         
         readRequestLength(stream);
         
-        return new ChangeWindowAttributes(stream.readWINDOW(), WindowAttributes.decode(stream));
+        return new ChangeWindowAttributes(stream.readWINDOW(), XWindowAttributes.decode(stream));
     }
     
-    public ChangeWindowAttributes(WINDOW window, WindowAttributes attributes) {
+    public ChangeWindowAttributes(WINDOW window, XWindowAttributes attributes) {
         
         Objects.requireNonNull(window);
         Objects.requireNonNull(attributes);
@@ -38,7 +38,7 @@ public final class ChangeWindowAttributes extends Request {
         return window;
     }
 
-    public WindowAttributes getAttributes() {
+    public XWindowAttributes getAttributes() {
         return attributes;
     }
     

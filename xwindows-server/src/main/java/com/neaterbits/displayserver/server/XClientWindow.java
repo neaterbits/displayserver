@@ -2,7 +2,7 @@ package com.neaterbits.displayserver.server;
 
 import java.util.Objects;
 
-import com.neaterbits.displayserver.protocol.messages.requests.WindowAttributes;
+import com.neaterbits.displayserver.protocol.messages.requests.XWindowAttributes;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
@@ -22,7 +22,7 @@ public final class XClientWindow extends XWindow {
             VISUALID visual,
             CARD16 borderWidth,
             CARD16 windowClass,
-            WindowAttributes currentWindowAttributes,
+            XWindowAttributes currentWindowAttributes,
             XLibRenderer renderer,
             Surface surface) {
         
@@ -37,7 +37,7 @@ public final class XClientWindow extends XWindow {
             VISUALID visual,
             CARD16 borderWidth,
             CARD16 windowClass,
-            WindowAttributes currentWindowAttributes,
+            XWindowAttributes currentWindowAttributes,
             XLibRenderer renderer,
             Surface surface) {
         
@@ -55,7 +55,7 @@ public final class XClientWindow extends XWindow {
             VISUALID visual,
             CARD16 borderWidth,
             CARD16 windowClass,
-            WindowAttributes currentWindowAttributes,
+            XWindowAttributes currentWindowAttributes,
             XLibRenderer renderer,
             Surface surface,
             int disambiguate) {
