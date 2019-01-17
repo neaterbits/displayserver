@@ -155,16 +155,16 @@ public class XCoreImageTest extends BaseXCorePixmapTest {
 
         verify(renderer).flush();
         
-        final ArgumentCaptor<GetImageReply> getImageReply = ArgumentCaptor.forClass(GetImageReply.class);
         
         when(surface.getDepth()).thenReturn(rootPixelFormat.getDepth());
         
         getImageListener.getValue().onResult(imageData);
 
         verify(surface).getDepth();
-        verify(client).send(getImageReply.capture());
+
+        final GetImageReply getImageReply = expectReply(GetImageReply.class);
         
-        final byte [] returnedData = getImageReply.getValue().getData();
+        final byte [] returnedData = getImageReply.getData();
         
         assertThat(returnedData).isEqualTo(imageData);
     }

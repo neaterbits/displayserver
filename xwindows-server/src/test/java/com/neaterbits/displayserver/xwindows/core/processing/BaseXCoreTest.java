@@ -9,7 +9,9 @@ import com.neaterbits.displayserver.protocol.enums.BackingStore;
 import com.neaterbits.displayserver.protocol.enums.WindowClass;
 import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLogImpl;
 import com.neaterbits.displayserver.protocol.messages.Encodeable;
+import com.neaterbits.displayserver.protocol.messages.Reply;
 import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.messages.ServerToClientMessage;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.DestroyWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.XWindowAttributes;
@@ -46,6 +48,7 @@ import com.neaterbits.displayserver.xwindows.model.render.XLibRenderer;
 import com.neaterbits.displayserver.xwindows.model.render.XLibRendererFactory;
 import com.neaterbits.displayserver.xwindows.processing.XClientOps;
 
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import static org.mockito.Mockito.mock;
 
@@ -288,6 +291,19 @@ public abstract class BaseXCoreTest {
         sendRequest(createWindow);
         
         return window;
+    }
+
+    private final <T extends ServerToClientMessage> T expectMessage(Class<T> messageClass) {
+
+        final ArgumentCaptor<T> argumentCaptor = ArgumentCaptor.forClass(messageClass);
+                
+        Mockito.verify(client).send(argumentCaptor.capture());
+    
+        return argumentCaptor.getValue();
+    }
+
+    protected final <T extends Reply> T expectReply(Class<T> replyClass) {
+        return expectMessage(replyClass);
     }
 
     protected final void closeWindow(WINDOW window) {
