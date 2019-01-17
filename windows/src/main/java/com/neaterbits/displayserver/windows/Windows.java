@@ -63,6 +63,7 @@ final class Windows {
 	
 		final Layer parentLayer = parentWindow.getLayer();
 		
+
 		final Layer layer = layers.createLayer(
 				new Position(parameters.getX(), parameters.getY()),
 				new Size(

@@ -6,11 +6,11 @@ import java.util.Objects;
 
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 
-final class XVisuals implements XVisualsConstAccess {
+public final class XVisuals implements XVisualsConstAccess {
 
     private final Map<VISUALID, XVisual> visualsById;
     
-    XVisuals(Map<VISUALID, XVisual> map) {
+    public XVisuals(Map<VISUALID, XVisual> map) {
         this.visualsById = new HashMap<>(map);
     }
     

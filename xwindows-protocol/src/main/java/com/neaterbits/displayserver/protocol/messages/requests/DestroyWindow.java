@@ -31,7 +31,12 @@ public final class DestroyWindow extends Request {
 
 	@Override
 	public void encode(XWindowsProtocolOutputStream stream) throws IOException {
-		stream.writeWINDOW(window);
+
+	    writeOpCode(stream);
+	    
+	    stream.writeWINDOW(window);
+	    
+	    writeRequestLength(stream, 2);
 	}
 
     @Override

@@ -14,7 +14,6 @@ public final class DisplayAreas {
 
     public static DisplayAreas from(DisplayAreaConfig config, GraphicsDriver driver) {
         
-        
         final DisplayArea displayArea = DisplayAreaFinder.makeDisplayArea(config, driver);
         
         if (displayArea == null) {

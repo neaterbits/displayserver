@@ -31,15 +31,15 @@ public final class XRendering {
         return displayAreas;
     }
 
-    Compositor getCompositor() {
+    public Compositor getCompositor() {
         return compositor;
     }
 
-    XLibRendererFactory getRendererFactory() {
+    public XLibRendererFactory getRendererFactory() {
         return rendererFactory;
     }
 
-    FontBufferFactory getFontBufferFactory() {
+    public FontBufferFactory getFontBufferFactory() {
         return fontBufferFactory;
     }
 }

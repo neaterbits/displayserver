@@ -44,7 +44,7 @@ public final class SingleViewPortDirectCompositor extends SingleViewPortComposit
     }
 
     @Override
-    public void freeSurfaceForClientWindow(Window window) {
+    public void freeSurfaceForClientWindow(Window window, Surface surface) {
         
     }
 }

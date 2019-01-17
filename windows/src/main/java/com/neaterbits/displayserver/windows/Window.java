@@ -22,7 +22,7 @@ public final class Window {
 	
 	private final List<Window> subWindows;
 	
-	Window(
+	public Window(
 	        WindowsDisplayArea displayArea,
 	        Window parentWindow,
 	        WindowParameters parameters,

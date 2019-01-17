@@ -45,8 +45,8 @@ import com.neaterbits.displayserver.server.XClientWindow;
 import com.neaterbits.displayserver.server.XClientWindows;
 import com.neaterbits.displayserver.types.Position;
 import com.neaterbits.displayserver.types.Size;
-import com.neaterbits.displayserver.windows.Display;
 import com.neaterbits.displayserver.windows.Window;
+import com.neaterbits.displayserver.windows.WindowManagement;
 import com.neaterbits.displayserver.windows.WindowParameters;
 import com.neaterbits.displayserver.windows.compositor.Compositor;
 import com.neaterbits.displayserver.windows.compositor.OffscreenSurface;
@@ -61,19 +61,19 @@ import com.neaterbits.displayserver.xwindows.processing.XOpCodeProcessor;
 
 public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
 
-    private final Display display;
+    private final WindowManagement windowManagement;
     private final XClientWindows xWindows;
     private final XPixmaps xPixmaps;
     private final Compositor compositor;
     private final XLibRendererFactory rendererFactory;
     
     public XCoreWindowMessageProcessor(
-            XWindowsServerProtocolLog protocolLog, Display display, XClientWindows windows,
+            XWindowsServerProtocolLog protocolLog, WindowManagement windowManagement, XClientWindows windows,
             XPixmaps pixmaps, Compositor compositor, XLibRendererFactory rendererFactory) {
         
         super(protocolLog);
         
-        this.display = display;
+        this.windowManagement = windowManagement;
         this.xWindows = windows;
         this.xPixmaps = pixmaps;
         this.compositor = compositor;
@@ -110,7 +110,7 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
                 sendError(client, Errors.Window, sequenceNumber, createWindow.getParent().getValue(), opcode);
             }
             else {
-            
+                
                 try {
                     final XWindow window = createWindow(createWindow, parentWindow, client);
 
@@ -148,7 +148,7 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
         case OpCodes.DESTROY_WINDOW: {
             final DestroyWindow destroyWindow = log(messageLength, opcode, sequenceNumber, DestroyWindow.decode(stream));
             
-            final XWindow window = destroyWindow(display, destroyWindow, client);
+            final XWindow window = destroyWindow(destroyWindow, client);
             
             if (window != null) {
                 xWindows.removeClientWindow(window);
@@ -264,7 +264,7 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
             }
             else {
 
-                final List<Window> children = display.getSubWindowsInOrder(xWindow.getWindow());
+                final List<Window> children = windowManagement.getSubWindowsInOrder(xWindow.getWindow());
                 
                 final QueryTreeReply reply = new QueryTreeReply(
                         sequenceNumber,
@@ -326,7 +326,7 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
                 createWindow.getBorderWidth().getValue());
         
 
-        final Window window = display.createWindow(parentWindow.getWindow(), windowParameters, null);
+        final Window window = windowManagement.createWindow(parentWindow.getWindow(), windowParameters, null);
         
         if (window == null) {
             throw new IllegalStateException();
@@ -379,7 +379,7 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
                       && !updatedAttributes.getBackgroundPixmap().equals(currentAttributes.getBackgroundPixmap()))
              ) {
     
-                final BufferOperations windowBuffer = xWindow.getBufferOperations();
+                final BufferOperations windowBuffer = xWindow.getSurface();
     
                 renderWindowBackground(updatedAttributes, xWindow.getWindow(), xWindow.getRenderer(), windowBuffer);
             }
@@ -416,7 +416,7 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
         }
     }
 
-    private XWindow destroyWindow(Display display, DestroyWindow destroyWindow, XClientOps client) {
+    private XWindow destroyWindow(DestroyWindow destroyWindow, XClientOps client) {
         
         client.checkAndRemoveResourceId(destroyWindow.getWindow());
     
@@ -425,10 +425,10 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
         if (xWindow != null) {
             
             if (!xWindow.isRootWindow()) {
-                compositor.freeSurfaceForClientWindow(xWindow.getWindow());
+                compositor.freeSurfaceForClientWindow(xWindow.getWindow(), xWindow.getSurface());
             }
             
-            display.disposeWindow(xWindow.getWindow());
+            windowManagement.disposeWindow(xWindow.getWindow());
             
             xWindow.dispose();
         }
@@ -445,7 +445,7 @@ public class XCoreWindowMessageProcessor extends XOpCodeProcessor {
                     xWindow.getCurrentWindowAttributes(),
                     xWindow.getWindow(),
                     xWindow.getRenderer(),
-                    xWindow.getBufferOperations());
+                    xWindow.getSurface());
         }
     }
     

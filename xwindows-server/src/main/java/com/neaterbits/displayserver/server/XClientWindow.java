@@ -2,12 +2,12 @@ package com.neaterbits.displayserver.server;
 
 import java.util.Objects;
 
-import com.neaterbits.displayserver.buffers.BufferOperations;
 import com.neaterbits.displayserver.protocol.messages.requests.WindowAttributes;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.windows.Window;
+import com.neaterbits.displayserver.windows.compositor.Surface;
 import com.neaterbits.displayserver.xwindows.model.XWindow;
 import com.neaterbits.displayserver.xwindows.model.render.XLibRenderer;
 import com.neaterbits.displayserver.xwindows.processing.XClientOps;
@@ -24,9 +24,9 @@ public final class XClientWindow extends XWindow {
             CARD16 windowClass,
             WindowAttributes currentWindowAttributes,
             XLibRenderer renderer,
-            BufferOperations bufferOperations) {
+            Surface surface) {
         
-        this(null, window, windowResource, rootWindow, parentWindow, visual, borderWidth, windowClass, currentWindowAttributes, renderer, bufferOperations, 0);
+        this(null, window, windowResource, rootWindow, parentWindow, visual, borderWidth, windowClass, currentWindowAttributes, renderer, surface, 0);
         
     }
 
@@ -39,9 +39,9 @@ public final class XClientWindow extends XWindow {
             CARD16 windowClass,
             WindowAttributes currentWindowAttributes,
             XLibRenderer renderer,
-            BufferOperations bufferOperations) {
+            Surface surface) {
         
-        this(createdBy, window, windowResource, rootWindow, parentWindow, visual, borderWidth, windowClass, currentWindowAttributes, renderer, bufferOperations, 0);
+        this(createdBy, window, windowResource, rootWindow, parentWindow, visual, borderWidth, windowClass, currentWindowAttributes, renderer, surface, 0);
         
         Objects.requireNonNull(createdBy);
         
@@ -57,10 +57,10 @@ public final class XClientWindow extends XWindow {
             CARD16 windowClass,
             WindowAttributes currentWindowAttributes,
             XLibRenderer renderer,
-            BufferOperations bufferOperations,
+            Surface surface,
             int disambiguate) {
 
-        super(window, windowResource, rootWindow, parentWindow, visual, borderWidth, windowClass, currentWindowAttributes, renderer, bufferOperations);
+        super(window, windowResource, rootWindow, parentWindow, visual, borderWidth, windowClass, currentWindowAttributes, renderer, surface);
         
         this.createdBy = createdBy;
         

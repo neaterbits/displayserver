@@ -2,9 +2,9 @@ package com.neaterbits.displayserver.xwindows.model;
 
 import java.util.Objects;
 
-import com.neaterbits.displayserver.buffers.BufferOperations;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.windows.compositor.OffscreenSurface;
+import com.neaterbits.displayserver.windows.compositor.Surface;
 import com.neaterbits.displayserver.xwindows.model.render.XLibRenderer;
 
 public final class XPixmap extends XDrawable {
@@ -25,7 +25,7 @@ public final class XPixmap extends XDrawable {
     }
 
     @Override
-    public BufferOperations getBufferOperations() {
+    public Surface getSurface() {
         return offscreenSurface;
     }
 }

@@ -3,7 +3,7 @@ package com.neaterbits.displayserver.windows;
 import java.util.List;
 import java.util.Objects;
 
-public class Display {
+public class Display implements WindowManagement {
 
     private final WindowsDisplayAreas displayAreas;
     
@@ -14,6 +14,7 @@ public class Display {
         this.displayAreas = displayAreas;
     }
     
+    @Override
     public Window createWindow(Window parentWindow, WindowParameters windowParameters, WindowAttributes windowAttributes) {
 
         final WindowsDisplayArea displayArea = parentWindow.getDisplayArea();
@@ -25,12 +26,14 @@ public class Display {
         return displayArea.createWindow(parentWindow, windowParameters, windowAttributes);
     }
     
+    @Override
     public void disposeWindow(Window window) {
         Objects.requireNonNull(window);
         
         window.getDisplayArea().disposeWindow(window);
     }
     
+    @Override
     public List<Window> getSubWindowsInOrder(Window window) {
         Objects.requireNonNull(window);
         

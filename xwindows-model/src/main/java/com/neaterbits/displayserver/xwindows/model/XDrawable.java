@@ -2,8 +2,8 @@ package com.neaterbits.displayserver.xwindows.model;
 
 import java.util.Objects;
 
-import com.neaterbits.displayserver.buffers.BufferOperations;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
+import com.neaterbits.displayserver.windows.compositor.Surface;
 import com.neaterbits.displayserver.xwindows.model.render.XLibRenderer;
 
 public abstract class XDrawable extends XResource {
@@ -12,7 +12,7 @@ public abstract class XDrawable extends XResource {
 
     private final XLibRenderer renderer;
     
-    public abstract BufferOperations getBufferOperations();
+    public abstract Surface getSurface();
     
     XDrawable(VISUALID visual, XLibRenderer renderer) {
         

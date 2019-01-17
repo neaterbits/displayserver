@@ -8,6 +8,6 @@ public interface BufferManager {
 
     Surface allocateSurfaceForClientWindow(Window window);
     
-    void freeSurfaceForClientWindow(Window window);
+    void freeSurfaceForClientWindow(Window window, Surface surface);
     
 }

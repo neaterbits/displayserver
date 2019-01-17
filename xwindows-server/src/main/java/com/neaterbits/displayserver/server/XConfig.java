@@ -26,11 +26,11 @@ public final class XConfig {
         return displayAreaConfig;
     }
 
-    FontLoaderConfig getFontConfig() {
+    public FontLoaderConfig getFontConfig() {
         return fontConfig;
     }
 
-    String getColorsFile() {
+    public String getColorsFile() {
         return colorsFile;
     }
 }

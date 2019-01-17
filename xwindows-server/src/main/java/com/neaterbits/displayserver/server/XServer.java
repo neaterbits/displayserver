@@ -5,9 +5,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -26,29 +24,10 @@ import com.neaterbits.displayserver.server.XConnection.State;
 import com.neaterbits.displayserver.windows.Display;
 import com.neaterbits.displayserver.windows.DisplayAreas;
 import com.neaterbits.displayserver.windows.WindowsDisplayAreas;
-import com.neaterbits.displayserver.xwindows.core.processing.XCoreAreaMessageProcessor;
-import com.neaterbits.displayserver.xwindows.core.processing.XCoreAtomMessageProcessor;
-import com.neaterbits.displayserver.xwindows.core.processing.XCoreColorMessageProcessor;
-import com.neaterbits.displayserver.xwindows.core.processing.XCoreCursorMessageProcessor;
-import com.neaterbits.displayserver.xwindows.core.processing.XCoreDrawMessageProcessor;
-import com.neaterbits.displayserver.xwindows.core.processing.XCoreExtensionMessageProcessor;
-import com.neaterbits.displayserver.xwindows.core.processing.XCoreFocusMessageProcessor;
-import com.neaterbits.displayserver.xwindows.core.processing.XCoreFontMessageProcessor;
-import com.neaterbits.displayserver.xwindows.core.processing.XCoreGCMessageProcessor;
-import com.neaterbits.displayserver.xwindows.core.processing.XCoreGrabMessageProcessor;
-import com.neaterbits.displayserver.xwindows.core.processing.XCoreImageMessageProcessor;
-import com.neaterbits.displayserver.xwindows.core.processing.XCoreKeyboardMessageProcessor;
-import com.neaterbits.displayserver.xwindows.core.processing.XCoreMiscMessageProcessor;
-import com.neaterbits.displayserver.xwindows.core.processing.XCorePixmapMessageProcessor;
-import com.neaterbits.displayserver.xwindows.core.processing.XCorePointerMessageProcessor;
-import com.neaterbits.displayserver.xwindows.core.processing.XCorePropertyMessageProcessor;
-import com.neaterbits.displayserver.xwindows.core.processing.XCoreSelectionMessageProcessor;
-import com.neaterbits.displayserver.xwindows.core.processing.XCoreSendEventMessageProcessor;
-import com.neaterbits.displayserver.xwindows.core.processing.XCoreWindowMessageProcessor;
+import com.neaterbits.displayserver.xwindows.core.processing.XCoreModule;
 import com.neaterbits.displayserver.xwindows.model.XScreensAndVisuals;
 import com.neaterbits.displayserver.xwindows.model.XWindow;
 import com.neaterbits.displayserver.xwindows.processing.XMessageDispatcher;
-import com.neaterbits.displayserver.xwindows.processing.XOpCodeProcessor;
 
 public class XServer implements AutoCloseable {
 
@@ -111,63 +90,19 @@ public class XServer implements AutoCloseable {
             }
         };
         
-        final List<XOpCodeProcessor> processors = Arrays.asList(
-
-                new XCoreWindowMessageProcessor(
-                        protocolLog,
-                        display,
-                        state.getWindows(),
-                        state.getPixmaps(),
-                        rendering.getCompositor(),
-                        rendering.getRendererFactory()),
-                
-                new XCorePixmapMessageProcessor(
-                        protocolLog,
-                        state.getWindows(),
-                        state.getPixmaps(),
-                        rendering.getRendererFactory()),
-                
-                new XCoreAtomMessageProcessor(protocolLog),
-                
-                new XCorePropertyMessageProcessor(protocolLog, state.getWindows(), timestampGenerator),
-                
-                new XCoreSelectionMessageProcessor(protocolLog),
-                
-                new XCoreSendEventMessageProcessor(protocolLog),
-                
-                new XCoreGrabMessageProcessor(protocolLog),
-                
-                new XCorePointerMessageProcessor(protocolLog, state.getWindows()),
-                
-                new XCoreFocusMessageProcessor(protocolLog),
-                
-                new XCoreFontMessageProcessor(protocolLog, config.getFontConfig(), rendering.getFontBufferFactory()),
-                
-                new XCoreGCMessageProcessor(protocolLog, state.getWindows(), state.getPixmaps()),
-                
-                new XCoreAreaMessageProcessor(protocolLog, state.getWindows(), state.getPixmaps()),
-                
-                new XCoreDrawMessageProcessor(protocolLog, state.getWindows(), state.getPixmaps()),
-                
-                new XCoreImageMessageProcessor(protocolLog, state.getWindows(), state.getPixmaps()),
-                
-                new XCoreColorMessageProcessor(
-                        protocolLog,
-                        state.getScreens(),
-                        state.getVisuals(),
-                        state.getWindows(),
-                        config.getColorsFile()),
-                
-                new XCoreCursorMessageProcessor(protocolLog),
-                
-                new XCoreExtensionMessageProcessor(protocolLog),
-                
-                new XCoreKeyboardMessageProcessor(protocolLog, hardware.getInputDriver()),
-                
-                new XCoreMiscMessageProcessor(protocolLog)
-        );
-        
-        this.messageDispatcher = new XMessageDispatcher(processors);
+        this.messageDispatcher = new XCoreModule(
+                protocolLog,
+                display,
+                state.getScreens(),
+                state.getVisuals(),
+                state.getWindows(),
+                state.getPixmaps(),
+                rendering.getCompositor(),
+                rendering.getRendererFactory(),
+                rendering.getFontBufferFactory(),
+                timestampGenerator,
+                hardware.getInputDriver(),
+                config);
 	}
 	
 	XClientWindowsConstAccess getWindows() {

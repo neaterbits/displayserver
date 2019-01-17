@@ -7,12 +7,12 @@ import com.neaterbits.displayserver.buffers.PixelFormat;
 import com.neaterbits.displayserver.types.Size;
 import com.neaterbits.displayserver.windows.compositor.OffscreenSurface;
 
-final class WindowsDisplayAreaImpl implements WindowsDisplayArea {
+public final class WindowsDisplayAreaImpl implements WindowsDisplayArea {
 
     private final DisplayArea displayArea;
     private final Windows windows;
 
-    WindowsDisplayAreaImpl(DisplayArea displayArea, WindowEventListener windowEventListener) {
+    public WindowsDisplayAreaImpl(DisplayArea displayArea, WindowEventListener windowEventListener) {
     
         Objects.requireNonNull(displayArea);
         
@@ -67,6 +67,7 @@ final class WindowsDisplayAreaImpl implements WindowsDisplayArea {
     
     @Override
     public Window createWindow(Window parentWindow, WindowParameters parameters, WindowAttributes attributes) {
+        
         return windows.createWindow(parentWindow, parameters, attributes);
     }
     

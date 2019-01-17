@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import com.neaterbits.displayserver.buffers.BufferOperations;
 import com.neaterbits.displayserver.protocol.enums.Mode;
 import com.neaterbits.displayserver.protocol.exception.AtomException;
 import com.neaterbits.displayserver.protocol.exception.MatchException;
@@ -20,6 +19,7 @@ import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.windows.Window;
+import com.neaterbits.displayserver.windows.compositor.Surface;
 import com.neaterbits.displayserver.xwindows.model.render.XLibRenderer;
 
 public class XWindow extends XDrawable {
@@ -30,7 +30,7 @@ public class XWindow extends XDrawable {
     private final WINDOW rootWindow;
     private final WINDOW parentWindow;
 
-    private final BufferOperations bufferOperations;
+    private final Surface surface;
     
     private CARD16 borderWidth;
     private final CARD16 windowClass;
@@ -50,9 +50,9 @@ public class XWindow extends XDrawable {
             CARD16 windowClass,
             WindowAttributes currentWindowAttributes,
             XLibRenderer renderer,
-            BufferOperations bufferOperations) {
+            Surface surface) {
         
-        this(window, windowResource, WINDOW.None, WINDOW.None, visual, borderWidth, windowClass, currentWindowAttributes, renderer, bufferOperations, 0);
+        this(window, windowResource, WINDOW.None, WINDOW.None, visual, borderWidth, windowClass, currentWindowAttributes, renderer, surface, 0);
     
         this.mapped = true;
     }
@@ -65,9 +65,9 @@ public class XWindow extends XDrawable {
             CARD16 windowClass,
             WindowAttributes currentWindowAttributes,
             XLibRenderer renderer,
-            BufferOperations bufferOperations) {
+            Surface surface) {
         
-        this(window, windowResource, rootWindow, parentWindow, visual, borderWidth, windowClass, currentWindowAttributes, renderer, bufferOperations, 0);
+        this(window, windowResource, rootWindow, parentWindow, visual, borderWidth, windowClass, currentWindowAttributes, renderer, surface, 0);
         
         if (rootWindow.equals(WINDOW.None)) {
             throw new IllegalArgumentException();
@@ -86,7 +86,7 @@ public class XWindow extends XDrawable {
             CARD16 windowClass,
             WindowAttributes currentWindowAttributes,
             XLibRenderer renderer,
-            BufferOperations bufferOperations,
+            Surface surface,
             int disambiguate) {
         
         super(visual, renderer);
@@ -108,16 +108,16 @@ public class XWindow extends XDrawable {
         this.windowClass = windowClass;
         this.currentWindowAttributes = currentWindowAttributes;
 
-        Objects.requireNonNull(bufferOperations);
+        Objects.requireNonNull(surface);
         
-        this.bufferOperations = bufferOperations;
+        this.surface = surface;
 
         this.properties = new HashMap<>();
     }
     
     @Override
-    public BufferOperations getBufferOperations() {
-        return bufferOperations;
+    public Surface getSurface() {
+        return surface;
     }
 
     public final boolean isRootWindow() {

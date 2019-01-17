@@ -109,7 +109,7 @@ public final class XCoreImageMessageProcessor extends XOpCodeProcessor {
                 getImage(
                         getImage,
                         sequenceNumber,
-                        xDrawable.getBufferOperations(),
+                        xDrawable.getSurface(),
                         xDrawable.getVisual(),
                         client);
             } catch (MatchException ex) {

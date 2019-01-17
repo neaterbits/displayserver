@@ -9,7 +9,7 @@ public final class WindowsDisplayAreas {
 
     private final List<WindowsDisplayArea> displayAreas;
     
-    WindowsDisplayAreas(DisplayAreas displayAreas, WindowEventListener windowEventListener) {
+    public WindowsDisplayAreas(DisplayAreas displayAreas, WindowEventListener windowEventListener) {
 
         Objects.requireNonNull(windowEventListener);
         

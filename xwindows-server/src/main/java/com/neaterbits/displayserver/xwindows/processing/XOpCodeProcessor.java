@@ -127,6 +127,6 @@ public abstract class XOpCodeProcessor extends XMessageProcessor {
         
         final XDrawable xDrawable = findDrawable(xWindows, xPixmaps, drawable);
         
-        return xDrawable.getBufferOperations();
+        return xDrawable.getSurface();
     }
 }
