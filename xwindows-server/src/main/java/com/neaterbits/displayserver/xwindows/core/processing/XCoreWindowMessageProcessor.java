@@ -358,7 +358,8 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
                 renderer,
                 windowSurface);
 
-        eventSubscriptions.sendEventToSubscribing(
+        sendEventToSubscribing(
+                eventSubscriptions,
                 createWindow.getParent(),
                 SETofEVENT.SUBSTRUCTURE_NOTIFY,
                 clientOps -> new CreateNotify(
@@ -515,7 +516,10 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
 
                 renderWindowBackground(xWindow);
                 
-                eventSubscriptions.sendEventToSubscribing(xWindow, SETofEVENT.STRUCTURE_NOTIFY,
+                sendEventToSubscribing(
+                        eventSubscriptions,
+                        xWindow,
+                        SETofEVENT.STRUCTURE_NOTIFY,
                         clientOps -> new MapNotify(
                                 clientOps.getSequenceNumber(),
                                 xWindow.getWINDOW(),
@@ -523,7 +527,9 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
                                 overrideRedirect));
                 
                 if (!xWindow.isRootWindow()) {
-                    eventSubscriptions.sendEventToSubscribing(
+                    
+                    sendEventToSubscribing(
+                            eventSubscriptions,
                             xWindow.getParentWINDOW(), 
                             SETofEVENT.SUBSTRUCTURE_NOTIFY,
                             clientOps -> new MapNotify(

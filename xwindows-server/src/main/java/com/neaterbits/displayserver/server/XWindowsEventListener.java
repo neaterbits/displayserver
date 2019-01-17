@@ -4,11 +4,6 @@ import java.util.Objects;
 
 import com.neaterbits.displayserver.layers.Rectangle;
 import com.neaterbits.displayserver.layers.Region;
-import com.neaterbits.displayserver.protocol.Events;
-import com.neaterbits.displayserver.protocol.enums.OpCodes;
-import com.neaterbits.displayserver.protocol.messages.events.GraphicsExposure;
-import com.neaterbits.displayserver.protocol.types.CARD16;
-import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.windows.Window;
 import com.neaterbits.displayserver.windows.WindowEventListener;
 import com.neaterbits.displayserver.xwindows.model.XWindow;
@@ -45,7 +40,9 @@ final class XWindowsEventListener implements WindowEventListener {
             
             final int c = count;
             
-            server.getEventSubscriptions().sendEventToSubscribing(
+            /*
+            sendEventToSubscribing(
+                    server.getEventSubscriptions(),
                     xWindow,
                     Events.GRAPHICS_EXPOSURE,
                     client ->
@@ -59,7 +56,7 @@ final class XWindowsEventListener implements WindowEventListener {
                     new CARD8((byte)OpCodes.COPY_AREA), new CARD16(0))
                 );
 
-            
+            */
         }
     }
 }
