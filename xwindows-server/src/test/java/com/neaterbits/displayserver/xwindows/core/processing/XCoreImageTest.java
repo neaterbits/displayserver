@@ -7,10 +7,7 @@ import com.neaterbits.displayserver.buffers.GetImageListener;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolUtil;
 import com.neaterbits.displayserver.protocol.enums.ImageFormat;
 import com.neaterbits.displayserver.protocol.enums.gc.Function;
-import com.neaterbits.displayserver.protocol.exception.GContextException;
-import com.neaterbits.displayserver.protocol.exception.IDChoiceException;
 import com.neaterbits.displayserver.protocol.messages.replies.GetImageReply;
-import com.neaterbits.displayserver.protocol.messages.requests.CreateGC;
 import com.neaterbits.displayserver.protocol.messages.requests.GetImage;
 import com.neaterbits.displayserver.protocol.messages.requests.PutImage;
 import com.neaterbits.displayserver.protocol.messages.requests.XGCAttributes;
@@ -19,13 +16,11 @@ import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
-import com.neaterbits.displayserver.protocol.types.GCONTEXT;
 import com.neaterbits.displayserver.protocol.types.INT16;
 import com.neaterbits.displayserver.types.Position;
 import com.neaterbits.displayserver.types.Size;
 import com.neaterbits.displayserver.windows.compositor.Surface;
 import com.neaterbits.displayserver.xwindows.core.util.XGCAttributesBuilder;
-import com.neaterbits.displayserver.xwindows.model.XGC;
 import com.neaterbits.displayserver.xwindows.model.render.XLibRenderer;
 
 import static org.mockito.Mockito.when;
@@ -35,31 +30,18 @@ import java.util.Arrays;
 import static org.mockito.Mockito.verify;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
-import static org.mockito.ArgumentMatchers.isNotNull;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class XCoreImageTest extends BaseXCorePixmapTest {
+public class XCoreImageTest extends BaseXCoreGCTest {
 
     private void checkPutAndGetImage(DRAWABLE drawable, Surface surface, XLibRenderer renderer, Size drawableSize) {
         
-        final GCONTEXT gc = new GCONTEXT(allocateResourceId());
-
         final XGCAttributes attributes = new XGCAttributesBuilder()
                 .addFunction(Function.Copy)
                 .build();
-        
-        final CreateGC createGC = new CreateGC(gc, drawable, attributes);
-        
-        sendRequest(createGC);
 
-        try {
-            verify(client).createGC(isNotNull());
-        } catch (IDChoiceException ex) {
-            throw new IllegalStateException(ex);
-        }
-
-        final XGC xgc = new XGC(attributes);
+        final GCState gcState = checkCreateGC(drawable, attributes);
         
         final byte [] imageData = new byte [] {
                 0x00, 0x01, 0x02,
@@ -85,7 +67,7 @@ public class XCoreImageTest extends BaseXCorePixmapTest {
         final PutImage putImage = new PutImage(
                 imageFormat,
                 drawable,
-                gc,
+                gcState.gc,
                 new CARD16(size.getWidth()),
                 new CARD16(size.getHeight()),
                 new INT16((short)position.getLeft()),
@@ -97,26 +79,18 @@ public class XCoreImageTest extends BaseXCorePixmapTest {
                 imageData.length);
         
         
-        try {
-            when(client.getGC(eq(gc))).thenReturn(xgc);
-        } catch (GContextException ex) {
-            throw new IllegalStateException(ex);
-        }
+        whenGetGCFromClient(gcState);
         
         sendRequest(putImage);
 
         final int padding = XWindowsProtocolUtil.getPadding(imageData.length);
         
         final byte [] paddedData = Arrays.copyOf(imageData, imageData.length + padding);
-        
-        try {
-            verify(client).getGC(eq(gc));
-        } catch (GContextException ex) {
-            throw new IllegalStateException(ex);
-        }
+
+        verifyGetGCFromClient(gcState);
         
         verify(renderer).putImage(
-                same(xgc),
+                same(gcState.xgc),
                 eq((int)imageFormat.getValue()),
                 eq(size.getWidth()),
                 eq(size.getHeight()),
@@ -154,7 +128,6 @@ public class XCoreImageTest extends BaseXCorePixmapTest {
                 getImageListener.capture());
 
         verify(renderer).flush();
-        
         
         when(surface.getDepth()).thenReturn(rootPixelFormat.getDepth());
         
