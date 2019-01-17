@@ -15,10 +15,11 @@ import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.messages.Encodeable;
 import com.neaterbits.displayserver.protocol.messages.Event;
 import com.neaterbits.displayserver.protocol.types.CARD16;
+import com.neaterbits.displayserver.xwindows.processing.XConnectionOps;
 
 public class XConnection
     extends NonBlockingChannelWriter
-    implements NonBlockingWritable, AutoCloseable {
+    implements NonBlockingWritable, AutoCloseable, XConnectionOps {
 
 	enum State {
 		
@@ -102,7 +103,8 @@ public class XConnection
         this.state = state;
     }
 
-	final void send(Encodeable message) {
+    @Override
+	public final void send(Encodeable message) {
 	    
 	    writeToOutputBuffer(byteOrder, dataOutputStream -> {
             final XWindowsProtocolOutputStream protocolOutputStream = new DataOutputXWindowsProtocolOutputStream(dataOutputStream);

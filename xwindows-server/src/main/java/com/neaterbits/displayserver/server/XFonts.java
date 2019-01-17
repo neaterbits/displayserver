@@ -12,17 +12,17 @@ import com.neaterbits.displayserver.xwindows.fonts.model.XFont;
 import com.neaterbits.displayserver.xwindows.fonts.model.XNamedFontModel;
 import com.neaterbits.displayserver.xwindows.fonts.render.FontBufferFactory;
 
-final class XFonts {
+public final class XFonts {
 
     private final FontLoader fontLoader;
     private final FontCache fontCache;
     
-    XFonts(FontLoaderConfig config) {
+    public XFonts(FontLoaderConfig config) {
         this.fontLoader = new FontLoader(config);
         this.fontCache = new FontCache();
     }
     
-    XFont openFont(String pattern, FontBufferFactory fontBufferFactory) throws NoSuchFontException, IOException, ValueException {
+    public XFont openFont(String pattern, FontBufferFactory fontBufferFactory) throws NoSuchFontException, IOException, ValueException {
 
         final FontDescriptor [] fonts = fontLoader.listFonts(pattern);
 
@@ -55,7 +55,7 @@ final class XFonts {
         return font;
     }
     
-    void closeFont(XFont font) {
+    public void closeFont(XFont font) {
         
         final boolean referenced = font.remRef();
         
@@ -64,11 +64,11 @@ final class XFonts {
         }
     }
     
-    FontDescriptor [] listFonts(String pattern) throws ValueException {
+    public FontDescriptor [] listFonts(String pattern) throws ValueException {
         return fontLoader.listFonts(pattern);
     }
 
-    XNamedFontModel [] listFontsWithInfo(String pattern) throws ValueException {
+    public XNamedFontModel [] listFontsWithInfo(String pattern) throws ValueException {
         return fontLoader.listFontsWithInfo(pattern);
     }
 }

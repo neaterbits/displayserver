@@ -6,10 +6,11 @@ import java.util.Objects;
 
 import com.neaterbits.displayserver.xwindows.model.XWindow;
 import com.neaterbits.displayserver.xwindows.model.XWindows;
+import com.neaterbits.displayserver.xwindows.processing.XClientOps;
 
 public class XClientWindows extends XWindows<XClientWindow> {
 
-    private final Map<XWindow, XClient> creatingClientByWindow;
+    private final Map<XWindow, XClientOps> creatingClientByWindow;
 
     public XClientWindows() {
         
@@ -17,7 +18,7 @@ public class XClientWindows extends XWindows<XClientWindow> {
     }
 
     
-    void addClientWindow(XWindow xWindow, XClient creatingClient) {
+    public void addClientWindow(XWindow xWindow, XClientOps creatingClient) {
 
         Objects.requireNonNull(creatingClient);
 
@@ -27,7 +28,7 @@ public class XClientWindows extends XWindows<XClientWindow> {
     }
     
     @Override
-    protected boolean removeClientWindow(XWindow xWindow) {
+    public boolean removeClientWindow(XWindow xWindow) {
 
         final boolean removed = super.removeClientWindow(xWindow);
         

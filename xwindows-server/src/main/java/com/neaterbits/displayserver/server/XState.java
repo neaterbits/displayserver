@@ -30,7 +30,8 @@ final class XState extends XDisplayState<XClientWindow, XClientWindows> implemen
         getWindows().addRootWindow(screen, window);
     }
     
-    Integer getScreenForWindow(WINDOW window) {
+    @Override
+    public Integer getScreenForWindow(WINDOW window) {
         return getWindows().getScreenForWindow(window);
     }
 

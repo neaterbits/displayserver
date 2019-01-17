@@ -48,6 +48,7 @@ public class XWindows<T extends XWindow> extends XResources<XWindow> implements 
         addWindowToXWindowMapping(xWindow);
     }
     
+    @Override
     public final Integer getScreenForWindow(WINDOW window) {
      
         Objects.requireNonNull(window);
@@ -74,7 +75,7 @@ public class XWindows<T extends XWindow> extends XResources<XWindow> implements 
         xWindowByWindow.put(xWindow.getWindow(), xWindow);
     }
 
-    protected boolean removeClientWindow(XWindow xWindow) {
+    public boolean removeClientWindow(XWindow xWindow) {
         
         Objects.requireNonNull(xWindow);
         

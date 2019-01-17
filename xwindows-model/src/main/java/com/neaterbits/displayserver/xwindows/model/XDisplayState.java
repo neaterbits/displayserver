@@ -1,6 +1,5 @@
 package com.neaterbits.displayserver.xwindows.model;
 
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -9,7 +8,6 @@ import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.PIXMAP;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
-import com.neaterbits.displayserver.windows.WindowsDisplayArea;
 import com.neaterbits.displayserver.windows.Window;
 
 public class XDisplayState<W extends XWindow, WINDOWS extends XWindows<W>>
@@ -17,8 +15,7 @@ public class XDisplayState<W extends XWindow, WINDOWS extends XWindows<W>>
         XScreensConstAccess,
         XVisualsConstAccess,
         XWindowsConstAccess<W>,
-        XPixmapsConstAccess,
-        XDrawablesConstAccess
+        XPixmapsConstAccess
 {
 
     private final XScreens screens;
@@ -75,8 +72,25 @@ public class XDisplayState<W extends XWindow, WINDOWS extends XWindows<W>>
         return windows.getClientWindow(window);
     }
 
-    protected final WINDOWS getWindows() {
+    @Override
+    public DRAWABLE getOwnerDrawable(PIXMAP pixmapDrawable) {
+        return pixmaps.getOwnerDrawable(pixmapDrawable);
+    }
+
+    public final XScreens getScreens() {
+        return screens;
+    }
+
+    public final XVisuals getVisuals() {
+        return visuals;
+    }
+
+    public final WINDOWS getWindows() {
         return windows;
+    }
+
+    public final XPixmaps getPixmaps() {
+        return pixmaps;
     }
 
     public final void addPixmap(PIXMAP resource, DRAWABLE drawable, XPixmap pixmap) {
@@ -86,59 +100,15 @@ public class XDisplayState<W extends XWindow, WINDOWS extends XWindows<W>>
     public final XPixmap removePixmap(PIXMAP resource) {
         return pixmaps.removePixmap(resource);
     }
-    
+
     @Override
     public XPixmap getPixmap(PIXMAP pixmap) {
         return pixmaps.getPixmap(pixmap);
     }
 
     @Override
-    public XDrawable findDrawable(DRAWABLE drawable) {
-        
-        XWindow window = getClientOrRootWindow(drawable.toWindow());
-
-        final XDrawable xDrawable;
-        
-        if (window != null) {
-            xDrawable = window;
-        }
-        else {
-            xDrawable = pixmaps.getPixmap(drawable.toPixmap());
-        }
-        
-        return xDrawable;
-    }
-    
-    @Override
-    public XWindow findPixmapWindow(PIXMAP pixmap) {
-
-        final DRAWABLE pixmapOwnerDrawable = pixmaps.getOwnerDrawable(pixmap);
-        
-        if (pixmapOwnerDrawable == null) {
-            throw new IllegalStateException();
-        }
-
-        XWindow xWindow = getClientOrRootWindow(pixmapOwnerDrawable.toWindow());
-        
-        if (xWindow == null) {
-            // See if is pixmap instead
-            xWindow = findPixmapWindow(pixmapOwnerDrawable.toPixmap());
-        }
-        
-        return xWindow;
+    public Integer getScreenForWindow(WINDOW window) {
+        return windows.getScreenForWindow(window);
     }
 
-    
-    public final WindowsDisplayArea findDisplayArea(DRAWABLE drawable) {
-        
-        Objects.requireNonNull(drawable);
-        
-        XWindow window = getClientOrRootWindow(drawable.toWindow());
-        
-        if (window == null) {
-            window = findPixmapWindow(drawable.toPixmap());
-        }
-
-        return window.getWindow().getDisplayArea();
-    }
 }

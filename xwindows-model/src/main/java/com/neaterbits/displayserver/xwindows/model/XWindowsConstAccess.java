@@ -12,4 +12,6 @@ public interface XWindowsConstAccess<T extends XWindow> {
     XWindow findRootWindowOf(WINDOW windowResource);
     
     T getClientWindow(Window window);
+
+    Integer getScreenForWindow(WINDOW window);
 }

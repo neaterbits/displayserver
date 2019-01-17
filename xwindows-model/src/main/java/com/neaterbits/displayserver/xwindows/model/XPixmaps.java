@@ -32,7 +32,7 @@ public final class XPixmaps extends XResources<XPixmap> implements XPixmapsConst
         return drawableToXPixmap.get(pixmap);
     }
     
-    void addPixmap(PIXMAP resource, DRAWABLE drawable, XPixmap xPixmap) {
+    public void addPixmap(PIXMAP resource, DRAWABLE drawable, XPixmap xPixmap) {
         
         Objects.requireNonNull(resource);
         Objects.requireNonNull(drawable);
@@ -44,7 +44,7 @@ public final class XPixmaps extends XResources<XPixmap> implements XPixmapsConst
         
     }
 
-    XPixmap removePixmap(PIXMAP resource) {
+    public XPixmap removePixmap(PIXMAP resource) {
         
         Objects.requireNonNull(resource);
         
@@ -55,7 +55,11 @@ public final class XPixmaps extends XResources<XPixmap> implements XPixmapsConst
         return xPixmap;
     }
 
-    DRAWABLE getOwnerDrawable(PIXMAP pixmapDrawable) {
+    @Override
+    public DRAWABLE getOwnerDrawable(PIXMAP pixmapDrawable) {
+        
+        Objects.requireNonNull(pixmapDrawable);
+        
         return pixmapToOwnerDrawable.get(pixmapDrawable);        
     }
 }

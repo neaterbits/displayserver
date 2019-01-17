@@ -10,12 +10,13 @@ import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.windows.Window;
 import com.neaterbits.displayserver.xwindows.model.XWindow;
 import com.neaterbits.displayserver.xwindows.model.render.XLibRenderer;
+import com.neaterbits.displayserver.xwindows.processing.XClientOps;
 
 public final class XClientWindow extends XWindow {
 
-    private final XClient createdBy;
+    private final XClientOps createdBy;
 
-    XClientWindow(
+    public XClientWindow(
             Window window,
             WINDOW windowResource, WINDOW rootWindow, WINDOW parentWindow,
             VISUALID visual,
@@ -29,8 +30,8 @@ public final class XClientWindow extends XWindow {
         
     }
 
-    XClientWindow(
-            XClient createdBy,
+    public XClientWindow(
+            XClientOps createdBy,
             Window window,
             WINDOW windowResource, WINDOW rootWindow, WINDOW parentWindow,
             VISUALID visual,
@@ -48,7 +49,7 @@ public final class XClientWindow extends XWindow {
 
     
     private XClientWindow(
-            XClient createdBy,
+            XClientOps createdBy,
             Window window,
             WINDOW windowResource, WINDOW rootWindow, WINDOW parentWindow,
             VISUALID visual,
@@ -66,7 +67,7 @@ public final class XClientWindow extends XWindow {
     }
 
     
-    boolean isCreatedBy(XClient client) {
+    public boolean isCreatedBy(XClientOps client) {
 
         Objects.requireNonNull(client);
 

@@ -85,7 +85,7 @@ public final class CopyArea extends Request {
         return dstDrawable;
     }
 
-    public GCONTEXT getGc() {
+    public GCONTEXT getGC() {
         return gc;
     }
 
