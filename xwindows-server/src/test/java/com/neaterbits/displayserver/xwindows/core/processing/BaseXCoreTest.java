@@ -75,6 +75,7 @@ public abstract class BaseXCoreTest {
     protected final Surface rootSurface;
     private final XLibRenderer rootRenderer;
     protected final XClientOps client;
+    protected final WINDOW rootWindow;
     
     protected final PixelFormat rootPixelFormat;
     
@@ -102,7 +103,7 @@ public abstract class BaseXCoreTest {
         this.resourceIds = 1;
         this.sequenceNumber = 1;
         
-        final WINDOW rootWindowResource = new WINDOW(allocateResourceId());
+        this.rootWindow = new WINDOW(allocateResourceId());
     
         this.rootSurface = mock(Surface.class);
     
@@ -147,7 +148,7 @@ public abstract class BaseXCoreTest {
         
         final XWindow xRootWindow = new XWindow(
                 windowsDisplayArea.getRootWindow(),
-                rootWindowResource,
+                rootWindow,
                 rootVisual,
                 new CARD16(0),
                 WindowClass.InputOutput,
@@ -196,13 +197,21 @@ public abstract class BaseXCoreTest {
         Mockito.verifyNoMoreInteractions(Mockito.ignoreStubs(displayArea));
     }
 
-    private int allocateResourceId() {
+    protected final int allocateResourceId() {
         return resourceIds ++;
     }
+
+    protected final int getRootDepthAsInt() {
+        return rootPixelFormat.getDepth();
+    }
     
-    private void sendMessage(Request message) {
+    protected final CARD8 getRootDepth() {
+        return new CARD8((byte)getRootDepthAsInt());
+    }
+    
+    protected final void sendRequest(Request request) {
         
-        final DataWriter dataWriter = Encodeable.makeDataWriter(message);
+        final DataWriter dataWriter = Encodeable.makeDataWriter(request);
         
         final ByteOrder byteOrder = ByteOrder.BIG_ENDIAN;
         
@@ -218,12 +227,12 @@ public abstract class BaseXCoreTest {
             // read opcode
             final BYTE opcode = stream.readBYTE();
 
-            assertThat((int)opcode.getValue()).isEqualTo(message.getOpCode());
+            assertThat((int)opcode.getValue()).isEqualTo(request.getOpCode());
             
             coreModule.processMessage(
                     stream,
                     encoded.length,
-                    message.getOpCode(),
+                    request.getOpCode(),
                     new CARD16(sequenceNumber ++),
                     client);
         } catch (IOException ex) {
@@ -276,14 +285,14 @@ public abstract class BaseXCoreTest {
                         null,
                         null));
 
-        sendMessage(createWindow);
+        sendRequest(createWindow);
         
         return window;
     }
 
     protected final void closeWindow(WINDOW window) {
         
-        sendMessage(new DestroyWindow(window));
+        sendRequest(new DestroyWindow(window));
         
     }
 
