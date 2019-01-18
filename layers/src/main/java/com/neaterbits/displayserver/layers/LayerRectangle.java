@@ -6,21 +6,21 @@ import java.util.Objects;
 import com.neaterbits.displayserver.types.Position;
 import com.neaterbits.displayserver.types.Size;
 
-public final class Rectangle {
+public final class LayerRectangle {
 	
 	private final int left;
 	private final int top;
 	private final int width;
 	private final int height;
 	
-	public Rectangle(int left, int top, int width, int height) {
+	LayerRectangle(int left, int top, int width, int height) {
 		this.left = left;
 		this.top = top;
 		this.width = width;
 		this.height = height;
 	}
 
-	public Rectangle(Position position, Size size) {
+	public LayerRectangle(Position position, Size size) {
 		this(position.getLeft(), position.getTop(), size.getWidth(), size.getHeight());
 	}
 	
@@ -44,7 +44,7 @@ public final class Rectangle {
 		return x >= left && x < left + width && y >= top && y < top + height;
 	}
 	
-	public boolean intersects(Rectangle other) {
+	public boolean intersects(LayerRectangle other) {
 
 		Objects.requireNonNull(other);
 		
@@ -56,7 +56,7 @@ public final class Rectangle {
 		
 	}
 	
-	public boolean obscurs(Rectangle other) {
+	public boolean obscurs(LayerRectangle other) {
 
 		Objects.requireNonNull(other);
 		
@@ -67,7 +67,7 @@ public final class Rectangle {
 	}
 	
 	
-	public Intersection splitFromIntersectingButNotIn(Rectangle intersectsWith, List<Rectangle> list) {
+	public Intersection splitFromIntersectingButNotIn(LayerRectangle intersectsWith, List<LayerRectangle> list) {
 		
 		final Intersection intersection;
 		

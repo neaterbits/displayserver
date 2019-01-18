@@ -16,7 +16,7 @@ public final class Layer {
 	
 	private Layer [] subLayers;
 	
-	private final List<Rectangle> visibleRectangles;
+	private final List<LayerRectangle> visibleRectangles;
 
 	Layer(int layerDescriptor, Position position, Size size) {
 		
@@ -122,8 +122,8 @@ public final class Layer {
 	    }
 	}
 	
-	Rectangle getRectangle() {
-		return new Rectangle(position, size);
+	LayerRectangle getRectangle() {
+		return new LayerRectangle(position, size);
 	}
 	
 	Layer [] getSubLayers() {
@@ -136,13 +136,13 @@ public final class Layer {
 		visibleRectangles.add(getRectangle());
 	}
 
-	static void intersectLayerOntoList(Layer toIntersect, List<Rectangle> updatedList) {
+	static void intersectLayerOntoList(Layer toIntersect, List<LayerRectangle> updatedList) {
 		
 		Objects.requireNonNull(toIntersect);
 
-		final Rectangle layerRectangle = toIntersect.getRectangle();
+		final LayerRectangle layerRectangle = toIntersect.getRectangle();
 		
-		for (Rectangle updated : updatedList) {
+		for (LayerRectangle updated : updatedList) {
 
 			final int numUpdated = updatedList.size();
 			
@@ -181,24 +181,24 @@ public final class Layer {
 		}
 	}
 
-	Region intersectLayer(Layer layer) {
+	LayerRegion intersectLayer(Layer layer) {
 		
 		Objects.requireNonNull(layer);
 		
-		final List<Rectangle> updated = new ArrayList<>(visibleRectangles.size());
+		final List<LayerRectangle> updated = new ArrayList<>(visibleRectangles.size());
 		
 		intersectLayerOntoList(layer, updated);
 		
-		return new Region(updated);
+		return new LayerRegion(updated);
 	}
 	
-	List<Rectangle> updateVisibleRectangles(List<Rectangle> updatedRectangles) {
+	List<LayerRectangle> updateVisibleRectangles(List<LayerRectangle> updatedRectangles) {
 		
-		final List<Rectangle> newlyVisible = new ArrayList<>(updatedRectangles.size());
+		final List<LayerRectangle> newlyVisible = new ArrayList<>(updatedRectangles.size());
 		
-		for (Rectangle updated : updatedRectangles) {
+		for (LayerRectangle updated : updatedRectangles) {
 			
-			for (Rectangle previous : visibleRectangles) {
+			for (LayerRectangle previous : visibleRectangles) {
 
 				final int numUpdated = updatedRectangles.size();
 				

@@ -80,7 +80,7 @@ public class Layers {
 	
 	private LayerRegions recomputeLayers() {
 		
-		final Map<Layer, Region> regions = new HashMap<>(subToParent.size() + 1);
+		final Map<Layer, LayerRegion> regions = new HashMap<>(subToParent.size() + 1);
 		
         /*
 		final List<Layer> stack = new ArrayList<>();
@@ -97,9 +97,9 @@ public class Layers {
 
 	private static void recomputeSubLayers(
 			Layer layer,
-			Map<Layer, Region> layerRegions,
+			Map<Layer, LayerRegion> layerRegions,
 			List<Layer> stack,
-			List<Rectangle> stillVisibleRectangles) {
+			List<LayerRectangle> stillVisibleRectangles) {
 
 		stack.add(layer);
 
@@ -116,24 +116,24 @@ public class Layers {
 	
 	private static void recomputeOneLayer(
 			Layer layer,
-			Map<Layer, Region> layerRegions,
+			Map<Layer, LayerRegion> layerRegions,
 			List<Layer> stack,
-			List<Rectangle> stillVisibleRectangles) {
+			List<LayerRectangle> stillVisibleRectangles) {
 
 		
 		intersectAllInFrontOf(layer, stack, stillVisibleRectangles);
 		
 		intersectAllSubLayers(layer, layer, stillVisibleRectangles);
 
-		final List<Rectangle> newlyVisibleRectangles = layer.updateVisibleRectangles(stillVisibleRectangles);
+		final List<LayerRectangle> newlyVisibleRectangles = layer.updateVisibleRectangles(stillVisibleRectangles);
 		
-		final Region newlyVisibleRegion = new Region(newlyVisibleRectangles);
+		final LayerRegion newlyVisibleRegion = new LayerRegion(newlyVisibleRectangles);
 		
 		layerRegions.put(layer, newlyVisibleRegion);
 	}
 	
 	
-	private static void intersectAllInFrontOf(Layer layer, List<Layer> stack, List<Rectangle> stillVisibleRectangles) {
+	private static void intersectAllInFrontOf(Layer layer, List<Layer> stack, List<LayerRectangle> stillVisibleRectangles) {
 
 		for (Layer ancestor : stack) {
 			
@@ -157,14 +157,14 @@ public class Layers {
 		}
 	}
 	
-	private static void intersectLayerAndSubLayers(Layer layer, Layer toIntersect, List<Rectangle> stillVisibleRectangles) {
+	private static void intersectLayerAndSubLayers(Layer layer, Layer toIntersect, List<LayerRectangle> stillVisibleRectangles) {
 	
 		Layer.intersectLayerOntoList(toIntersect, stillVisibleRectangles);
 		
 		intersectAllSubLayers(layer, toIntersect, stillVisibleRectangles);
 	}
 	
-	private static void intersectAllSubLayers(Layer layer, Layer subLayersOf, List<Rectangle> stillVisibleRectangles) {
+	private static void intersectAllSubLayers(Layer layer, Layer subLayersOf, List<LayerRectangle> stillVisibleRectangles) {
 		
 		for (Layer subLayer : subLayersOf.getSubLayers()) {
 			intersectLayerAndSubLayers(layer, subLayer, stillVisibleRectangles);

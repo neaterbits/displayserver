@@ -2,8 +2,8 @@ package com.neaterbits.displayserver.server;
 
 import java.util.Objects;
 
-import com.neaterbits.displayserver.layers.Rectangle;
-import com.neaterbits.displayserver.layers.Region;
+import com.neaterbits.displayserver.layers.LayerRectangle;
+import com.neaterbits.displayserver.layers.LayerRegion;
 import com.neaterbits.displayserver.windows.Window;
 import com.neaterbits.displayserver.windows.WindowEventListener;
 import com.neaterbits.displayserver.xwindows.model.XWindow;
@@ -20,7 +20,7 @@ final class XWindowsEventListener implements WindowEventListener {
     }
     
     @Override
-    public final void onUpdate(Window window, Region region) {
+    public final void onUpdate(Window window, LayerRegion region) {
         
         Objects.requireNonNull(window);
         Objects.requireNonNull(region);
@@ -34,7 +34,7 @@ final class XWindowsEventListener implements WindowEventListener {
         
         int count = region.getRectangles().size();
         
-        for (Rectangle rectangle : region.getRectangles()) {
+        for (LayerRectangle rectangle : region.getRectangles()) {
             
             -- count;
             

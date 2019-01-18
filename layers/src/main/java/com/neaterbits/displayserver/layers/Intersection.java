@@ -1,6 +1,6 @@
 package com.neaterbits.displayserver.layers;
 
-public enum Intersection {
+enum Intersection {
 
 	NONE,
 	OVERLAP,

@@ -4,18 +4,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public final class Region {
+public final class LayerRegion {
 
-	private final List<Rectangle> rectangles;
+	private final List<LayerRectangle> rectangles;
 
-	public Region(List<Rectangle> rectangles) {
+	LayerRegion(List<LayerRectangle> rectangles) {
 		
 		Objects.requireNonNull(rectangles);
 		
 		this.rectangles = Collections.unmodifiableList(rectangles);
 	}
 
-	public List<Rectangle> getRectangles() {
+	public List<LayerRectangle> getRectangles() {
 		return rectangles;
 	}
 }

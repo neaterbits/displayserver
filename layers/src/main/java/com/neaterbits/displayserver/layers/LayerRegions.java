@@ -6,9 +6,9 @@ import java.util.Set;
 
 public final class LayerRegions {
 
-	private final Map<Layer, Region> layerRegions;
+	private final Map<Layer, LayerRegion> layerRegions;
 
-	LayerRegions(Map<Layer, Region> layerRegions) {
+	LayerRegions(Map<Layer, LayerRegion> layerRegions) {
 		
 		Objects.requireNonNull(layerRegions);
 		
@@ -19,7 +19,7 @@ public final class LayerRegions {
 		return layerRegions.keySet();
 	}
 	
-	public Region getRegion(Layer layer) {
+	public LayerRegion getRegion(Layer layer) {
 		Objects.requireNonNull(layer);
 
 		return layerRegions.get(layer);
