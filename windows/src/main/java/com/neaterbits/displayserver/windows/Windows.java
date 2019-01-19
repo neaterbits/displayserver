@@ -8,15 +8,12 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.layers.Layer;
-import com.neaterbits.displayserver.layers.LayerRegions;
 import com.neaterbits.displayserver.layers.Layers;
 import com.neaterbits.displayserver.types.Position;
 import com.neaterbits.displayserver.types.Size;
 
 final class Windows {
 
-	private final WindowEventListener windowEventListener;
-	
 	private final WindowsDisplayArea displayArea;
 	
 	private final Layers layers;
@@ -25,13 +22,11 @@ final class Windows {
 	
 	private final Map<Layer, Window> layerToWindow;
 	
-	Windows(WindowsDisplayArea displayArea, WindowEventListener windowEventListener) {
+	Windows(WindowsDisplayArea displayArea) {
 		
 	    Objects.requireNonNull(displayArea);
-	    Objects.requireNonNull(windowEventListener);
 
 	    this.displayArea = displayArea;
-		this.windowEventListener = windowEventListener;
 		
 		this.layers = new Layers(displayArea.getSize());
 		
@@ -138,18 +133,6 @@ final class Windows {
         return subWindowsBackToFront;
     }
 
-	private void sendUpdateEvents(LayerRegions regions) {
-		
-		Objects.requireNonNull(regions);
-
-		for (Layer layer : regions.getLayers()) {
-			
-			final Window window = layerToWindow.get(layer);
-			
-			windowEventListener.onUpdate(window, regions.getRegion(layer));
-		}
-	}
-	
 	Window findWindowAt(int x, int y) {
 		
 		final Layer layer = layers.findLayerAt(x, y);

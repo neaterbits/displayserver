@@ -9,12 +9,10 @@ public final class WindowsDisplayAreas {
 
     private final List<WindowsDisplayArea> displayAreas;
     
-    public WindowsDisplayAreas(DisplayAreas displayAreas, WindowEventListener windowEventListener) {
+    public WindowsDisplayAreas(DisplayAreas displayAreas) {
 
-        Objects.requireNonNull(windowEventListener);
-        
         final List<WindowsDisplayArea> windowsDisplayAreas = displayAreas.getDisplayAreas().stream()
-                .map(displayArea -> new WindowsDisplayAreaImpl(displayArea, windowEventListener))
+                .map(displayArea -> new WindowsDisplayAreaImpl(displayArea))
                 .collect(Collectors.toList());
     
         this.displayAreas = Collections.unmodifiableList(windowsDisplayAreas);

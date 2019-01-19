@@ -77,7 +77,6 @@ public class LayersTest extends BaseLayersTest {
         assertThat(layer.getSubLayers().length).isEqualTo(1);
         assertThat(layer.getSubLayers()[0]).isEqualTo(subLayer);
 
-
         try {
             layers.removeSubLayer(layer, otherLayerUnderRootLayer);
             
@@ -175,7 +174,7 @@ public class LayersTest extends BaseLayersTest {
 
         Layer subLayer = layers.createAndAddSubLayer(layer, new Position(50, 75), new Size(150, 100));
 
-        layers.showLayer(layer);
+        layers.showLayer(layer, null);
 
         assertThat(layer.isVisible()).isTrue();
         assertThat(subLayer.isVisible()).isFalse();
@@ -195,7 +194,7 @@ public class LayersTest extends BaseLayersTest {
         
         subLayer = layers.createAndAddSubLayer(layer, new Position(50, 75), new Size(150, 100));
 
-        layers.showLayer(subLayer);
+        layers.showLayer(subLayer, null);
         
         try {
             layers.removeSubLayer(layer, subLayer);
@@ -205,9 +204,9 @@ public class LayersTest extends BaseLayersTest {
         catch (IllegalStateException ex) {
         }
         
-        layers.hideLayer(subLayer);
+        layers.hideLayer(subLayer, null);
         layers.removeSubLayer(layer, subLayer);
-        layers.hideLayer(layer);
+        layers.hideLayer(layer, null);
         layers.removeFromRootLayer(layer);
     }
 }

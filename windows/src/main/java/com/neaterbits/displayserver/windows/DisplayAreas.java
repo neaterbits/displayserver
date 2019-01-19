@@ -31,11 +31,9 @@ public final class DisplayAreas {
         return displayAreas;
     }
 
-    public WindowsDisplayAreas toWindowsDisplayAreas(WindowEventListener windowEventListener) {
+    public WindowsDisplayAreas toWindowsDisplayAreas() {
         
-        Objects.requireNonNull(windowEventListener);
-        
-        return new WindowsDisplayAreas(this, windowEventListener);
+        return new WindowsDisplayAreas(this);
     }
     
     private DisplayAreas(List<DisplayArea> displayAreas) {

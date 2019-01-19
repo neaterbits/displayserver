@@ -12,12 +12,12 @@ public final class WindowsDisplayAreaImpl implements WindowsDisplayArea {
     private final DisplayArea displayArea;
     private final Windows windows;
 
-    public WindowsDisplayAreaImpl(DisplayArea displayArea, WindowEventListener windowEventListener) {
+    public WindowsDisplayAreaImpl(DisplayArea displayArea) {
     
         Objects.requireNonNull(displayArea);
         
         this.displayArea = displayArea;
-        this.windows = new Windows(this, windowEventListener);
+        this.windows = new Windows(this);
     }
 
     @Override

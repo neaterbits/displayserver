@@ -29,7 +29,6 @@ import com.neaterbits.displayserver.types.Position;
 import com.neaterbits.displayserver.types.Size;
 import com.neaterbits.displayserver.util.logging.DebugLevel;
 import com.neaterbits.displayserver.windows.DisplayArea;
-import com.neaterbits.displayserver.windows.WindowEventListener;
 import com.neaterbits.displayserver.windows.WindowManagement;
 import com.neaterbits.displayserver.windows.WindowsDisplayAreaImpl;
 import com.neaterbits.displayserver.windows.compositor.Compositor;
@@ -72,7 +71,6 @@ public abstract class BaseXCoreTest {
     private final XTimestampGenerator timestampGenerator;
     private final InputDriver inputDriver;
     protected final DisplayArea displayArea;
-    private final WindowEventListener windowEventListener;
     protected final Surface rootSurface;
     private final XLibRenderer rootRenderer;
     protected final XClientOps client;
@@ -119,13 +117,12 @@ public abstract class BaseXCoreTest {
         final int rootDepth = rootPixelFormat.getDepth();
         
         this.displayArea = mock(DisplayArea.class);
-        this.windowEventListener = mock(WindowEventListener.class);
 
         Mockito.when(displayArea.getDepth()).thenReturn(rootDepth);
         Mockito.when(displayArea.getSize()).thenReturn(displaySize);
         Mockito.when(displayArea.getPixelFormat()).thenReturn(rootPixelFormat);
 
-        final WindowsDisplayAreaImpl windowsDisplayArea = new WindowsDisplayAreaImpl(displayArea, windowEventListener);
+        final WindowsDisplayAreaImpl windowsDisplayArea = new WindowsDisplayAreaImpl(displayArea);
         
         this.windowManagement = windowsDisplayArea;
         
@@ -322,7 +319,6 @@ public abstract class BaseXCoreTest {
                 timestampGenerator,
                 inputDriver,
                 displayArea,
-                windowEventListener,
                 rootSurface,
                 rootRenderer,
                 client);

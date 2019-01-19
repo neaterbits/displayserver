@@ -126,18 +126,26 @@ public class Layers {
 		parentLayer.removeSubLayer(subLayer);
 	}
 	
-	public void showLayer(Layer layer) {
+	public void showLayer(Layer layer, LayerUpdateListener listener) {
 	    
 	    Objects.requireNonNull(layer);
 	    
 	    layer.setVisible(true);
+	    
+	    if (listener != null) {
+	        listener.onLayerUpdate(layer, recomputeLayers());
+	    }
 	}
 
-    public void hideLayer(Layer layer) {
+    public void hideLayer(Layer layer, LayerUpdateListener listener) {
 
         Objects.requireNonNull(layer);
 
         layer.setVisible(false);
+
+        if (listener != null) {
+            listener.onLayerUpdate(layer, recomputeLayers());
+        }
     }
 
 	public Layer findLayerAt(int x, int y) {

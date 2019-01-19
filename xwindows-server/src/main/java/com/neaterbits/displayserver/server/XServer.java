@@ -62,11 +62,9 @@ public class XServer implements AutoCloseable {
 		
 		final Map<XWindow, Integer> rootWindows = new HashMap<>();
 
-		final XWindowsEventListener eventListener = new XWindowsEventListener(this);
-		
 		final DisplayAreas displayAreas = rendering.getDisplayAreas();
 		
-		final WindowsDisplayAreas windowsDisplayAreas = displayAreas.toWindowsDisplayAreas(eventListener);
+		final WindowsDisplayAreas windowsDisplayAreas = displayAreas.toWindowsDisplayAreas();
 
 		final XScreensAndVisuals screens = ScreensHelper.getScreens(
 		        hardware.getGraphicsDriver(),
