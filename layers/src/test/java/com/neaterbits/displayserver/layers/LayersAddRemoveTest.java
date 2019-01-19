@@ -8,9 +8,9 @@ import com.neaterbits.displayserver.types.Size;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
-public class LayersTest extends BaseLayersTest {
+public class LayersAddRemoveTest extends BaseLayersTest {
 
-    public LayersTest() {
+    public LayersAddRemoveTest() {
         super(new Size(1280, 1024));
     }
     

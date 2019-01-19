@@ -18,6 +18,19 @@ public final class Size {
 		return height;
 	}
 
+	public boolean contains(int x, int y) {
+
+	    if (x < 0) {
+            throw new IllegalArgumentException();
+        }
+        
+        if (y < 0) {
+            throw new IllegalArgumentException();
+        }
+
+        return x < width && y < height;
+	}
+	
     @Override
     public int hashCode() {
         final int prime = 31;

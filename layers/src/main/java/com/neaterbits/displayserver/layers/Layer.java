@@ -15,6 +15,7 @@ public final class Layer {
 	
 	private Position position;
 	private Size size;
+	private LayerRectangle rectangle;
 	
 	private boolean visible;
 	
@@ -34,6 +35,8 @@ public final class Layer {
 		this.visible = false;
 		
 		this.visibleRectangles = new ArrayList<>();
+		
+		updateRectangle();
 	}
 
 	public boolean isRootLayer() {
@@ -58,21 +61,20 @@ public final class Layer {
 
 	Layer findLayerAt(int x, int y) {
 		
-		if (!getRectangle().contains(x, y)) {
-			throw new IllegalArgumentException();
-		}
+	    if (!size.contains(x, y)) {
+	        throw new IllegalArgumentException();
+	    }
+	    
+		Layer found = this;
 		
-		Layer found = null;
-		
-		for (Layer layer : subLayers) {
-			if (layer.getRectangle().contains(x, y)) {
-				found = layer.findLayerAt(x - layer.position.getLeft(), y - layer.position.getTop());
-				break;
-			}
-		}
-		
-		if (found == null) {
-			found = this;
+		if (subLayers != null) {
+    		for (Layer layer : subLayers) {
+    			if (layer.isVisible() && layer.getRectangle().contains(x, y)) {
+    			    
+    				found = layer.findLayerAt(x - layer.position.getLeft(), y - layer.position.getTop());
+    				break;
+    			}
+    		}
 		}
 		
 		return found;
@@ -83,6 +85,8 @@ public final class Layer {
 		Objects.requireNonNull(position);
 		
 		this.position = position;
+		
+		updateRectangle();
 	}
 
 	public Size getSize() {
@@ -94,6 +98,8 @@ public final class Layer {
 		Objects.requireNonNull(size);
 		
 		this.size = size;
+
+		updateRectangle();
 	}
 	
 	void addSubLayer(Layer subLayer) {
@@ -163,8 +169,12 @@ public final class Layer {
 	    }
 	}
 	
+	private void updateRectangle() {
+	    this.rectangle = new LayerRectangle(position, size);	    
+	}
+	
 	LayerRectangle getRectangle() {
-		return new LayerRectangle(position, size);
+		return rectangle;
 	}
 	
 	Layer [] getSubLayers() {
