@@ -86,4 +86,35 @@ public final class LayerRectangle {
 
 		return intersection;
 	}
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + height;
+        result = prime * result + left;
+        result = prime * result + top;
+        result = prime * result + width;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        LayerRectangle other = (LayerRectangle) obj;
+        if (height != other.height)
+            return false;
+        if (left != other.left)
+            return false;
+        if (top != other.top)
+            return false;
+        if (width != other.width)
+            return false;
+        return true;
+    }
 }

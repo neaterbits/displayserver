@@ -15,6 +15,10 @@ public final class LayerRegions {
 		this.layerRegions = layerRegions;
 	}
 	
+	public boolean isEmpty() {
+	    return layerRegions.isEmpty();
+	}
+	
 	public Set<Layer> getLayers() {
 		return layerRegions.keySet();
 	}

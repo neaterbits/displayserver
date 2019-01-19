@@ -11,28 +11,50 @@ import com.neaterbits.displayserver.types.Size;
 public final class Layer {
 
 	private final int layerDescriptor;
+	private final boolean rootLayer;
+	
 	private Position position;
 	private Size size;
+	
+	private boolean visible;
 	
 	private Layer [] subLayers;
 	
 	private final List<LayerRectangle> visibleRectangles;
 
-	Layer(int layerDescriptor, Position position, Size size) {
+	Layer(int layerDescriptor, Position position, Size size, boolean rootLayer) {
 		
 		Objects.requireNonNull(position);
 		Objects.requireNonNull(size);
 	
 		this.layerDescriptor = layerDescriptor;
+		this.rootLayer = rootLayer;
 		this.position = position;
 		this.size = size;
+		this.visible = false;
 		
 		this.visibleRectangles = new ArrayList<>();
 	}
 
-	public Position getPosition() {
+	public boolean isRootLayer() {
+        return rootLayer;
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+
+    public Position getPosition() {
 		return position;
 	}
+    
+    boolean hasSubLayers() {
+        return subLayers != null && subLayers.length != 0;
+    }
 
 	Layer findLayerAt(int x, int y) {
 		
@@ -95,23 +117,42 @@ public final class Layer {
 	}
 
 	void removeSubLayer(Layer subLayer) {
+
 		Objects.requireNonNull(subLayer);
 
-		final Layer [] newArray = new Layer[subLayers.length - 1];
+		int layerIdx = -1;
 		
-		int dstIdx = 0;
-		
-		for (Layer layer : subLayers) {
-			if (layer != subLayer) {
-				newArray[dstIdx ++] = layer;
-			}
+		if (subLayers != null) {
+    		for (int i = 0; i < subLayers.length; ++ i) {
+    		    
+    		    if (subLayers[i] == subLayer) {
+    		        layerIdx = i;
+    		        break;
+    		    }
+    		}
 		}
 		
-		if (dstIdx != newArray.length) {
-			throw new IllegalStateException();
+		if (layerIdx == -1) {
+		    throw new IllegalArgumentException();
 		}
+
+		if (subLayers.length == 1) {
+		    this.subLayers = null;
+		}
+		else {
 		
-		this.subLayers = newArray;
+            final Layer [] newArray = new Layer[subLayers.length - 1];
+            
+            for (int i = 0; i < layerIdx; ++ i) {
+                newArray[i] = subLayers[i];
+            }
+            
+            for (int i = layerIdx; i < newArray.length; ++ i) {
+                newArray[i] = subLayers[i + 1];
+            }
+    		
+    		this.subLayers = newArray;
+		}
 	}
 	
 	public void forEachSubLayerBackToFront(Consumer<Layer> onEach) {
@@ -261,4 +302,10 @@ public final class Layer {
 			return false;
 		return true;
 	}
+
+    @Override
+    public String toString() {
+        return "Layer [layerDescriptor=" + layerDescriptor + ", position=" + position + ", size=" + size + ", visible="
+                + visible + "]";
+    }
 }

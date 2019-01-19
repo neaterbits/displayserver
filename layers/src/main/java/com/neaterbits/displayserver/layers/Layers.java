@@ -16,25 +16,48 @@ public class Layers {
 	
 	private final Map<Layer, Layer> subToParent;
 	
-	private int getLayerDescriptor() {
+	private int generateLayerDescriptor() {
 		return layerDescriptorSequence ++;
 	}
 	
 	public Layers(Size size) {
-		this.rootLayer = new Layer(getLayerDescriptor(), new Position(0, 0), size);
+	    
+		this.rootLayer = new Layer(generateLayerDescriptor(), new Position(0, 0), size, true);
 		
 		this.subToParent = new HashMap<>();
 	}
 	
 	public Layer getRootLayer() {
+	    
 		return rootLayer;
 	}
 
-	public Layer createLayer(Position position, Size size) {
-		return new Layer(getLayerDescriptor(), position, size);
+	public Layer createAndAddToRootLayer(Position position, Size size) {
+	    
+		final Layer layer = new Layer(generateLayerDescriptor(), position, size, false);
+
+		addSubLayer(rootLayer, layer);
+		
+		return layer;
 	}
+
 	
-	public LayerRegions addLayer(Layer parentLayer, Layer subLayer) {
+    public Layer createAndAddSubLayer(Layer parentLayer, Position position, Size size) {
+        
+        Objects.requireNonNull(parentLayer);
+        
+        if (parentLayer.isRootLayer()) {
+            throw new IllegalArgumentException();
+        }
+        
+        final Layer subLayer = new Layer(generateLayerDescriptor(), position, size, false);
+        
+        addSubLayer(parentLayer, subLayer);
+        
+        return subLayer;
+    }
+	
+	private void addSubLayer(Layer parentLayer, Layer subLayer) {
 		
 		Objects.requireNonNull(parentLayer);
 		Objects.requireNonNull(subLayer);
@@ -48,18 +71,50 @@ public class Layers {
 		}
 		
 		if (subToParent.containsKey(subLayer)) {
-			throw new IllegalArgumentException();
+			throw new IllegalStateException();
 		}
 		
 		parentLayer.addSubLayer(subLayer);
 		
 		subToParent.put(subLayer, parentLayer);
-	
-		return recomputeLayers();
 	}
-	
-	public LayerRegions removeLayer(Layer parentLayer, Layer subLayer) {
 
+	public void removeFromRootLayer(Layer layer) {
+	    
+	    Objects.requireNonNull(layer);
+	    
+	    removeLayer(rootLayer, layer);
+	}
+
+	public void removeSubLayer(Layer parentLayer, Layer subLayer) {
+
+	    Objects.requireNonNull(parentLayer);
+	    Objects.requireNonNull(subLayer);
+
+	    if (parentLayer.isRootLayer()) {
+            throw new IllegalArgumentException();
+        }
+	    
+	    if (subToParent.get(subLayer) != parentLayer) {
+            throw new IllegalArgumentException("Not a sublayer");
+        }
+       
+	    removeLayer(parentLayer, subLayer);
+	}
+
+	private void removeLayer(Layer parentLayer, Layer subLayer) {
+
+	    Objects.requireNonNull(parentLayer);
+	    Objects.requireNonNull(subLayer);
+
+	    if (subLayer.isVisible()) {
+	        throw new IllegalStateException();
+	    }
+	    
+	    if (subLayer.hasSubLayers()) {
+	        throw new IllegalStateException();
+	    }
+	    
 		if (parentLayer != rootLayer && !subToParent.containsKey(parentLayer)) {
 			throw new IllegalArgumentException();
 		}
@@ -69,14 +124,25 @@ public class Layers {
 		}
 		
 		parentLayer.removeSubLayer(subLayer);
-		
-		return recomputeLayers();
 	}
 	
+	public void showLayer(Layer layer) {
+	    
+	    Objects.requireNonNull(layer);
+	    
+	    layer.setVisible(true);
+	}
+
+    public void hideLayer(Layer layer) {
+
+        Objects.requireNonNull(layer);
+
+        layer.setVisible(false);
+    }
+
 	public Layer findLayerAt(int x, int y) {
 		return rootLayer.findLayerAt(x, y);
 	}
-	
 	
 	private LayerRegions recomputeLayers() {
 		

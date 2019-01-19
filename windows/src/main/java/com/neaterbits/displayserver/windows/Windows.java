@@ -62,21 +62,25 @@ final class Windows {
     Window createWindow(Window parentWindow, WindowParameters parameters, WindowAttributes attributes) {
 	
 		final Layer parentLayer = parentWindow.getLayer();
-		
 
-		final Layer layer = layers.createLayer(
-				new Position(parameters.getX(), parameters.getY()),
-				new Size(
-						parameters.getWidth() + parameters.getBorderWidth() * 2,
-						parameters.getHeight() + parameters.getBorderWidth() * 2));
+		final Layer layer;
 		
-		final LayerRegions toUpdate = layers.addLayer(parentLayer, layer);
+		final Position position = new Position(parameters.getX(), parameters.getY());
+		
+		final Size size = new Size(
+                parameters.getWidth() + parameters.getBorderWidth() * 2,
+                parameters.getHeight() + parameters.getBorderWidth() * 2);
+		
+		if (parentLayer.isRootLayer()) {
+		    layer = layers.createAndAddToRootLayer(position, size);
+		}
+		else {
+		    layer = layers.createAndAddSubLayer(parentLayer, position, size);
+		}
 		
 		final Window window = new Window(displayArea, parentWindow, parameters, attributes, layer);
 		
 		layerToWindow.put(layer, window);
-		
-		sendUpdateEvents(toUpdate);
 		
 		return window;
 	}
@@ -93,13 +97,11 @@ final class Windows {
 			}
 		}
 		
-		final LayerRegions toUpdate = layers.removeLayer(window.getParentWindow().getLayer(), window.getLayer());
+		layers.removeSubLayer(window.getParentWindow().getLayer(), window.getLayer());
 		
 		layerToWindow.remove(window);
 		
 		window.getParentWindow().removeSubWindow(window);
-		
-		sendUpdateEvents(toUpdate);
 	}
 	
     List<Window> getSubWindowsInOrder(Window window) {
