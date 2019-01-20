@@ -14,6 +14,8 @@ import com.neaterbits.displayserver.server.XTimestampGenerator;
 import com.neaterbits.displayserver.windows.WindowManagement;
 import com.neaterbits.displayserver.windows.compositor.Compositor;
 import com.neaterbits.displayserver.xwindows.fonts.render.FontBufferFactory;
+import com.neaterbits.displayserver.xwindows.model.XColormaps;
+import com.neaterbits.displayserver.xwindows.model.XCursors;
 import com.neaterbits.displayserver.xwindows.model.XPixmaps;
 import com.neaterbits.displayserver.xwindows.model.XScreensConstAccess;
 import com.neaterbits.displayserver.xwindows.model.XVisualsConstAccess;
@@ -30,6 +32,8 @@ public class XCoreModule extends XModule {
             XVisualsConstAccess visuals,
             XClientWindows windows,
             XPixmaps pixmaps,
+            XColormaps colormaps,
+            XCursors cursors,
             XEventSubscriptions eventSubscriptions,
             Compositor compositor,
             XLibRendererFactory rendererFactory,
@@ -45,6 +49,8 @@ public class XCoreModule extends XModule {
                 visuals,
                 windows,
                 pixmaps,
+                colormaps,
+                cursors,
                 eventSubscriptions,
                 compositor,
                 rendererFactory,
@@ -61,6 +67,8 @@ public class XCoreModule extends XModule {
             XVisualsConstAccess visuals,
             XClientWindows windows,
             XPixmaps pixmaps,
+            XColormaps colormaps,
+            XCursors cursors,
             XEventSubscriptions eventSubscriptions,
             Compositor compositor,
             XLibRendererFactory rendererFactory,
@@ -76,6 +84,8 @@ public class XCoreModule extends XModule {
                         windowManagement,
                         windows,
                         pixmaps,
+                        colormaps,
+                        cursors,
                         eventSubscriptions,
                         compositor,
                         rendererFactory),
@@ -115,9 +125,10 @@ public class XCoreModule extends XModule {
                         screens,
                         visuals,
                         windows,
+                        colormaps,
                         config.getColorsFile()),
                 
-                new XCoreCursorMessageProcessor(protocolLog),
+                new XCoreCursorMessageProcessor(protocolLog, cursors),
                 
                 new XCoreExtensionMessageProcessor(protocolLog),
                 

@@ -138,6 +138,44 @@ public final class XEventSubscriptions implements XEventSubscriptionsConstAccess
     }
 
 
+    @Override
+    public int getAllEventMasks(WINDOW window) {
+        
+        Objects.requireNonNull(window);
+        
+        int mask = 0;
+        
+        for (Key key : eventToClients.keySet()) {
+            if (key.window.equals(window)) {
+                mask |= key.event;
+            }
+        }
+        
+        return mask;
+    }
+
+    @Override
+    public int getYourEventMask(WINDOW window, XClientOps client) {
+
+        Objects.requireNonNull(window);
+        Objects.requireNonNull(client);
+        
+        int mask = 0;
+        
+        for (Map.Entry<Key, List<XClientOps>> entry : eventToClients.entrySet()) {
+            
+            final Key key = entry.getKey();
+            
+            if (key.window.equals(window) && entry.getValue().contains(client)) {
+                mask |= key.event;
+            }
+        }
+        
+        return mask;
+    }
+
+
+
 
     private static class Key {
         private final WINDOW window;

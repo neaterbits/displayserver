@@ -2,12 +2,12 @@ package com.neaterbits.displayserver.xwindows.model;
 
 import java.util.Objects;
 
-public final class XColorMap {
+public final class XColormap {
 
     private final XScreen screen;
     private final XVisual visual;
 
-    public XColorMap(XScreen screen, XVisual visual) {
+    public XColormap(XScreen screen, XVisual visual) {
 
         Objects.requireNonNull(screen);
         Objects.requireNonNull(visual);

@@ -5,7 +5,9 @@ import com.neaterbits.displayserver.protocol.types.PIXMAP;
 
 public interface XPixmapsConstAccess {
     
-    XPixmap getPixmap(PIXMAP drawable);
+    boolean hasPixmap(PIXMAP pixmap);
     
-    DRAWABLE getOwnerDrawable(PIXMAP pixmapDrawable);
+    XPixmap getPixmap(PIXMAP pixmap);
+    
+    DRAWABLE getOwnerDrawable(PIXMAP pixmap);
 }

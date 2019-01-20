@@ -25,6 +25,14 @@ public final class XPixmaps extends XResources<XPixmap> implements XPixmapsConst
     }
 
     @Override
+    public boolean hasPixmap(PIXMAP pixmap) {
+
+        Objects.requireNonNull(pixmap);
+        
+        return drawableToXPixmap.containsKey(pixmap);
+    }
+
+    @Override
     public XPixmap getPixmap(PIXMAP pixmap) {
         
         Objects.requireNonNull(pixmap);

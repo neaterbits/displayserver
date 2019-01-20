@@ -27,8 +27,8 @@ import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.COLORMAP;
 import com.neaterbits.displayserver.xwindows.model.XBuiltinColor;
 import com.neaterbits.displayserver.xwindows.model.XBuiltinColors;
-import com.neaterbits.displayserver.xwindows.model.XColorMap;
-import com.neaterbits.displayserver.xwindows.model.XColorMaps;
+import com.neaterbits.displayserver.xwindows.model.XColormap;
+import com.neaterbits.displayserver.xwindows.model.XColormaps;
 import com.neaterbits.displayserver.xwindows.model.XScreen;
 import com.neaterbits.displayserver.xwindows.model.XScreensConstAccess;
 import com.neaterbits.displayserver.xwindows.model.XVisual;
@@ -45,7 +45,7 @@ public final class XCoreColorMessageProcessor extends XOpCodeProcessor {
     private final XVisualsConstAccess xVisuals;
     private final XWindowsConstAccess<?> xWindows;
 
-    private final XColorMaps xColormaps;
+    private final XColormaps xColormaps;
     private final XBuiltinColors builtinColors;
 
     public XCoreColorMessageProcessor(
@@ -53,6 +53,7 @@ public final class XCoreColorMessageProcessor extends XOpCodeProcessor {
             XScreensConstAccess xScreens,
             XVisualsConstAccess xVisuals,
             XWindowsConstAccess<?> xWindows,
+            XColormaps xColormaps,
             String colorsFileName) throws IOException {
 
         super(protocolLog);
@@ -61,7 +62,7 @@ public final class XCoreColorMessageProcessor extends XOpCodeProcessor {
         this.xVisuals = xVisuals;
         this.xWindows = xWindows;
 
-        this.xColormaps = new XColorMaps();
+        this.xColormaps = xColormaps;
         
         final File colorsFile = new File(colorsFileName);
         
@@ -102,7 +103,7 @@ public final class XCoreColorMessageProcessor extends XOpCodeProcessor {
             if (xWindow == null) {
                 sendError(client, Errors.Window, sequenceNumber, createColorMap.getWindow().getValue(), opcode);
             }
-            else if (xColormaps.contains(createColorMap.getMid())) {
+            else if (xColormaps.hasColormap(createColorMap.getMid())) {
                 sendError(client, Errors.IDChoice, sequenceNumber, createColorMap.getMid().getValue(), opcode);
             }
             else {
@@ -124,7 +125,7 @@ public final class XCoreColorMessageProcessor extends XOpCodeProcessor {
                         sendError(client, Errors.Match, sequenceNumber, createColorMap.getVisual().getValue(), opcode);
                     }
                     else {
-                        final XColorMap colormap = new XColorMap(xScreen, xVisual);
+                        final XColormap colormap = new XColormap(xScreen, xVisual);
                         
                         xColormaps.add(createColorMap.getMid(), colormap);
                     }
@@ -277,7 +278,7 @@ public final class XCoreColorMessageProcessor extends XOpCodeProcessor {
             pixelFormat = PixelFormat.RGB32;
         }
         else {
-            final XColorMap xColorMap = xColormaps.get(cmap);
+            final XColormap xColorMap = xColormaps.getColormap(cmap);
             
             if (xColorMap == null) {
                 throw new ColormapException("No such colormap", cmap);

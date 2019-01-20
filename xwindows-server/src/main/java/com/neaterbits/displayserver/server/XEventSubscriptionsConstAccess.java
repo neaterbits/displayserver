@@ -8,4 +8,9 @@ public interface XEventSubscriptionsConstAccess {
     Iterable<XClientOps> getClientsInterestedInEvent(WINDOW window, int event);
     
     XClientOps getSingleClientInterestedInEvent(WINDOW window, int event);
+
+    int getAllEventMasks(WINDOW window);
+
+    int getYourEventMask(WINDOW window, XClientOps client);
+    
 }

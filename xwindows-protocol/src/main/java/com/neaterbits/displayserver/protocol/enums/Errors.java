@@ -29,6 +29,7 @@ public class Errors {
     public static final BYTE Request  = make(REQUEST);
     public static final BYTE Value    = make(VALUE);
     public static final BYTE Window   = make(WINDOW);
+    public static final BYTE Pixmap   = make(PIXMAP);
     public static final BYTE Atom     = make(ATOM);
     public static final BYTE Cursor   = make(CURSOR);
     public static final BYTE Font     = make(FONT);
@@ -52,6 +53,7 @@ public class Errors {
         case REQUEST:   name = "Request"; break;
         case VALUE:     name = "Value"; break;
         case WINDOW:    name = "Window"; break;
+        case PIXMAP:    name = "Pixmap"; break;
         case ATOM:      name = "Atom"; break;
         case CURSOR:    name = "Cursor"; break;
         case FONT:      name = "Font"; break;

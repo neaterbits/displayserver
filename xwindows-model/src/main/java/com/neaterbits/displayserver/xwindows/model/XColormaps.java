@@ -6,15 +6,15 @@ import java.util.Objects;
 
 import com.neaterbits.displayserver.protocol.types.COLORMAP;
 
-public final class XColorMaps {
+public final class XColormaps implements XColormapsConstAccess {
 
-    private final Map<COLORMAP, XColorMap> colormaps;
+    private final Map<COLORMAP, XColormap> colormaps;
 
-    public XColorMaps() {
+    public XColormaps() {
         this.colormaps = new HashMap<>();
     }
     
-    public void add(COLORMAP resource, XColorMap colormap) {
+    public void add(COLORMAP resource, XColormap colormap) {
 
         Objects.requireNonNull(resource);
         Objects.requireNonNull(colormap);
@@ -22,14 +22,16 @@ public final class XColorMaps {
         colormaps.put(resource, colormap);
     }
     
-    public boolean contains(COLORMAP resource) {
+    @Override
+    public boolean hasColormap(COLORMAP resource) {
         
         Objects.requireNonNull(resource);
 
         return colormaps.containsKey(resource);
     }
 
-    public XColorMap get(COLORMAP resource) {
+    @Override
+    public XColormap getColormap(COLORMAP resource) {
 
         Objects.requireNonNull(resource);
 

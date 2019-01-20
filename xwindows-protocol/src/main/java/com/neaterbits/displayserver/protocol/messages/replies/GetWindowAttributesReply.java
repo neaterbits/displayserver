@@ -66,6 +66,66 @@ public final class GetWindowAttributesReply extends XReply {
         this.doNotPropagateMask = doNotPropagateMask;
     }
 
+    public BYTE getBackingStore() {
+        return backingStore;
+    }
+
+    public VISUALID getVisual() {
+        return visual;
+    }
+
+    public CARD16 getWindowClass() {
+        return windowClass;
+    }
+
+    public BITGRAVITY getBitGravity() {
+        return bitGravity;
+    }
+
+    public WINGRAVITY getWinGravity() {
+        return winGravity;
+    }
+
+    public CARD32 getBackingPlanes() {
+        return backingPlanes;
+    }
+
+    public CARD32 getBackingPixel() {
+        return backingPixel;
+    }
+
+    public BOOL getSaveUnder() {
+        return saveUnder;
+    }
+
+    public BOOL getMapIsInstalled() {
+        return mapIsInstalled;
+    }
+
+    public BYTE getMapState() {
+        return mapState;
+    }
+
+    public BOOL getOverrideRedirect() {
+        return overrideRedirect;
+    }
+
+    public COLORMAP getColormap() {
+        return colormap;
+    }
+
+    public SETofEVENT getAllEventMasks() {
+        return allEventMasks;
+    }
+
+    public SETofEVENT getYourEventMasks() {
+        return yourEventMasks;
+    }
+
+    public SETofDEVICEEVENT getDoNotPropagateMask() {
+        return doNotPropagateMask;
+    }
+
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
         

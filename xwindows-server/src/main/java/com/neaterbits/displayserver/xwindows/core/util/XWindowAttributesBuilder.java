@@ -141,7 +141,7 @@ public final class XWindowAttributesBuilder extends XAttributesBuilder {
         return this;
     }
 
-    public XWindowAttributesBuilder setColorMap(COLORMAP colormap) {
+    public XWindowAttributesBuilder setColormap(COLORMAP colormap) {
         
         this.colormap = set(colormap, XWindowAttributes.COLOR_MAP);
         

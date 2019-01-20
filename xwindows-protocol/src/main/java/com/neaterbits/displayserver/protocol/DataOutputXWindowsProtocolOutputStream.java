@@ -169,7 +169,7 @@ public final class DataOutputXWindowsProtocolOutputStream implements XWindowsPro
 	
 	@Override
     public void writeCURSOR(CURSOR value) throws IOException {
-	    writeCURSOR(value);
+	    writeRESOURCE(value);
     }
 
     @Override
@@ -231,7 +231,7 @@ public final class DataOutputXWindowsProtocolOutputStream implements XWindowsPro
 
     @Override
     public void writeSETofDEVICEEVENT(SETofDEVICEEVENT value) throws IOException {
-        dataOutput.writeShort(value.getValue());
+        dataOutput.writeInt(value.getValue());
     }
     
     @Override

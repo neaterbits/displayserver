@@ -54,6 +54,8 @@ public final class ChangeWindowAttributes extends XRequest {
         
         writeUnusedByte(stream);
         
+        System.out.println("## write attributes " + attributes.getCount());
+        
         writeRequestLength(stream, 3 + attributes.getCount());
         
         stream.writeWINDOW(window);

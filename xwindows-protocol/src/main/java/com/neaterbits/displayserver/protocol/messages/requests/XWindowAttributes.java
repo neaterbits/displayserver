@@ -277,4 +277,8 @@ public final class XWindowAttributes extends XAttributes {
     public COLORMAP getColormap() {
         return colormap;
     }
+
+    public CURSOR getCursor() {
+        return cursor;
+    }
 }

@@ -184,11 +184,11 @@ public class XWindow extends XDrawable {
         return currentWindowAttributes;
     }
     
-    public final void setCurrentWindowAttributes(XWindowAttributes currentWindowAttributes) {
+    public final void setCurrentWindowAttributes(XWindowAttributes attributes) {
         
-        Objects.requireNonNull(currentWindowAttributes);
+        Objects.requireNonNull(attributes);
         
-        this.currentWindowAttributes = currentWindowAttributes;
+        this.currentWindowAttributes = attributes;
     }
 
     public boolean isMapped() {

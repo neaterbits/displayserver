@@ -57,4 +57,14 @@ final class XState extends XDisplayState<XClientWindow, XClientWindows> implemen
     public XClientOps getSingleClientInterestedInEvent(WINDOW window, int event) {
         return eventSubscriptions.getSingleClientInterestedInEvent(window, event);
     }
+
+    @Override
+    public int getAllEventMasks(WINDOW window) {
+        return eventSubscriptions.getAllEventMasks(window);
+    }
+
+    @Override
+    public int getYourEventMask(WINDOW window, XClientOps client) {
+        return eventSubscriptions.getYourEventMask(window, client);
+    }
 }

@@ -12,13 +12,19 @@ import com.neaterbits.displayserver.protocol.messages.requests.RecolorCursor;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.CreateGlyphCursor;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.FreeCursor;
 import com.neaterbits.displayserver.protocol.types.CARD16;
+import com.neaterbits.displayserver.xwindows.model.XCursor;
+import com.neaterbits.displayserver.xwindows.model.XCursors;
 import com.neaterbits.displayserver.xwindows.processing.XClientOps;
 import com.neaterbits.displayserver.xwindows.processing.XOpCodeProcessor;
 
 public final class XCoreCursorMessageProcessor extends XOpCodeProcessor {
 
-    public XCoreCursorMessageProcessor(XWindowsServerProtocolLog protocolLog) {
+    private final XCursors xCursors;
+    
+    public XCoreCursorMessageProcessor(XWindowsServerProtocolLog protocolLog, XCursors xCursors) {
         super(protocolLog);
+        
+        this.xCursors = xCursors;
     }
 
     @Override
@@ -47,6 +53,8 @@ public final class XCoreCursorMessageProcessor extends XOpCodeProcessor {
             
             try {
                 client.checkAndAddResourceId(createCursor.getCID());
+
+                xCursors.add(createCursor.getCID(), new XCursor());
             } catch (IDChoiceException ex) {
                 sendError(client, Errors.IDChoice, sequenceNumber, createCursor.getCID().getValue(), opcode);
             }
@@ -66,6 +74,9 @@ public final class XCoreCursorMessageProcessor extends XOpCodeProcessor {
             
             client.checkAndRemoveResourceId(freeCursor.getCursor());
             
+            if (!xCursors.remove(freeCursor.getCursor())) {
+                sendError(client, Errors.Cursor, sequenceNumber, freeCursor.getCursor().getValue(), opcode);
+            }
             break;
         }
         

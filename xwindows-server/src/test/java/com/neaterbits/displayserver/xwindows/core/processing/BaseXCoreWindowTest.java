@@ -15,6 +15,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import com.neaterbits.displayserver.protocol.exception.IDChoiceException;
+import com.neaterbits.displayserver.protocol.messages.XError;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeWindowAttributes;
 import com.neaterbits.displayserver.protocol.messages.requests.XWindowAttributes;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
@@ -64,17 +65,27 @@ public abstract class BaseXCoreWindowTest extends BaseXCoreTest {
     }
 
     protected final void subscribeEvents(WINDOW window, int events) {
-        changeWindowAttributes(window, b -> b.setEventMask(events));
+        changeWindowAttributes(window, b -> b.setEventMask(events), true);
     }
 
     protected final void changeWindowAttributes(WindowState windowState, Consumer<XWindowAttributesBuilder> builder) {
-        changeWindowAttributes(windowState.windowResource, builder);
+        changeWindowAttributes(windowState.windowResource, builder, true);
     }
 
-    protected final com.neaterbits.displayserver.protocol.messages.Error changeWindowAttributes(WindowState windowState, Consumer<XWindowAttributesBuilder> builder) {
+    protected final XError changeWindowAttributesAndExpectError(WindowState windowState, Consumer<XWindowAttributesBuilder> builder) {
 
+        changeWindowAttributes(windowState.windowResource, builder, false);
+        
+        final XError error = expectError();
+        
+        assertThat(error).isNotNull();
+        
+        verifyNoMoreInteractions(windowState);
+        
+        return error;
+    }
     
-    protected final void changeWindowAttributes(WINDOW window, Consumer<XWindowAttributesBuilder> builder) {
+    protected final void changeWindowAttributes(WINDOW window, Consumer<XWindowAttributesBuilder> builder, boolean verifyNoMoreInteractions) {
         final XWindowAttributesBuilder xWindowAttributesBuilder = new XWindowAttributesBuilder();
         
         builder.accept(xWindowAttributesBuilder);
@@ -87,7 +98,9 @@ public abstract class BaseXCoreWindowTest extends BaseXCoreTest {
     
         sendRequest(changeWindowAttributes);
         
-        verifyNoMoreInteractions();
+        if (verifyNoMoreInteractions) {
+            verifyNoMoreInteractions();
+        }
     }
     
     protected final WindowState checkCreateWindow(Position position, Size size) {

@@ -11,8 +11,11 @@ import com.neaterbits.displayserver.protocol.enums.MapState;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
 import com.neaterbits.displayserver.protocol.enums.WindowClass;
 import com.neaterbits.displayserver.protocol.exception.AccessException;
+import com.neaterbits.displayserver.protocol.exception.ColormapException;
+import com.neaterbits.displayserver.protocol.exception.CursorException;
 import com.neaterbits.displayserver.protocol.exception.DrawableException;
 import com.neaterbits.displayserver.protocol.exception.IDChoiceException;
+import com.neaterbits.displayserver.protocol.exception.PixmapException;
 import com.neaterbits.displayserver.protocol.exception.ValueException;
 import com.neaterbits.displayserver.protocol.exception.WindowException;
 import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLog;
@@ -36,10 +39,12 @@ import com.neaterbits.displayserver.protocol.messages.requests.XWindowConfigurat
 import com.neaterbits.displayserver.protocol.types.BOOL;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD8;
+import com.neaterbits.displayserver.protocol.types.COLORMAP;
+import com.neaterbits.displayserver.protocol.types.CURSOR;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.INT16;
+import com.neaterbits.displayserver.protocol.types.PIXMAP;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
-import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.server.XClientWindow;
 import com.neaterbits.displayserver.server.XClientWindows;
@@ -51,6 +56,8 @@ import com.neaterbits.displayserver.windows.WindowManagement;
 import com.neaterbits.displayserver.windows.WindowParameters;
 import com.neaterbits.displayserver.windows.compositor.Compositor;
 import com.neaterbits.displayserver.windows.compositor.Surface;
+import com.neaterbits.displayserver.xwindows.model.XColormapsConstAccess;
+import com.neaterbits.displayserver.xwindows.model.XCursorsConstAccess;
 import com.neaterbits.displayserver.xwindows.model.XPixmap;
 import com.neaterbits.displayserver.xwindows.model.XPixmaps;
 import com.neaterbits.displayserver.xwindows.model.XWindow;
@@ -63,6 +70,8 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
     private final WindowManagement windowManagement;
     private final XClientWindows xWindows;
     private final XPixmaps xPixmaps;
+    private final XColormapsConstAccess xColormaps;
+    private final XCursorsConstAccess xCursors;
     private final XEventSubscriptions eventSubscriptions;
     private final Compositor compositor;
     private final XLibRendererFactory rendererFactory;
@@ -72,6 +81,8 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
             WindowManagement windowManagement,
             XClientWindows xWindows,
             XPixmaps xPixmaps,
+            XColormapsConstAccess xColormaps,
+            XCursorsConstAccess xCursors,
             XEventSubscriptions eventSubscriptions,
             Compositor compositor,
             XLibRendererFactory rendererFactory) {
@@ -81,6 +92,8 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
         this.windowManagement = windowManagement;
         this.xWindows = xWindows;
         this.xPixmaps = xPixmaps;
+        this.xColormaps = xColormaps;
+        this.xCursors = xCursors;
         this.eventSubscriptions = eventSubscriptions;
         this.compositor = compositor;
         this.rendererFactory = rendererFactory;
@@ -127,6 +140,12 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
                     sendError(client, Errors.Value, sequenceNumber, ex.getValue(), opcode);
                 } catch (IDChoiceException ex) {
                     sendError(client, Errors.IDChoice, sequenceNumber, ex.getResource().getValue(), opcode);
+                } catch (PixmapException ex) {
+                    sendError(client, Errors.Pixmap, sequenceNumber, ex.getPixmap().getValue(), opcode);
+                } catch (ColormapException ex) {
+                    sendError(client, Errors.Colormap, sequenceNumber, ex.getColormap().getValue(), opcode);
+                } catch (CursorException ex) {
+                    sendError(client, Errors.Cursor, sequenceNumber, ex.getCursor().getValue(), opcode);
                 }
             }
             break;
@@ -141,6 +160,12 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
                 sendError(client, Errors.Window, sequenceNumber, ex.getWindow().getValue(), opcode);
             } catch (AccessException ex) {
                 sendError(client, Errors.Acess, sequenceNumber, 0L, opcode);
+            } catch (PixmapException ex) {
+                sendError(client, Errors.Pixmap, sequenceNumber, ex.getPixmap().getValue(), opcode);
+            } catch (ColormapException ex) {
+                sendError(client, Errors.Colormap, sequenceNumber, ex.getColormap().getValue(), opcode);
+            } catch (CursorException ex) {
+                sendError(client, Errors.Cursor, sequenceNumber, ex.getCursor().getValue(), opcode);
             }
             break;
         }
@@ -293,7 +318,7 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
         }
     }
     
-    private XWindow createWindow(CreateWindow createWindow, XWindow parentWindow, XClientOps client) throws ValueException, IDChoiceException {
+    private XWindow createWindow(CreateWindow createWindow, XWindow parentWindow, XClientOps client) throws ValueException, IDChoiceException, PixmapException, ColormapException, CursorException {
 
         Objects.requireNonNull(createWindow);
         Objects.requireNonNull(parentWindow);
@@ -301,6 +326,8 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
         final DRAWABLE drawable = createWindow.getWid().toDrawable();
         
         client.checkAndAddResourceId(drawable);
+        
+        checkWindowAttributes(createWindow.getAttributes());
         
         final com.neaterbits.displayserver.windows.WindowClass windowClass;
 
@@ -376,7 +403,47 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
         return xWindow;
     }
 
-    private void changeWindowAttributes(ChangeWindowAttributes changeWindowAttributes, XClientOps client) throws WindowException, AccessException {
+    private void checkPixmap(PIXMAP pixmap) throws PixmapException {
+        
+        if (!pixmap.equals(PIXMAP.None) && !xPixmaps.hasPixmap(pixmap)) {
+            throw new PixmapException("No such pixmap", pixmap);
+        }
+    }
+
+    private void checkColormap(COLORMAP colormap) throws ColormapException {
+        
+        if (!colormap.equals(COLORMAP.None) && !xColormaps.hasColormap(colormap)) {
+            throw new ColormapException("No such colormap", colormap);
+        }
+    }
+
+    private void checkCursor(CURSOR cursor) throws CursorException {
+        
+        if (!cursor.equals(CURSOR.None) && !xCursors.hasCursor(cursor)) {
+            throw new CursorException("No such cursor", cursor);
+        }
+    }
+
+    private void checkWindowAttributes(XWindowAttributes requestAttributes) throws PixmapException, ColormapException, CursorException {
+
+        if (requestAttributes.isSet(XWindowAttributes.BACKGROUND_PIXMAP)) {
+            checkPixmap(requestAttributes.getBackgroundPixmap());
+        }
+
+        if (requestAttributes.isSet(XWindowAttributes.BORDER_PIXMAP)) {
+            checkPixmap(requestAttributes.getBorderPixmap());
+        }
+        
+        if (requestAttributes.isSet(XWindowAttributes.COLOR_MAP)) {
+            checkColormap(requestAttributes.getColormap());
+        }
+
+        if (requestAttributes.isSet(XWindowAttributes.CURSOR)) {
+            checkCursor(requestAttributes.getCursor());
+        }
+    }
+    
+    private void changeWindowAttributes(ChangeWindowAttributes changeWindowAttributes, XClientOps client) throws WindowException, AccessException, PixmapException, ColormapException, CursorException {
         
         final XWindow xWindow = findClientOrRootWindow(xWindows, changeWindowAttributes.getWindow());
      
@@ -385,9 +452,10 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
         final XWindowAttributes requestAttributes = changeWindowAttributes.getAttributes();
         
         final XWindowAttributes updatedAttributes = currentAttributes.applyImmutably(requestAttributes);
-        
+
+        checkWindowAttributes(requestAttributes);
+
         xWindow.setCurrentWindowAttributes(updatedAttributes);
-        
 
         if (requestAttributes.isSet(XWindowAttributes.EVENT_MASK)) {
             eventSubscriptions.setEventMapping(xWindow, requestAttributes.getEventMask(), client);
@@ -418,20 +486,22 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
     }
 
     void getWindowAttributes(GetWindowAttributes getWindowAttributes, int opcode, CARD16 sequenceNumber, XClientOps client) {
-        
-        final XWindow window = xWindows.getClientOrRootWindow(getWindowAttributes.getWindow());
 
-        if (window == null) {
-            sendError(client, Errors.Window, sequenceNumber, getWindowAttributes.getWindow().getValue(), opcode);
+        final WINDOW window = getWindowAttributes.getWindow();
+        
+        final XWindow xWindow = xWindows.getClientOrRootWindow(window);
+        
+        if (xWindow == null) {
+            sendError(client, Errors.Window, sequenceNumber, window.getValue(), opcode);
         }
         else {
-            final XWindowAttributes curAttributes = window.getCurrentWindowAttributes();
-            
+            final XWindowAttributes curAttributes = xWindow.getCurrentWindowAttributes();
+
             final GetWindowAttributesReply reply = new GetWindowAttributesReply(
                     sequenceNumber,
                     curAttributes.getBackingStore(),
-                    new VISUALID(0),
-                    window.getWindowClass(),
+                    xWindow.getVisual(),
+                    xWindow.getWindowClass(),
                     curAttributes.getBitGravity(), curAttributes.getWinGravity(),
                     curAttributes.getBackingPlanes(), curAttributes.getBackingPixel(),
                     curAttributes.getSaveUnder(),
@@ -439,8 +509,8 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
                     MapState.Viewable,
                     curAttributes.getOverrideRedirect(),
                     curAttributes.getColormap(),
-                    new SETofEVENT(0), // TODO
-                    new SETofEVENT(0), // TODO
+                    new SETofEVENT(eventSubscriptions.getAllEventMasks(window)),
+                    new SETofEVENT(eventSubscriptions.getYourEventMask(window, client)),
                     curAttributes.getDoNotPropagateMask());
             
             sendReply(client, reply);

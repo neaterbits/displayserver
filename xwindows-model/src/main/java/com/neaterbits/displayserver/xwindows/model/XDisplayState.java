@@ -4,6 +4,8 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import com.neaterbits.displayserver.buffers.PixelFormat;
+import com.neaterbits.displayserver.protocol.types.COLORMAP;
+import com.neaterbits.displayserver.protocol.types.CURSOR;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.PIXMAP;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
@@ -15,13 +17,17 @@ public class XDisplayState<W extends XWindow, WINDOWS extends XWindows<W>>
         XScreensConstAccess,
         XVisualsConstAccess,
         XWindowsConstAccess<W>,
-        XPixmapsConstAccess
+        XPixmapsConstAccess,
+        XColormapsConstAccess,
+        XCursorsConstAccess
 {
 
     private final XScreens screens;
     private final XVisuals visuals;
     private final WINDOWS windows;
     private final XPixmaps pixmaps;
+    private final XColormaps colormaps;
+    private final XCursors cursors;
 
     protected XDisplayState(XScreensAndVisuals screensAndVisuals, Supplier<WINDOWS> windowsCtor) {
 
@@ -30,6 +36,8 @@ public class XDisplayState<W extends XWindow, WINDOWS extends XWindows<W>>
         
         this.windows = windowsCtor.get();
         this.pixmaps = new XPixmaps();
+        this.colormaps = new XColormaps();
+        this.cursors = new XCursors();
     }
 
     @Override
@@ -93,6 +101,14 @@ public class XDisplayState<W extends XWindow, WINDOWS extends XWindows<W>>
         return pixmaps;
     }
 
+    public final XColormaps getColormaps() {
+        return colormaps;
+    }
+
+    public final XCursors getCursors() {
+        return cursors;
+    }
+
     public final void addPixmap(PIXMAP resource, DRAWABLE drawable, XPixmap pixmap) {
         pixmaps.addPixmap(resource, drawable, pixmap);
     }
@@ -100,15 +116,39 @@ public class XDisplayState<W extends XWindow, WINDOWS extends XWindows<W>>
     public final XPixmap removePixmap(PIXMAP resource) {
         return pixmaps.removePixmap(resource);
     }
+    
+    @Override
+    public final boolean hasPixmap(PIXMAP pixmap) {
+        return pixmaps.hasPixmap(pixmap);
+    }
 
     @Override
-    public XPixmap getPixmap(PIXMAP pixmap) {
+    public final XPixmap getPixmap(PIXMAP pixmap) {
         return pixmaps.getPixmap(pixmap);
+    }
+
+    @Override
+    public final boolean hasColormap(COLORMAP resource) {
+        return colormaps.hasColormap(resource);
+    }
+
+    @Override
+    public final XColormap getColormap(COLORMAP resource) {
+        return colormaps.getColormap(resource);
+    }
+
+    @Override
+    public final boolean hasCursor(CURSOR resource) {
+        return cursors.hasCursor(resource);
+    }
+
+    @Override
+    public final XCursor getCursor(CURSOR resource) {
+        return cursors.getCursor(resource);
     }
 
     @Override
     public Integer getScreenForWindow(WINDOW window) {
         return windows.getScreenForWindow(window);
     }
-
 }

@@ -5,9 +5,11 @@ import com.neaterbits.displayserver.events.common.InputDriver;
 import com.neaterbits.displayserver.io.common.DataWriter;
 import com.neaterbits.displayserver.protocol.ByteBufferXWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
+import com.neaterbits.displayserver.protocol.enums.VisualClass;
 import com.neaterbits.displayserver.protocol.enums.WindowClass;
 import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLogImpl;
 import com.neaterbits.displayserver.protocol.messages.XEncodeable;
+import com.neaterbits.displayserver.protocol.messages.XError;
 import com.neaterbits.displayserver.protocol.messages.XEvent;
 import com.neaterbits.displayserver.protocol.messages.XReply;
 import com.neaterbits.displayserver.protocol.messages.XRequest;
@@ -36,10 +38,13 @@ import com.neaterbits.displayserver.windows.compositor.Surface;
 import com.neaterbits.displayserver.windows.config.DisplayAreaConfig;
 import com.neaterbits.displayserver.xwindows.fonts.FontLoaderConfig;
 import com.neaterbits.displayserver.xwindows.fonts.render.FontBufferFactory;
+import com.neaterbits.displayserver.xwindows.model.XColormaps;
+import com.neaterbits.displayserver.xwindows.model.XCursors;
 import com.neaterbits.displayserver.xwindows.model.XPixmaps;
 import com.neaterbits.displayserver.xwindows.model.XScreen;
 import com.neaterbits.displayserver.xwindows.model.XScreenDepth;
 import com.neaterbits.displayserver.xwindows.model.XScreens;
+import com.neaterbits.displayserver.xwindows.model.XVisual;
 import com.neaterbits.displayserver.xwindows.model.XVisuals;
 import com.neaterbits.displayserver.xwindows.model.XWindow;
 import com.neaterbits.displayserver.xwindows.model.render.XLibRenderer;
@@ -57,7 +62,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class BaseXCoreTest {
 
@@ -85,6 +92,8 @@ public abstract class BaseXCoreTest {
     
         final XClientWindows windows = new XClientWindows();
         final XPixmaps pixmaps = new XPixmaps();
+        final XColormaps colormaps = new XColormaps();
+        final XCursors cursors = new XCursors();
         
         this.compositor = mock(Compositor.class);
         this.rendererFactory = mock(XLibRendererFactory.class);
@@ -110,6 +119,18 @@ public abstract class BaseXCoreTest {
 
         final VISUALID rootVisual = new VISUALID(allocateResourceId());
 
+        final XVisual xRootVisual = new XVisual(
+                VisualClass.TRUECOLOR,
+                8,
+                1 << 24,
+                0x00FF0000,
+                0x0000FF00,
+                0x000000FF);
+        
+        final Map<VISUALID, XVisual> visualsMap = new HashMap<>();
+        
+        visualsMap.put(rootVisual, xRootVisual);
+        
         final Size displaySize = new Size(1280, 1024);
 
         this.rootPixelFormat = PixelFormat.RGB24;
@@ -173,10 +194,12 @@ public abstract class BaseXCoreTest {
             this.coreModule = new XCoreModule(
                 new XWindowsServerProtocolLogImpl("test", DebugLevel.TRACE),
                 windowManagement,
-                new XScreens(Collections.emptyList()),
-                new XVisuals(Collections.emptyMap()),
+                new XScreens(Arrays.asList(screen)),
+                new XVisuals(visualsMap),
                 windows,
                 pixmaps,
+                colormaps,
+                cursors,
                 new XEventSubscriptions(),
                 compositor,
                 rendererFactory,
@@ -196,6 +219,10 @@ public abstract class BaseXCoreTest {
         Mockito.verifyNoMoreInteractions(Mockito.ignoreStubs(displayArea));
     }
 
+    protected final VISUALID getRootVisual() {
+        return screen.getRootVisual();
+    }
+    
     protected final int allocateResourceId() {
         return resourceIds ++;
     }
@@ -300,6 +327,15 @@ public abstract class BaseXCoreTest {
 
         Mockito.verify(client).getSequenceNumber();
         Mockito.verify(client).sendEvent(argumentCaptor.capture());
+    
+        return argumentCaptor.getValue();
+    }
+
+    protected final XError expectError() {
+        
+        final ArgumentCaptor<XError> argumentCaptor = ArgumentCaptor.forClass(XError.class);
+        
+        Mockito.verify(client).sendError(argumentCaptor.capture());
     
         return argumentCaptor.getValue();
     }
