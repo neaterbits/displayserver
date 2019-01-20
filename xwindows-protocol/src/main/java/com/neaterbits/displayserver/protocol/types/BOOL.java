@@ -7,6 +7,10 @@ public final class BOOL {
     
 	private final byte value;
 
+	public static BOOL valueOf(boolean value) {
+	    return value ? True : False;
+	}
+	
 	public BOOL(boolean value) {
 	    this.value = value ? (byte)1 : (byte)0;
 	}

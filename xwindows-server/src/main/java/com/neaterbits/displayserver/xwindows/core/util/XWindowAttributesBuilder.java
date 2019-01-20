@@ -32,42 +32,125 @@ public final class XWindowAttributesBuilder extends XAttributesBuilder {
     private COLORMAP colormap;
     private CURSOR cursor;
 
+
+    private <T> T set(T value, int flag) {
+        
+        Objects.requireNonNull(value);
+        
+        addFlag(flag);
+        
+        return value;
+    }
+    
     public XWindowAttributesBuilder setBackgroundPixmap(PIXMAP pixmap) {
         
-        Objects.requireNonNull(pixmap);
-        
-        addFlag(XWindowAttributes.BACKGROUND_PIXMAP);
-        
-        this.backgroundPixmap = pixmap;
+        this.backgroundPixmap = set(pixmap, XWindowAttributes.BACKGROUND_PIXMAP);
 
         return this;
     }
     
     public XWindowAttributesBuilder setBackgroundPixel(long backgroundPixel) {
         
-        addFlag(XWindowAttributes.BACKGROUND_PIXEL);
-    
-        this.backgroundPixel = new CARD32(backgroundPixel);
+        this.backgroundPixel = set(new CARD32(backgroundPixel), XWindowAttributes.BACKGROUND_PIXEL);
     
         return this;
     }
 
+    public XWindowAttributesBuilder setBorderPixmap(PIXMAP pixmap) {
+        
+        this.borderPixmap = set(pixmap, XWindowAttributes.BORDER_PIXMAP);
+
+        return this;
+    }
+    
+    public XWindowAttributesBuilder setBorderPixel(long borderPixel) {
+        
+        this.borderPixel = set(new CARD32(borderPixel), XWindowAttributes.BORDER_PIXEL);
+    
+        return this;
+    }
+
+    public XWindowAttributesBuilder setBitGravity(BITGRAVITY bitGravity) {
+        
+        this.bitGravity = set(bitGravity, XWindowAttributes.BIT_GRAVITY);
+    
+        return this;
+    }
+
+    public XWindowAttributesBuilder setBitGravity(WINGRAVITY winGravity) {
+        
+        this.winGravity = set(winGravity, XWindowAttributes.WIN_GRAVITY);
+    
+        return this;
+    }
+
+    public XWindowAttributesBuilder setBackingStore(BYTE backingStore) {
+        
+        this.backingStore = set(backingStore, XWindowAttributes.BACKING_STORE);
+    
+        return this;
+    }
+
+    public XWindowAttributesBuilder setBackingPlanes(int backingPlanes) {
+        
+        this.backingPlanes = set(new CARD32(backingPlanes), XWindowAttributes.BACKING_PLANES);
+    
+        return this;
+    }
+
+    public XWindowAttributesBuilder setBackingPixel(int backingPixel) {
+        
+        this.backingPixel = set(new CARD32(backingPixel), XWindowAttributes.BACKING_PIXEL);
+    
+        return this;
+    }
+
+    public XWindowAttributesBuilder setOverrideRedirect(boolean value) {
+        return setOverrideRedirect(BOOL.valueOf(value));
+    }
+        
     public XWindowAttributesBuilder setOverrideRedirect(BOOL value) {
         
-        Objects.requireNonNull(value);
+        this.overrideRedirect = set(value, XWindowAttributes.OVERRIDE_REDIRECT);
         
-        addFlag(XWindowAttributes.OVERRIDE_REDIRECT);
+        return this;
+    }
+
+    public XWindowAttributesBuilder setSaveUnder(boolean value) {
+        return setSaveUnder(BOOL.valueOf(value));
+    }
         
-        this.overrideRedirect = value;
+    public XWindowAttributesBuilder setSaveUnder(BOOL value) {
+        
+        this.saveUnder = set(value, XWindowAttributes.SAVE_UNDER);
+        
+        return this;
+    }
+
+    public XWindowAttributesBuilder setEventMask(int eventMask) {
+        
+        this.eventMask = set(new SETofEVENT(eventMask), XWindowAttributes.EVENT_MASK);
+        
+        return this;
+    }
+
+    public XWindowAttributesBuilder setDoNotPropagateMask(int doNotPropagateMask) {
+        
+        this.doNotPropagateMask = set(new SETofDEVICEEVENT(doNotPropagateMask), XWindowAttributes.DO_NOT_PROPAGATE_MASK);
+        
+        return this;
+    }
+
+    public XWindowAttributesBuilder setColorMap(COLORMAP colormap) {
+        
+        this.colormap = set(colormap, XWindowAttributes.COLOR_MAP);
         
         return this;
     }
     
-    public XWindowAttributesBuilder setEventMask(int eventMask) {
+    public XWindowAttributesBuilder setCursor(CURSOR cursor) {
         
-        addFlag(XWindowAttributes.EVENT_MASK);
-        
-        this.eventMask = new SETofEVENT(eventMask);
+        this.cursor = set(cursor, XWindowAttributes.CURSOR);
         
         return this;
     }
@@ -83,7 +166,7 @@ public final class XWindowAttributesBuilder extends XAttributesBuilder {
                 bitGravity,
                 winGravity,
                 backingStore,
-                backingPlanes,
+                backingPixel,
                 backingPixel,
                 overrideRedirect,
                 saveUnder,
