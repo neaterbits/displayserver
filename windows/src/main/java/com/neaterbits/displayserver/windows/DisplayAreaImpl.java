@@ -84,9 +84,7 @@ public final class DisplayAreaImpl implements DisplayArea {
 
         return new OffscreenSurfaceWrapper(
                 offscreenBufferProvider.allocateOffscreenBuffer(size, pixelFormat),
-                new NoopCoordinateTranslator(),
-                size,
-                pixelFormat.getDepth());
+                new NoopCoordinateTranslator());
     }
 
     @Override

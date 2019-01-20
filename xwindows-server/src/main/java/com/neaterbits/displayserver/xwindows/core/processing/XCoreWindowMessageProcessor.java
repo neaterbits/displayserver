@@ -263,8 +263,11 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
                     depth = xPixmap.getOffscreenSurface().getDepth();
                     x = 0;
                     y = 0;
-                    width = xPixmap.getOffscreenSurface().getWidth();
-                    height = xPixmap.getOffscreenSurface().getHeight();
+
+                    final Size size = xPixmap.getOffscreenSurface().getSize();
+                    
+                    width = size.getWidth();
+                    height = size.getHeight();
                     borderWidth = 0;
                 }
                 else {

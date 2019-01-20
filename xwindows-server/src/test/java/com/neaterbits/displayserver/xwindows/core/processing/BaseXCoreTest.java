@@ -84,7 +84,8 @@ public abstract class BaseXCoreTest {
     protected final WINDOW rootWindow;
     
     protected final PixelFormat rootPixelFormat;
-    
+    private final Size displaySize;
+
     private int resourceIds;
     private int sequenceNumber;
     
@@ -108,6 +109,8 @@ public abstract class BaseXCoreTest {
                 new FontLoaderConfig(Collections.emptyList()),
                 "/usr/share/X11/rgb.txt");
     
+        this.displaySize = new Size(1280, 1024);
+        
         this.resourceIds = 1;
         this.sequenceNumber = 0;
         
@@ -231,6 +234,14 @@ public abstract class BaseXCoreTest {
         return rootPixelFormat.getDepth();
     }
     
+    protected final int getRootWidth() {
+        return displaySize.getWidth();
+    }
+    
+    protected final int getRootHeight() {
+        return displaySize.getHeight();
+    }
+    
     protected final CARD8 getRootDepth() {
         return new CARD8((byte)getRootDepthAsInt());
     }
@@ -267,17 +278,17 @@ public abstract class BaseXCoreTest {
     }
     
     protected final WINDOW createWindow(Position position, Size size, int borderWidth) {
-        return createWindow(position, size, borderWidth, null);
+        return createWindow(position, size, borderWidth, null, null);
     }
 
-    protected final WINDOW createWindow(Position position, Size size, int borderWidth, XWindowAttributes windowAttributes) {
+    protected final WINDOW createWindow(Position position, Size size, int borderWidth, XWindowAttributes windowAttributes, WINDOW w) {
 
         final WINDOW window = new WINDOW(allocateResourceId());
         
         final CreateWindow createWindow = new CreateWindow(
                 new CARD8((short)0),
                 window,
-                screen.getRootWINDOW(),
+                w != null ? w : screen.getRootWINDOW(),
                 new INT16((short)position.getLeft()), new INT16((short)position.getTop()),
                 new CARD16(size.getWidth()), new CARD16(size.getHeight()),
                 new CARD16(borderWidth),

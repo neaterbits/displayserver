@@ -35,6 +35,34 @@ public final class GetGeometryReply extends XReply {
         this.borderWidth = borderWidth;
     }
 
+    public CARD8 getDepth() {
+        return depth;
+    }
+
+    public WINDOW getRoot() {
+        return root;
+    }
+
+    public INT16 getX() {
+        return x;
+    }
+
+    public INT16 getY() {
+        return y;
+    }
+
+    public CARD16 getWidth() {
+        return width;
+    }
+
+    public CARD16 getHeight() {
+        return height;
+    }
+
+    public CARD16 getBorderWidth() {
+        return borderWidth;
+    }
+
     @Override
     public Object[] getDebugParams() {
         return wrap(

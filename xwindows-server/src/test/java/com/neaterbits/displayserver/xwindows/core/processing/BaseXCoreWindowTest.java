@@ -104,7 +104,7 @@ public abstract class BaseXCoreWindowTest extends BaseXCoreTest {
     }
     
     protected final WindowState checkCreateWindow(Position position, Size size) {
-        return checkCreateWindow(position, size, 0, null, true);
+        return checkCreateWindow(position, size, 0, null, null, true);
     }
 
     protected final WindowState checkCreateWindow(
@@ -113,7 +113,7 @@ public abstract class BaseXCoreWindowTest extends BaseXCoreTest {
             int borderWidth,
             XWindowAttributes windowAttributes) {
         
-        return checkCreateWindow(position, size, borderWidth, windowAttributes, true);
+        return checkCreateWindow(position, size, borderWidth, windowAttributes, null, true);
     }
 
     protected final WindowState checkCreateWindow(
@@ -121,16 +121,28 @@ public abstract class BaseXCoreWindowTest extends BaseXCoreTest {
             Size size,
             int borderWidth,
             XWindowAttributes windowAttributes,
+            WINDOW window) {
+        
+        return checkCreateWindow(position, size, borderWidth, windowAttributes, window, true);
+    }
+
+    protected final WindowState checkCreateWindow(
+            Position position,
+            Size size,
+            int borderWidth,
+            XWindowAttributes windowAttributes,
+            WINDOW wr,
             boolean verifyNoMoreInteractions) {
 
         final Surface surface = mock(Surface.class);
         final XLibRenderer xlibRenderer = mock(XLibRenderer.class);
 
         when(compositor.allocateSurfaceForClientWindow(isNotNull())).thenReturn(surface);
+        when(displayArea.getPixelFormat()).thenReturn(rootPixelFormat);
         when(rendererFactory.createRenderer(isNotNull(), any()))
             .thenReturn(xlibRenderer);
         
-        final WINDOW window = createWindow(position, size, borderWidth, windowAttributes);
+        final WINDOW window = createWindow(position, size, borderWidth, windowAttributes, wr);
         
         final ArgumentCaptor<Window> surfaceWindow = ArgumentCaptor.forClass(Window.class);
         

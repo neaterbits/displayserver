@@ -39,7 +39,7 @@ public final class XCoreWindowCreateWindowTest extends BaseXCoreWindowTest {
         
         whenEvent(CreateNotify.class);
         
-        final WindowState window = checkCreateWindow(position, size, borderWidth, null, false);
+        final WindowState window = checkCreateWindow(position, size, borderWidth, null, null, false);
 
         final CreateNotify createNotify = expectEvent(CreateNotify.class);
 
@@ -78,7 +78,7 @@ public final class XCoreWindowCreateWindowTest extends BaseXCoreWindowTest {
         
         assertThat(windowAttributes.isSet(XWindowAttributes.OVERRIDE_REDIRECT));
         
-        final WindowState window = checkCreateWindow(position, size, borderWidth, windowAttributes, false);
+        final WindowState window = checkCreateWindow(position, size, borderWidth, windowAttributes, null, false);
 
         final CreateNotify createNotify = expectEvent(CreateNotify.class);
 

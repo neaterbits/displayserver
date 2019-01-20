@@ -38,9 +38,7 @@ public final class SingleViewPortDirectCompositor extends SingleViewPortComposit
                     public double translateY(double y) {
                         return y + window.getPosition().getTop();
                     }
-                },
-                window.getSize(),
-                window.getDepth());
+                });
     }
 
     @Override

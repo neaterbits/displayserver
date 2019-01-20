@@ -12,18 +12,13 @@ public class SurfaceWrapper implements Surface {
 
     private BufferOperations bufferOperations;
     private CoordinateTranslator coordinateTranslator;
-    private Size size;
-    private int depth;
     
     public SurfaceWrapper(
             BufferOperations bufferOperations,
-            CoordinateTranslator coordinateTranslator,
-            Size size,
-            int depth) {
+            CoordinateTranslator coordinateTranslator) {
         
         Objects.requireNonNull(bufferOperations);
         Objects.requireNonNull(coordinateTranslator);
-        Objects.requireNonNull(size);
         
         if (bufferOperations instanceof SurfaceWrapper) {
             throw new IllegalArgumentException();
@@ -32,8 +27,6 @@ public class SurfaceWrapper implements Surface {
 
         this.bufferOperations = bufferOperations;
         this.coordinateTranslator = coordinateTranslator;
-        this.size = size;
-        this.depth = depth;
     }
 
     @Override
@@ -111,12 +104,12 @@ public class SurfaceWrapper implements Surface {
 
     @Override
     public final Size getSize() {
-        return size;
+        return bufferOperations.getSize();
     }
     
     @Override
     public final int getDepth() {
-        return depth;
+        return bufferOperations.getDepth();
     }
     
     @Override

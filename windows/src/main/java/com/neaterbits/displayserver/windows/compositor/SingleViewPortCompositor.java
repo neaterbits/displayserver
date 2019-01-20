@@ -24,11 +24,7 @@ public abstract class SingleViewPortCompositor implements Compositor {
 
         final CoordinateTranslator coordinateTranslator = new NoopCoordinateTranslator();
         
-        this.rootSurface = new SurfaceWrapper(
-                viewPort.getFrameBuffer(),
-                coordinateTranslator,
-                viewPort.getFrameBuffer().getSize(),
-                viewPort.getFrameBuffer().getDepth());
+        this.rootSurface = new SurfaceWrapper(viewPort.getFrameBuffer(), coordinateTranslator);
     }
 
     final BufferOperations getRootFramebuffer() {
