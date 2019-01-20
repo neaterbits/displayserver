@@ -92,7 +92,14 @@ final class Windows {
 			}
 		}
 		
-		layers.removeSubLayer(window.getParentWindow().getLayer(), window.getLayer());
+		final Layer layer = window.getParentWindow().getLayer();
+		
+		if (layer.isRootLayer()) {
+		    layers.removeFromRootLayer(window.getLayer());
+		}
+		else {
+		    layers.removeSubLayer(layer, window.getLayer());
+		}
 		
 		layerToWindow.remove(window);
 		
