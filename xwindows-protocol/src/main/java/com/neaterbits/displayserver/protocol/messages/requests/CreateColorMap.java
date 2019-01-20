@@ -7,14 +7,14 @@ import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.enums.Alloc;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
-import com.neaterbits.displayserver.protocol.messages.Reply;
-import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.messages.XReply;
+import com.neaterbits.displayserver.protocol.messages.XRequest;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.COLORMAP;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 
-public final class CreateColorMap extends Request {
+public final class CreateColorMap extends XRequest {
 
     private final BYTE alloc;
     private final COLORMAP mid;
@@ -88,7 +88,7 @@ public final class CreateColorMap extends Request {
     }
 
     @Override
-    public Class<? extends Reply> getReplyClass() {
+    public Class<? extends XReply> getReplyClass() {
         return null;
     }
 }

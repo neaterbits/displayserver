@@ -12,8 +12,8 @@ import com.neaterbits.displayserver.events.common.InputDriver;
 import com.neaterbits.displayserver.events.common.KeyboardMapping;
 import com.neaterbits.displayserver.events.common.Modifier;
 import com.neaterbits.displayserver.events.common.ModifierScancodes;
-import com.neaterbits.displayserver.protocol.messages.Error;
-import com.neaterbits.displayserver.protocol.messages.Reply;
+import com.neaterbits.displayserver.protocol.messages.XError;
+import com.neaterbits.displayserver.protocol.messages.XReply;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ServerMessage;
 import com.neaterbits.displayserver.protocol.messages.replies.GetKeyboardMappingReply;
 import com.neaterbits.displayserver.protocol.messages.replies.GetModifierMappingReply;
@@ -97,7 +97,7 @@ public final class XWindowsInputDriver extends BaseInputDriver implements InputD
         driverConnection.sendRequestWaitReply(new GetModifierMapping(), new ReplyListener() {
             
             @Override
-            public void onReply(Reply reply) {
+            public void onReply(XReply reply) {
                 
                 System.out.println("## scancodes response" + reply);
                 
@@ -107,7 +107,7 @@ public final class XWindowsInputDriver extends BaseInputDriver implements InputD
             }
             
             @Override
-            public void onError(Error error) {
+            public void onError(XError error) {
                 System.out.println("## scancodes error" + error);
             }
         });
@@ -163,7 +163,7 @@ public final class XWindowsInputDriver extends BaseInputDriver implements InputD
         driverConnection.sendRequestWaitReply(request, new ReplyListener() {
             
             @Override
-            public void onReply(Reply reply) {
+            public void onReply(XReply reply) {
                 
                 System.out.println("## keyboardmapping response" + reply);
                 
@@ -173,7 +173,7 @@ public final class XWindowsInputDriver extends BaseInputDriver implements InputD
             }
             
             @Override
-            public void onError(Error error) {
+            public void onError(XError error) {
                 System.out.println("## scancodes error" + error);
             }
         });

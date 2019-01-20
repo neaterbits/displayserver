@@ -1,10 +1,10 @@
 package com.neaterbits.displayserver.driver.xwindows.common;
 
-import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.messages.XRequest;
 
 public interface XWindowsRequestSender {
 
-	void sendRequest(Request request);
+	void sendRequest(XRequest request);
 	
-    void sendRequestWaitReply(Request request, ReplyListener replyListener);
+    void sendRequestWaitReply(XRequest request, ReplyListener replyListener);
 }

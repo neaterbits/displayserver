@@ -4,9 +4,9 @@ import java.io.IOException;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
-import com.neaterbits.displayserver.protocol.messages.Encodeable;
+import com.neaterbits.displayserver.protocol.messages.XEncodeable;
 
-public final class RECTANGLE extends Encodeable {
+public final class RECTANGLE extends XEncodeable {
 
     private final INT16 x;
     private final INT16 y;

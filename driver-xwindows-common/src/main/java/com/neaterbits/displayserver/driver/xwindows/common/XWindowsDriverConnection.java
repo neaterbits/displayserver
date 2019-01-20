@@ -6,7 +6,7 @@ import java.util.Objects;
 import com.neaterbits.displayserver.driver.common.Listeners;
 import com.neaterbits.displayserver.driver.xwindows.common.messaging.XWindowsDriverMessageSending;
 import com.neaterbits.displayserver.protocol.logging.XWindowsClientProtocolLog;
-import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.messages.XRequest;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ServerMessage;
 import com.neaterbits.displayserver.render.cairo.xcb.XCBConnection;
 import com.neaterbits.displayserver.render.cairo.xcb.XCBVisual;
@@ -84,12 +84,12 @@ public final class XWindowsDriverConnection
     }
 
     @Override
-    public void sendRequest(Request request) {
+    public void sendRequest(XRequest request) {
 	    messaging.sendRequest(request);
     }
 
     @Override
-    public void sendRequestWaitReply(Request request, ReplyListener replyListener) {
+    public void sendRequestWaitReply(XRequest request, ReplyListener replyListener) {
         messaging.sendRequestWaitReply(request, replyListener);
     }
 

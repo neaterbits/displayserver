@@ -5,12 +5,12 @@ import java.io.IOException;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
-import com.neaterbits.displayserver.protocol.messages.Reply;
-import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.messages.XReply;
+import com.neaterbits.displayserver.protocol.messages.XRequest;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.util.logging.LogUtil;
 
-public final class ConfigureWindow extends Request {
+public final class ConfigureWindow extends XRequest {
 
     private final WINDOW window;
     private final XWindowConfiguration configuration;
@@ -63,7 +63,7 @@ public final class ConfigureWindow extends Request {
     }
 
     @Override
-    public Class<? extends Reply> getReplyClass() {
+    public Class<? extends XReply> getReplyClass() {
         return null;
     }
 }

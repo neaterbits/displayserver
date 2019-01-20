@@ -6,14 +6,14 @@ import java.util.Objects;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolUtil;
-import com.neaterbits.displayserver.protocol.messages.Reply;
+import com.neaterbits.displayserver.protocol.messages.XReply;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 
 
-public final class GetImageReply extends Reply {
+public final class GetImageReply extends XReply {
 
     private final CARD8 depth;
     private final VISUALID visual;

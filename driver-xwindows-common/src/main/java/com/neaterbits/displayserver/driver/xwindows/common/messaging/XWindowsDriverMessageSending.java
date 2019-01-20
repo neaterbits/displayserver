@@ -21,10 +21,10 @@ import com.neaterbits.displayserver.protocol.Events;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
 import com.neaterbits.displayserver.protocol.logging.XWindowsClientProtocolLog;
-import com.neaterbits.displayserver.protocol.messages.Error;
-import com.neaterbits.displayserver.protocol.messages.Reply;
-import com.neaterbits.displayserver.protocol.messages.Request;
-import com.neaterbits.displayserver.protocol.messages.ServerToClientMessage;
+import com.neaterbits.displayserver.protocol.messages.XError;
+import com.neaterbits.displayserver.protocol.messages.XReply;
+import com.neaterbits.displayserver.protocol.messages.XRequest;
+import com.neaterbits.displayserver.protocol.messages.XServerToClientMessage;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ClientConnectionError;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ServerMessage;
 import com.neaterbits.displayserver.protocol.messages.replies.GetImageReply;
@@ -117,7 +117,7 @@ public class XWindowsDriverMessageSending implements XWindowsMessaging {
             
             if (receivedInitialMessage()) {
                 try {
-                    final Error error = readError(byteBuffer);
+                    final XError error = readError(byteBuffer);
                     
                     final CARD16 sequenceNumber = error.getSequenceNumber();
                     
@@ -145,7 +145,7 @@ public class XWindowsDriverMessageSending implements XWindowsMessaging {
                     initialMessage = serverMessage;
                 }
                 else {
-                    final ServerToClientMessage message = processResponseMessage(
+                    final XServerToClientMessage message = processResponseMessage(
                             byteBuffer,
                             messageLength,
                             seq -> getRequestOpCodeFor(seq));
@@ -155,7 +155,7 @@ public class XWindowsDriverMessageSending implements XWindowsMessaging {
                     final RequestWithReply requestWithReply = getRequestWithReply(sequenceNumber);
                     
                     if (requestWithReply != null) {
-                        requestWithReply.listener.onReply((Reply)message);
+                        requestWithReply.listener.onReply((XReply)message);
                     }
                 }
             }
@@ -175,14 +175,14 @@ public class XWindowsDriverMessageSending implements XWindowsMessaging {
         return ServerMessage.decode(stream);
     }
 
-    private ServerToClientMessage processResponseMessage(
+    private XServerToClientMessage processResponseMessage(
             ByteBuffer byteBuffer,
             int messageLength,
             Function<Integer, Integer> getRequestOpCode) throws IOException {
         
         final int opcode = byteBuffer.get();
         
-        final ServerToClientMessage message;
+        final XServerToClientMessage message;
         
         final XWindowsProtocolInputStream stream = new ByteBufferXWindowsProtocolInputStream(byteBuffer);
         
@@ -194,7 +194,7 @@ public class XWindowsDriverMessageSending implements XWindowsMessaging {
             
             final int requestOpCode = getRequestOpCode.apply(sequenceNumber);
             
-            final Reply reply;
+            final XReply reply;
             
             switch (requestOpCode) {
             case OpCodes.GET_IMAGE:
@@ -283,11 +283,11 @@ public class XWindowsDriverMessageSending implements XWindowsMessaging {
         }
     }
     
-    private com.neaterbits.displayserver.protocol.messages.Error readError(ByteBuffer byteBuffer) throws IOException {
+    private com.neaterbits.displayserver.protocol.messages.XError readError(ByteBuffer byteBuffer) throws IOException {
 
         final XWindowsProtocolInputStream stream = new ByteBufferXWindowsProtocolInputStream(byteBuffer);
         
-        final com.neaterbits.displayserver.protocol.messages.Error error = com.neaterbits.displayserver.protocol.messages.Error.decode(stream);
+        final com.neaterbits.displayserver.protocol.messages.XError error = com.neaterbits.displayserver.protocol.messages.XError.decode(stream);
 
         if (protocolLog != null) {
             protocolLog.onReceivedError(error);
@@ -296,7 +296,7 @@ public class XWindowsDriverMessageSending implements XWindowsMessaging {
         return error;
     }
 
-    private SentRequest sendRequestWithSequenceNumber(Request request) {
+    private SentRequest sendRequestWithSequenceNumber(XRequest request) {
         
         final SentRequest sentRequest;
         
@@ -313,17 +313,17 @@ public class XWindowsDriverMessageSending implements XWindowsMessaging {
         return sentRequest;
     }
     
-    private SentRequest writeRequestToOutputBuffer(Request request, ByteOrder byteOrder) {
+    private SentRequest writeRequestToOutputBuffer(XRequest request, ByteOrder byteOrder) {
         return network.sendRequest(request, byteOrder);
     }
     
     @Override
-    public void sendRequest(Request request) {
+    public void sendRequest(XRequest request) {
         sendRequestWithSequenceNumber(request);
     }
 
     @Override
-    public void sendRequestWaitReply(Request request, ReplyListener replyListener) {
+    public void sendRequestWaitReply(XRequest request, ReplyListener replyListener) {
 
         final SentRequest sentRequest = sendRequestWithSequenceNumber(request);
 

@@ -5,12 +5,12 @@ import java.io.IOException;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolUtil;
-import com.neaterbits.displayserver.protocol.messages.Encodeable;
+import com.neaterbits.displayserver.protocol.messages.XEncodeable;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 
-public final class ClientMessage extends Encodeable {
+public final class ClientMessage extends XEncodeable {
 
 	private final CARD8 byteOrder;
 	

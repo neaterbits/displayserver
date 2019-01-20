@@ -1,9 +1,9 @@
 package com.neaterbits.displayserver.driver.xwindows.common;
 
-import com.neaterbits.displayserver.protocol.messages.Reply;
+import com.neaterbits.displayserver.protocol.messages.XReply;
 
 public interface XWindowsReplyListener {
 
-    void onReply(Reply reply);
+    void onReply(XReply reply);
     
 }

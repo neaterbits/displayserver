@@ -3,7 +3,7 @@ package com.neaterbits.displayserver.protocol.messages.replies;
 import java.io.IOException;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
-import com.neaterbits.displayserver.protocol.messages.Reply;
+import com.neaterbits.displayserver.protocol.messages.XReply;
 import com.neaterbits.displayserver.protocol.types.BITGRAVITY;
 import com.neaterbits.displayserver.protocol.types.BOOL;
 import com.neaterbits.displayserver.protocol.types.BYTE;
@@ -15,7 +15,7 @@ import com.neaterbits.displayserver.protocol.types.SETofEVENT;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINGRAVITY;
 
-public final class GetWindowAttributesReply extends Reply {
+public final class GetWindowAttributesReply extends XReply {
 
     private final BYTE backingStore;
     

@@ -6,13 +6,13 @@ import java.util.Objects;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
-import com.neaterbits.displayserver.protocol.messages.Reply;
-import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.messages.XReply;
+import com.neaterbits.displayserver.protocol.messages.XRequest;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.GCONTEXT;
 import com.neaterbits.displayserver.util.logging.LogUtil;
 
-public final class CreateGC extends Request {
+public final class CreateGC extends XRequest {
 
 	private final GCONTEXT cid;
 	private final DRAWABLE drawable;
@@ -86,7 +86,7 @@ public final class CreateGC extends Request {
     }
 
     @Override
-    public Class<? extends Reply> getReplyClass() {
+    public Class<? extends XReply> getReplyClass() {
         return null;
     }
 }

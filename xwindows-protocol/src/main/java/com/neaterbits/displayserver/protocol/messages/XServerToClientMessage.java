@@ -7,11 +7,11 @@ import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 
-public abstract class ServerToClientMessage extends Message {
+public abstract class XServerToClientMessage extends XMessage {
 
     private final CARD16 sequenceNumber;
 
-    public ServerToClientMessage(CARD16 sequenceNumber) {
+    public XServerToClientMessage(CARD16 sequenceNumber) {
         Objects.requireNonNull(sequenceNumber);
         
         this.sequenceNumber = sequenceNumber;

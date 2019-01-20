@@ -3,13 +3,13 @@ package com.neaterbits.displayserver.protocol.messages.replies;
 import java.io.IOException;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
-import com.neaterbits.displayserver.protocol.messages.Reply;
+import com.neaterbits.displayserver.protocol.messages.XReply;
 import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD32;
 
-public final class InternAtomReply extends Reply {
+public final class InternAtomReply extends XReply {
 
     private final ATOM atom;
 

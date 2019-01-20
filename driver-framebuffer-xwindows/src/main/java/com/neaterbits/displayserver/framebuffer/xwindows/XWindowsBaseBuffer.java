@@ -9,8 +9,8 @@ import com.neaterbits.displayserver.buffers.PixelFormat;
 import com.neaterbits.displayserver.driver.xwindows.common.ReplyListener;
 import com.neaterbits.displayserver.driver.xwindows.common.XWindowsDriverConnection;
 import com.neaterbits.displayserver.protocol.enums.ImageFormat;
-import com.neaterbits.displayserver.protocol.messages.Error;
-import com.neaterbits.displayserver.protocol.messages.Reply;
+import com.neaterbits.displayserver.protocol.messages.XError;
+import com.neaterbits.displayserver.protocol.messages.XReply;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.DEPTH;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.FORMAT;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.SCREEN;
@@ -272,7 +272,7 @@ abstract class XWindowsBaseBuffer implements BufferOperations {
         driverConnection.sendRequestWaitReply(getImageRequest, new ReplyListener() {
             
             @Override
-            public void onReply(Reply reply) {
+            public void onReply(XReply reply) {
                 final GetImageReply getImageReply = (GetImageReply)reply;
                 
                 final int returnedDepth = getImageReply.getDepth().getValue();
@@ -307,7 +307,7 @@ abstract class XWindowsBaseBuffer implements BufferOperations {
             }
             
             @Override
-            public void onError(Error error) {
+            public void onError(XError error) {
                 listener.onError();
             }
         });

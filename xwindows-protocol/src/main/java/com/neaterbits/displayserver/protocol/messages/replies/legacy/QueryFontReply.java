@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
-import com.neaterbits.displayserver.protocol.messages.Reply;
+import com.neaterbits.displayserver.protocol.messages.XReply;
 import com.neaterbits.displayserver.protocol.types.BOOL;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
@@ -12,7 +12,7 @@ import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.INT16;
 
-public final class QueryFontReply extends Reply {
+public final class QueryFontReply extends XReply {
 
     private final CHARINFO minBounds;
     private final CHARINFO maxBounds;

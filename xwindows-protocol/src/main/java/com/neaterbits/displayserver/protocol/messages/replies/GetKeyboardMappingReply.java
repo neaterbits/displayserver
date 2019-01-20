@@ -5,13 +5,13 @@ import java.util.Objects;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
-import com.neaterbits.displayserver.protocol.messages.Reply;
+import com.neaterbits.displayserver.protocol.messages.XReply;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.KEYSYM;
 
-public final class GetKeyboardMappingReply extends Reply {
+public final class GetKeyboardMappingReply extends XReply {
 
     private final BYTE keysymsPerKeycode;
     private final KEYSYM [] keysyms;

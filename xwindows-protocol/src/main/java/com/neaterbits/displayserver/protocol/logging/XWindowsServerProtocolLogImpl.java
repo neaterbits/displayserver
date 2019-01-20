@@ -1,8 +1,8 @@
 package com.neaterbits.displayserver.protocol.logging;
 
-import com.neaterbits.displayserver.protocol.messages.Event;
-import com.neaterbits.displayserver.protocol.messages.Reply;
-import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.messages.XEvent;
+import com.neaterbits.displayserver.protocol.messages.XReply;
+import com.neaterbits.displayserver.protocol.messages.XRequest;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.util.logging.BaseLogImpl;
 import com.neaterbits.displayserver.util.logging.DebugLevel;
@@ -14,7 +14,7 @@ public final class XWindowsServerProtocolLogImpl extends BaseLogImpl implements 
     }
 
     @Override
-    public final void onReceivedRequest(int messageLength, int opcode, CARD16 sequenceNumber, Request request) {
+    public final void onReceivedRequest(int messageLength, int opcode, CARD16 sequenceNumber, XRequest request) {
         debug("onReceivedRequest",
                 "messageLength", messageLength,
                 "opcode", opcode,
@@ -24,17 +24,17 @@ public final class XWindowsServerProtocolLogImpl extends BaseLogImpl implements 
 
     
     @Override
-    public void onSendEvent(Event event) {
+    public void onSendEvent(XEvent event) {
         debug("sendEvent", "event", event.toDebugString());
     }
 
     @Override
-    public void onSendReply(Reply reply) {
+    public void onSendReply(XReply reply) {
         debug("sendReply", "reply", reply.toDebugString());
     }
 
     @Override
-    public void onSendError(com.neaterbits.displayserver.protocol.messages.Error error) {
+    public void onSendError(com.neaterbits.displayserver.protocol.messages.XError error) {
         info("sendError", "error", error.toDebugString());
     }
 }

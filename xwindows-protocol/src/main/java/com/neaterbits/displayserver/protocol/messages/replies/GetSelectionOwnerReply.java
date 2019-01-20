@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
-import com.neaterbits.displayserver.protocol.messages.Reply;
+import com.neaterbits.displayserver.protocol.messages.XReply;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 
-public final class GetSelectionOwnerReply extends Reply {
+public final class GetSelectionOwnerReply extends XReply {
 
     private final WINDOW owner;
 

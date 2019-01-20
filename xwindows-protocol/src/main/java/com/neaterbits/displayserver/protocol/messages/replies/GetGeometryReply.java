@@ -3,13 +3,13 @@ package com.neaterbits.displayserver.protocol.messages.replies;
 import java.io.IOException;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
-import com.neaterbits.displayserver.protocol.messages.Reply;
+import com.neaterbits.displayserver.protocol.messages.XReply;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.INT16;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 
-public final class GetGeometryReply extends Reply {
+public final class GetGeometryReply extends XReply {
 
     private final CARD8 depth;
     private final WINDOW root;

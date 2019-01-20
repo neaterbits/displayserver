@@ -9,9 +9,9 @@ import com.neaterbits.displayserver.protocol.messages.events.ClientMessage;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 
-public abstract class Event extends ServerToClientMessage {
+public abstract class XEvent extends XServerToClientMessage {
 
-    public Event(CARD16 sequenceNumber) {
+    public XEvent(CARD16 sequenceNumber) {
         super(sequenceNumber);
     }
 
@@ -19,9 +19,9 @@ public abstract class Event extends ServerToClientMessage {
         stream.writeBYTE(new BYTE((byte)code));
     }
     
-    public static Event decode(XWindowsProtocolInputStream stream, int code) throws IOException {
+    public static XEvent decode(XWindowsProtocolInputStream stream, int code) throws IOException {
         
-        final Event event;
+        final XEvent event;
         
         switch (code) {
         

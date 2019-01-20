@@ -3,9 +3,9 @@ package com.neaterbits.displayserver.protocol.types;
 import java.io.IOException;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
-import com.neaterbits.displayserver.protocol.messages.Encodeable;
+import com.neaterbits.displayserver.protocol.messages.XEncodeable;
 
-public final class POINT extends Encodeable {
+public final class POINT extends XEncodeable {
 
     private final short x;
     private final short y;

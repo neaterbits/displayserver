@@ -15,7 +15,7 @@ import com.neaterbits.displayserver.protocol.ByteBufferXWindowsProtocolInputStre
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolUtil;
 import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLog;
-import com.neaterbits.displayserver.protocol.messages.Encodeable;
+import com.neaterbits.displayserver.protocol.messages.XEncodeable;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ClientMessage;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ServerMessage;
 import com.neaterbits.displayserver.protocol.types.CARD16;
@@ -237,7 +237,7 @@ public class XServer implements AutoCloseable {
     }
     
     
-    private void send(XClient client, Encodeable message) {
+    private void send(XClient client, XEncodeable message) {
         client.send(message);
     }
 

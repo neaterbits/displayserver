@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
-import com.neaterbits.displayserver.protocol.messages.Encodeable;
+import com.neaterbits.displayserver.protocol.messages.XEncodeable;
 import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.protocol.types.CARD32;
 
-public final class FONTPROP extends Encodeable {
+public final class FONTPROP extends XEncodeable {
 
     private final ATOM name;
     private final CARD32 value;

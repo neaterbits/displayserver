@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
-import com.neaterbits.displayserver.protocol.messages.Reply;
+import com.neaterbits.displayserver.protocol.messages.XReply;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 
-public final class QueryColorsReply extends Reply {
+public final class QueryColorsReply extends XReply {
 
     private final RGB [] colors;
 

@@ -5,12 +5,12 @@ import java.io.IOException;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
-import com.neaterbits.displayserver.protocol.messages.Reply;
-import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.messages.XReply;
+import com.neaterbits.displayserver.protocol.messages.XRequest;
 import com.neaterbits.displayserver.protocol.messages.replies.ListPropertiesReply;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 
-public final class ListProperties extends Request {
+public final class ListProperties extends XRequest {
 
     private final WINDOW window;
 
@@ -56,7 +56,7 @@ public final class ListProperties extends Request {
     }
 
     @Override
-    public Class<? extends Reply> getReplyClass() {
+    public Class<? extends XReply> getReplyClass() {
         return ListPropertiesReply.class;
     }
 }

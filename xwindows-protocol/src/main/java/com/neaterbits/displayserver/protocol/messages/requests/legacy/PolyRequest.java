@@ -6,22 +6,22 @@ import java.util.Objects;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
-import com.neaterbits.displayserver.protocol.messages.Encodeable;
+import com.neaterbits.displayserver.protocol.messages.XEncodeable;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.GCONTEXT;
 
-public abstract class PolyRequest<T extends Encodeable> extends DrawRequest {
+public abstract class PolyRequest<T extends XEncodeable> extends DrawRequest {
 
     private final T [] list;
     
-    public interface CreateArray<T extends Encodeable> {
+    public interface CreateArray<T extends XEncodeable> {
         T [] create(int length);
     }
     
     @FunctionalInterface
-    public interface CreatePolyRequest<T extends Encodeable, REQUEST extends PolyRequest<T>> {
+    public interface CreatePolyRequest<T extends XEncodeable, REQUEST extends PolyRequest<T>> {
 
         REQUEST create(
                 BYTE initialByte,
@@ -32,7 +32,7 @@ public abstract class PolyRequest<T extends Encodeable> extends DrawRequest {
     }
 
     @FunctionalInterface
-    public interface CreatePolyRequestNoInitialByte<T extends Encodeable, REQUEST extends PolyRequest<T>> {
+    public interface CreatePolyRequestNoInitialByte<T extends XEncodeable, REQUEST extends PolyRequest<T>> {
 
         REQUEST create(
                 DRAWABLE drawable,
@@ -41,7 +41,7 @@ public abstract class PolyRequest<T extends Encodeable> extends DrawRequest {
 
     }
 
-    protected static <T extends Encodeable, REQUEST extends PolyRequest<T>> 
+    protected static <T extends XEncodeable, REQUEST extends PolyRequest<T>> 
     REQUEST decodeNoInitialByte(
             XWindowsProtocolInputStream stream,
             int card32PerEntry,
@@ -57,7 +57,7 @@ public abstract class PolyRequest<T extends Encodeable> extends DrawRequest {
                 (BYTE initialByte, DRAWABLE drawable, GCONTEXT gc, T [] list) -> createPolyRequest.create(drawable, gc, list));
     }
 
-    protected static <T extends Encodeable, REQUEST extends PolyRequest<T>> 
+    protected static <T extends XEncodeable, REQUEST extends PolyRequest<T>> 
     REQUEST decode(
             XWindowsProtocolInputStream stream,
             int card32PerEntry,

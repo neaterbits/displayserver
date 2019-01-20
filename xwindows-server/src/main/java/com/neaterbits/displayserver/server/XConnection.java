@@ -10,10 +10,10 @@ import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLog;
 import com.neaterbits.displayserver.io.common.NonBlockingWritable;
 import com.neaterbits.displayserver.protocol.DataOutputXWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
-import com.neaterbits.displayserver.protocol.messages.Encodeable;
-import com.neaterbits.displayserver.protocol.messages.Error;
-import com.neaterbits.displayserver.protocol.messages.Event;
-import com.neaterbits.displayserver.protocol.messages.Reply;
+import com.neaterbits.displayserver.protocol.messages.XEncodeable;
+import com.neaterbits.displayserver.protocol.messages.XError;
+import com.neaterbits.displayserver.protocol.messages.XEvent;
+import com.neaterbits.displayserver.protocol.messages.XReply;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.xwindows.processing.XConnectionOps;
 
@@ -100,7 +100,7 @@ public class XConnection
         this.state = state;
     }
 
-	final void send(Encodeable message) {
+	final void send(XEncodeable message) {
 	    
 	    writeToOutputBuffer(byteOrder, dataOutputStream -> {
             final XWindowsProtocolOutputStream protocolOutputStream = new DataOutputXWindowsProtocolOutputStream(dataOutputStream);
@@ -110,17 +110,17 @@ public class XConnection
 	}
 	
     @Override
-    public final void sendReply(Reply reply) {
+    public final void sendReply(XReply reply) {
         send(reply);
     }
     
     @Override
-    public final void sendError(Error error) {
+    public final void sendError(XError error) {
         send(error);
     }
 
     @Override
-    public final void sendEvent(Event event) {
+    public final void sendEvent(XEvent event) {
         send(event);
     }
 

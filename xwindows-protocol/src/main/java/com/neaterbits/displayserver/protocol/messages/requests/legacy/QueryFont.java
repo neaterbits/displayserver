@@ -6,12 +6,12 @@ import java.util.Objects;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
-import com.neaterbits.displayserver.protocol.messages.Reply;
-import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.messages.XReply;
+import com.neaterbits.displayserver.protocol.messages.XRequest;
 import com.neaterbits.displayserver.protocol.messages.replies.legacy.QueryFontReply;
 import com.neaterbits.displayserver.protocol.types.FONTABLE;
 
-public final class QueryFont extends Request {
+public final class QueryFont extends XRequest {
 
     private final FONTABLE font;
 
@@ -60,7 +60,7 @@ public final class QueryFont extends Request {
     }
 
     @Override
-    public Class<? extends Reply> getReplyClass() {
+    public Class<? extends XReply> getReplyClass() {
         return QueryFontReply.class;
     }
 }

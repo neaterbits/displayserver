@@ -10,8 +10,8 @@ import com.neaterbits.displayserver.protocol.enums.BackingStore;
 import com.neaterbits.displayserver.protocol.enums.WindowClass;
 import com.neaterbits.displayserver.protocol.enums.gc.FillStyle;
 import com.neaterbits.displayserver.protocol.enums.gc.Function;
-import com.neaterbits.displayserver.protocol.messages.Encodeable;
-import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.messages.XEncodeable;
+import com.neaterbits.displayserver.protocol.messages.XRequest;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateGC;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.XGCAttributes;
@@ -172,9 +172,9 @@ public class XWindowsTest {
         }
     }
     
-    private void sendRequest(XCBConnection connection, Request request) {
+    private void sendRequest(XCBConnection connection, XRequest request) {
         
-        final DataWriter dataWriter = Encodeable.makeDataWriter(request);
+        final DataWriter dataWriter = XEncodeable.makeDataWriter(request);
         
         final byte [] buf = DataWriter.writeToBuf(dataWriter, ByteOrder.LITTLE_ENDIAN);
         

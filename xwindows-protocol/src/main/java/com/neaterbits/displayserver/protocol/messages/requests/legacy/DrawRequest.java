@@ -2,11 +2,11 @@ package com.neaterbits.displayserver.protocol.messages.requests.legacy;
 
 import java.util.Objects;
 
-import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.messages.XRequest;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.GCONTEXT;
 
-public abstract class DrawRequest extends Request {
+public abstract class DrawRequest extends XRequest {
 
     private final DRAWABLE drawable;
     private final GCONTEXT gc;

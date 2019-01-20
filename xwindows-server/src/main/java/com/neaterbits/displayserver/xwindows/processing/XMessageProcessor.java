@@ -4,10 +4,10 @@ import java.io.IOException;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLog;
-import com.neaterbits.displayserver.protocol.messages.Error;
-import com.neaterbits.displayserver.protocol.messages.Event;
-import com.neaterbits.displayserver.protocol.messages.Reply;
-import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.messages.XError;
+import com.neaterbits.displayserver.protocol.messages.XEvent;
+import com.neaterbits.displayserver.protocol.messages.XReply;
+import com.neaterbits.displayserver.protocol.messages.XRequest;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD32;
@@ -39,7 +39,7 @@ public abstract class XMessageProcessor {
             CARD16 sequenceNumber,
             XClientOps client) throws IOException;
     
-    protected final <T extends Request> T log(int messageLength, int opcode, CARD16 sequenceNumber, T request) {
+    protected final <T extends XRequest> T log(int messageLength, int opcode, CARD16 sequenceNumber, T request) {
         
         if (protocolLog != null) {
             protocolLog.onReceivedRequest(messageLength, opcode, sequenceNumber, request);
@@ -48,7 +48,7 @@ public abstract class XMessageProcessor {
         return request;
     }
     
-    protected final void sendEvent(XClientOps client, WINDOW window, Event event) {
+    protected final void sendEvent(XClientOps client, WINDOW window, XEvent event) {
         
         if (protocolLog != null) {
             protocolLog.onSendEvent(event);
@@ -57,7 +57,7 @@ public abstract class XMessageProcessor {
         client.sendEvent(event);
     }
 
-    protected final void sendReply(XClientOps client, Reply reply) {
+    protected final void sendReply(XClientOps client, XReply reply) {
         
         if (protocolLog != null) {
             protocolLog.onSendReply(reply);
@@ -68,7 +68,7 @@ public abstract class XMessageProcessor {
 
     protected final void sendError(XClientOps client, BYTE errorCode, CARD16 sequenceNumber, long value, int opcode) {
         
-        final Error error = new Error(errorCode, sequenceNumber, new CARD32(value), new CARD8((short)opcode));
+        final XError error = new XError(errorCode, sequenceNumber, new CARD32(value), new CARD8((short)opcode));
         
         if (protocolLog != null) {
             protocolLog.onSendError(error);

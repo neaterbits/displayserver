@@ -3,9 +3,9 @@ package com.neaterbits.displayserver.protocol.types;
 import java.io.IOException;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
-import com.neaterbits.displayserver.protocol.messages.Encodeable;
+import com.neaterbits.displayserver.protocol.messages.XEncodeable;
 
-public final class ATOM extends Encodeable {
+public final class ATOM extends XEncodeable {
 
     public static final ATOM None = new ATOM(0);
     public static final ATOM AnyPropertyType = new ATOM(0);

@@ -5,13 +5,13 @@ import java.io.IOException;
 import com.neaterbits.displayserver.protocol.Events;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
-import com.neaterbits.displayserver.protocol.messages.Event;
+import com.neaterbits.displayserver.protocol.messages.XEvent;
 import com.neaterbits.displayserver.protocol.types.BOOL;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.INT16;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 
-public final class CreateNotify extends Event {
+public final class CreateNotify extends XEvent {
 
     private final WINDOW parent;
     private final WINDOW window;

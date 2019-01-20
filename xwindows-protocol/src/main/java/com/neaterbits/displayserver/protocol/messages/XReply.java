@@ -7,9 +7,9 @@ import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD32;
 
-public abstract class Reply extends ServerToClientMessage {
+public abstract class XReply extends XServerToClientMessage {
 
-    public Reply(CARD16 sequenceNumber) {
+    public XReply(CARD16 sequenceNumber) {
         super(sequenceNumber);
     }
 

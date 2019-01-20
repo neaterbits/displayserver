@@ -5,8 +5,8 @@ import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolUtil;
-import com.neaterbits.displayserver.protocol.messages.Encodeable;
-import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.messages.XEncodeable;
+import com.neaterbits.displayserver.protocol.messages.XRequest;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ServerMessage;
 
 public interface XWindowsNetwork {
@@ -74,9 +74,9 @@ public interface XWindowsNetwork {
     
     ServerMessage getInitialMessage();
     
-    SentRequest sendRequest(Request request, ByteOrder byteOrder);
+    SentRequest sendRequest(XRequest request, ByteOrder byteOrder);
     
-    int send(Encodeable message, ByteOrder byteOrder);
+    int send(XEncodeable message, ByteOrder byteOrder);
     
     ByteBuffer pollForEvent();
     

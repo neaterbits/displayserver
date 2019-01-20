@@ -5,11 +5,11 @@ import java.io.IOException;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
-import com.neaterbits.displayserver.protocol.messages.Reply;
-import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.messages.XReply;
+import com.neaterbits.displayserver.protocol.messages.XRequest;
 import com.neaterbits.displayserver.protocol.messages.replies.GetInputFocusReply;
 
-public final class GetInputFocus extends Request {
+public final class GetInputFocus extends XRequest {
 
     public static GetInputFocus decode(XWindowsProtocolInputStream stream) throws IOException {
         
@@ -36,7 +36,7 @@ public final class GetInputFocus extends Request {
     }
 
     @Override
-    public Class<? extends Reply> getReplyClass() {
+    public Class<? extends XReply> getReplyClass() {
         return GetInputFocusReply.class;
     }
 }

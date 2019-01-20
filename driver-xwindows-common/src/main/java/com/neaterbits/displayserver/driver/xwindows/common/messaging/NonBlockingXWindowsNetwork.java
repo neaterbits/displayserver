@@ -14,8 +14,8 @@ import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLog;
 import com.neaterbits.displayserver.io.common.Selectable;
 import com.neaterbits.displayserver.protocol.ByteBufferXWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
-import com.neaterbits.displayserver.protocol.messages.Encodeable;
-import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.messages.XEncodeable;
+import com.neaterbits.displayserver.protocol.messages.XRequest;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ClientMessage;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ServerMessage;
 import com.neaterbits.displayserver.protocol.types.CARD16;
@@ -123,9 +123,9 @@ public class NonBlockingXWindowsNetwork implements XWindowsNetwork {
     }
 
     @Override
-    public SentRequest sendRequest(Request request, ByteOrder byteOrder) {
+    public SentRequest sendRequest(XRequest request, ByteOrder byteOrder) {
 
-        final DataWriter dataWriter = Encodeable.makeDataWriter(request);
+        final DataWriter dataWriter = XEncodeable.makeDataWriter(request);
 
         final SentRequest sentRequest;
         
@@ -142,9 +142,9 @@ public class NonBlockingXWindowsNetwork implements XWindowsNetwork {
     }
 
     @Override
-    public int send(Encodeable message, ByteOrder byteOrder) {
+    public int send(XEncodeable message, ByteOrder byteOrder) {
         
-        final DataWriter dataWriter = Encodeable.makeDataWriter(message);
+        final DataWriter dataWriter = XEncodeable.makeDataWriter(message);
 
         return readerWriter.writeToOutputBuffer(byteOrder, dataWriter);
     }

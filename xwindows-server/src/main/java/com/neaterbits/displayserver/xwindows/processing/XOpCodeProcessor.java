@@ -7,7 +7,7 @@ import com.neaterbits.displayserver.buffers.BufferOperations;
 import com.neaterbits.displayserver.protocol.exception.DrawableException;
 import com.neaterbits.displayserver.protocol.exception.WindowException;
 import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLog;
-import com.neaterbits.displayserver.protocol.messages.Event;
+import com.neaterbits.displayserver.protocol.messages.XEvent;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.PIXMAP;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
@@ -137,7 +137,7 @@ public abstract class XOpCodeProcessor extends XMessageProcessor {
             XEventSubscriptionsConstAccess xEventSubscriptions,
             XWindow xWindow,
             int eventCode,
-            Function<XClientOps, Event> makeEvent) {
+            Function<XClientOps, XEvent> makeEvent) {
         
         sendEventToSubscribing(xEventSubscriptions, xWindow.getWINDOW(), eventCode, makeEvent);
     }
@@ -146,12 +146,12 @@ public abstract class XOpCodeProcessor extends XMessageProcessor {
             XEventSubscriptionsConstAccess xEventSubscriptions,
             WINDOW window,
             int eventCode,
-            Function<XClientOps, Event> makeEvent) {
+            Function<XClientOps, XEvent> makeEvent) {
         
         
         for (XClientOps client : xEventSubscriptions.getClientsInterestedInEvent(window, eventCode)) {
             
-            final Event event = makeEvent.apply(client);
+            final XEvent event = makeEvent.apply(client);
 
             sendEvent(client, window, event);
         }

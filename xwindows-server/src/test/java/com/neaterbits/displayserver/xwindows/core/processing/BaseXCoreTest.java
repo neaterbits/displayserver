@@ -7,10 +7,10 @@ import com.neaterbits.displayserver.protocol.ByteBufferXWindowsProtocolInputStre
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.enums.WindowClass;
 import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLogImpl;
-import com.neaterbits.displayserver.protocol.messages.Encodeable;
-import com.neaterbits.displayserver.protocol.messages.Event;
-import com.neaterbits.displayserver.protocol.messages.Reply;
-import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.messages.XEncodeable;
+import com.neaterbits.displayserver.protocol.messages.XEvent;
+import com.neaterbits.displayserver.protocol.messages.XReply;
+import com.neaterbits.displayserver.protocol.messages.XRequest;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.DestroyWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.XWindowAttributes;
@@ -208,9 +208,9 @@ public abstract class BaseXCoreTest {
         return new CARD8((byte)getRootDepthAsInt());
     }
     
-    protected final void sendRequest(Request request) {
+    protected final void sendRequest(XRequest request) {
         
-        final DataWriter dataWriter = Encodeable.makeDataWriter(request);
+        final DataWriter dataWriter = XEncodeable.makeDataWriter(request);
         
         final ByteOrder byteOrder = ByteOrder.BIG_ENDIAN;
         
@@ -279,7 +279,7 @@ public abstract class BaseXCoreTest {
         return window;
     }
 
-    protected final <T extends Reply> T expectReply(Class<T> replyClass) {
+    protected final <T extends XReply> T expectReply(Class<T> replyClass) {
         
         final ArgumentCaptor<T> argumentCaptor = ArgumentCaptor.forClass(replyClass);
         
@@ -288,13 +288,13 @@ public abstract class BaseXCoreTest {
         return argumentCaptor.getValue();
     }
 
-    protected final <T extends Event> void whenEvent(Class<T> eventClass) {
+    protected final <T extends XEvent> void whenEvent(Class<T> eventClass) {
         
         Mockito.when(client.getSequenceNumber()).thenReturn(new CARD16(sequenceNumber));
         
     }
 
-    protected final <T extends Event> T expectEvent(Class<T> eventClass) {
+    protected final <T extends XEvent> T expectEvent(Class<T> eventClass) {
 
         final ArgumentCaptor<T> argumentCaptor = ArgumentCaptor.forClass(eventClass);
 

@@ -7,12 +7,12 @@ import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolUtil;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
-import com.neaterbits.displayserver.protocol.messages.Reply;
-import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.messages.XReply;
+import com.neaterbits.displayserver.protocol.messages.XRequest;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryExtensionReply;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 
-public final class QueryExtension extends Request {
+public final class QueryExtension extends XRequest {
 
     private final String name;
 
@@ -69,7 +69,7 @@ public final class QueryExtension extends Request {
     }
 
     @Override
-    public Class<? extends Reply> getReplyClass() {
+    public Class<? extends XReply> getReplyClass() {
         return QueryExtensionReply.class;
     }
 }

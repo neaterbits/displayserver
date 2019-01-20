@@ -3,9 +3,9 @@ package com.neaterbits.displayserver.protocol.types;
 import java.io.IOException;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
-import com.neaterbits.displayserver.protocol.messages.Encodeable;
+import com.neaterbits.displayserver.protocol.messages.XEncodeable;
 
-public final class CARD32 extends Encodeable {
+public final class CARD32 extends XEncodeable {
 
 	private final long value;
 

@@ -7,10 +7,10 @@ import java.util.Objects;
 import com.neaterbits.displayserver.protocol.FieldReader;
 import com.neaterbits.displayserver.protocol.FieldWriter;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
-import com.neaterbits.displayserver.protocol.messages.Encodeable;
+import com.neaterbits.displayserver.protocol.messages.XEncodeable;
 import com.neaterbits.displayserver.protocol.types.BITMASK;
 
-public abstract class XAttributes extends Encodeable {
+public abstract class XAttributes extends XEncodeable {
 
     private final BITMASK valueMask;
 

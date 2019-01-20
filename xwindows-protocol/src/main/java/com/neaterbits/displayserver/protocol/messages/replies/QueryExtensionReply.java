@@ -3,14 +3,14 @@ package com.neaterbits.displayserver.protocol.messages.replies;
 import java.io.IOException;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
-import com.neaterbits.displayserver.protocol.messages.Reply;
+import com.neaterbits.displayserver.protocol.messages.XReply;
 import com.neaterbits.displayserver.protocol.types.BOOL;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 
-public final class QueryExtensionReply extends Reply {
+public final class QueryExtensionReply extends XReply {
 
     private final BOOL present;
     private final CARD8 majorOpCode;

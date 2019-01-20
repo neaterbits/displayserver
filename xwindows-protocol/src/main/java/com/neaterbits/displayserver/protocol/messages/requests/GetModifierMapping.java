@@ -5,11 +5,11 @@ import java.io.IOException;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
-import com.neaterbits.displayserver.protocol.messages.Reply;
-import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.messages.XReply;
+import com.neaterbits.displayserver.protocol.messages.XRequest;
 import com.neaterbits.displayserver.protocol.messages.replies.GetModifierMappingReply;
 
-public final class GetModifierMapping extends Request {
+public final class GetModifierMapping extends XRequest {
 
     public static GetModifierMapping decode(XWindowsProtocolInputStream stream) throws IOException {
         
@@ -35,7 +35,7 @@ public final class GetModifierMapping extends Request {
     }
 
     @Override
-    public Class<? extends Reply> getReplyClass() {
+    public Class<? extends XReply> getReplyClass() {
         return GetModifierMappingReply.class;
     }
 }

@@ -7,11 +7,11 @@ import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 
-public abstract class Request extends Message {
+public abstract class XRequest extends XMessage {
 
     public abstract int getOpCode();
     
-    public abstract Class<? extends Reply> getReplyClass();
+    public abstract Class<? extends XReply> getReplyClass();
     
     protected final void writeOpCode(XWindowsProtocolOutputStream stream) throws IOException {
         stream.writeBYTE(new BYTE((byte)getOpCode()));

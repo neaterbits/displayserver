@@ -10,11 +10,11 @@ import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.util.logging.LogUtil;
 
-public abstract class Encodeable {
+public abstract class XEncodeable {
 
 	public abstract void encode(XWindowsProtocolOutputStream stream) throws IOException;
 	
-	protected final <T extends Encodeable> void encodeArray(T [] array, XWindowsProtocolOutputStream stream) throws IOException {
+	protected final <T extends XEncodeable> void encodeArray(T [] array, XWindowsProtocolOutputStream stream) throws IOException {
 		for (T element : array) {
 			element.encode(stream);
 		}
@@ -30,7 +30,7 @@ public abstract class Encodeable {
 	    T decode(XWindowsProtocolInputStream stream) throws IOException;
 	}
 
-	protected static <T extends Encodeable> T [] decodeArray(
+	protected static <T extends XEncodeable> T [] decodeArray(
 	        XWindowsProtocolInputStream stream,
 	        T [] array,
 	        DecodeArrayElement<T> decode) throws IOException {
@@ -43,7 +43,7 @@ public abstract class Encodeable {
 	}
 
 
-    public static DataWriter makeDataWriter(Encodeable encodeable) {
+    public static DataWriter makeDataWriter(XEncodeable encodeable) {
         return dataOutputStream -> {
             final XWindowsProtocolOutputStream protocolOutputStream = new DataOutputXWindowsProtocolOutputStream(dataOutputStream);
             
@@ -59,7 +59,7 @@ public abstract class Encodeable {
        return null;
    }
    
-   public static <T extends Encodeable>
+   public static <T extends XEncodeable>
    String outputArrayInBrackets(T [] encodeables) {
        
        final StringBuilder sb = new StringBuilder("[ ");

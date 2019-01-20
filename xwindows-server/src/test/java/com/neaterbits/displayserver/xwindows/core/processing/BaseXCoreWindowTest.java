@@ -71,6 +71,9 @@ public abstract class BaseXCoreWindowTest extends BaseXCoreTest {
         changeWindowAttributes(windowState.windowResource, builder);
     }
 
+    protected final com.neaterbits.displayserver.protocol.messages.Error changeWindowAttributes(WindowState windowState, Consumer<XWindowAttributesBuilder> builder) {
+
+    
     protected final void changeWindowAttributes(WINDOW window, Consumer<XWindowAttributesBuilder> builder) {
         final XWindowAttributesBuilder xWindowAttributesBuilder = new XWindowAttributesBuilder();
         

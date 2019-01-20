@@ -5,13 +5,13 @@ import java.io.IOException;
 import com.neaterbits.displayserver.protocol.Events;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
-import com.neaterbits.displayserver.protocol.messages.Event;
+import com.neaterbits.displayserver.protocol.messages.XEvent;
 import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 
-public final class ClientMessage extends Event {
+public final class ClientMessage extends XEvent {
 
     private final CARD8 format;
     private final WINDOW window;

@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
-import com.neaterbits.displayserver.protocol.messages.Reply;
+import com.neaterbits.displayserver.protocol.messages.XReply;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 
-public abstract class BaseColorReply extends Reply {
+public abstract class BaseColorReply extends XReply {
 
     private final CARD16 exactRed;
     private final CARD16 exactGreen;

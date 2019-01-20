@@ -5,9 +5,9 @@ import java.util.Objects;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
-import com.neaterbits.displayserver.protocol.messages.Encodeable;
+import com.neaterbits.displayserver.protocol.messages.XEncodeable;
 
-public final class SEGMENT extends Encodeable {
+public final class SEGMENT extends XEncodeable {
 
     private final INT16 x1;
     private final INT16 y1;

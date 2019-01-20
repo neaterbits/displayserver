@@ -5,11 +5,11 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
-import com.neaterbits.displayserver.protocol.messages.Reply;
+import com.neaterbits.displayserver.protocol.messages.XReply;
 import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 
-public final class ListPropertiesReply extends Reply {
+public final class ListPropertiesReply extends XReply {
 
     private final ATOM [] atoms;
 

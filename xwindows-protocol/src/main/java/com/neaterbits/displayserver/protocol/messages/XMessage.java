@@ -8,7 +8,7 @@ import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD32;
 
-public abstract class Message extends Encodeable {
+public abstract class XMessage extends XEncodeable {
     
     protected static void writeUnusedByte(XWindowsProtocolOutputStream stream) throws IOException {
         stream.writeBYTE(new BYTE((byte)0));

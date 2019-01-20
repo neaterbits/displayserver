@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
-import com.neaterbits.displayserver.protocol.messages.Encodeable;
+import com.neaterbits.displayserver.protocol.messages.XEncodeable;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.INT16;
 
-public final class CHARINFO extends Encodeable {
+public final class CHARINFO extends XEncodeable {
 
     private final INT16 leftSideBearing;
     private final INT16 rigthSideBearing;

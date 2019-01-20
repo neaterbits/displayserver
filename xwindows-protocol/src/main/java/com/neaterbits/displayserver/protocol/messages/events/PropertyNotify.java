@@ -5,14 +5,14 @@ import java.util.Objects;
 
 import com.neaterbits.displayserver.protocol.Events;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
-import com.neaterbits.displayserver.protocol.messages.Event;
+import com.neaterbits.displayserver.protocol.messages.XEvent;
 import com.neaterbits.displayserver.protocol.types.ATOM;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.TIMESTAMP;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 
-public final class PropertyNotify extends Event {
+public final class PropertyNotify extends XEvent {
 
     public static final BYTE NewValue = new BYTE((byte)0);
     public static final BYTE Deleted = new BYTE((byte)1);

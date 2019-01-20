@@ -10,21 +10,21 @@ import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 
-public final class Error extends Message {
+public final class XError extends XMessage {
 
     private final BYTE code;
     private final CARD16 sequenceNumber;
     private final CARD32 value;
     private final CARD8 opcode;
 
-    public Error(BYTE code, CARD16 sequenceNumber, CARD32 value, CARD8 opcode) {
+    public XError(BYTE code, CARD16 sequenceNumber, CARD32 value, CARD8 opcode) {
         this.code = code;
         this.sequenceNumber = sequenceNumber;
         this.value = value;
         this.opcode = opcode;
     }
 
-    public static Error decode(XWindowsProtocolInputStream stream) throws IOException {
+    public static XError decode(XWindowsProtocolInputStream stream) throws IOException {
         
         final BYTE errorMarker = stream.readBYTE();
         
@@ -42,7 +42,7 @@ public final class Error extends Message {
         
         stream.readPad(21);
         
-        return new Error(code, sequenceNumber, value, opcode);
+        return new XError(code, sequenceNumber, value, opcode);
     }
     
     public BYTE getCode() {

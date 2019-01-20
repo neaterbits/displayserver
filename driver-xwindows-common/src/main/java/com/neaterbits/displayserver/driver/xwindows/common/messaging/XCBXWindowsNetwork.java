@@ -8,8 +8,8 @@ import java.util.Objects;
 import com.neaterbits.displayserver.driver.xwindows.common.SentRequest;
 import com.neaterbits.displayserver.driver.xwindows.common.XWindowsNetwork;
 import com.neaterbits.displayserver.io.common.DataWriter;
-import com.neaterbits.displayserver.protocol.messages.Encodeable;
-import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.messages.XEncodeable;
+import com.neaterbits.displayserver.protocol.messages.XRequest;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.DEPTH;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.FORMAT;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.SCREEN;
@@ -64,9 +64,9 @@ public class XCBXWindowsNetwork implements XWindowsNetwork {
     }
 
     @Override
-    public SentRequest sendRequest(Request request, ByteOrder byteOrder) {
+    public SentRequest sendRequest(XRequest request, ByteOrder byteOrder) {
         
-        final DataWriter dataWriter = Encodeable.makeDataWriter(request);
+        final DataWriter dataWriter = XEncodeable.makeDataWriter(request);
         final byte [] data = DataWriter.writeToBuf(dataWriter, byteOrder);
         
         System.out.println("## writing request " + request.getOpCode() + " of length " + data.length);
@@ -92,7 +92,7 @@ public class XCBXWindowsNetwork implements XWindowsNetwork {
     }
 
     @Override
-    public int send(Encodeable message, ByteOrder byteOrder) {
+    public int send(XEncodeable message, ByteOrder byteOrder) {
         throw new UnsupportedOperationException();
     }
 

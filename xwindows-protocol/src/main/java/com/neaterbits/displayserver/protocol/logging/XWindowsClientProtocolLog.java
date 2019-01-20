@@ -1,21 +1,21 @@
 package com.neaterbits.displayserver.protocol.logging;
 
-import com.neaterbits.displayserver.protocol.messages.Event;
-import com.neaterbits.displayserver.protocol.messages.Reply;
-import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.messages.XEvent;
+import com.neaterbits.displayserver.protocol.messages.XReply;
+import com.neaterbits.displayserver.protocol.messages.XRequest;
 
 public interface XWindowsClientProtocolLog {
 
     void onInitialMessageError(byte errorCode, int sequenceNumber, String reason);
 
-    void onSendRequest(Request request);
+    void onSendRequest(XRequest request);
 
-    void onSentRequest(int messageLength, int sequenceNumber, Request request);
+    void onSentRequest(int messageLength, int sequenceNumber, XRequest request);
     
-    void onRecivedEvent(Event event);
+    void onRecivedEvent(XEvent event);
     
-    void onReceivedReply(Reply reply);
+    void onReceivedReply(XReply reply);
     
-    void onReceivedError(com.neaterbits.displayserver.protocol.messages.Error error);
+    void onReceivedError(com.neaterbits.displayserver.protocol.messages.XError error);
 
 }

@@ -6,20 +6,20 @@ import java.util.Objects;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
-import com.neaterbits.displayserver.protocol.messages.Event;
-import com.neaterbits.displayserver.protocol.messages.Reply;
-import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.messages.XEvent;
+import com.neaterbits.displayserver.protocol.messages.XReply;
+import com.neaterbits.displayserver.protocol.messages.XRequest;
 import com.neaterbits.displayserver.protocol.types.BOOL;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.util.logging.LogUtil;
 
-public final class SendEvent extends Request {
+public final class SendEvent extends XRequest {
 
     private final BOOL propagate;
     private final WINDOW destination;
     private final SETofEVENT eventMask;
-    private final Event event;
+    private final XEvent event;
 
     public static SendEvent decode(XWindowsProtocolInputStream stream) throws IOException {
         
@@ -31,10 +31,10 @@ public final class SendEvent extends Request {
                 propagate,
                 stream.readWINDOW(),
                 stream.readSETofEVENT(),
-                Event.decode(stream, stream.readBYTE().getValue()));
+                XEvent.decode(stream, stream.readBYTE().getValue()));
     }
     
-    public SendEvent(BOOL propagate, WINDOW destination, SETofEVENT eventMask, Event event) {
+    public SendEvent(BOOL propagate, WINDOW destination, SETofEVENT eventMask, XEvent event) {
     
         Objects.requireNonNull(propagate);
         Objects.requireNonNull(destination);
@@ -59,7 +59,7 @@ public final class SendEvent extends Request {
         return eventMask;
     }
 
-    public Event getEvent() {
+    public XEvent getEvent() {
         return event;
     }
 
@@ -95,7 +95,7 @@ public final class SendEvent extends Request {
     }
 
     @Override
-    public Class<? extends Reply> getReplyClass() {
+    public Class<? extends XReply> getReplyClass() {
         return null;
     }
 }

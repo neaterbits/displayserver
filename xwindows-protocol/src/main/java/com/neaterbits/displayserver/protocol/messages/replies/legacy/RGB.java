@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
-import com.neaterbits.displayserver.protocol.messages.Encodeable;
+import com.neaterbits.displayserver.protocol.messages.XEncodeable;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 
-public final class RGB extends Encodeable {
+public final class RGB extends XEncodeable {
 
     private final CARD16 red;
     private final CARD16 green;

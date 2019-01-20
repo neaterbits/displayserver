@@ -1,9 +1,9 @@
 package com.neaterbits.displayserver.protocol.logging;
 
-import com.neaterbits.displayserver.protocol.messages.Error;
-import com.neaterbits.displayserver.protocol.messages.Event;
-import com.neaterbits.displayserver.protocol.messages.Reply;
-import com.neaterbits.displayserver.protocol.messages.Request;
+import com.neaterbits.displayserver.protocol.messages.XError;
+import com.neaterbits.displayserver.protocol.messages.XEvent;
+import com.neaterbits.displayserver.protocol.messages.XReply;
+import com.neaterbits.displayserver.protocol.messages.XRequest;
 import com.neaterbits.displayserver.util.logging.BaseLogImpl;
 import com.neaterbits.displayserver.util.logging.DebugLevel;
 
@@ -25,14 +25,14 @@ public final class XWindowsClientProtocolLogImpl extends BaseLogImpl implements 
     }
 
     @Override
-    public void onSendRequest(Request request) {
+    public void onSendRequest(XRequest request) {
         debug("onSendRequest",
                 "opcode", request.getOpCode(),
                 "request", request.toDebugString());
     }
 
     @Override
-    public void onSentRequest(int messageLength, int sequenceNumber, Request request) {
+    public void onSentRequest(int messageLength, int sequenceNumber, XRequest request) {
         debug("onSentRequest",
                 "messageLength", messageLength,
                 "opcode", request.getOpCode(),
@@ -41,17 +41,17 @@ public final class XWindowsClientProtocolLogImpl extends BaseLogImpl implements 
     }
 
     @Override
-    public void onRecivedEvent(Event event) {
+    public void onRecivedEvent(XEvent event) {
         debug("onReceivedEvent", "event", event.toDebugString());
     }
 
     @Override
-    public void onReceivedReply(Reply reply) {
+    public void onReceivedReply(XReply reply) {
         debug("onReceivedReply", "reply", reply.toDebugString());
     }
 
     @Override
-    public void onReceivedError(Error error) {
+    public void onReceivedError(XError error) {
         info("onReceivedError",
                 "error", error.toDebugString());
     }
