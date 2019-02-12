@@ -147,6 +147,8 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
                     sendError(client, Errors.IDChoice, sequenceNumber, ex.getResource().getValue(), opcode);
                 } catch (PixmapException ex) {
                     sendError(client, Errors.Pixmap, sequenceNumber, ex.getPixmap().getValue(), opcode);
+                } catch (AccessException ex) {
+                    sendError(client, Errors.Acess, sequenceNumber, 0L, opcode);
                 } catch (ColormapException ex) {
                     sendError(client, Errors.Colormap, sequenceNumber, ex.getColormap().getValue(), opcode);
                 } catch (CursorException ex) {
@@ -326,7 +328,7 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
         }
     }
     
-    private XWindow createWindow(CreateWindow createWindow, XWindow parentWindow, XClientOps client) throws ValueException, IDChoiceException, PixmapException, ColormapException, CursorException {
+    private XWindow createWindow(CreateWindow createWindow, XWindow parentWindow, XClientOps client) throws ValueException, IDChoiceException, PixmapException, ColormapException, CursorException, AccessException {
 
         Objects.requireNonNull(createWindow);
         Objects.requireNonNull(parentWindow);
@@ -414,6 +416,8 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
                 xWindowAttributes,
                 renderer,
                 windowSurface);
+        
+        subscribeToEvents(xWindow, xWindowAttributes, client);
 
         sendEventToSubscribing(
                 eventSubscriptions,
@@ -473,6 +477,13 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
         }
     }
     
+    private void subscribeToEvents(XWindow xWindow, XWindowAttributes requestAttributes, XClientOps client) throws AccessException {
+
+        if (requestAttributes.isSet(XWindowAttributes.EVENT_MASK)) {
+            eventSubscriptions.setEventMapping(xWindow, requestAttributes.getEventMask(), client);
+        }
+    }
+    
     private void changeWindowAttributes(ChangeWindowAttributes changeWindowAttributes, XClientOps client) throws WindowException, AccessException, PixmapException, ColormapException, CursorException {
         
         final XWindow xWindow = findClientOrRootWindow(xWindows, changeWindowAttributes.getWindow());
@@ -487,10 +498,8 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
 
         xWindow.setCurrentWindowAttributes(updatedAttributes);
 
-        if (requestAttributes.isSet(XWindowAttributes.EVENT_MASK)) {
-            eventSubscriptions.setEventMapping(xWindow, requestAttributes.getEventMask(), client);
-        }
-
+        subscribeToEvents(xWindow, requestAttributes, client);
+        
         /*
 
         if (xWindow.isMapped()) {

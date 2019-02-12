@@ -62,7 +62,7 @@ public final class XEventSubscriptions implements XEventSubscriptionsConstAccess
         }
     }
     
-    public void addEventMapping(XWindow xWindow, int event, XClientOps client) throws AccessException {
+    private void addEventMapping(XWindow xWindow, int event, XClientOps client) throws AccessException {
         
         Objects.requireNonNull(xWindow);
         Objects.requireNonNull(client);
@@ -174,8 +174,10 @@ public final class XEventSubscriptions implements XEventSubscriptionsConstAccess
         return mask;
     }
 
-
-
+    @Override
+    public String toString() {
+        return eventToClients.toString();
+    }
 
     private static class Key {
         private final WINDOW window;

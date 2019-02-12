@@ -202,7 +202,12 @@ public class XCoreWindowMapWindowTest extends BaseXCorePixmapTest {
         
         verifyNoMoreInteractions();
     }
-    
+
+    @Test
+    public void testMapWindowBackingStoreSubscribeInCreateWindow() {
+        checkMapWindowBackingStore(BackingStore.NotUseful, true);
+    }
+
     @Test
     public void testMapWindowBackingStoreNotUseful() {
         checkMapWindowBackingStore(BackingStore.NotUseful);
@@ -219,17 +224,29 @@ public class XCoreWindowMapWindowTest extends BaseXCorePixmapTest {
     }
         
     private void checkMapWindowBackingStore(BYTE backingStore) {
+        checkMapWindowBackingStore(backingStore, false);
+    }
+    
+    private void checkMapWindowBackingStore(BYTE backingStore, boolean subscribeInCreateWindow) {
         
         final Position position = new Position(150, 250);
         final Size size = new Size(450, 350);
         
-        final XWindowAttributes windowAttributes = new XWindowAttributesBuilder()
-                .setBackingStore(backingStore)
-                .build();
+        final XWindowAttributesBuilder windowAttributesBuilder = new XWindowAttributesBuilder();
+        
+        windowAttributesBuilder.setBackingStore(backingStore);
+        
+        if (subscribeInCreateWindow) {
+            windowAttributesBuilder.setEventMask(SETofEVENT.EXPOSURE);
+        }
+                
+        final XWindowAttributes windowAttributes = windowAttributesBuilder.build();
         
         final WindowState window = checkCreateWindow(position, size, 0, windowAttributes);
 
-        subscribeEvents(window.windowResource, SETofEVENT.EXPOSURE);
+        if (!subscribeInCreateWindow) {
+            subscribeEvents(window.windowResource, SETofEVENT.EXPOSURE);
+        }
 
         MapWindow mapWindow = new MapWindow(window.windowResource);
         
