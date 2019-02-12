@@ -225,6 +225,9 @@ public final class Layer {
 					throw new IllegalStateException();
 				}
 				break;
+				
+			case EQUALS:
+                throw new UnsupportedOperationException();
 			}
 
 			
@@ -281,6 +284,9 @@ public final class Layer {
 						throw new IllegalStateException();
 					}
 					break;
+					
+				case EQUALS:
+				    throw new UnsupportedOperationException();
 				}
 			}
 		}
