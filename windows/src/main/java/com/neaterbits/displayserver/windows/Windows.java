@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.layers.Layer;
+import com.neaterbits.displayserver.layers.LayerRegion;
 import com.neaterbits.displayserver.layers.Layers;
 import com.neaterbits.displayserver.types.Position;
 import com.neaterbits.displayserver.types.Size;
@@ -80,6 +81,18 @@ final class Windows {
 		
 		return window;
 	}
+    
+    
+    LayerRegion showWindow(Window window) {
+
+        Objects.requireNonNull(window);
+        
+        final LayerRegion region = window.showWindow();
+        
+        layers.showLayer(window.getLayer());
+        
+        return region;
+    }
 	
 	void disposeWindow(Window window) {
 		

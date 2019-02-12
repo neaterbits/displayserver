@@ -8,7 +8,7 @@ public final class LayerRegion {
 
 	private final List<LayerRectangle> rectangles;
 
-	LayerRegion(List<LayerRectangle> rectangles) {
+	public LayerRegion(List<LayerRectangle> rectangles) {
 		
 		Objects.requireNonNull(rectangles);
 		

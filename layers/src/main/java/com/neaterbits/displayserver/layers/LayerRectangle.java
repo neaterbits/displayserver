@@ -8,17 +8,17 @@ import com.neaterbits.displayserver.types.Size;
 
 public final class LayerRectangle extends LayerRectangleIntersection {
 	
-	LayerRectangle(int left, int top, int width, int height) {
+	public LayerRectangle(int left, int top, int width, int height) {
 	    super(left, top, width, height);
 	}
 	
-	public LayerRectangle(LayerRectangle toCopy) {
-        super(toCopy);
+    public LayerRectangle(Position position, Size size) {
+        this(position.getLeft(), position.getTop(), size.getWidth(), size.getHeight());
     }
 
-    public LayerRectangle(Position position, Size size) {
-		this(position.getLeft(), position.getTop(), size.getWidth(), size.getHeight());
-	}
+    LayerRectangle(LayerRectangle toCopy) {
+        super(toCopy);
+    }
 	
 	public boolean contains(int x, int y) {
 		return x >= left && x < left + width && y >= top && y < top + height;

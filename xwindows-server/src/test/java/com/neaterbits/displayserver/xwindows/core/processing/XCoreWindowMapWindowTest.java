@@ -10,7 +10,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 
+import com.neaterbits.displayserver.protocol.enums.BackingStore;
 import com.neaterbits.displayserver.protocol.exception.IDChoiceException;
+import com.neaterbits.displayserver.protocol.messages.events.Expose;
 import com.neaterbits.displayserver.protocol.messages.events.MapNotify;
 import com.neaterbits.displayserver.protocol.messages.events.MapRequest;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeWindowAttributes;
@@ -18,6 +20,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.ClearArea;
 import com.neaterbits.displayserver.protocol.messages.requests.MapWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.XWindowAttributes;
 import com.neaterbits.displayserver.protocol.types.BOOL;
+import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.INT16;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
@@ -199,6 +202,58 @@ public class XCoreWindowMapWindowTest extends BaseXCorePixmapTest {
         
         verifyNoMoreInteractions();
     }
+    
+    @Test
+    public void testMapWindowBackingStoreNotUseful() {
+        checkMapWindowBackingStore(BackingStore.NotUseful);
+    }
+
+    @Test
+    public void testMapWindowBackingStoreWhenMapped() {
+        checkMapWindowBackingStore(BackingStore.WhenMapped);
+    }
+
+    @Test
+    public void testMapWindowBackingStoreAlways() {
+        checkMapWindowBackingStore(BackingStore.Always);
+    }
+        
+    private void checkMapWindowBackingStore(BYTE backingStore) {
+        
+        final Position position = new Position(150, 250);
+        final Size size = new Size(450, 350);
+        
+        final XWindowAttributes windowAttributes = new XWindowAttributesBuilder()
+                .setBackingStore(backingStore)
+                .build();
+        
+        final WindowState window = checkCreateWindow(position, size, 0, windowAttributes);
+
+        subscribeEvents(window.windowResource, SETofEVENT.EXPOSURE);
+
+        MapWindow mapWindow = new MapWindow(window.windowResource);
+        
+        whenEvent(Expose.class);
+
+        sendRequest(mapWindow);
+
+        final Expose expose = expectEvent(Expose.class);
+
+        assertThat(expose).isNotNull();
+        assertThat(expose.getWindow()).isEqualTo(window.windowResource);
+
+        assertThat(expose.getX().getValue()).isEqualTo(0);
+        assertThat(expose.getY().getValue()).isEqualTo(0);
+        assertThat(expose.getWidth().getValue()).isEqualTo(450);
+        assertThat(expose.getHeight().getValue()).isEqualTo(350);
+        
+        assertThat(expose.getCount().getValue()).isEqualTo(1);
+        
+        verifyNoMoreInteractions(window);
+
+    }
+    
+    
     
     @Test
     public void testWindowBackgroundPixel() {

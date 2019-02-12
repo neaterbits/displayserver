@@ -174,7 +174,7 @@ public class LayersAddRemoveTest extends BaseLayersTest {
 
         Layer subLayer = layers.createAndAddSubLayer(layer, new Position(50, 75), new Size(150, 100));
 
-        layers.showLayer(layer, null);
+        layers.showLayer(layer);
 
         assertThat(layer.isVisible()).isTrue();
         assertThat(subLayer.isVisible()).isFalse();
@@ -194,7 +194,7 @@ public class LayersAddRemoveTest extends BaseLayersTest {
         
         subLayer = layers.createAndAddSubLayer(layer, new Position(50, 75), new Size(150, 100));
 
-        layers.showLayer(subLayer, null);
+        layers.showLayer(subLayer);
         
         try {
             layers.removeSubLayer(layer, subLayer);

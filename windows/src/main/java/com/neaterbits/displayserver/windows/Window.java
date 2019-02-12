@@ -1,12 +1,15 @@
 package com.neaterbits.displayserver.windows;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.buffers.PixelFormat;
 import com.neaterbits.displayserver.layers.Layer;
+import com.neaterbits.displayserver.layers.LayerRectangle;
+import com.neaterbits.displayserver.layers.LayerRegion;
 import com.neaterbits.displayserver.types.Position;
 import com.neaterbits.displayserver.types.Size;
 
@@ -21,6 +24,8 @@ public final class Window {
 	private final Layer layer;
 	
 	private final List<Window> subWindows;
+	
+	private boolean previouslyVisible;
 	
 	public Window(
 	        WindowsDisplayArea displayArea,
@@ -39,6 +44,8 @@ public final class Window {
 		this.parameters = parameters;
 		this.attributes = attributes;
 		this.layer = layer;
+		
+		this.previouslyVisible = false;
 		
 		this.subWindows = new ArrayList<>();
 		
@@ -87,6 +94,43 @@ public final class Window {
         return parameters.getWindowContentStorage();
     }
 	
+    LayerRegion showWindow() {
+
+        final boolean returnRegion;
+        
+        switch (parameters.getWindowContentStorage()) {
+        
+        case NONE:
+        case WHEN_VISIBLE:
+            returnRegion = true;
+            break;
+        
+        case ALWAYS:
+            returnRegion = !previouslyVisible;
+            break;
+
+        default:
+            throw new IllegalStateException();
+        }
+        
+        final LayerRegion region;
+    
+        if (returnRegion) {
+            final List<LayerRectangle> rectangles = Arrays.asList(
+                    new LayerRectangle(0, 0, layer.getSize().getWidth(), layer.getSize().getHeight())
+            );
+            
+            region = new LayerRegion(rectangles);
+        }
+        else {
+            region = null;
+        }
+        
+        this.previouslyVisible = true;
+        
+        return region;
+    }
+    
 	Window getParentWindow() {
 		return parentWindow;
 	}

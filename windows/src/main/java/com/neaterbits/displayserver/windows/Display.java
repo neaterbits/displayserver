@@ -3,6 +3,8 @@ package com.neaterbits.displayserver.windows;
 import java.util.List;
 import java.util.Objects;
 
+import com.neaterbits.displayserver.layers.LayerRegion;
+
 public class Display implements WindowManagement {
 
     private final WindowsDisplayAreas displayAreas;
@@ -26,6 +28,13 @@ public class Display implements WindowManagement {
         return displayArea.createWindow(parentWindow, windowParameters, windowAttributes);
     }
     
+    
+    @Override
+    public LayerRegion showWindow(Window window) {
+
+        return window.getDisplayArea().showWindow(window);
+    }
+
     @Override
     public void disposeWindow(Window window) {
         Objects.requireNonNull(window);

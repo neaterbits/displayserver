@@ -84,7 +84,7 @@ public class FindLayerAtTest extends BaseLayersTest {
         assertThat(layers.findLayerAt(650, 160)).isSameAs(layers.getRootLayer());
         assertThat(layers.findLayerAt(260, 100)).isSameAs(layers.getRootLayer());
 
-        layers.showLayer(leftLayer, null);
+        layers.showLayer(leftLayer);
 
         assertThat(layers.findLayerAt(0, 0)).isSameAs(layers.getRootLayer());
         assertThat(layers.findLayerAt(600, 500)).isSameAs(layers.getRootLayer());
@@ -107,9 +107,9 @@ public class FindLayerAtTest extends BaseLayersTest {
         assertThat(layers.findLayerAt(50, 249)).isSameAs(layers.getRootLayer());
         assertThat(layers.findLayerAt(349, 249)).isSameAs(layers.getRootLayer());
 
-        layers.showLayer(leftLayer, null);
+        layers.showLayer(leftLayer);
         
-        layers.showLayer(rightLayer, null);
+        layers.showLayer(rightLayer);
 
         assertThat(layers.findLayerAt(599, 75)).isSameAs(layers.getRootLayer());
         assertThat(layers.findLayerAt(600, 74)).isSameAs(layers.getRootLayer());
@@ -121,7 +121,7 @@ public class FindLayerAtTest extends BaseLayersTest {
         assertThat(layers.findLayerAt(649, 324)).isSameAs(rightLayer);
         assertThat(layers.findLayerAt(949, 324)).isSameAs(rightLayer);
         
-        layers.showLayer(aboveLayer, null);
+        layers.showLayer(aboveLayer);
 
         assertThat(layers.findLayerAt(249, 120)).isSameAs(leftLayer);
         assertThat(layers.findLayerAt(250, 119)).isSameAs(leftLayer);
@@ -136,7 +136,7 @@ public class FindLayerAtTest extends BaseLayersTest {
         // Add sublayer
         final Layer leftSubLayer = layers.createAndAddSubLayer(leftLayer, new Position(30, 30), new Size(270, 170));
         
-        layers.showLayer(leftSubLayer, null);
+        layers.showLayer(leftSubLayer);
 
         assertThat(layers.findLayerAt(249, 120)).isSameAs(leftSubLayer);
         assertThat(layers.findLayerAt(250, 119)).isSameAs(leftSubLayer);
