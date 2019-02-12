@@ -184,7 +184,7 @@ abstract class XWindowsBaseBuffer implements BufferOperations {
     
     private static boolean isPixelFormat(VISUALTYPE visualType, PixelFormat pixelFormat) {
         return   
-                  visualType.getBitsPerRGBValue().getValue() == pixelFormat.getBitsPerPixel()
+                  visualType.getBitsPerRGBValue().getValue() == pixelFormat.getBitsPerColorComponent()
                && visualType.getRedMask().getValue()    == pixelFormat.getRedMask()
                && visualType.getGreenMask().getValue()  == pixelFormat.getGreenMask()
                && visualType.getBlueMask().getValue()   == pixelFormat.getBlueMask();
@@ -213,7 +213,7 @@ abstract class XWindowsBaseBuffer implements BufferOperations {
                     pixelFormat = PixelFormat.RGB32;
                 }
                 else {
-                    throw new UnsupportedOperationException();
+                    throw new UnsupportedOperationException("Unknown pixel format " + visualType);
                 }
                 break;
                 

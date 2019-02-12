@@ -100,8 +100,9 @@ public final class VISUALTYPE extends XEncodeable {
 
     @Override
     public String toString() {
-        return "VISUALTYPE [visualId=" + visualId + ", _class=" + _class + ", bitsPerRGBValue=" + bitsPerRGBValue
-                + ", colormapEntries=" + colormapEntries + ", redMask=" + redMask + ", greenMask=" + greenMask
-                + ", blueMask=" + blueMask + "]";
+        return String.format("VISUALTYPE [visualId=%d, class=%d, bitsPerRGBValue=%d"
+                + ", colormapEntries=%d, redMask=0x%08x, greenMask=0x%08x, blueMask=0x%08x]",
+                visualId.getValue(), _class.getValue(), bitsPerRGBValue.getValue(),
+                colormapEntries.getValue(), redMask.getValue(), greenMask.getValue(), blueMask.getValue());
     }
 }
