@@ -82,6 +82,10 @@ public final class Window {
     public PixelFormat getPixelFormat() {
         return displayArea.getPixelFormat();
     }
+    
+    public WindowContentStorage getWindowContentStorage() {
+        return parameters.getWindowContentStorage();
+    }
 	
 	Window getParentWindow() {
 		return parentWindow;

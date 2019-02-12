@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
+import com.neaterbits.displayserver.protocol.enums.BackingStore;
 import com.neaterbits.displayserver.protocol.enums.Errors;
 import com.neaterbits.displayserver.protocol.enums.MapState;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
@@ -52,6 +53,7 @@ import com.neaterbits.displayserver.server.XEventSubscriptions;
 import com.neaterbits.displayserver.types.Position;
 import com.neaterbits.displayserver.types.Size;
 import com.neaterbits.displayserver.windows.Window;
+import com.neaterbits.displayserver.windows.WindowContentStorage;
 import com.neaterbits.displayserver.windows.WindowManagement;
 import com.neaterbits.displayserver.windows.WindowParameters;
 import com.neaterbits.displayserver.windows.compositor.Compositor;
@@ -352,6 +354,27 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
             throw new ValueException("Unknown window class", createWindow.getWindowClass().getValue());
         }
         
+        final XWindowAttributes xWindowAttributes = XWindowAttributes.DEFAULT_ATTRIBUTES.applyImmutably(createWindow.getAttributes());
+        
+        final WindowContentStorage windowContentStorage;
+        
+        switch (xWindowAttributes.getBackingStore().getValue()) {
+        case BackingStore.NOT_USEFUL:
+            windowContentStorage = WindowContentStorage.NONE;
+            break;
+            
+        case BackingStore.WHEN_MAPPED:
+            windowContentStorage = WindowContentStorage.WHEN_VISIBLE;
+            break;
+            
+        case BackingStore.ALWAYS:
+            windowContentStorage = WindowContentStorage.ALWAYS;
+            break;
+            
+        default:
+            throw new IllegalArgumentException();
+        }
+        
         final WindowParameters windowParameters = new WindowParameters(
                 windowClass,
                 createWindow.getDepth().getValue(),
@@ -360,7 +383,8 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
                 createWindow.getY().getValue(),
                 createWindow.getWidth().getValue(),
                 createWindow.getHeight().getValue(),
-                createWindow.getBorderWidth().getValue());
+                createWindow.getBorderWidth().getValue(),
+                windowContentStorage);
         
 
         final Window window = windowManagement.createWindow(parentWindow.getWindow(), windowParameters, null);
@@ -384,7 +408,7 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
                 parentWindow.getVisual(),
                 createWindow.getBorderWidth(),
                 createWindow.getWindowClass(),
-                XWindowAttributes.DEFAULT_ATTRIBUTES.applyImmutably(createWindow.getAttributes()),
+                xWindowAttributes,
                 renderer,
                 windowSurface);
 

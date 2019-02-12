@@ -1,5 +1,7 @@
 package com.neaterbits.displayserver.windows;
 
+import java.util.Objects;
+
 public final class WindowParameters {
 
 	private final WindowClass windowClass;
@@ -14,11 +16,18 @@ public final class WindowParameters {
 	
 	private final int borderWidth;
 
+	private final WindowContentStorage windowContentStorage;
+	
 	public WindowParameters(
 			WindowClass windowClass,
 			int depth, Visual visual,
 			int x, int y, int width, int height,
-			int borderWidth) {
+			int borderWidth,
+			WindowContentStorage windowContentStorage) {
+	    
+	    Objects.requireNonNull(windowClass);
+	    Objects.requireNonNull(windowContentStorage);
+	    
 		this.windowClass = windowClass;
 		this.depth = depth;
 		this.visual = visual;
@@ -27,6 +36,7 @@ public final class WindowParameters {
 		this.width = width;
 		this.height = height;
 		this.borderWidth = borderWidth;
+		this.windowContentStorage = windowContentStorage;
 	}
 
 	public WindowClass getWindowClass() {
@@ -60,4 +70,8 @@ public final class WindowParameters {
 	public int getBorderWidth() {
 		return borderWidth;
 	}
+
+    public WindowContentStorage getWindowContentStorage() {
+        return windowContentStorage;
+    }
 }

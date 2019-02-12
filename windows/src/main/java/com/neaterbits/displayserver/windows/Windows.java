@@ -39,7 +39,8 @@ final class Windows {
 						null,
 						0, 0,
 						displayArea.getSize().getWidth(), displayArea.getSize().getHeight(),
-						0),
+						0,
+						WindowContentStorage.ALWAYS),
 				null,
 				layers.getRootLayer());
 		
