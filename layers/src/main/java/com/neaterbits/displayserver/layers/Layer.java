@@ -197,16 +197,16 @@ public final class Layer {
 
 			final int numUpdated = updatedList.size();
 			
-			final Intersection intersection = updated.splitFromIntersectingButNotIn(layerRectangle, updatedList);
+			final OverlapType overlap = updated.splitFromIntersectingButNotIn(layerRectangle, updatedList);
 
-			switch (intersection) {
+			switch (overlap) {
 			case NONE:
 				if (updatedList.size() != numUpdated) {
 					throw new IllegalStateException();
 				}
 				break;
 				
-			case OVERLAP:
+			case INTERSECTION:
 				if (updatedList.size() == numUpdated) {
 					throw new IllegalStateException();
 				}
@@ -219,7 +219,7 @@ public final class Layer {
 				
 				updatedList.remove(updated);
 				break;
-				
+			
 			case OBSCURING:
 				if (updatedList.size() == numUpdated) {
 					throw new IllegalStateException();
@@ -253,9 +253,9 @@ public final class Layer {
 
 				final int numUpdated = updatedRectangles.size();
 				
-				final Intersection intersection = updated.splitFromIntersectingButNotIn(previous, newlyVisible);
+				final OverlapType overlap = updated.splitFromIntersectingButNotIn(previous, newlyVisible);
 				
-				switch (intersection) {
+				switch (overlap) {
 				case NONE:
 					if (updatedRectangles.size() != numUpdated) {
 						throw new IllegalStateException();
@@ -264,7 +264,7 @@ public final class Layer {
 					newlyVisible.add(updated);
 					break;
 					
-				case OVERLAP:
+				case INTERSECTION:
 					if (updatedRectangles.size() == numUpdated) {
 						throw new IllegalStateException();
 					}

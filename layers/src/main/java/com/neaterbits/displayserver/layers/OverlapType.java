@@ -1,9 +1,10 @@
 package com.neaterbits.displayserver.layers;
 
-enum Intersection {
+enum OverlapType {
 
 	NONE,
-	OVERLAP,
+	INTERSECTION,
+	EQUALS,
 	OBSCURED_BY,
 	OBSCURING
 }
