@@ -8,6 +8,7 @@ import com.neaterbits.displayserver.protocol.enums.OpCodes;
 import com.neaterbits.displayserver.protocol.exception.DrawableException;
 import com.neaterbits.displayserver.protocol.exception.GContextException;
 import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLog;
+import com.neaterbits.displayserver.protocol.messages.requests.legacy.FillPoly;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolyFillRectangle;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolyLine;
 import com.neaterbits.displayserver.protocol.messages.requests.legacy.PolyPoint;
@@ -45,7 +46,8 @@ public final class XCoreDrawMessageProcessor extends XOpCodeProcessor {
                 OpCodes.POLY_LINE,
                 OpCodes.POLY_SEGMENT,
                 OpCodes.POLY_FILL_RECTANGLE,
-                OpCodes.POLY_RECTANGLE
+                OpCodes.POLY_RECTANGLE,
+                OpCodes.FILL_POLY
         };
     }
 
@@ -119,6 +121,17 @@ public final class XCoreDrawMessageProcessor extends XOpCodeProcessor {
                 break;
             }
             
+            case OpCodes.FILL_POLY: {
+                
+                final FillPoly fillPoly = log(messageLength, opcode, sequenceNumber, FillPoly.decode(stream));
+                
+                xDrawable = findDrawable(xWindows, xPixmaps, fillPoly.getDrawable());
+                xgc = client.getGC(fillPoly.getGC());
+                
+                xDrawable.getRenderer().fillPoly(xgc, fillPoly.getPoints());
+                break;
+            }
+
             default:
                 throw new UnsupportedOperationException();
             }

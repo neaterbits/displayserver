@@ -3,9 +3,12 @@ package com.neaterbits.displayserver.xwindows.model;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
+import com.neaterbits.displayserver.protocol.exception.WindowException;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.windows.Window;
 
@@ -144,6 +147,23 @@ public class XWindows<T extends XWindow> extends XResources<XWindow> implements 
         return result;
     }
     
+    @Override
+    public final Collection<XWindow> getAllSubWindows(WINDOW windowResource) throws WindowException {
+
+        Objects.requireNonNull(windowResource);
+        
+        final Collection<XWindow> windows;
+        
+        if (rootWindows.contains(windowResource)) {
+            windows = rootWindows.getAllSubWindows(windowResource);
+        }
+        else {
+            windows = clientWindows.getAllSubWindows(windowResource);
+        }
+        
+        return windows;
+    }
+
     private static class WindowMap {
         private final Map<WINDOW, XWindow> resourceToWindow;
         private final Map<XWindow, WINDOW> windowToResource;
@@ -151,6 +171,13 @@ public class XWindows<T extends XWindow> extends XResources<XWindow> implements 
         public WindowMap() {
             this.resourceToWindow = new HashMap<>();
             this.windowToResource = new HashMap<>();
+        }
+
+        boolean contains(WINDOW windowResource) {
+            
+            Objects.requireNonNull(windowResource);
+            
+            return resourceToWindow.containsKey(windowResource);
         }
 
         XWindow getWindow(WINDOW windowResource) {
@@ -189,6 +216,41 @@ public class XWindows<T extends XWindow> extends XResources<XWindow> implements 
             }
             
             return removed;
+        }
+        
+        Collection<XWindow> getAllSubWindows(WINDOW windowResource) throws WindowException {
+            
+            Objects.requireNonNull(windowResource);
+            
+            final Set<XWindow> windows = new HashSet<>();
+            
+            final XWindow xWindow = resourceToWindow.get(windowResource);
+            
+            if (xWindow == null) {
+                throw new WindowException("No such window", windowResource);
+            }
+            
+            getAllSubWindows(xWindow, windows);
+            
+            return windows;
+        }
+    
+        private void getAllSubWindows(XWindow xWindow, Set<XWindow> windows) {
+
+            Objects.requireNonNull(xWindow);
+            
+            for (XWindow xw : windowToResource.keySet()) {
+                if (xw.getParentWINDOW().equals(xWindow.getWINDOW())) {
+                    
+                    if (windows.contains(xw)) {
+                        throw new IllegalStateException();
+                    }
+                    
+                    windows.add(xw);
+                    
+                    getAllSubWindows(xw, windows);
+                }
+            }
         }
     }
 }

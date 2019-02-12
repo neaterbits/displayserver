@@ -33,7 +33,7 @@ public abstract class PolyPointRequest extends PolyRequest<POINT> {
                 stream,
                 CARD32_PER_ENTRY,
                 POINT[]::new,
-                XWindowsProtocolInputStream::readPOINT,
+                POINT::decode,
                 (BYTE initialByte, DRAWABLE drawable, GCONTEXT gc, POINT [] list) -> createPolyPointRequest.create(initialByte, drawable, gc, list));
     }
     

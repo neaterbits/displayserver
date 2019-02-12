@@ -17,6 +17,7 @@ import com.neaterbits.displayserver.protocol.messages.events.MapNotify;
 import com.neaterbits.displayserver.protocol.messages.events.MapRequest;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeWindowAttributes;
 import com.neaterbits.displayserver.protocol.messages.requests.ClearArea;
+import com.neaterbits.displayserver.protocol.messages.requests.MapSubwindows;
 import com.neaterbits.displayserver.protocol.messages.requests.MapWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.XWindowAttributes;
 import com.neaterbits.displayserver.protocol.types.BOOL;
@@ -222,7 +223,51 @@ public class XCoreWindowMapWindowTest extends BaseXCorePixmapTest {
     public void testMapWindowBackingStoreAlways() {
         checkMapWindowBackingStore(BackingStore.Always);
     }
+    
+    @Test
+    public void testMapSubwindows() {
+
+        final Position position = new Position(150, 250);
+        final Size size = new Size(450, 350);
         
+        
+        final WindowState window = checkCreateWindow(position, size);
+
+        verifyNoMoreInteractions(window);
+
+        Mockito.reset(compositor);
+        Mockito.reset(displayArea);
+        Mockito.reset(rendererFactory);
+        
+        final Position subPosition = new Position(15, 25);
+        final Size subSize = new Size(45, 35);
+        
+        final WindowState subWindow = checkCreateWindow(subPosition, subSize, 0, null, window.windowResource);
+
+        subscribeEvents(subWindow.windowResource, SETofEVENT.EXPOSURE);
+
+        MapSubwindows mapSubwindows = new MapSubwindows(window.windowResource);
+        
+        whenEvent(Expose.class);
+
+        sendRequest(mapSubwindows);
+
+        final Expose expose = expectEvent(Expose.class);
+
+        assertThat(expose).isNotNull();
+        assertThat(expose.getWindow()).isEqualTo(subWindow.windowResource);
+
+        assertThat(expose.getX().getValue()).isEqualTo(0);
+        assertThat(expose.getY().getValue()).isEqualTo(0);
+        assertThat(expose.getWidth().getValue()).isEqualTo(45);
+        assertThat(expose.getHeight().getValue()).isEqualTo(35);
+        
+        assertThat(expose.getCount().getValue()).isEqualTo(1);
+        
+        verifyNoMoreInteractions(subWindow);
+    }
+    
+    
     private void checkMapWindowBackingStore(BYTE backingStore) {
         checkMapWindowBackingStore(backingStore, false);
     }
@@ -267,7 +312,6 @@ public class XCoreWindowMapWindowTest extends BaseXCorePixmapTest {
         assertThat(expose.getCount().getValue()).isEqualTo(1);
         
         verifyNoMoreInteractions(window);
-
     }
     
     

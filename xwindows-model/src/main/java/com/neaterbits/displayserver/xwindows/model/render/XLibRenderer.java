@@ -44,6 +44,8 @@ public interface XLibRenderer extends Disposable {
     
     void polyRectangle(XGC gc, RECTANGLE [] rectangles);
 
+    void fillPoly(XGC gc, POINT [] points);
+
     void putImage(XGC gc, int format, int width, int height, int dstX, int dstY, int leftPad, int depth, byte [] data);
 
     void renderBitmap(XGC gc, Buffer buffer, int x, int y);

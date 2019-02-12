@@ -222,6 +222,24 @@ final class CairoXLibRenderer implements XLibRenderer {
     }
 
     @Override
+    public void fillPoly(XGC gc, POINT[] points) {
+
+        if (points.length != 0) {
+            
+            applyGC(gc);
+            
+            cr.newPath();
+            
+            for (POINT point : points) {
+                
+                cr.lineTo(point.getX(), point.getY());
+            }
+            
+            cr.fill();
+        }
+    }
+
+    @Override
     public void putImage(XGC gc, int format, int width, int height, int dstX, int dstY, int leftPad, int depth, byte[] data) {
 
         if (width != 0 && height != 0) {

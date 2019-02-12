@@ -136,6 +136,9 @@ public class XConnection
 
     @Override
     public final void close() throws Exception {
+        
+        System.out.println("## close X connection");
+        
         socketChannel.close();
     }
 }

@@ -1,9 +1,11 @@
 package com.neaterbits.displayserver.xwindows.model;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.function.Supplier;
 
 import com.neaterbits.displayserver.buffers.PixelFormat;
+import com.neaterbits.displayserver.protocol.exception.WindowException;
 import com.neaterbits.displayserver.protocol.types.COLORMAP;
 import com.neaterbits.displayserver.protocol.types.CURSOR;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
@@ -78,6 +80,11 @@ public class XDisplayState<W extends XWindow, WINDOWS extends XWindows<W>>
     @Override
     public final W getClientWindow(Window window) {
         return windows.getClientWindow(window);
+    }
+
+    @Override
+    public Collection<XWindow> getAllSubWindows(WINDOW windowResource) throws WindowException {
+        return windows.getAllSubWindows(windowResource);
     }
 
     @Override

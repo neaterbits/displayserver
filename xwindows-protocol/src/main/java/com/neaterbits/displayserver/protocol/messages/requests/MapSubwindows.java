@@ -30,14 +30,16 @@ public final class MapSubwindows extends XRequest {
         this.window = window;
     }
 
+    public WINDOW getWindow() {
+        return window;
+    }
+
     @Override
     public Object[] getDebugParams() {
         return wrap(
                 "window", window
         );
     }
-
-
 
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {

@@ -23,7 +23,6 @@ import com.neaterbits.displayserver.protocol.types.INT8;
 import com.neaterbits.displayserver.protocol.types.KEYCODE;
 import com.neaterbits.displayserver.protocol.types.KEYSYM;
 import com.neaterbits.displayserver.protocol.types.PIXMAP;
-import com.neaterbits.displayserver.protocol.types.POINT;
 import com.neaterbits.displayserver.protocol.types.SET32;
 import com.neaterbits.displayserver.protocol.types.SETofDEVICEEVENT;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
@@ -88,8 +87,6 @@ public interface XWindowsProtocolInputStream {
 	SETofPOINTEREVENT readSETofPOINTEREVENT() throws IOException;
 	SETofKEYBUTMASK readSETofKEYBUTMASK() throws IOException;
 	SETofKEYMASK readSETofKEYMASK() throws IOException;
-	
-	POINT readPOINT() throws IOException;
 	
 	byte [] readData(int length) throws IOException;
 	
