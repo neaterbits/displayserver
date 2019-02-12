@@ -70,6 +70,8 @@ public class OpCodes {
 	public static final int PUT_IMAGE = 72;
 	public static final int GET_IMAGE = 73;
 	
+	public static final int POLY_TEXT_8 = 74;
+	
 	public static final int IMAGE_TEXT_16 = 77;
 	
 	public static final int CREATE_COLOR_MAP = 78;

@@ -4,15 +4,9 @@ public class CairoImageSurface extends CairoSurfaceImpl {
 
     private final long mallocedDataReference;
     
-    private final int width;
-    private final int height;
-    
     public CairoImageSurface(CairoFormat format, int width, int height) {
-        super(CairoNative.cairo_image_surface_create(format.getCairoValue(), width, height));
+        super(CairoNative.cairo_image_surface_create(format.getCairoValue(), width, height), width, height);
 
-        this.width = width;
-        this.height = height;
-        
         this.mallocedDataReference = 0L;
     }
 
@@ -24,21 +18,11 @@ public class CairoImageSurface extends CairoSurfaceImpl {
     }
     
     private CairoImageSurface(long [] references, int width, int height) {
-        super(references[0]);
-        
-        this.width = width;
-        this.height = height;
+        super(references[0], width, height);
         
         this.mallocedDataReference = references[1];
     }
     
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
 
     @Override
     public void dispose() {

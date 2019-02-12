@@ -2,22 +2,22 @@ package com.neaterbits.displayserver.server.render.cairo;
 
 import java.util.Objects;
 
-import com.neaterbits.displayserver.render.cairo.CairoImageSurface;
+import com.neaterbits.displayserver.render.cairo.CairoSurface;
 import com.neaterbits.displayserver.types.Size;
 import com.neaterbits.displayserver.xwindows.fonts.render.FontBuffer;
 
 public final class CairoFontBuffer implements FontBuffer {
 
-    private final CairoImageSurface surface;
+    private final CairoSurface surface;
     
-    CairoFontBuffer(CairoImageSurface surface) {
+    CairoFontBuffer(CairoSurface surface) {
         
         Objects.requireNonNull(surface);
         
         this.surface = surface;
     }
 
-    CairoImageSurface getSurface() {
+    CairoSurface getSurface() {
         return surface;
     }
 

@@ -26,9 +26,9 @@ import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.INT16;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
+import com.neaterbits.displayserver.protocol.util.XWindowAttributesBuilder;
 import com.neaterbits.displayserver.types.Position;
 import com.neaterbits.displayserver.types.Size;
-import com.neaterbits.displayserver.xwindows.core.util.XWindowAttributesBuilder;
 
 public class XCoreWindowMapWindowTest extends BaseXCorePixmapTest {
 

@@ -20,11 +20,11 @@ public final class CairoXCBSurface extends CairoSurfaceImpl {
                 width,
                 height);
         
-        return surface != 0L ? new CairoXCBSurface(surface, drawable, drawableType, connection) : null;
+        return surface != 0L ? new CairoXCBSurface(surface, drawable, drawableType, width, height, connection) : null;
     }
     
-    private CairoXCBSurface(long reference, int drawable, DrawableType drawableType, XCBConnection connection) {
-        super(reference);
+    private CairoXCBSurface(long reference, int drawable, DrawableType drawableType, int width, int height, XCBConnection connection) {
+        super(reference, width, height);
 
         Objects.requireNonNull(drawableType);
         

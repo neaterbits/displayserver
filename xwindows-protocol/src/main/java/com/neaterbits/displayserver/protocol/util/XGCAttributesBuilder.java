@@ -1,4 +1,4 @@
-package com.neaterbits.displayserver.xwindows.core.util;
+package com.neaterbits.displayserver.protocol.util;
 
 import java.util.Objects;
 
@@ -59,6 +59,13 @@ public class XGCAttributesBuilder extends XAttributesBuilder {
         
         this.function = function;
     
+        return this;
+    }
+    
+    public XGCAttributesBuilder setFont(FONT font) {
+        
+        this.font = set(font, XGCAttributes.FONT);
+        
         return this;
     }
     

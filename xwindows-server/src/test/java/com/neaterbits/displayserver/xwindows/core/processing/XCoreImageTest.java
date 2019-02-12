@@ -17,10 +17,10 @@ import com.neaterbits.displayserver.protocol.types.CARD32;
 import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.INT16;
+import com.neaterbits.displayserver.protocol.util.XGCAttributesBuilder;
 import com.neaterbits.displayserver.types.Position;
 import com.neaterbits.displayserver.types.Size;
 import com.neaterbits.displayserver.windows.compositor.Surface;
-import com.neaterbits.displayserver.xwindows.core.util.XGCAttributesBuilder;
 import com.neaterbits.displayserver.xwindows.model.render.XLibRenderer;
 
 import static org.mockito.Mockito.when;

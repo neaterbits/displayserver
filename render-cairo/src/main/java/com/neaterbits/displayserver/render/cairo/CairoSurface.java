@@ -9,5 +9,8 @@ public interface CairoSurface extends Disposable {
     Cairo createContext();
 
     CairoStatus writeToPNG(String fileName);
+
+    int getWidth();
     
+    int getHeight();
 }

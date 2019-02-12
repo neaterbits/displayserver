@@ -25,7 +25,6 @@ final class CairoWrapper implements Cairo {
         this.cr = cr;
         this.cairoSurface = cairoSurface;
     }
-
     
     @Override
     public CairoStatus getStatus() {

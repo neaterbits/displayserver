@@ -9,9 +9,9 @@ import com.neaterbits.displayserver.protocol.messages.events.CreateNotify;
 import com.neaterbits.displayserver.protocol.messages.requests.XWindowAttributes;
 import com.neaterbits.displayserver.protocol.types.BOOL;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
+import com.neaterbits.displayserver.protocol.util.XWindowAttributesBuilder;
 import com.neaterbits.displayserver.types.Position;
 import com.neaterbits.displayserver.types.Size;
-import com.neaterbits.displayserver.xwindows.core.util.XWindowAttributesBuilder;
 
 
 public final class XCoreWindowCreateWindowTest extends BaseXCoreWindowTest {

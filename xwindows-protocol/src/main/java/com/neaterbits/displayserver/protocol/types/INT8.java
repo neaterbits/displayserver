@@ -11,4 +11,9 @@ public final class INT8 {
 	public byte getValue() {
 		return value;
 	}
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
 }

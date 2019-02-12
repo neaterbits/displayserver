@@ -120,6 +120,8 @@ public class XCoreModule extends XModule {
                 
                 new XCoreImageMessageProcessor(protocolLog, windows, pixmaps),
                 
+                new XCoreTextMessageProcessor(protocolLog, windows, pixmaps),
+                
                 new XCoreColorMessageProcessor(
                         protocolLog,
                         screens,

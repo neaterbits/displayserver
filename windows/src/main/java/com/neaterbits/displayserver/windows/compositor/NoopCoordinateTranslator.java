@@ -2,6 +2,12 @@ package com.neaterbits.displayserver.windows.compositor;
 
 public final class NoopCoordinateTranslator implements CoordinateTranslator {
 
+    public static final NoopCoordinateTranslator INSTANCE = new NoopCoordinateTranslator();
+    
+    private NoopCoordinateTranslator() {
+        
+    }
+    
     @Override
     public int translateX(int x) {
         return x;

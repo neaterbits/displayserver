@@ -2,8 +2,14 @@ package com.neaterbits.displayserver.render.cairo;
 
 public class CairoSurfaceImpl extends CairoReference implements CairoSurface {
 
-    protected CairoSurfaceImpl(long reference) {
+    private final int width;
+    private final int height;
+
+    protected CairoSurfaceImpl(long reference, int width, int height) {
         super(reference);
+    
+        this.width = width;
+        this.height = height;
     }
 
     int getReferenceCount() {
@@ -21,11 +27,20 @@ public class CairoSurfaceImpl extends CairoReference implements CairoSurface {
     }
 
     @Override
-    public Cairo createContext() {
+    public final Cairo createContext() {
         return new CairoImpl(this);
     }
     
-    
+    @Override
+    public final int getWidth() {
+        return width;
+    }
+
+    @Override
+    public final int getHeight() {
+        return height;
+    }
+
     @Override
     public void dispose() {
         CairoNative.cairo_surface_destroy(getReference());

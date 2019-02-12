@@ -1,9 +1,11 @@
 package com.neaterbits.displayserver.server.render.cairo;
 
 import java.util.Objects;
+import java.util.function.Function;
 
 import com.neaterbits.displayserver.render.cairo.CairoFormat;
 import com.neaterbits.displayserver.render.cairo.CairoImageSurface;
+import com.neaterbits.displayserver.render.cairo.CairoSurface;
 import com.neaterbits.displayserver.xwindows.fonts.model.DataLength;
 import com.neaterbits.displayserver.xwindows.fonts.model.FontBitmapFormat;
 import com.neaterbits.displayserver.xwindows.fonts.model.StoreOrder;
@@ -27,6 +29,11 @@ public final class CairoFontBufferFactory implements FontBufferFactory {
     @Override
     public FontBuffer createFontBuffer(int glyphIndex, byte [] bitmap, FontBitmapFormat sourceBitmapFormat, int width, int height) {
 
+        return createFontBuffer(glyphIndex, bitmap, sourceBitmapFormat, width, height, surface -> surface);
+    }
+
+    
+    FontBuffer createFontBuffer(int glyphIndex, byte [] bitmap, FontBitmapFormat sourceBitmapFormat, int width, int height, Function<CairoImageSurface, CairoSurface> wrapSurface) {
         if (width <= 0) {
             throw new IllegalArgumentException();
         }
@@ -76,7 +83,7 @@ public final class CairoFontBufferFactory implements FontBufferFactory {
         
         // Arrays.fill(data, (byte)0x33);
         
-        final CairoImageSurface surface = new CairoImageSurface(data, format, width, height, stride);
+        final CairoSurface surface = wrapSurface.apply(new CairoImageSurface(data, format, width, height, stride));
         
         return new CairoFontBuffer(surface);
     }

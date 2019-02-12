@@ -22,7 +22,7 @@ public abstract class SingleViewPortCompositor implements Compositor {
     
         this.viewPort = getSingleViewPort(displayArea);
 
-        final CoordinateTranslator coordinateTranslator = new NoopCoordinateTranslator();
+        final CoordinateTranslator coordinateTranslator = NoopCoordinateTranslator.INSTANCE;
         
         this.rootSurface = new SurfaceWrapper(viewPort.getFrameBuffer(), coordinateTranslator);
     }

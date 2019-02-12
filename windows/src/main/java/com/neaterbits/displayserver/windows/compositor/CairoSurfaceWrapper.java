@@ -6,12 +6,12 @@ import com.neaterbits.displayserver.render.cairo.Cairo;
 import com.neaterbits.displayserver.render.cairo.CairoStatus;
 import com.neaterbits.displayserver.render.cairo.CairoSurface;
 
-final class CairoSurfaceWrapper implements CairoSurface {
+public final class CairoSurfaceWrapper implements CairoSurface {
 
     private CairoSurface cairoSurface;
     private CoordinateTranslator coordinateTranslator;
     
-    CairoSurfaceWrapper(CairoSurface cairoSurface, CoordinateTranslator coordinateTranslator) {
+    public CairoSurfaceWrapper(CairoSurface cairoSurface, CoordinateTranslator coordinateTranslator) {
         
         Objects.requireNonNull(cairoSurface);
         Objects.requireNonNull(coordinateTranslator);
@@ -39,6 +39,16 @@ final class CairoSurfaceWrapper implements CairoSurface {
     @Override
     public Cairo createContext() {
         return new CairoWrapper(cairoSurface.createContext(), this);
+    }
+
+    @Override
+    public int getWidth() {
+        return cairoSurface.getWidth();
+    }
+
+    @Override
+    public int getHeight() {
+        return cairoSurface.getHeight();
     }
 
     @Override

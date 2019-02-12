@@ -32,6 +32,7 @@ import com.neaterbits.displayserver.server.XHardware;
 import com.neaterbits.displayserver.server.XRendering;
 import com.neaterbits.displayserver.server.XServer;
 import com.neaterbits.displayserver.server.render.cairo.CairoFontBufferFactory;
+import com.neaterbits.displayserver.server.render.cairo.CairoWrapperFontBufferFactory;
 import com.neaterbits.displayserver.server.render.cairo.CairoXLibRendererFactory;
 import com.neaterbits.displayserver.util.logging.DebugLevel;
 import com.neaterbits.displayserver.windows.DisplayAreas;
@@ -216,7 +217,7 @@ public class DisplayServerMain {
                 displayAreas,
                 compositor,
                 new CairoXLibRendererFactory(),
-                new CairoFontBufferFactory(nativeOrder));
+                new CairoWrapperFontBufferFactory(new CairoFontBufferFactory(nativeOrder)));
         
         try (XServer server = new XServer(
                 hardware,

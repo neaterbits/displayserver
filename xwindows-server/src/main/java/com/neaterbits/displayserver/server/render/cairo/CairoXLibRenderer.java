@@ -355,7 +355,7 @@ final class CairoXLibRenderer implements XLibRenderer {
         
         final CairoFontBuffer fontBuffer = (CairoFontBuffer)buffer;
         
-        final CairoImageSurface surface = fontBuffer.getSurface();
+        final CairoSurface surface = fontBuffer.getSurface();
 
   //      cr.rectangle(x, y, surface.getWidth(), surface.getHeight());
         //cr.clip();

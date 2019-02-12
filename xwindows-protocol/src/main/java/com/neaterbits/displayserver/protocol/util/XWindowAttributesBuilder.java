@@ -1,6 +1,4 @@
-package com.neaterbits.displayserver.xwindows.core.util;
-
-import java.util.Objects;
+package com.neaterbits.displayserver.protocol.util;
 
 import com.neaterbits.displayserver.protocol.messages.requests.XWindowAttributes;
 import com.neaterbits.displayserver.protocol.types.BITGRAVITY;
@@ -31,16 +29,6 @@ public final class XWindowAttributesBuilder extends XAttributesBuilder {
     private SETofDEVICEEVENT doNotPropagateMask;
     private COLORMAP colormap;
     private CURSOR cursor;
-
-
-    private <T> T set(T value, int flag) {
-        
-        Objects.requireNonNull(value);
-        
-        addFlag(flag);
-        
-        return value;
-    }
     
     public XWindowAttributesBuilder setBackgroundPixmap(PIXMAP pixmap) {
         

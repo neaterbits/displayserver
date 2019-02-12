@@ -46,7 +46,6 @@ public class LogUtil {
         append.accept("]");
     }
     
-
     public static void outputParameters(Consumer<String> append, Object ... parameters) {
         
         if (parameters.length % 2 != 0) {
@@ -61,7 +60,10 @@ public class LogUtil {
             
             append.accept(parameters[i ++].toString());
             append.accept("=");
-            append.accept(parameters[i ++].toString());
+            
+            final Object value = parameters[i ++];
+            
+            append.accept(value != null ? value.toString() : "null");
         }
     }
 }

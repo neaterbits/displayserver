@@ -19,11 +19,11 @@ import com.neaterbits.displayserver.protocol.messages.XError;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeWindowAttributes;
 import com.neaterbits.displayserver.protocol.messages.requests.XWindowAttributes;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
+import com.neaterbits.displayserver.protocol.util.XWindowAttributesBuilder;
 import com.neaterbits.displayserver.types.Position;
 import com.neaterbits.displayserver.types.Size;
 import com.neaterbits.displayserver.windows.Window;
 import com.neaterbits.displayserver.windows.compositor.Surface;
-import com.neaterbits.displayserver.xwindows.core.util.XWindowAttributesBuilder;
 import com.neaterbits.displayserver.xwindows.model.render.XLibRenderer;
 
 public abstract class BaseXCoreWindowTest extends BaseXCoreTest {
