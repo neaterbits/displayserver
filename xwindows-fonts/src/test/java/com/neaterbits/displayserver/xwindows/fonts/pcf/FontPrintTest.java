@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import com.neaterbits.displayserver.protocol.exception.MatchException;
 import com.neaterbits.displayserver.xwindows.fonts.BaseFontTest;
+import com.neaterbits.displayserver.xwindows.fonts.FontDescriptor;
 import com.neaterbits.displayserver.xwindows.fonts.FontLoader;
 import com.neaterbits.displayserver.xwindows.fonts.NoSuchFontException;
 import com.neaterbits.displayserver.xwindows.fonts.model.FontBitmapFormat;
@@ -20,7 +21,7 @@ public class FontPrintTest extends BaseFontTest {
         
         final FontLoader fontLoader = getFontLoader(false);
 
-        final XFont font = fontLoader.loadFont("7x14", new FontBufferFactory() {
+        final XFont font = fontLoader.loadFont(new FontDescriptor("7x14"), new FontBufferFactory() {
             @Override
             public FontBuffer createFontBuffer(int glyphIndex, byte[] bitmap, FontBitmapFormat fontBitmapFormat, int width, int height) {
                 return null;

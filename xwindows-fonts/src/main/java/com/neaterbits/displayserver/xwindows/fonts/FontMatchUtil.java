@@ -26,4 +26,22 @@ class FontMatchUtil {
         
         return regexPattern;
     }
+
+    static String getFontName(String fileName) {
+
+        final String name;
+        
+        if (fileName.endsWith(".pcf")) {
+            name = fileName.substring(0, fileName.length() - ".pcf".length());
+        }
+        else if (fileName.endsWith(".pcf.gz")) {
+            name = fileName.substring(0, fileName.length() - ".pcf.gz".length());
+        }
+        else {
+            name = fileName;
+        }
+        
+        return name;
+    }
+
 }

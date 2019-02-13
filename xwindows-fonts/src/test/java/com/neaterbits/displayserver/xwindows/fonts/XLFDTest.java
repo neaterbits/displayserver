@@ -21,7 +21,7 @@ public class XLFDTest {
 
         for (File file : path.listFiles((File file, String name) -> name.endsWith(".pcf.gz"))) {
 
-            final List<XFontProperty> fontProperties = FontLoader.readProperties(file);
+            final List<XFontProperty> fontProperties = FontUtil.readProperties(file);
             
             final XLFD xlfd = XLFD.fromFontProperties(fontProperties);
             

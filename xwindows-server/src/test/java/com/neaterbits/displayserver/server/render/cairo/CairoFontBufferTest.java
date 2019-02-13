@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.neaterbits.displayserver.protocol.exception.MatchException;
+import com.neaterbits.displayserver.xwindows.fonts.FontDescriptor;
 import com.neaterbits.displayserver.xwindows.fonts.FontLoader;
 import com.neaterbits.displayserver.xwindows.fonts.FontLoaderConfig;
 import com.neaterbits.displayserver.xwindows.fonts.NoSuchFontException;
@@ -26,6 +27,6 @@ public class CairoFontBufferTest {
         final FontLoader fontLoader = new FontLoader(
                 new FontLoaderConfig(Arrays.asList("/usr/share/fonts/X11/misc")));
 
-        fontLoader.loadFont("7x14", new CairoFontBufferFactory(StoreOrder.getNativeOrder()));
+        fontLoader.loadFont(new FontDescriptor("7x14"), new CairoFontBufferFactory(StoreOrder.getNativeOrder()));
     }
 }

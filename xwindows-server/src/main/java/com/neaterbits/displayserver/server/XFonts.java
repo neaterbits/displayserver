@@ -30,13 +30,14 @@ public final class XFonts {
         
         if (fonts.length > 0) {
             
-            final String fontName = fonts[0].getFontName();
+            final FontDescriptor fontDescriptor = fonts[0];
+            final String fontName = fontDescriptor.getFontName();
             
             font = fontCache.getFont(fontName);
             
             if (font == null) {
                 
-                font = fontLoader.loadFont(fontName, fontBufferFactory);
+                font = fontLoader.loadFont(fontDescriptor, fontBufferFactory);
                 
                 if (font == null) {
                     throw new IllegalStateException(); // Exception if font not found

@@ -30,4 +30,9 @@ public final class FontDescriptor {
     public XLFD getXlfd() {
         return xlfd;
     }
+
+    @Override
+    public String toString() {
+        return "FontDescriptor [fontName=" + fontName + ", xlfd=" + xlfd + "]";
+    }
 }
