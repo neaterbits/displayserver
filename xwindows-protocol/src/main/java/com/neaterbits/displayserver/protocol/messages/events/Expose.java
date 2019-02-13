@@ -63,6 +63,18 @@ public final class Expose extends XEvent {
     }
 
     @Override
+    public Object[] getDebugParams() {
+        return wrap(
+                "window", window,
+                "x", x,
+                "y", y,
+                "width", width,
+                "height", height,
+                "count", count
+        );
+    }
+
+    @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 
         writeEventCode(stream, Events.EXPOSE);
@@ -79,5 +91,7 @@ public final class Expose extends XEvent {
         stream.writeCARD16(height);
 
         stream.writeCARD16(count);
+        
+        stream.pad(14);
     }
 }
