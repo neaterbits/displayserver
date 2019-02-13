@@ -63,8 +63,16 @@ public final class XCoreCursorMessageProcessor extends XOpCodeProcessor {
         
         case OpCodes.CREATE_GLYPH_CURSOR: {
             
-            log(messageLength, opcode, sequenceNumber, CreateGlyphCursor.decode(stream));
+            final CreateGlyphCursor createGlyphCursor = log(messageLength, opcode, sequenceNumber, CreateGlyphCursor.decode(stream));
             
+            try {
+                client.checkAndAddResourceId(createGlyphCursor.getCID());
+    
+                xCursors.add(createGlyphCursor.getCID(), new XCursor());
+            }
+            catch (IDChoiceException ex) {
+                sendError(client, Errors.IDChoice, sequenceNumber, createGlyphCursor.getCID().getValue(), opcode);
+            }
             break;
         }
         

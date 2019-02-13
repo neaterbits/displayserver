@@ -79,7 +79,7 @@ public final class CreateGlyphCursor extends XRequest {
         this.backBlue = backBlue;
     }
 
-    public CURSOR getCid() {
+    public CURSOR getCID() {
         return cid;
     }
 
