@@ -659,11 +659,17 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
             
             if (!xWindow.isRootWindow()) {
                 compositor.freeSurfaceForClientWindow(xWindow.getWindow(), xWindow.getSurface());
+
+                unmapSubWindows(xWindow);
+                
+                if (xWindow.isMapped()) {
+                    unmapWindow(xWindow);
+                }
+
+                windowManagement.disposeWindow(xWindow.getWindow());
+                
+                xWindow.dispose();
             }
-            
-            windowManagement.disposeWindow(xWindow.getWindow());
-            
-            xWindow.dispose();
         }
         
         return xWindow;
@@ -774,6 +780,26 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
 
                 xWindow.setMapped(true);
             }
+        }
+    }
+    
+    private void unmapWindow(XWindow xWindow) {
+        
+        if (xWindow.isMapped()) {
+            windowManagement.hideWindow(xWindow.getWindow());
+        }
+    }
+
+    private void unmapSubWindows(XWindow xWindow) {
+        try {
+            final Collection<XWindow> subWindows = xWindows.getAllSubWindows(xWindow.getWINDOW());
+            
+            for (XWindow xSubWindow : subWindows) {
+                unmapWindow(xSubWindow);
+            }
+        }
+        catch (WindowException ex) {
+            throw new IllegalStateException(ex);
         }
     }
     

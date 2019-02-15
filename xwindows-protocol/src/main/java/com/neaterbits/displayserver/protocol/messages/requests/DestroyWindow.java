@@ -26,6 +26,11 @@ public final class DestroyWindow extends XRequest {
 	}
 
 	public static DestroyWindow decode(XWindowsProtocolInputStream stream) throws IOException {
+	    
+	    readUnusedByte(stream);
+
+	    readRequestLength(stream);
+	    
 		return new DestroyWindow(stream.readWINDOW());
 	}
 

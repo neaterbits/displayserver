@@ -100,7 +100,7 @@ public class FindLayerAtTest extends BaseLayersTest {
         assertThat(layers.findLayerAt(50, 249)).isSameAs(leftLayer);
         assertThat(layers.findLayerAt(349, 249)).isSameAs(leftLayer);
         
-        layers.hideLayer(leftLayer, null);
+        layers.hideLayer(leftLayer);
 
         assertThat(layers.findLayerAt(50, 50)).isSameAs(layers.getRootLayer());
         assertThat(layers.findLayerAt(349, 50)).isSameAs(layers.getRootLayer());

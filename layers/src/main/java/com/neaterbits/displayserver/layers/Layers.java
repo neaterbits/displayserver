@@ -134,15 +134,13 @@ public class Layers {
 
 	}
 
-    public void hideLayer(Layer layer, LayerUpdateListener listener) {
+    public LayerRegions hideLayer(Layer layer) {
 
         Objects.requireNonNull(layer);
 
         layer.setVisible(false);
 
-        if (listener != null) {
-            listener.onLayerUpdate(layer, recomputeLayers());
-        }
+        return recomputeLayers();
     }
 
 	public Layer findLayerAt(int x, int y) {

@@ -204,9 +204,9 @@ public class LayersAddRemoveTest extends BaseLayersTest {
         catch (IllegalStateException ex) {
         }
         
-        layers.hideLayer(subLayer, null);
+        layers.hideLayer(subLayer);
         layers.removeSubLayer(layer, subLayer);
-        layers.hideLayer(layer, null);
+        layers.hideLayer(layer);
         layers.removeFromRootLayer(layer);
     }
 }

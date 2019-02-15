@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.layers.LayerRegion;
+import com.neaterbits.displayserver.layers.LayerRegions;
 
 public class Display implements WindowManagement {
 
@@ -33,6 +34,11 @@ public class Display implements WindowManagement {
     public LayerRegion showWindow(Window window) {
 
         return window.getDisplayArea().showWindow(window);
+    }
+
+    @Override
+    public LayerRegions hideWindow(Window window) {
+        return window.getDisplayArea().hideWindow(window);
     }
 
     @Override

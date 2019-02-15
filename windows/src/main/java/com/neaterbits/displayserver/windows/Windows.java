@@ -9,6 +9,7 @@ import java.util.Objects;
 
 import com.neaterbits.displayserver.layers.Layer;
 import com.neaterbits.displayserver.layers.LayerRegion;
+import com.neaterbits.displayserver.layers.LayerRegions;
 import com.neaterbits.displayserver.layers.Layers;
 import com.neaterbits.displayserver.types.Position;
 import com.neaterbits.displayserver.types.Size;
@@ -93,7 +94,16 @@ final class Windows {
         
         return region;
     }
-	
+
+    LayerRegions hideWindow(Window window) {
+
+        Objects.requireNonNull(window);
+        
+        final LayerRegions regions = layers.hideLayer(window.getLayer());
+        
+        return regions;
+    }
+
 	void disposeWindow(Window window) {
 		
 		Objects.requireNonNull(window);

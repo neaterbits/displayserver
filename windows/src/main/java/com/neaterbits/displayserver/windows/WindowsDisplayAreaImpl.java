@@ -5,6 +5,7 @@ import java.util.Objects;
 
 import com.neaterbits.displayserver.buffers.PixelFormat;
 import com.neaterbits.displayserver.layers.LayerRegion;
+import com.neaterbits.displayserver.layers.LayerRegions;
 import com.neaterbits.displayserver.types.Size;
 import com.neaterbits.displayserver.windows.compositor.OffscreenSurface;
 
@@ -76,6 +77,11 @@ public final class WindowsDisplayAreaImpl implements WindowsDisplayArea {
     public LayerRegion showWindow(Window window) {
 
         return windows.showWindow(window);
+    }
+    
+    @Override
+    public LayerRegions hideWindow(Window window) {
+        return windows.hideWindow(window);
     }
 
     @Override
