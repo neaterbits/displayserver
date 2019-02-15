@@ -94,6 +94,8 @@ public class OpCodes {
 
 	public static final int GET_KEYBOARD_MAPPING = 101;
 	
+	public static final int BELL = 104;
+	
 	public static final int SET_CLOSE_DOWN_MODE = 112;
 	
 	public static final int GET_MODIFIER_MAPPING = 119;

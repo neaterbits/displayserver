@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
 import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLog;
+import com.neaterbits.displayserver.protocol.messages.requests.Bell;
 import com.neaterbits.displayserver.protocol.messages.requests.SetCloseDownMode;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.xwindows.processing.XClientOps;
@@ -20,6 +21,7 @@ public final class XCoreMiscMessageProcessor extends XOpCodeProcessor {
     protected int[] getOpCodes() {
 
         return new int [] {
+                OpCodes.BELL,
                 OpCodes.SET_CLOSE_DOWN_MODE
         };
     }
@@ -33,6 +35,13 @@ public final class XCoreMiscMessageProcessor extends XOpCodeProcessor {
             XClientOps client) throws IOException {
 
         switch (opcode) {
+        
+        case OpCodes.BELL: {
+            
+            log(messageLength, opcode, sequenceNumber, Bell.decode(stream));
+            
+            break;
+        }
         
         case OpCodes.SET_CLOSE_DOWN_MODE: {
             
