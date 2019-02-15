@@ -1,10 +1,13 @@
 package com.neaterbits.displayserver.xwindows.core.processing;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.neaterbits.displayserver.buffers.BufferOperations;
 import com.neaterbits.displayserver.buffers.GetImageListener;
-import com.neaterbits.displayserver.buffers.PixelFormat;
+import com.neaterbits.displayserver.buffers.ImageBufferFormat;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.enums.Errors;
 import com.neaterbits.displayserver.protocol.enums.ImageFormat;
@@ -31,17 +34,27 @@ public final class XCoreImageMessageProcessor extends XOpCodeProcessor {
 
     private final XWindowsConstAccess<?> xWindows;
     private final XPixmapsConstAccess xPixmaps;
-    
+    private final Set<ImageBufferFormat> imageBufferFormats;
     
     public XCoreImageMessageProcessor(
             XWindowsServerProtocolLog protocolLog,
             XWindowsConstAccess<?> xWindows,
-            XPixmapsConstAccess xPixmaps) {
+            XPixmapsConstAccess xPixmaps,
+            Set<ImageBufferFormat> imageBufferFormats) {
         
         super(protocolLog);
         
         this.xWindows = xWindows;
         this.xPixmaps = xPixmaps;
+        this.imageBufferFormats = imageBufferFormats;
+        
+        final List<Integer> depths = imageBufferFormats.stream()
+                .map(f -> f.getPixelFormat().getDepth())
+                .collect(Collectors.toList());
+    
+        if (depths.size() != imageBufferFormats.size()) {
+            throw new IllegalArgumentException();
+        }
     }
 
     @Override
@@ -142,10 +155,20 @@ public final class XCoreImageMessageProcessor extends XOpCodeProcessor {
         switch (getImage.getFormat().getValue()) {
 
         case ImageFormat.ZPIXMAP:
+            
+            final ImageBufferFormat imageBufferFormat = imageBufferFormats.stream()
+                .filter(f -> f.getPixelFormat().getDepth() == bufferOperations.getDepth())
+                .findFirst()
+                .orElse(null);
+            
+            if (imageBufferFormat == null) {
+                throw new IllegalArgumentException();
+            }
+            
             bufferOperations.getImage(
                     getImage.getX().getValue(), getImage.getY().getValue(),
                     getImage.getWidth().getValue(), getImage.getHeight().getValue(),
-                    PixelFormat.RGB24,
+                    imageBufferFormat.getPixelFormat(),
                     
                     new GetImageListener() {
                         @Override

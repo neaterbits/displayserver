@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
+import com.neaterbits.displayserver.buffers.ImageBufferFormat;
 import com.neaterbits.displayserver.events.common.InputDriver;
 import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLog;
 import com.neaterbits.displayserver.server.XClientWindows;
@@ -35,6 +37,7 @@ public class XCoreModule extends XModule {
             XColormaps colormaps,
             XCursors cursors,
             XEventSubscriptions eventSubscriptions,
+            Set<ImageBufferFormat> imageBufferFormats,
             Compositor compositor,
             XLibRendererFactory rendererFactory,
             FontBufferFactory fontBufferFactory,
@@ -52,6 +55,7 @@ public class XCoreModule extends XModule {
                 colormaps,
                 cursors,
                 eventSubscriptions,
+                imageBufferFormats,
                 compositor,
                 rendererFactory,
                 fontBufferFactory,
@@ -70,6 +74,7 @@ public class XCoreModule extends XModule {
             XColormaps colormaps,
             XCursors cursors,
             XEventSubscriptions eventSubscriptions,
+            Set<ImageBufferFormat> imageBufferFormats,
             Compositor compositor,
             XLibRendererFactory rendererFactory,
             FontBufferFactory fontBufferFactory,
@@ -118,7 +123,7 @@ public class XCoreModule extends XModule {
                 
                 new XCoreDrawMessageProcessor(protocolLog, windows, pixmaps),
                 
-                new XCoreImageMessageProcessor(protocolLog, windows, pixmaps),
+                new XCoreImageMessageProcessor(protocolLog, windows, pixmaps, imageBufferFormats),
                 
                 new XCoreTextMessageProcessor(protocolLog, windows, pixmaps),
                 

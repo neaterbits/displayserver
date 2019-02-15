@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.neaterbits.displayserver.buffers.ImageBufferFormat;
-import com.neaterbits.displayserver.buffers.PixelFormat;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.DEPTH;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.FORMAT;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.SCREEN;
@@ -28,7 +27,6 @@ import com.neaterbits.displayserver.xwindows.model.XScreenDepth;
 import com.neaterbits.displayserver.xwindows.model.XScreensConstAccess;
 import com.neaterbits.displayserver.xwindows.model.XVisual;
 import com.neaterbits.displayserver.xwindows.model.XVisualsConstAccess;
-import com.neaterbits.displayserver.xwindows.model.render.XLibRendererFactory;
 
 class InitialServerMessageHelper {
 
@@ -36,32 +34,26 @@ class InitialServerMessageHelper {
             int connectionNo,
             XScreensConstAccess screensAccess,
             XVisualsConstAccess visualsAccess,
-            XLibRendererFactory imageRendererInfo,
+            Set<ImageBufferFormat> imageBufferFormats,
             long resourceBase,
             long resourceMask) {
         
         final String vendor = "Test";
         
-        final Set<PixelFormat> distinctScreenPixelFormats = screensAccess.getDistinctPixelFormats();
-        
-        final Set<Integer> distinctScreenDepths = distinctScreenPixelFormats.stream()
-                .map(PixelFormat::getDepth)
-                .collect(Collectors.toSet());
-        
-        
-        final FORMAT [] formats = new FORMAT[distinctScreenDepths.size()];
+        final FORMAT [] formats = new FORMAT[imageBufferFormats.size()];
         
         int dstIdx = 0;
         
-        for (int depth : distinctScreenDepths) {
-            
-            final ImageBufferFormat imageBufferFormat = imageRendererInfo.getPreferedImageBufferFormat(depth);
-            
+        for (ImageBufferFormat imageBufferFormat : imageBufferFormats.stream()
+                .sorted((f1, f2) -> Integer.compare(f1.getPixelFormat().getDepth(), f2.getPixelFormat().getDepth()))
+                .collect(Collectors.toList())) {
+        
+        
             final FORMAT format = new FORMAT(
-                    new CARD8((short)imageBufferFormat.getPixelFormat().getDepth()),
-                    new CARD8((short)imageBufferFormat.getPixelFormat().getBitsPerPixel()),
-                    new CARD8((short)imageBufferFormat.getScanlinePadBits()));
-            
+                new CARD8((short)imageBufferFormat.getPixelFormat().getDepth()),
+                new CARD8((short)imageBufferFormat.getPixelFormat().getBitsPerPixel()),
+                new CARD8((short)imageBufferFormat.getScanlinePadBits()));
+        
             formats[dstIdx ++] = format;
         }
         

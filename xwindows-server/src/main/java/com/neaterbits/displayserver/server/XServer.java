@@ -5,10 +5,16 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import com.neaterbits.displayserver.buffers.ImageBufferFormat;
+import com.neaterbits.displayserver.buffers.PixelFormat;
 import com.neaterbits.displayserver.io.common.Client;
 import com.neaterbits.displayserver.io.common.NonBlockingChannelWriterLog;
 import com.neaterbits.displayserver.protocol.ByteBufferXWindowsProtocolInputStream;
@@ -31,8 +37,6 @@ import com.neaterbits.displayserver.xwindows.processing.XMessageDispatcher;
 
 public class XServer implements AutoCloseable {
 
-    private final XRendering rendering;
-    
     private final NonBlockingChannelWriterLog connectionWriteLog;
     
 	private final Display display;
@@ -43,6 +47,8 @@ public class XServer implements AutoCloseable {
 	private final long timeServerStarted;
 	
 	private final XMessageDispatcher messageDispatcher;
+
+	private final Set<ImageBufferFormat> imageBufferFormats;
 	
 	public XServer(
 	        XHardware hardware,
@@ -52,9 +58,6 @@ public class XServer implements AutoCloseable {
 	        NonBlockingChannelWriterLog connectionWriteLog) throws IOException {
 		
 		Objects.requireNonNull(hardware);
-		Objects.requireNonNull(rendering);
-		
-		this.rendering = rendering;
 		
 		this.connectionWriteLog = connectionWriteLog;
 		
@@ -88,6 +91,21 @@ public class XServer implements AutoCloseable {
             }
         };
         
+        final Set<PixelFormat> distinctScreenPixelFormats = state.getDistinctPixelFormats();
+        
+        final Set<Integer> distinctScreenDepths = distinctScreenPixelFormats.stream()
+                .map(PixelFormat::getDepth)
+                .collect(Collectors.toSet());
+
+        this.imageBufferFormats = new HashSet<>(distinctScreenDepths.size());
+        
+        for (int depth : distinctScreenDepths) {
+            
+            final ImageBufferFormat imageBufferFormat = rendering.getRendererFactory().getPreferedImageBufferFormat(depth);
+            
+            imageBufferFormats.add(imageBufferFormat);
+        }
+        
         this.messageDispatcher = new XCoreModule(
                 protocolLog,
                 display,
@@ -98,6 +116,7 @@ public class XServer implements AutoCloseable {
                 state.getColormaps(),
                 state.getCursors(),
                 state.getEventSubscriptions(),
+                Collections.unmodifiableSet(imageBufferFormats),
                 rendering.getCompositor(),
                 rendering.getRendererFactory(),
                 rendering.getFontBufferFactory(),
@@ -229,7 +248,7 @@ public class XServer implements AutoCloseable {
                 connectionNo,
                 state,
                 state,
-                rendering.getRendererFactory(),
+                imageBufferFormats,
                 resourceIdAllocator.getResourceBase(connectionNo),
                 resourceIdAllocator.getResourceMask(connectionNo));
 
