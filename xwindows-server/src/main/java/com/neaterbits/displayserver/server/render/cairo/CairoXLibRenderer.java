@@ -186,6 +186,8 @@ final class CairoXLibRenderer implements XLibRenderer {
                 
                 cr.moveTo(segment.getX1().getValue(), segment.getY1().getValue());
                 cr.lineTo(segment.getX2().getValue(), segment.getY2().getValue());
+            
+                cr.stroke();
             }
         }
     }
