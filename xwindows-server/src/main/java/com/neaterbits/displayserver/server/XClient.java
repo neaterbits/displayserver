@@ -153,13 +153,15 @@ public class XClient extends XConnection implements XClientOps {
         Objects.requireNonNull(context);
         Objects.requireNonNull(attributes);
         
-        final XGC existing = gcs.get(context);
+        final XGC gc = gcs.get(context);
         
-        if (existing == null) {
+        if (gc == null) {
             throw new IllegalStateException();
         }
 
-        gcs.put(context, new XGC(existing.getAttributes().applyImmutably(attributes)));
+        final XGCAttributes updatedAttributes = gc.getAttributes().applyImmutably(attributes);
+        
+        gc.setAttributes(updatedAttributes);
     }
 
     private void removeGC(GCONTEXT context) {

@@ -25,6 +25,10 @@ public final class XGC {
         return attributes;
     }
     
+    public void setAttributes(XGCAttributes attributes) {
+        this.attributes = attributes;
+    }
+
     public void setFont(FONT font) {
  
         Objects.requireNonNull(font);
