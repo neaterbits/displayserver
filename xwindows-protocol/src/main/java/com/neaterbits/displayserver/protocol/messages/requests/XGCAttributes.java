@@ -243,8 +243,8 @@ public final class XGCAttributes extends XAttributes {
 
         addIfSet(params, "function",    function,       FUNCTION);
         addIfSet(params, "planeMask",   planeMask,      PLANE_MASK);
-        addIfSet(params, "fg",          foreground,     FOREGROUND);
-        addIfSet(params, "bg",          background,     BACKGROUND);
+        addIfSet(params, "fg",          hex32(foreground),     FOREGROUND);
+        addIfSet(params, "bg",          hex32(background),     BACKGROUND);
         addIfSet(params, "linewidth",   lineWidth,      LINE_WIDTH);
         addIfSet(params, "lineStyle",   lineStyle,      LINE_STYLE);
         addIfSet(params, "capStyle",    capStyle,       CAP_STYLE);
