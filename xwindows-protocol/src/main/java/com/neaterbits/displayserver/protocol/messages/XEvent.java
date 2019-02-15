@@ -6,6 +6,7 @@ import com.neaterbits.displayserver.protocol.Events;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.messages.events.ClientMessage;
+import com.neaterbits.displayserver.protocol.messages.events.UnmapNotify;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 
@@ -27,6 +28,10 @@ public abstract class XEvent extends XServerToClientMessage {
         
         case Events.CLIENT_MESSAGE:
             event = ClientMessage.decode(stream);
+            break;
+            
+        case Events.UNMAP_NOTIFY:
+            event = UnmapNotify.decode(stream);
             break;
         
         default:
