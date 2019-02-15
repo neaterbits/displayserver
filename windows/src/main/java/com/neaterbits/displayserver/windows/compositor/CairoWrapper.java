@@ -62,6 +62,11 @@ final class CairoWrapper implements Cairo {
     public void clip() {
         cr.clip();
     }
+    
+    @Override
+    public void resetClip() {
+        cr.resetClip();
+    }
 
     @Override
     public void fill() {

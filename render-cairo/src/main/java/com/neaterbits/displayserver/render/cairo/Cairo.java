@@ -16,6 +16,8 @@ public interface Cairo extends Disposable {
     
     void clip();
     
+    void resetClip();
+    
     void fill();
     
     void maskSurface(CairoSurface surface, double surfaceX, double surfaceY);

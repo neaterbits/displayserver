@@ -73,6 +73,14 @@ JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNativ
 
 /*
  * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
+ * Method:    cairo_reset_clip
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1reset_1clip
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
  * Method:    cairo_fill
  * Signature: (J)V
  */

@@ -82,6 +82,27 @@ final class CairoXLibRenderer implements XLibRenderer {
                 pixelConversion.getRed(sourceRGB),
                 pixelConversion.getGreen(sourceRGB),
                 pixelConversion.getBlue(sourceRGB));
+        
+        final RECTANGLE [] clipRectangles = gc.getClipRectangles();
+        
+        cr.resetClip();
+        
+        if (clipRectangles != null && clipRectangles.length > 0) {
+
+            cr.newPath();
+
+            for (RECTANGLE rectangle : clipRectangles) {
+
+                cr.rectangle(
+                        gc.getClipXOrigin().getValue() + rectangle.getX().getValue(),
+                        gc.getClipYOrigin().getValue() + rectangle.getY().getValue(),
+                        rectangle.getWidth().getValue(),
+                        rectangle.getHeight().getValue());
+
+            }
+            
+            cr.clip();
+        }
     }
     
     @Override

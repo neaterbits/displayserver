@@ -18,7 +18,9 @@ public class CairoNative {
     static native void cairo_set_fill_rule(long cr, int fillRule);
     
     static native void cairo_clip(long cr);
-    
+
+    static native void cairo_reset_clip(long cr);
+
     static native void cairo_fill(long cr);
 
     static native void cairo_mask_surface(long cr, long surface, double surface_x, double surface_y);

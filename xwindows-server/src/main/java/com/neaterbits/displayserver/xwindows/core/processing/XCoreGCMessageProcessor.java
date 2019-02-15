@@ -16,6 +16,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.SetClipRectangles
 import com.neaterbits.displayserver.protocol.messages.requests.SetDashes;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
+import com.neaterbits.displayserver.xwindows.model.XGC;
 import com.neaterbits.displayserver.xwindows.model.XPixmapsConstAccess;
 import com.neaterbits.displayserver.xwindows.model.XWindowsConstAccess;
 import com.neaterbits.displayserver.xwindows.processing.XClientOps;
@@ -96,8 +97,20 @@ public class XCoreGCMessageProcessor extends XOpCodeProcessor {
         
         case OpCodes.SET_CLIP_RECTANGLES: {
             
-            log(messageLength, opcode, sequenceNumber, SetClipRectangles.decode(stream));
+            final SetClipRectangles setClipRectangles = log(messageLength, opcode, sequenceNumber, SetClipRectangles.decode(stream));
             
+            try {
+                final XGC gc = client.getGC(setClipRectangles.getGC());
+
+                gc.setClipRectangles(
+                        setClipRectangles.getClipXOrigin(),
+                        setClipRectangles.getClipYOrigin(),
+                        setClipRectangles.getRectangles()
+                );
+            }
+            catch (GContextException ex) {
+                sendError(client, Errors.GContext, sequenceNumber, ex.getGContext().getValue(), opcode);
+            }
             break;
         }
         

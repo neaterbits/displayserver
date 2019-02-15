@@ -1,4 +1,5 @@
 
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -64,6 +65,14 @@ JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNativ
 	cairo_t *cr = (cairo_t *)cairo_reference;
 
 	cairo_clip(cr);
+}
+
+JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1reset_1clip
+  (JNIEnv *env, jclass cl, jlong cairo_reference) {
+
+	cairo_t *cr = (cairo_t *)cairo_reference;
+
+	cairo_reset_clip(cr);
 }
 
 JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1set_1fill_1rule

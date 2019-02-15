@@ -69,6 +69,20 @@ public class XGCAttributesBuilder extends XAttributesBuilder {
         return this;
     }
     
+    public XGCAttributesBuilder setClipXOrigin(INT16 clipXOrigin) {
+        
+        this.clipXOrigin = set(clipXOrigin, XGCAttributes.CLIP_X_ORIGIN);
+        
+        return this;
+    }
+
+    public XGCAttributesBuilder setClipYOrigin(INT16 clipYOrigin) {
+        
+        this.clipYOrigin = set(clipYOrigin, XGCAttributes.CLIP_Y_ORIGIN);
+        
+        return this;
+    }
+
     public XGCAttributes build() {
         
         return new XGCAttributes(

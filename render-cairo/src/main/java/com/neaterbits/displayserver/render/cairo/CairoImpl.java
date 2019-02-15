@@ -40,6 +40,11 @@ final class CairoImpl extends CairoReference implements Cairo {
     }
     
     @Override
+    public void resetClip() {
+        CairoNative.cairo_reset_clip(getCairoReference());
+    }
+
+    @Override
     public void fill() {
         CairoNative.cairo_fill(getCairoReference());
     }
