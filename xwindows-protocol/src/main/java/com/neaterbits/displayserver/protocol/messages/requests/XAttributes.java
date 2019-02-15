@@ -45,9 +45,6 @@ public abstract class XAttributes extends XEncodeable {
     protected final <T> void writeIfSet(T value, int flag, FieldWriter<T> writer) throws IOException {
         
         if (isSet(flag)) {
-            
-            System.out.format("## writeIfSet %08x\n", flag);
-            
             writer.write(value);
         }
     }

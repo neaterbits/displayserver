@@ -61,8 +61,6 @@ final class CairoXLibRenderer implements XLibRenderer {
             throw new UnsupportedOperationException();
         }
 
-        System.out.println("## set cairo operator " + operator);
-        
         cr.setOperator(operator);
 
         final CARD32 planeMask = XLibRenderer.getGCValue(gc, XGCAttributes.PLANE_MASK, XGCAttributes::getPlaneMask);
@@ -251,8 +249,6 @@ final class CairoXLibRenderer implements XLibRenderer {
 
         if (width != 0 && height != 0) {
             
-            System.out.println("## apply GC");
-            
             applyGC(gc, false);
             
             switch (format) {
@@ -290,11 +286,6 @@ final class CairoXLibRenderer implements XLibRenderer {
                     // final int sequenceNumber = writeToPNG(imageSurface, "src");
                     
                     try {
-                        System.out.println("## write image surface" /* + " " + sequenceNumber */ + " to " + surface + " at "
-                                    + "(" + dstX + ", " + dstY + "), size "
-                                    + "(" + width + ", " + height + ")");
-                        
-
                         cr.setSourceSurface(imageSurface, dstX, dstY);
                         
                         // cr.rectangle(dstX, dstY, width, height);
