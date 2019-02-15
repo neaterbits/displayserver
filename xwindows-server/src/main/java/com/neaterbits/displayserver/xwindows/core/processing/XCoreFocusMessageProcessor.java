@@ -9,6 +9,7 @@ import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLog;
 import com.neaterbits.displayserver.protocol.messages.replies.GetInputFocusReply;
 import com.neaterbits.displayserver.protocol.messages.requests.GetInputFocus;
 import com.neaterbits.displayserver.protocol.messages.requests.SetInputFocus;
+import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.xwindows.processing.XClientOps;
@@ -16,6 +17,9 @@ import com.neaterbits.displayserver.xwindows.processing.XOpCodeProcessor;
 
 public final class XCoreFocusMessageProcessor extends XOpCodeProcessor {
 
+    private WINDOW inputFocus;
+    private BYTE inputFocusRevertTo;
+    
     public XCoreFocusMessageProcessor(XWindowsServerProtocolLog protocolLog) {
         super(protocolLog);
     }
@@ -41,8 +45,10 @@ public final class XCoreFocusMessageProcessor extends XOpCodeProcessor {
         
         case OpCodes.SET_INPUT_FOCUS: {
             
-            log(messageLength, opcode, sequenceNumber, SetInputFocus.decode(stream));
+            final SetInputFocus setInputFocus = log(messageLength, opcode, sequenceNumber, SetInputFocus.decode(stream));
             
+            this.inputFocus = setInputFocus.getFocus();
+            this.inputFocusRevertTo = setInputFocus.getRevertTo();
             break;
         }
         
@@ -50,8 +56,19 @@ public final class XCoreFocusMessageProcessor extends XOpCodeProcessor {
             
             log(messageLength, opcode, sequenceNumber, GetInputFocus.decode(stream));
             
-            sendReply(client, new GetInputFocusReply(sequenceNumber, RevertTo.None, WINDOW.None));
+            final BYTE revertTo;
+            final WINDOW window;
             
+            if (inputFocus == null) {
+                revertTo = RevertTo.None;
+                window = WINDOW.None;
+            }
+            else {
+                revertTo = inputFocusRevertTo;
+                window = inputFocus;
+            }
+            
+            sendReply(client, new GetInputFocusReply(sequenceNumber, revertTo, window));
             break;
         }
         
