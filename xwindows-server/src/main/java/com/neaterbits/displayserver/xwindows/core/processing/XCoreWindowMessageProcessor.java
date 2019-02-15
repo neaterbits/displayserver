@@ -121,6 +121,7 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
                 OpCodes.UNMAP_WINDOW,
                 OpCodes.CONFIGURE_WINDOW,
                 OpCodes.GET_GEOMETRY,
+                OpCodes.QUERY_TREE,
                 OpCodes.TRANSLATE_COORDINATES
         };
     }
