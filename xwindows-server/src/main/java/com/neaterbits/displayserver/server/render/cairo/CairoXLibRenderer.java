@@ -195,7 +195,7 @@ final class CairoXLibRenderer implements XLibRenderer {
 
         if (rectangles.length != 0) {
 
-            applyGC(gc, false);
+            applyGC(gc, true);
 
             for (RECTANGLE rectangle : rectangles) {
                 fillRectangle(
