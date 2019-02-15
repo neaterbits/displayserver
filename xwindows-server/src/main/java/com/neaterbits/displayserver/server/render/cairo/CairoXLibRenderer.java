@@ -41,7 +41,7 @@ final class CairoXLibRenderer implements XLibRenderer {
         this.cr = surface.createContext();
     }
 
-    private void applyGC(XGC gc) {
+    private void applyGC(XGC gc, boolean renderForeground) {
         
         final BYTE function = XLibRenderer.getGCValue(gc, XGCAttributes.FUNCTION, XGCAttributes::getFunction);
         
@@ -71,12 +71,19 @@ final class CairoXLibRenderer implements XLibRenderer {
             throw new UnsupportedOperationException();
         }
         
-        final int foreground = (int)XLibRenderer.getGCValue(gc, XGCAttributes.FOREGROUND, XGCAttributes::getForeground).getValue();
+        final int sourceRGB;
+        
+        if (renderForeground) {
+            sourceRGB = (int)XLibRenderer.getGCValue(gc, XGCAttributes.FOREGROUND, XGCAttributes::getForeground).getValue();
+        }
+        else {
+            sourceRGB = (int)XLibRenderer.getGCValue(gc, XGCAttributes.BACKGROUND, XGCAttributes::getBackground).getValue();
+        }
         
         cr.setSourceRGB(
-                pixelConversion.getRed(foreground),
-                pixelConversion.getGreen(foreground),
-                pixelConversion.getBlue(foreground));
+                pixelConversion.getRed(sourceRGB),
+                pixelConversion.getGreen(sourceRGB),
+                pixelConversion.getBlue(sourceRGB));
     }
     
     @Override
@@ -112,7 +119,7 @@ final class CairoXLibRenderer implements XLibRenderer {
 
         if (points.length != 0) {
 
-            applyGC(gc);
+            applyGC(gc, true);
             
             cr.newPath();
             
@@ -141,7 +148,7 @@ final class CairoXLibRenderer implements XLibRenderer {
     @Override
     public void polyLine(XGC gc, BYTE coordinateMode, POINT[] points) {
 
-        applyGC(gc);
+        applyGC(gc, true);
         
         if (points.length != 0) {
 
@@ -173,7 +180,7 @@ final class CairoXLibRenderer implements XLibRenderer {
 
         if (segments.length != 0) {
             
-            applyGC(gc);
+            applyGC(gc, true);
             
             for (SEGMENT segment : segments) {
                 
@@ -190,7 +197,7 @@ final class CairoXLibRenderer implements XLibRenderer {
 
         if (rectangles.length != 0) {
 
-            applyGC(gc);
+            applyGC(gc, false);
 
             for (RECTANGLE rectangle : rectangles) {
                 fillRectangle(
@@ -208,7 +215,7 @@ final class CairoXLibRenderer implements XLibRenderer {
 
         if (rectangles.length != 0) {
             
-            applyGC(gc);
+            applyGC(gc, true);
             
             for (RECTANGLE rectangle : rectangles) {
             
@@ -226,7 +233,7 @@ final class CairoXLibRenderer implements XLibRenderer {
 
         if (points.length != 0) {
             
-            applyGC(gc);
+            applyGC(gc, false);
             
             cr.newPath();
             
@@ -246,7 +253,7 @@ final class CairoXLibRenderer implements XLibRenderer {
             
             System.out.println("## apply GC");
             
-            applyGC(gc);
+            applyGC(gc, false);
             
             switch (format) {
             case ImageFormat.XYPIXMAP:
@@ -351,7 +358,7 @@ final class CairoXLibRenderer implements XLibRenderer {
         Objects.requireNonNull(gc);
         Objects.requireNonNull(buffer);
         
-        applyGC(gc);
+        applyGC(gc, false);
         
         final CairoFontBuffer fontBuffer = (CairoFontBuffer)buffer;
         
