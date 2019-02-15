@@ -10,13 +10,13 @@ import com.neaterbits.displayserver.protocol.messages.XRequest;
 
 public final class UngrabServer extends XRequest {
 
-    public static GrabServer decode(XWindowsProtocolInputStream stream) throws IOException {
+    public static UngrabServer decode(XWindowsProtocolInputStream stream) throws IOException {
         
         readUnusedByte(stream);
         
         readRequestLength(stream);
         
-        return new GrabServer();
+        return new UngrabServer();
     }
     
     @Override
