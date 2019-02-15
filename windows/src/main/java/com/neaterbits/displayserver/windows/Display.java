@@ -48,4 +48,9 @@ public class Display implements WindowManagement {
         
         return window.getDisplayArea().getSubWindowsInOrder(window);
     }
+
+    @Override
+    public TranslatedCoordinates translateCoordinates(Window window, int x, int y) {
+        return window.getDisplayArea().translateCoordinates(window, x, y);
+    }
 }

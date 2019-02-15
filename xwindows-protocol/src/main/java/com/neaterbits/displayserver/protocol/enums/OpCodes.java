@@ -39,6 +39,8 @@ public class OpCodes {
     public static final int UNGRAB_SERVER = 37;
     public static final int QUERY_POINTER = 38;
 	
+    public static final int TRANSLATE_COORDINATES = 40;
+    
     public static final int SET_INPUT_FOCUS = 42;
     public static final int GET_INPUT_FOCUS = 43;
     

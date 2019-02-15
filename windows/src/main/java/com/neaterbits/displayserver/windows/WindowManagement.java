@@ -13,4 +13,7 @@ public interface WindowManagement {
     void disposeWindow(Window window);
 
     List<Window> getSubWindowsInOrder(Window window);
+
+    TranslatedCoordinates translateCoordinates(Window window, int x, int y);
 }
+

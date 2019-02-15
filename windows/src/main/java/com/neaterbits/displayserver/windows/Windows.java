@@ -160,4 +160,32 @@ final class Windows {
 		
 		return layer != null ? layerToWindow.get(layer) : null;
 	}
+
+	TranslatedCoordinates translateCoordinates(Window window, int x, int y) {
+	    
+	    final Position positionInRootWindow = findRootWindowPosition(window);
+	    
+	    final int xPos = x + positionInRootWindow.getLeft();
+	    final int yPos = y + positionInRootWindow.getTop();
+	    
+	    final Window foundWindow = findWindowAt(xPos, yPos);
+	
+	    return new TranslatedCoordinates(xPos, yPos, foundWindow);
+	}
+	
+	private Position findRootWindowPosition(Window window) {
+	 
+	    int x = window.getPosition().getLeft();
+	    int y = window.getPosition().getTop();
+	    
+	    
+	    for (Window parentWindow = window.getParentWindow(); parentWindow != null; parentWindow = parentWindow.getParentWindow()) {
+
+	        x += parentWindow.getPosition().getLeft();
+	        y += parentWindow.getPosition().getTop();
+	        
+	    }
+	    
+	    return new Position(x, y);
+	}
 }

@@ -30,6 +30,7 @@ import com.neaterbits.displayserver.protocol.messages.events.MapRequest;
 import com.neaterbits.displayserver.protocol.messages.replies.GetGeometryReply;
 import com.neaterbits.displayserver.protocol.messages.replies.GetWindowAttributesReply;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryTreeReply;
+import com.neaterbits.displayserver.protocol.messages.replies.TranslateCoordinatesReply;
 import com.neaterbits.displayserver.protocol.messages.requests.ChangeWindowAttributes;
 import com.neaterbits.displayserver.protocol.messages.requests.ConfigureWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateWindow;
@@ -39,6 +40,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.GetWindowAttribut
 import com.neaterbits.displayserver.protocol.messages.requests.MapSubwindows;
 import com.neaterbits.displayserver.protocol.messages.requests.MapWindow;
 import com.neaterbits.displayserver.protocol.messages.requests.QueryTree;
+import com.neaterbits.displayserver.protocol.messages.requests.TranslateCoordinates;
 import com.neaterbits.displayserver.protocol.messages.requests.XWindowAttributes;
 import com.neaterbits.displayserver.protocol.messages.requests.XWindowConfiguration;
 import com.neaterbits.displayserver.protocol.types.BOOL;
@@ -56,6 +58,7 @@ import com.neaterbits.displayserver.server.XClientWindows;
 import com.neaterbits.displayserver.server.XEventSubscriptions;
 import com.neaterbits.displayserver.types.Position;
 import com.neaterbits.displayserver.types.Size;
+import com.neaterbits.displayserver.windows.TranslatedCoordinates;
 import com.neaterbits.displayserver.windows.Window;
 import com.neaterbits.displayserver.windows.WindowContentStorage;
 import com.neaterbits.displayserver.windows.WindowManagement;
@@ -117,7 +120,8 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
                 OpCodes.MAP_SUBWINDOWS,
                 OpCodes.UNMAP_WINDOW,
                 OpCodes.CONFIGURE_WINDOW,
-                OpCodes.GET_GEOMETRY
+                OpCodes.GET_GEOMETRY,
+                OpCodes.TRANSLATE_COORDINATES
         };
     }
 
@@ -336,6 +340,82 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
             break;
         }
 
+        case OpCodes.TRANSLATE_COORDINATES: {
+            
+            final TranslateCoordinates translateCoordinates = log(messageLength, opcode, sequenceNumber, TranslateCoordinates.decode(stream));
+            
+            try {
+                
+                final XWindow srcXWindow = xWindows.getClientOrRootWindow(translateCoordinates.getSrcWindow());
+            
+                if (srcXWindow == null) {
+                    throw new WindowException("No src window", translateCoordinates.getSrcWindow());
+                }
+                
+                final XWindow dstXWindow = xWindows.getClientOrRootWindow(translateCoordinates.getDstWindow());
+                
+                if (dstXWindow == null) {
+                    throw new WindowException("No dst window", translateCoordinates.getDstWindow());
+                }
+                
+                final int srcScreen = xWindows.getScreenForWindow(srcXWindow.getWINDOW());
+                final int dstScreen = xWindows.getScreenForWindow(dstXWindow.getWINDOW());
+            
+                final TranslateCoordinatesReply reply;
+                
+                if (srcScreen == dstScreen) {
+                    
+                    final TranslatedCoordinates translatedCoordinates = windowManagement.translateCoordinates(
+                            srcXWindow.getWindow(),
+                            translateCoordinates.getSrcX().getValue(),
+                            translateCoordinates.getSrcY().getValue());
+                    
+                    final Window foundWindow = translatedCoordinates.getWindow();
+
+                    WINDOW subWindow = WINDOW.None;
+                    
+                    if (foundWindow != null) {
+                        
+                        final XWindow foundXWindow = xWindows.getClientWindow(foundWindow);
+                        
+                        if (foundXWindow != null) {
+                            
+                            for (XWindow parentXWindow = xWindows.getClientOrRootWindow(foundXWindow.getParentWINDOW());
+                                    parentXWindow != null;
+                                    parentXWindow = xWindows.getClientOrRootWindow(foundXWindow.getParentWINDOW())) {
+                                
+                                if (translateCoordinates.getDstWindow().equals(foundXWindow.getWINDOW())) {
+
+                                    subWindow = foundXWindow.getWINDOW();
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    
+                    reply = new TranslateCoordinatesReply(
+                            sequenceNumber,
+                            BOOL.True,
+                            subWindow,
+                            new INT16((short)translatedCoordinates.getX()),
+                            new INT16((short)translatedCoordinates.getY()));
+                }
+                else {
+                    reply = new TranslateCoordinatesReply(
+                            sequenceNumber,
+                            BOOL.False,
+                            WINDOW.None,
+                            new INT16((short)0),
+                            new INT16((short)0));
+                }
+                
+                sendReply(client, reply);
+            }
+            catch (WindowException ex) {
+                sendError(client, Errors.Window, sequenceNumber, ex.getWindow().getValue(), opcode);
+            }
+            break;
+        }
         
         }
     }

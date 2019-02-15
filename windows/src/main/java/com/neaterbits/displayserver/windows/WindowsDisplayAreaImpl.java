@@ -88,4 +88,8 @@ public final class WindowsDisplayAreaImpl implements WindowsDisplayArea {
         return windows.getSubWindowsInOrder(window);
     }
 
+    @Override
+    public TranslatedCoordinates translateCoordinates(Window window, int x, int y) {
+        return windows.translateCoordinates(window, x, y);
+    }
 }
