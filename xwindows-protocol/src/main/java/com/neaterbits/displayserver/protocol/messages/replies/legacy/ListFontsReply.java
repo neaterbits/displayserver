@@ -22,7 +22,7 @@ public final class ListFontsReply extends XReply {
     }
 
     @Override
-    public Object[] getDebugParams() {
+    protected Object[] getServerToClientDebugParams() {
         return wrap("names", Arrays.toString(names));
     }
 

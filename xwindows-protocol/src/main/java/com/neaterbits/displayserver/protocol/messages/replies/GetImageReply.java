@@ -60,7 +60,7 @@ public final class GetImageReply extends XReply {
     }
 
     @Override
-    public Object[] getDebugParams() {
+    protected Object[] getServerToClientDebugParams() {
         return wrap(
                 "depth", depth,
                 "visual", visual,

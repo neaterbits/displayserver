@@ -50,7 +50,7 @@ public final class TranslateCoordinatesReply extends XReply {
     }
     
     @Override
-    public Object[] getDebugParams() {
+    protected Object[] getServerToClientDebugParams() {
         return wrap(
                 "sameScreen", sameScreen,
                 "child", child,

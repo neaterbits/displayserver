@@ -21,7 +21,7 @@ public final class GetSelectionOwnerReply extends XReply {
     }
 
     @Override
-    public Object[] getDebugParams() {
+    protected Object[] getServerToClientDebugParams() {
         return wrap("owner", owner);
     }
 

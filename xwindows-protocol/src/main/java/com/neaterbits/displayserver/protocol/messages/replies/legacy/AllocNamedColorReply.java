@@ -23,7 +23,7 @@ public final class AllocNamedColorReply extends BaseColorReply {
     }
 
     @Override
-    public Object[] getDebugParams() {
+    protected Object[] getServerToClientDebugParams() {
         return merge(
                 wrap("pixel", pixel),
                 super.getBaseDebugParams());

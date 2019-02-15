@@ -29,7 +29,7 @@ public class GetPropertyReply extends XReply {
     }
     
     @Override
-    public Object[] getDebugParams() {
+    protected Object[] getServerToClientDebugParams() {
         return wrap(
                 "format", format,
                 "type", type,

@@ -1,6 +1,7 @@
 package com.neaterbits.displayserver.protocol.messages;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
@@ -11,6 +12,8 @@ public abstract class XServerToClientMessage extends XMessage {
 
     private final CARD16 sequenceNumber;
 
+    protected abstract Object [] getServerToClientDebugParams();
+    
     public XServerToClientMessage(CARD16 sequenceNumber) {
         Objects.requireNonNull(sequenceNumber);
         
@@ -28,4 +31,17 @@ public abstract class XServerToClientMessage extends XMessage {
     protected final void writeSequenceNumber(XWindowsProtocolOutputStream stream) throws IOException {
         stream.writeCARD16(sequenceNumber);
     }
+
+    @Override
+    public final Object[] getDebugParams() {
+
+        final Object [] debugParams = getServerToClientDebugParams();
+        
+        final Object [] params = Arrays.copyOf(wrap("seq", sequenceNumber), debugParams.length + 2);
+    
+        System.arraycopy(debugParams, 0, params, 2, debugParams.length);
+    
+        return params;
+    }
 }
+

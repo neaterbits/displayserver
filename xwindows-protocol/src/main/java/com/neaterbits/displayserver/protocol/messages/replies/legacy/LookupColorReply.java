@@ -19,7 +19,7 @@ public final class LookupColorReply extends BaseColorReply {
     }
 
     @Override
-    public Object[] getDebugParams() {
+    protected Object[] getServerToClientDebugParams() {
         return super.getBaseDebugParams();
     }
 }

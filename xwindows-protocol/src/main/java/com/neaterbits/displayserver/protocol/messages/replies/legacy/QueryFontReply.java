@@ -88,7 +88,7 @@ public final class QueryFontReply extends XReply {
     }
     
     @Override
-    public Object[] getDebugParams() {
+    protected Object[] getServerToClientDebugParams() {
         return wrap(
                 "minBounds", minBounds,
                 "maxBounds", maxBounds,

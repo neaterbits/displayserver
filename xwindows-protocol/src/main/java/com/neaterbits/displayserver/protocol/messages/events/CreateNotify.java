@@ -97,7 +97,7 @@ public final class CreateNotify extends XEvent {
     }
 
     @Override
-    public Object[] getDebugParams() {
+    protected Object[] getServerToClientDebugParams() {
 
         return wrap(
                 "parent", parent,

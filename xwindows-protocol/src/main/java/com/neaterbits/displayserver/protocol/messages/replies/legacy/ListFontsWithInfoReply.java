@@ -80,7 +80,7 @@ public final class ListFontsWithInfoReply extends XReply {
     }
 
     @Override
-    public Object[] getDebugParams() {
+    protected Object[] getServerToClientDebugParams() {
         
         return wrap(
                 "minBounds", minBounds,

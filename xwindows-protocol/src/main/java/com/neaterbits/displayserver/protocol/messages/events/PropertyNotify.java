@@ -52,7 +52,7 @@ public final class PropertyNotify extends XEvent {
     }
 
     @Override
-    public Object[] getDebugParams() {
+    protected Object[] getServerToClientDebugParams() {
         return wrap(
                 "window", window,
                 "atom", atom,

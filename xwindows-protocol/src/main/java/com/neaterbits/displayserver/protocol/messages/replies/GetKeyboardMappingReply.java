@@ -56,7 +56,7 @@ public final class GetKeyboardMappingReply extends XReply {
         return keysyms;
     }
 
-    public Object[] getDebugParams() {
+    protected Object[] getServerToClientDebugParams() {
         return wrap(
                 "keysymsPerKeycode", keysymsPerKeycode,
                 "keysyms", keysyms.length

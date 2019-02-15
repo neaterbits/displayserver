@@ -63,7 +63,7 @@ public final class Expose extends XEvent {
     }
 
     @Override
-    public Object[] getDebugParams() {
+    protected Object[] getServerToClientDebugParams() {
         return wrap(
                 "window", window,
                 "x", x,

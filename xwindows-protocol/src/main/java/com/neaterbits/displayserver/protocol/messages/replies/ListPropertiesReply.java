@@ -28,7 +28,7 @@ public final class ListPropertiesReply extends XReply {
     
     
     @Override
-    public Object[] getDebugParams() {
+    protected Object[] getServerToClientDebugParams() {
         return wrap(
                 "atoms", Arrays.toString(atoms)
         );

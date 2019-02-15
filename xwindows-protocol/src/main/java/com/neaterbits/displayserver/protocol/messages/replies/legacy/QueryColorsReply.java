@@ -20,7 +20,7 @@ public final class QueryColorsReply extends XReply {
     }
     
     @Override
-    public Object[] getDebugParams() {
+    protected Object[] getServerToClientDebugParams() {
         return wrap(
                 "colors", outputArrayInBrackets(colors)
         );

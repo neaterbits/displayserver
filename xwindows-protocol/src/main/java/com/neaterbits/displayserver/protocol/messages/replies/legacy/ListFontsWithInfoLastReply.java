@@ -15,6 +15,11 @@ public final class ListFontsWithInfoLastReply extends XReply {
     }
 
     @Override
+    protected Object[] getServerToClientDebugParams() {
+        return new Object[0];
+    }
+
+    @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 
         writeReplyHeader(stream);

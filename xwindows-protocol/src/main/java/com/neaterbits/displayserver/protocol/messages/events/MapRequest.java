@@ -48,7 +48,7 @@ public final class MapRequest extends XEvent {
     }
 
     @Override
-    public Object[] getDebugParams() {
+    protected Object[] getServerToClientDebugParams() {
 
         return wrap(
                 "parent", parent,

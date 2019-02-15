@@ -41,7 +41,7 @@ public final class GetInputFocusReply extends XReply {
     }
     
     @Override
-    public Object[] getDebugParams() {
+    protected Object[] getServerToClientDebugParams() {
         return wrap("revertTo", revertTo, "focus", focus);
     }
 

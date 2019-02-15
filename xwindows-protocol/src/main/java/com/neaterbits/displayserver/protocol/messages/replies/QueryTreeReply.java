@@ -66,7 +66,7 @@ public final class QueryTreeReply extends XReply {
     }
 
     @Override
-    public Object[] getDebugParams() {
+    protected Object[] getServerToClientDebugParams() {
         return wrap(
                 "root", root,
                 "parent", parent,

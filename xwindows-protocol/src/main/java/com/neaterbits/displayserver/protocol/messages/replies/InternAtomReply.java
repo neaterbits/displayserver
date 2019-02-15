@@ -20,7 +20,7 @@ public final class InternAtomReply extends XReply {
     }
 
     @Override
-    public Object[] getDebugParams() {
+    protected Object[] getServerToClientDebugParams() {
         return wrap("atom", atom);
     }
 

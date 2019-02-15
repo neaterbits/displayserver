@@ -26,7 +26,7 @@ public final class AllocColorReply extends XReply {
     }
     
     @Override
-    public Object[] getDebugParams() {
+    protected final Object[] getServerToClientDebugParams() {
         return wrap("red", red, "green", green, "blue", blue, "pixel", String.format("%08x", pixel.getValue()));
     }
 

@@ -126,6 +126,29 @@ public final class GetWindowAttributesReply extends XReply {
         return doNotPropagateMask;
     }
 
+    
+    
+    @Override
+    protected Object[] getServerToClientDebugParams() {
+        return wrap(
+                "backingStore", backingStore,
+                "visual", visual,
+                "windowClass", windowClass,
+                "bitGravity", bitGravity,
+                "winGravity", winGravity,
+                "backingPlanes", backingPlanes,
+                "backingPixel", backingPixel,
+                "saveUnder", saveUnder,
+                "mapIsInstalled", mapIsInstalled,
+                "mapState", mapState,
+                "overrideRedirect", overrideRedirect,
+                "colormap", colormap,
+                "allEventMasks", allEventMasks,
+                "yourEventMasks", yourEventMasks,
+                "doNotPropagateMask", doNotPropagateMask
+        );
+    }
+
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
         

@@ -60,7 +60,7 @@ public final class GetModifierMappingReply extends XReply {
     }
 
     @Override
-    public Object[] getDebugParams() {
+    protected Object[] getServerToClientDebugParams() {
         return wrap(
                 "keycodesPerModifier", keycodesPerModifier,
                 "keycodes", Arrays.toString(keycodes)

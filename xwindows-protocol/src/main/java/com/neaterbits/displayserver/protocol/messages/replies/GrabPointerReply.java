@@ -25,7 +25,7 @@ public final class GrabPointerReply extends XReply {
     }
     
     @Override
-    public Object[] getDebugParams() {
+    protected Object[] getServerToClientDebugParams() {
         return wrap("status", status);
     }
 

@@ -43,7 +43,7 @@ public final class QueryExtensionReply extends XReply {
     }
     
     @Override
-    public Object[] getDebugParams() {
+    protected Object[] getServerToClientDebugParams() {
         return wrap("present", isPresent(), "majorOpCode", majorOpCode, "firstEvent", firstEvent, "firstError", firstError);
     }
 

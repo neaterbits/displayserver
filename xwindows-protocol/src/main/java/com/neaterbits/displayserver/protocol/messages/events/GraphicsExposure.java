@@ -43,6 +43,22 @@ public final class GraphicsExposure extends XEvent {
 	}
 
 	@Override
+    protected Object[] getServerToClientDebugParams() {
+        return wrap(
+                "drawable", drawable,
+                "x", x,
+                "y", y,
+                "width", width,
+                "height", height,
+                "count", count,
+                "majorOpcode", majorOpcode,
+                "minorOpcode", minorOpcode
+        );
+    }
+
+
+
+    @Override
 	public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 		
 	    writeEventCode(stream, Events.GRAPHICS_EXPOSURE);

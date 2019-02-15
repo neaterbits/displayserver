@@ -64,7 +64,7 @@ public final class GetGeometryReply extends XReply {
     }
 
     @Override
-    public Object[] getDebugParams() {
+    protected final Object[] getServerToClientDebugParams() {
         return wrap(
                 "depth", depth,
                 "root", root,

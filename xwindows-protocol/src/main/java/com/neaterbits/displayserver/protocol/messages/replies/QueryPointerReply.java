@@ -74,7 +74,7 @@ public final class QueryPointerReply extends XReply {
     }
 
     @Override
-    public Object[] getDebugParams() {
+    protected Object[] getServerToClientDebugParams() {
         return wrap(
             "sameScreen", sameScreen,
             "root", root,

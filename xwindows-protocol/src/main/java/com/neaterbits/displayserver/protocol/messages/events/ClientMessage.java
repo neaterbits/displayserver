@@ -58,7 +58,7 @@ public final class ClientMessage extends XEvent {
     }
 
     @Override
-    public Object[] getDebugParams() {
+    protected Object[] getServerToClientDebugParams() {
         return wrap(
                 "format", format,
                 "window", window,
