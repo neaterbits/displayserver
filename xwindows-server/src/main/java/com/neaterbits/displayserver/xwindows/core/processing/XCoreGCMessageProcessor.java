@@ -13,6 +13,7 @@ import com.neaterbits.displayserver.protocol.messages.requests.ChangeGC;
 import com.neaterbits.displayserver.protocol.messages.requests.CreateGC;
 import com.neaterbits.displayserver.protocol.messages.requests.FreeGC;
 import com.neaterbits.displayserver.protocol.messages.requests.SetClipRectangles;
+import com.neaterbits.displayserver.protocol.messages.requests.SetDashes;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.xwindows.model.XPixmapsConstAccess;
@@ -39,6 +40,7 @@ public class XCoreGCMessageProcessor extends XOpCodeProcessor {
         return new int [] {
                 OpCodes.CREATE_GC,
                 OpCodes.CHANGE_GC,
+                OpCodes.SET_DASHES,
                 OpCodes.SET_CLIP_RECTANGLES,
                 OpCodes.FREE_GC
         };
@@ -82,6 +84,13 @@ public class XCoreGCMessageProcessor extends XOpCodeProcessor {
             } catch (GContextException ex) {
                 sendError(client, Errors.GContext, sequenceNumber, changeGC.getGc().getValue(), opcode);
             }
+            break;
+        }
+        
+        case OpCodes.SET_DASHES: {
+            
+            log(messageLength, opcode, sequenceNumber, SetDashes.decode(stream));
+            
             break;
         }
         

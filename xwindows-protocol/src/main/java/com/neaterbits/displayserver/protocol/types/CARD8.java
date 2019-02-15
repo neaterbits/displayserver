@@ -1,6 +1,11 @@
 package com.neaterbits.displayserver.protocol.types;
 
-public final class CARD8 {
+import java.io.IOException;
+
+import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
+import com.neaterbits.displayserver.protocol.messages.XEncodeable;
+
+public final class CARD8 extends XEncodeable {
 
 	private final short value;
 
@@ -16,6 +21,11 @@ public final class CARD8 {
 	public short getValue() {
 		return value;
 	}
+
+    @Override
+    public void encode(XWindowsProtocolOutputStream stream) throws IOException {
+        stream.writeCARD8(this);
+    }
 
     @Override
     public String toString() {
