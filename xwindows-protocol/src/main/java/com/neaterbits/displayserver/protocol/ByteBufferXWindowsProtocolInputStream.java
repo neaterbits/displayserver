@@ -239,7 +239,7 @@ public class ByteBufferXWindowsProtocolInputStream implements XWindowsProtocolIn
 
     @Override
     public SETofDEVICEEVENT readSETofDEVICEEVENT() throws IOException {
-        return new SETofDEVICEEVENT(buffer.getInt());
+        return new SETofDEVICEEVENT(buffer.getShort());
     }
     
     @Override
