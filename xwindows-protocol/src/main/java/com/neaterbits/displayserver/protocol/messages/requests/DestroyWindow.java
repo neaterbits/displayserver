@@ -30,6 +30,11 @@ public final class DestroyWindow extends XRequest {
 	}
 
 	@Override
+    public Object[] getDebugParams() {
+        return wrap("window", window);
+    }
+
+    @Override
 	public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 
 	    writeOpCode(stream);
