@@ -77,11 +77,11 @@ final class CairoXLibRenderer implements XLibRenderer {
         else {
             sourceRGB = (int)XLibRenderer.getGCValue(gc, XGCAttributes.BACKGROUND, XGCAttributes::getBackground).getValue();
         }
-        
+
         cr.setSourceRGB(
-                pixelConversion.getRed(sourceRGB),
-                pixelConversion.getGreen(sourceRGB),
-                pixelConversion.getBlue(sourceRGB));
+                toCairoColor(pixelConversion.getRed(sourceRGB)),
+                toCairoColor(pixelConversion.getGreen(sourceRGB)),
+                toCairoColor(pixelConversion.getBlue(sourceRGB)));
         
         final RECTANGLE [] clipRectangles = gc.getClipRectangles();
         
@@ -103,6 +103,10 @@ final class CairoXLibRenderer implements XLibRenderer {
             
             cr.clip();
         }
+    }
+    
+    private static double toCairoColor(int pixelComponent) {
+        return ((double)pixelComponent) / 255.0;
     }
     
     @Override
