@@ -130,7 +130,7 @@ public final class XGCAttributes extends XAttributes {
 	        SubwindowMode.ClipByChildren,
 	        new BOOL(true),
 	        new INT16((short)0), new INT16((short)0), PIXMAP.None,
-	        new CARD16(0), new CARD8((short)(4 << 4 | 4)),
+	        new CARD16(0), new CARD8((short)4),
 	        ArcMode.PieSlice);
 	
     public XGCAttributes applyImmutably(XGCAttributes other) {

@@ -59,6 +59,19 @@ JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNativ
 	cairo_set_source_surface(cr, surface, x, y);
 }
 
+JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1set_1dash
+  (JNIEnv *env, jclass cl, jlong cairo_reference, jdoubleArray dashes, jdouble offset) {
+
+	cairo_t *cr = (cairo_t *)cairo_reference;
+
+	int num_dashes = (*env)->GetArrayLength(env, dashes);
+	double native_dashes[num_dashes];
+
+	(*env)->GetDoubleArrayRegion(env, dashes, 0, num_dashes, native_dashes);
+
+	cairo_set_dash(cr, native_dashes, num_dashes, offset);
+}
+
 JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1clip
   (JNIEnv *env, jclass cl, jlong cairo_reference) {
 

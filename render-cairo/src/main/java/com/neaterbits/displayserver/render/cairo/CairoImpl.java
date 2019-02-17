@@ -30,6 +30,12 @@ final class CairoImpl extends CairoReference implements Cairo {
     }
     
     @Override
+    public void setDashes(double[] dashes, double offset) {
+        
+        CairoNative.cairo_set_dash(getCairoReference(), dashes, offset);
+    }
+
+    @Override
     public void setFillRule(CairoFillRule fillRule) {
         CairoNative.cairo_set_fill_rule(getCairoReference(), fillRule.getCairoFillRule());
     }

@@ -54,7 +54,7 @@ public final class SetDashes extends XRequest {
         this.dashes = dashes;
     }
 
-    public GCONTEXT getGc() {
+    public GCONTEXT getGC() {
         return gc;
     }
 

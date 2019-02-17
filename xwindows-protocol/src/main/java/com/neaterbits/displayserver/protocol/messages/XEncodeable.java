@@ -8,6 +8,7 @@ import com.neaterbits.displayserver.protocol.DataOutputXWindowsProtocolOutputStr
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolOutputStream;
 import com.neaterbits.displayserver.protocol.types.CARD32;
+import com.neaterbits.displayserver.util.ArrayUtil;
 import com.neaterbits.displayserver.util.logging.LogUtil;
 
 public abstract class XEncodeable {
@@ -78,13 +79,8 @@ public abstract class XEncodeable {
    }
 
    protected final Object [] merge(Object [] objs1, Object [] objs2) {
-       
-       final Object [] merged = new Object[objs1.length + objs2.length];
-       
-       System.arraycopy(objs1, 0, merged, 0, objs1.length);
-       System.arraycopy(objs2, 0, merged, objs1.length, objs2.length);
-       
-       return merged;
+
+       return ArrayUtil.merge(objs1, objs2, Object[]::new);
    }
    
    protected final Object [] wrap(Object ... objects) {

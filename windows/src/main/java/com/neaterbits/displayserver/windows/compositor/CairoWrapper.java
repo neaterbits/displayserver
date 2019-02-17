@@ -54,6 +54,11 @@ final class CairoWrapper implements Cairo {
     }
 
     @Override
+    public void setDashes(double[] dashes, double offset) {
+        cr.setDashes(dashes, offset);
+    }
+
+    @Override
     public void setFillRule(CairoFillRule fillRule) {
         cr.setFillRule(fillRule);
     }

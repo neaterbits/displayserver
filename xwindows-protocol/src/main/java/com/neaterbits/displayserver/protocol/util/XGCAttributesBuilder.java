@@ -69,6 +69,13 @@ public class XGCAttributesBuilder extends XAttributesBuilder {
         return this;
     }
     
+    public XGCAttributesBuilder setDashOffset(CARD16 dashOffset) {
+        
+        this.dashOffset = set(dashOffset, XGCAttributes.DASH_OFFSET);
+        
+        return this;
+    }
+
     public XGCAttributesBuilder setClipXOrigin(INT16 clipXOrigin) {
         
         this.clipXOrigin = set(clipXOrigin, XGCAttributes.CLIP_X_ORIGIN);

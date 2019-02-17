@@ -57,6 +57,14 @@ JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNativ
 
 /*
  * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
+ * Method:    cairo_set_dash
+ * Signature: (J[DD)V
+ */
+JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1set_1dash
+  (JNIEnv *, jclass, jlong, jdoubleArray, jdouble);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
  * Method:    cairo_set_fill_rule
  * Signature: (JI)V
  */

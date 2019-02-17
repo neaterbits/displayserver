@@ -90,8 +90,16 @@ public class XCoreGCMessageProcessor extends XOpCodeProcessor {
         
         case OpCodes.SET_DASHES: {
             
-            log(messageLength, opcode, sequenceNumber, SetDashes.decode(stream));
+            final SetDashes setDashes = log(messageLength, opcode, sequenceNumber, SetDashes.decode(stream));
             
+            try {
+                final XGC gc = client.getGC(setDashes.getGC());
+
+                gc.setDashes(setDashes.getDashOffset(), setDashes.getDashes());
+            }
+            catch (GContextException ex) {
+                sendError(client, Errors.GContext, sequenceNumber, ex.getGContext().getValue(), opcode);
+            }
             break;
         }
         

@@ -12,6 +12,8 @@ public interface Cairo extends Disposable {
     
     void setSourceSurface(CairoSurface surface, double x, double y);
     
+    void setDashes(double [] dashes, double offset);
+    
     void setFillRule(CairoFillRule fillRule);
     
     void clip();

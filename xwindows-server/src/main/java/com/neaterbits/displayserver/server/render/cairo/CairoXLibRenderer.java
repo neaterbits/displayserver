@@ -7,9 +7,11 @@ import com.neaterbits.displayserver.buffers.PixelConversion;
 import com.neaterbits.displayserver.protocol.enums.CoordinateMode;
 import com.neaterbits.displayserver.protocol.enums.ImageFormat;
 import com.neaterbits.displayserver.protocol.enums.gc.Function;
+import com.neaterbits.displayserver.protocol.enums.gc.LineStyle;
 import com.neaterbits.displayserver.protocol.messages.requests.XGCAttributes;
 import com.neaterbits.displayserver.protocol.types.BYTE;
 import com.neaterbits.displayserver.protocol.types.CARD32;
+import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.POINT;
 import com.neaterbits.displayserver.protocol.types.RECTANGLE;
 import com.neaterbits.displayserver.protocol.types.SEGMENT;
@@ -82,6 +84,35 @@ final class CairoXLibRenderer implements XLibRenderer {
                 toCairoColor(pixelConversion.getRed(sourceRGB)),
                 toCairoColor(pixelConversion.getGreen(sourceRGB)),
                 toCairoColor(pixelConversion.getBlue(sourceRGB)));
+        
+        if (gc.getAttributes().getLineStyle().equals(LineStyle.OnOffDash)) {
+         
+            CARD8 [] dashes = gc.getDashes();
+            
+            if (dashes == null && gc.getAttributes().isSet(XGCAttributes.DASHES)) {
+                
+                final CARD8 dash = gc.getAttributes().getDashes();
+                
+                dashes = new CARD8 [] { dash, dash };
+            }
+            
+            if (dashes != null) {
+                
+                final double [] cairoDashes = new double[dashes.length];
+                
+                for (int i = 0; i < dashes.length; ++ i) {
+                    cairoDashes[i] = dashes[i].getValue();
+                }
+                
+                cr.setDashes(
+                        cairoDashes,
+                        gc.getAttributes().getDashOffset().getValue()
+                );
+            }
+        }
+        else {
+            cr.setDashes(new double[0], 0);
+        }
         
         final RECTANGLE [] clipRectangles = gc.getClipRectangles();
         
