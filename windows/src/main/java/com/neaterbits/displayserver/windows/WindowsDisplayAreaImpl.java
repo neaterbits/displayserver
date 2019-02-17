@@ -85,6 +85,11 @@ public final class WindowsDisplayAreaImpl implements WindowsDisplayArea {
     }
 
     @Override
+    public LayerRegion getVisibleOrStoredRegion(Window window) {
+        return windows.getVisibleOrStoredRegion(window);
+    }
+
+    @Override
     public void disposeWindow(Window window) {
         windows.disposeWindow(window);
     }

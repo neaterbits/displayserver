@@ -37,6 +37,11 @@ public class Display implements WindowManagement {
     }
 
     @Override
+    public LayerRegion getVisibleOrStoredRegion(Window window) {
+        return window.getDisplayArea().getVisibleOrStoredRegion(window);
+    }
+
+    @Override
     public LayerRegions hideWindow(Window window) {
         return window.getDisplayArea().hideWindow(window);
     }

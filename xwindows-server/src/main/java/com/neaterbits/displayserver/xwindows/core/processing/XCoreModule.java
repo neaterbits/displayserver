@@ -119,7 +119,7 @@ public class XCoreModule extends XModule {
                 
                 new XCoreGCMessageProcessor(protocolLog, windows, pixmaps),
                 
-                new XCoreAreaMessageProcessor(protocolLog, windows, pixmaps),
+                new XCoreAreaMessageProcessor(protocolLog, windowManagement, eventSubscriptions, windows, pixmaps),
                 
                 new XCoreDrawMessageProcessor(protocolLog, windows, pixmaps),
                 

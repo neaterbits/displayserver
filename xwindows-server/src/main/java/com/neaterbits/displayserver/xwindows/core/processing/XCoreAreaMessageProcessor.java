@@ -3,6 +3,7 @@ package com.neaterbits.displayserver.xwindows.core.processing;
 import java.io.IOException;
 
 import com.neaterbits.displayserver.buffers.BufferOperations;
+import com.neaterbits.displayserver.layers.LayerRegion;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.enums.Errors;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
@@ -13,6 +14,8 @@ import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLog;
 import com.neaterbits.displayserver.protocol.messages.requests.ClearArea;
 import com.neaterbits.displayserver.protocol.messages.requests.CopyArea;
 import com.neaterbits.displayserver.protocol.types.CARD16;
+import com.neaterbits.displayserver.server.XEventSubscriptions;
+import com.neaterbits.displayserver.windows.WindowManagement;
 import com.neaterbits.displayserver.xwindows.model.XPixmapsConstAccess;
 import com.neaterbits.displayserver.xwindows.model.XWindow;
 import com.neaterbits.displayserver.xwindows.model.XWindowsConstAccess;
@@ -20,17 +23,23 @@ import com.neaterbits.displayserver.xwindows.processing.XClientOps;
 
 public final class XCoreAreaMessageProcessor extends BaseXCorePixmapRenderProcessor {
 
+    private final WindowManagement windowManagement;
+    private final XEventSubscriptions eventSubscriptions;
     private final XWindowsConstAccess<?> xWindows;
     private final XPixmapsConstAccess xPixmaps;
     
     
     public XCoreAreaMessageProcessor(
             XWindowsServerProtocolLog protocolLog,
+            WindowManagement windowManagement,
+            XEventSubscriptions eventSubscriptions,
             XWindowsConstAccess<?> xWindows,
             XPixmapsConstAccess xPixmaps) {
 
         super(protocolLog, xPixmaps);
 
+        this.windowManagement = windowManagement;
+        this.eventSubscriptions = eventSubscriptions;
         this.xWindows = xWindows;
         this.xPixmaps = xPixmaps;
     }
@@ -83,6 +92,15 @@ public final class XCoreAreaMessageProcessor extends BaseXCorePixmapRenderProces
                         clearArea.getY().getValue(),
                         width,
                         height);
+                
+                if (clearArea.getExposures().isSet()) {
+
+                    final LayerRegion layerRegion = windowManagement.getVisibleOrStoredRegion(xWindow.getWindow());
+                    
+                    if (layerRegion != null) {
+                        sendExposeEvent(xWindow, eventSubscriptions, layerRegion);
+                    }
+                }
             }
             catch (WindowException ex) {
                 sendError(client, Errors.Window, sequenceNumber, ex.getWindow().getValue(), opcode);

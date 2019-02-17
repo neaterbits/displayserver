@@ -13,6 +13,8 @@ public interface WindowManagement {
 
     LayerRegions hideWindow(Window window);
 
+    LayerRegion getVisibleOrStoredRegion(Window window);
+    
     void disposeWindow(Window window);
 
     List<Window> getSubWindowsInOrder(Window window);

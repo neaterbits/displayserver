@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import com.neaterbits.displayserver.layers.LayerRectangle;
 import com.neaterbits.displayserver.layers.LayerRegion;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.enums.BackingStore;
@@ -24,7 +23,6 @@ import com.neaterbits.displayserver.protocol.exception.ValueException;
 import com.neaterbits.displayserver.protocol.exception.WindowException;
 import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLog;
 import com.neaterbits.displayserver.protocol.messages.events.CreateNotify;
-import com.neaterbits.displayserver.protocol.messages.events.Expose;
 import com.neaterbits.displayserver.protocol.messages.events.MapNotify;
 import com.neaterbits.displayserver.protocol.messages.events.MapRequest;
 import com.neaterbits.displayserver.protocol.messages.replies.GetGeometryReply;
@@ -757,25 +755,7 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
                 final LayerRegion exposedRectangles = windowManagement.showWindow(xWindow.getWindow());
                 
                 if (exposedRectangles != null) {
-                    
-                    for (LayerRectangle rectangle : exposedRectangles.getRectangles()) {
-                        sendEventToSubscribing(
-                                eventSubscriptions,
-                                xWindow,
-                                SETofEVENT.EXPOSURE,
-                                
-                                clientOps -> new Expose(
-                                        clientOps.getSequenceNumber(),
-                                        xWindow.getWINDOW(),
-                                        
-                                        new CARD16(rectangle.getLeft()),
-                                        new CARD16(rectangle.getTop()),
-                                        new CARD16(rectangle.getWidth()),
-                                        new CARD16(rectangle.getHeight()),
-                                        
-                                        new CARD16(exposedRectangles.getRectangles().size())
-                                        ));
-                    }
+                    sendExposeEvent(xWindow, eventSubscriptions, exposedRectangles);
                 }
 
                 xWindow.setMapped(true);

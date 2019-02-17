@@ -1,6 +1,7 @@
 package com.neaterbits.displayserver.windows;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.neaterbits.displayserver.layers.Layer;
+import com.neaterbits.displayserver.layers.LayerRectangle;
 import com.neaterbits.displayserver.layers.LayerRegion;
 import com.neaterbits.displayserver.layers.LayerRegions;
 import com.neaterbits.displayserver.layers.Layers;
@@ -91,6 +93,33 @@ final class Windows {
         final LayerRegion region = window.showWindow();
         
         layers.showLayer(window.getLayer());
+        
+        return region;
+    }
+    
+    LayerRegion getVisibleOrStoredRegion(Window window) {
+        
+        Objects.requireNonNull(window);
+        
+        final LayerRegion region;
+        
+        switch (window.getWindowContentStorage()) {
+        case NONE:
+            region = layers.getVisibleOrStoredRegion(window.getLayer());
+            break;
+            
+        case WHEN_VISIBLE:
+        case ALWAYS:
+            final Layer layer = window.getLayer();
+            final List<LayerRectangle> rectangles = Arrays.asList(
+                    new LayerRectangle(0, 0, layer.getSize().getWidth(), layer.getSize().getHeight())
+            );
+            region = new LayerRegion(rectangles);
+            break;
+            
+        default:
+            throw new UnsupportedOperationException();
+        }
         
         return region;
     }

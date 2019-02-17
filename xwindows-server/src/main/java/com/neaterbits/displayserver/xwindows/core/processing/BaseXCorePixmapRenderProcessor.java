@@ -1,18 +1,29 @@
 package com.neaterbits.displayserver.xwindows.core.processing;
 
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.neaterbits.displayserver.buffers.BufferOperations;
 import com.neaterbits.displayserver.buffers.PixelFormat;
+import com.neaterbits.displayserver.layers.LayerRectangle;
+import com.neaterbits.displayserver.layers.LayerRegion;
 import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLog;
+import com.neaterbits.displayserver.protocol.messages.XEvent;
+import com.neaterbits.displayserver.protocol.messages.events.Expose;
 import com.neaterbits.displayserver.protocol.messages.requests.XWindowAttributes;
+import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.protocol.types.PIXMAP;
+import com.neaterbits.displayserver.protocol.types.SETofEVENT;
+import com.neaterbits.displayserver.protocol.types.WINDOW;
+import com.neaterbits.displayserver.server.XEventSubscriptions;
+import com.neaterbits.displayserver.server.XEventSubscriptionsConstAccess;
 import com.neaterbits.displayserver.windows.compositor.OffscreenSurface;
 import com.neaterbits.displayserver.xwindows.model.XPixmap;
 import com.neaterbits.displayserver.xwindows.model.XPixmapsConstAccess;
 import com.neaterbits.displayserver.xwindows.model.XWindow;
 import com.neaterbits.displayserver.xwindows.model.render.XLibRenderer;
+import com.neaterbits.displayserver.xwindows.processing.XClientOps;
 import com.neaterbits.displayserver.xwindows.processing.XOpCodeProcessor;
 
 abstract class BaseXCorePixmapRenderProcessor extends XOpCodeProcessor {
@@ -104,5 +115,55 @@ abstract class BaseXCorePixmapRenderProcessor extends XOpCodeProcessor {
                 }
             }
         }
+    }
+
+    protected final void sendEventToSubscribing(
+            XEventSubscriptionsConstAccess xEventSubscriptions,
+            XWindow xWindow,
+            int eventCode,
+            Function<XClientOps, XEvent> makeEvent) {
+        
+        sendEventToSubscribing(xEventSubscriptions, xWindow.getWINDOW(), eventCode, makeEvent);
+    }
+
+    protected final void sendEventToSubscribing(
+            XEventSubscriptionsConstAccess xEventSubscriptions,
+            WINDOW window,
+            int eventCode,
+            Function<XClientOps, XEvent> makeEvent) {
+        
+        
+        for (XClientOps client : xEventSubscriptions.getClientsInterestedInEvent(window, eventCode)) {
+            
+            final XEvent event = makeEvent.apply(client);
+
+            sendEvent(client, window, event);
+        }
+    }
+
+
+    
+    protected final void sendExposeEvent(XWindow xWindow, XEventSubscriptions eventSubscriptions, LayerRegion region) {
+        
+        for (LayerRectangle rectangle : region.getRectangles()) {
+
+            sendEventToSubscribing(
+                    eventSubscriptions,
+                    xWindow,
+                    SETofEVENT.EXPOSURE,
+                    
+                    clientOps -> new Expose(
+                            clientOps.getSequenceNumber(),
+                            xWindow.getWINDOW(),
+                            
+                            new CARD16(rectangle.getLeft()),
+                            new CARD16(rectangle.getTop()),
+                            new CARD16(rectangle.getWidth()),
+                            new CARD16(rectangle.getHeight()),
+                            
+                            new CARD16(region.getRectangles().size())
+                            ));
+        }
+        
     }
 }

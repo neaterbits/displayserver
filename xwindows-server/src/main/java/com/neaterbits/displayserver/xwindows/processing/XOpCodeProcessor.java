@@ -1,18 +1,15 @@
 package com.neaterbits.displayserver.xwindows.processing;
 
 import java.util.Objects;
-import java.util.function.Function;
 
 import com.neaterbits.displayserver.buffers.BufferOperations;
 import com.neaterbits.displayserver.protocol.exception.DrawableException;
 import com.neaterbits.displayserver.protocol.exception.WindowException;
 import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLog;
-import com.neaterbits.displayserver.protocol.messages.XEvent;
 import com.neaterbits.displayserver.protocol.types.DRAWABLE;
 import com.neaterbits.displayserver.protocol.types.PIXMAP;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
-import com.neaterbits.displayserver.server.XEventSubscriptionsConstAccess;
 import com.neaterbits.displayserver.windows.WindowsDisplayArea;
 import com.neaterbits.displayserver.xwindows.model.XDrawable;
 import com.neaterbits.displayserver.xwindows.model.XPixmapsConstAccess;
@@ -132,30 +129,4 @@ public abstract class XOpCodeProcessor extends XMessageProcessor {
         
         return xDrawable.getSurface();
     }
-
-    protected final void sendEventToSubscribing(
-            XEventSubscriptionsConstAccess xEventSubscriptions,
-            XWindow xWindow,
-            int eventCode,
-            Function<XClientOps, XEvent> makeEvent) {
-        
-        sendEventToSubscribing(xEventSubscriptions, xWindow.getWINDOW(), eventCode, makeEvent);
-    }
-        
-    protected final void sendEventToSubscribing(
-            XEventSubscriptionsConstAccess xEventSubscriptions,
-            WINDOW window,
-            int eventCode,
-            Function<XClientOps, XEvent> makeEvent) {
-        
-        
-        for (XClientOps client : xEventSubscriptions.getClientsInterestedInEvent(window, eventCode)) {
-            
-            final XEvent event = makeEvent.apply(client);
-
-            sendEvent(client, window, event);
-        }
-    }
-
-
 }

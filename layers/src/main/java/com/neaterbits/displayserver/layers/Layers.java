@@ -143,6 +143,11 @@ public class Layers {
         return recomputeLayers();
     }
 
+    public LayerRegion getVisibleOrStoredRegion(Layer layer) {
+
+        throw new UnsupportedOperationException();
+    }
+    
 	public Layer findLayerAt(int x, int y) {
 		return rootLayer.findLayerAt(x, y);
 	}
