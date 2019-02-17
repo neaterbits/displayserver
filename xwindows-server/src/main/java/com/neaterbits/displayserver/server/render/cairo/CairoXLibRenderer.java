@@ -85,6 +85,15 @@ final class CairoXLibRenderer implements XLibRenderer {
                 toCairoColor(pixelConversion.getGreen(sourceRGB)),
                 toCairoColor(pixelConversion.getBlue(sourceRGB)));
         
+        final int lineWidth = gc.getAttributes().getLineWidth().getValue();
+        
+        if (lineWidth == 0) {
+            cr.setLineWidth(1);
+        }
+        else {
+            cr.setLineWidth(lineWidth);
+        }
+        
         if (gc.getAttributes().getLineStyle().equals(LineStyle.OnOffDash)) {
          
             CARD8 [] dashes = gc.getDashes();

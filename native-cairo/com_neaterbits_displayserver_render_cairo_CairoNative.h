@@ -33,14 +33,6 @@ JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNativ
 
 /*
  * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
- * Method:    cairo_set_operator
- * Signature: (JI)V
- */
-JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1set_1operator
-  (JNIEnv *, jclass, jlong, jint);
-
-/*
- * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
  * Method:    cairo_set_source_rgb
  * Signature: (JDDD)V
  */
@@ -69,6 +61,22 @@ JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNativ
  * Signature: (JI)V
  */
 JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1set_1fill_1rule
+  (JNIEnv *, jclass, jlong, jint);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
+ * Method:    cairo_set_line_width
+ * Signature: (JD)V
+ */
+JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1set_1line_1width
+  (JNIEnv *, jclass, jlong, jdouble);
+
+/*
+ * Class:     com_neaterbits_displayserver_render_cairo_CairoNative
+ * Method:    cairo_set_operator
+ * Signature: (JI)V
+ */
+JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1set_1operator
   (JNIEnv *, jclass, jlong, jint);
 
 /*

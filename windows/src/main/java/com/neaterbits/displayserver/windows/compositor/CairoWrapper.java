@@ -32,11 +32,6 @@ final class CairoWrapper implements Cairo {
     }
 
     @Override
-    public void setOperator(CairoOperator operator) {
-        cr.setOperator(operator);
-    }
-
-    @Override
     public void setSourceRGB(double red, double green, double blue) {
         cr.setSourceRGB(red, green, blue);
     }
@@ -61,6 +56,16 @@ final class CairoWrapper implements Cairo {
     @Override
     public void setFillRule(CairoFillRule fillRule) {
         cr.setFillRule(fillRule);
+    }
+
+    @Override
+    public void setLineWidth(double width) {
+        cr.setLineWidth(width);
+    }
+
+    @Override
+    public void setOperator(CairoOperator operator) {
+        cr.setOperator(operator);
     }
 
     @Override

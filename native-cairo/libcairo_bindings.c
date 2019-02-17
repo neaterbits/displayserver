@@ -32,15 +32,6 @@ JNIEXPORT jint JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNativ
 	return cairo_status(cr);
 }
 
-JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1set_1operator
-  (JNIEnv *env, jclass cl, jlong cairo_reference, jint operator) {
-
-	cairo_t *cr = (cairo_t *)cairo_reference;
-
-	cairo_set_operator(cr, operator);
-}
-
-
 JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1set_1source_1rgb
   (JNIEnv *env, jclass cl, jlong cairo_reference, jdouble red, jdouble green, jdouble blue) {
 
@@ -94,6 +85,22 @@ JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNativ
 	cairo_t *cr = (cairo_t *)cairo_reference;
 
 	cairo_set_fill_rule(cr, fill_rule);
+}
+
+JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1set_1line_1width
+  (JNIEnv *env, jclass cl, jlong cairo_reference, jdouble width) {
+
+	cairo_t *cr = (cairo_t *)cairo_reference;
+
+	cairo_set_line_width(cr, width);
+}
+
+JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1set_1operator
+  (JNIEnv *env, jclass cl, jlong cairo_reference, jint operator) {
+
+	cairo_t *cr = (cairo_t *)cairo_reference;
+
+	cairo_set_operator(cr, operator);
 }
 
 JNIEXPORT void JNICALL Java_com_neaterbits_displayserver_render_cairo_CairoNative_cairo_1fill

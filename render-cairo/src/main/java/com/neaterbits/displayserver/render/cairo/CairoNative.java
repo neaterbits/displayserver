@@ -9,8 +9,6 @@ public class CairoNative {
 
     static native int cairo_status(long cr);
     
-    static native void cairo_set_operator(long cr, int operator);
-    
     static native void cairo_set_source_rgb(long cr, double red, double green, double blue);
 
     static native void cairo_set_source_surface(long cr, long surface, double x, double y);
@@ -18,6 +16,10 @@ public class CairoNative {
     static native void cairo_set_dash(long cr, double [] dashes, double offset);
     
     static native void cairo_set_fill_rule(long cr, int fillRule);
+
+    static native void cairo_set_line_width(long cr, double width);
+    
+    static native void cairo_set_operator(long cr, int operator);
     
     static native void cairo_clip(long cr);
 

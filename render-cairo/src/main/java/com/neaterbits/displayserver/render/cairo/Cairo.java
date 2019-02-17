@@ -16,6 +16,8 @@ public interface Cairo extends Disposable {
     
     void setFillRule(CairoFillRule fillRule);
     
+    void setLineWidth(double width);
+    
     void clip();
     
     void resetClip();

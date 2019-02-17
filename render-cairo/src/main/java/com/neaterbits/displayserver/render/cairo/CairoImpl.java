@@ -39,7 +39,12 @@ final class CairoImpl extends CairoReference implements Cairo {
     public void setFillRule(CairoFillRule fillRule) {
         CairoNative.cairo_set_fill_rule(getCairoReference(), fillRule.getCairoFillRule());
     }
-    
+
+    @Override
+    public void setLineWidth(double width) {
+        CairoNative.cairo_set_line_width(getCairoReference(), width);
+    }
+
     @Override
     public void clip() {
         CairoNative.cairo_clip(getCairoReference());
