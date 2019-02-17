@@ -4,15 +4,12 @@ import java.io.IOException;
 
 import org.junit.Test;
 
+import com.neaterbits.displayserver.util.Value;
 import com.neaterbits.displayserver.util.logging.DebugLevel;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class WriteBufferTest {
-
-    private static class Value<T> {
-        private T value;
-    }
     
     @Test
     public void testSimpleWrite() throws IOException {
@@ -30,17 +27,17 @@ public class WriteBufferTest {
             
             final int length = byteBuffer.remaining();
             
-            value.value = new byte[length];
+            value.set(new byte[length]);
             
-            byteBuffer.get(value.value);
+            byteBuffer.get(value.get());
             
             return length;
         },
         null);
         
 
-        assertThat(value.value.length).isEqualTo(data.length);
-        assertThat(value.value).isEqualTo(data);
+        assertThat(value.get().length).isEqualTo(data.length);
+        assertThat(value.get()).isEqualTo(data);
     }
     
     @Test
@@ -60,17 +57,17 @@ public class WriteBufferTest {
             
             final int length = byteBuffer.remaining();
             
-            value.value = new byte[length];
+            value.set(new byte[length]);
             
-            byteBuffer.get(value.value);
+            byteBuffer.get(value.get());
             
             return length;
         },
         log);
         
 
-        assertThat(value.value.length).isEqualTo(data.length);
-        assertThat(value.value).isEqualTo(data);
+        assertThat(value.get().length).isEqualTo(data.length);
+        assertThat(value.get()).isEqualTo(data);
     }
 
     @Test
@@ -94,16 +91,16 @@ public class WriteBufferTest {
             
             final int length = byteBuffer.remaining();
             
-            value.value = new byte[length];
+            value.set(new byte[length]);
             
-            byteBuffer.get(value.value);
+            byteBuffer.get(value.get());
             
             return length;
         },
         log);
         
 
-        assertThat(value.value.length).isEqualTo(data.length);
-        assertThat(value.value).isEqualTo(data);
+        assertThat(value.get().length).isEqualTo(data.length);
+        assertThat(value.get()).isEqualTo(data);
     }
 }

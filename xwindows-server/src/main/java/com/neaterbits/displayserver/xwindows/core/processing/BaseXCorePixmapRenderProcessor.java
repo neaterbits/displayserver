@@ -18,6 +18,7 @@ import com.neaterbits.displayserver.protocol.types.SETofEVENT;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.server.XEventSubscriptions;
 import com.neaterbits.displayserver.server.XEventSubscriptionsConstAccess;
+import com.neaterbits.displayserver.util.Value;
 import com.neaterbits.displayserver.windows.compositor.OffscreenSurface;
 import com.neaterbits.displayserver.xwindows.model.XPixmap;
 import com.neaterbits.displayserver.xwindows.model.XPixmapsConstAccess;
@@ -141,9 +142,9 @@ abstract class BaseXCorePixmapRenderProcessor extends XOpCodeProcessor {
         }
     }
 
-
-    
     protected final void sendExposeEvent(XWindow xWindow, XEventSubscriptions eventSubscriptions, LayerRegion region) {
+
+        final Value<Integer> count = new Value<>(region.getRectangles().size());
         
         for (LayerRectangle rectangle : region.getRectangles()) {
 
@@ -152,7 +153,11 @@ abstract class BaseXCorePixmapRenderProcessor extends XOpCodeProcessor {
                     xWindow,
                     SETofEVENT.EXPOSURE,
                     
-                    clientOps -> new Expose(
+                    clientOps -> {
+                        
+                        count.set(count.get() - 1);
+                        
+                        final Expose event = new Expose(
                             clientOps.getSequenceNumber(),
                             xWindow.getWINDOW(),
                             
@@ -161,8 +166,10 @@ abstract class BaseXCorePixmapRenderProcessor extends XOpCodeProcessor {
                             new CARD16(rectangle.getWidth()),
                             new CARD16(rectangle.getHeight()),
                             
-                            new CARD16(region.getRectangles().size())
-                            ));
+                            new CARD16(count.get()));
+                        
+                        return event;
+                    });
         }
         
     }
