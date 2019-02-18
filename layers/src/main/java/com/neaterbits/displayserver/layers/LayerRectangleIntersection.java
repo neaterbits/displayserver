@@ -577,9 +577,9 @@ public abstract class LayerRectangleIntersection extends LayerRectangleBase {
         return intersection;
     }
 
-    private void buildSplitList(LayerRectangle inFront, IntersectionType intersection, List<LayerRectangle> splitList) {
+    private void buildSplitList(LayerRectangle inFront, IntersectionType inFrontIntersection, List<LayerRectangle> splitList) {
         
-        switch (intersection) {
+        switch (inFrontIntersection) {
         case UPPER_LEFT:
             
             splitList.add(new LayerRectangle(
@@ -617,6 +617,32 @@ public abstract class LayerRectangleIntersection extends LayerRectangleBase {
                     height - (inFront.top + inFront.height - top)));
             break;
             
+        case WITHIN:
+            splitList.add(new LayerRectangle(
+                    left,
+                    top,
+                    width,
+                    inFront.top - top));
+            
+            splitList.add(new LayerRectangle(
+                    left,
+                    inFront.top,
+                    inFront.left - left,
+                    inFront.height));
+
+            splitList.add(new LayerRectangle(
+                    inFront.left + inFront.width,
+                    inFront.top,
+                    width - inFront.width - (inFront.left - left),
+                    inFront.top + inFront.height - top));
+            
+            splitList.add(new LayerRectangle(
+                    left,
+                    inFront.top + inFront.height,
+                    width,
+                    height - inFront.height - (inFront.top - top)));
+            break;
+            
         default:
             throw new UnsupportedOperationException();
         }
@@ -624,7 +650,7 @@ public abstract class LayerRectangleIntersection extends LayerRectangleBase {
     }
 
     
-    public final IntersectionType intersect(LayerRectangle inFront, List<LayerRectangle> splitList) {
+    final IntersectionType intersect(LayerRectangle inFront, List<LayerRectangle> splitList) {
 
         final IntersectionType intersection = intersectAlternative(inFront);
 

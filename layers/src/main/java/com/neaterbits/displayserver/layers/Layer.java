@@ -11,7 +11,7 @@ import com.neaterbits.displayserver.types.Size;
 public final class Layer {
 
 	private final int layerDescriptor;
-	private final boolean rootLayer;
+	private final Layer parentLayer;
 	
 	private Position position;
 	private Size size;
@@ -23,13 +23,13 @@ public final class Layer {
 	
 	private final List<LayerRectangle> visibleRectangles;
 
-	Layer(int layerDescriptor, Position position, Size size, boolean rootLayer) {
+	Layer(int layerDescriptor, Position position, Size size, Layer parentLayer) {
 		
 		Objects.requireNonNull(position);
 		Objects.requireNonNull(size);
 	
 		this.layerDescriptor = layerDescriptor;
-		this.rootLayer = rootLayer;
+		this.parentLayer = parentLayer;
 		this.position = position;
 		this.size = size;
 		this.visible = false;
@@ -40,7 +40,7 @@ public final class Layer {
 	}
 
 	public boolean isRootLayer() {
-        return rootLayer;
+        return parentLayer == null;
     }
 
     public boolean isVisible() {
@@ -57,6 +57,28 @@ public final class Layer {
     
     boolean hasSubLayers() {
         return subLayers != null && subLayers.length != 0;
+    }
+
+    int getAbsoluteLeft() {
+        
+        int left = position.getLeft();
+        
+        for (Layer layer = parentLayer; layer != null; layer = layer.parentLayer) {
+            left += layer.getPosition().getLeft();
+        }
+
+        return left;
+    }
+
+    int getAbsoluteTop() {
+        
+        int top = position.getTop();
+        
+        for (Layer layer = parentLayer; layer != null; layer = layer.parentLayer) {
+            top += layer.getPosition().getTop();
+        }
+
+        return top;
     }
 
 	Layer findLayerAt(int x, int y) {
@@ -187,111 +209,122 @@ public final class Layer {
 		visibleRectangles.add(getRectangle());
 	}
 
-	static void intersectLayerOntoList(Layer toIntersect, List<LayerRectangle> updatedList) {
+	static void intersectFrontLayerOntoList(Layer toIntersect, LayerComputeWorkArea workArea) {
 		
 		Objects.requireNonNull(toIntersect);
 
 		final LayerRectangle layerRectangle = toIntersect.getRectangle();
-		
-		for (LayerRectangle updated : updatedList) {
 
-			final int numUpdated = updatedList.size();
+        workArea.splitTempList.clear();
+        workArea.splitRemoveList.clear();
+
+		for (LayerRectangle updated : workArea.intersectList) {
 			
-			final OverlapType overlap = updated.splitFromIntersectingButNotIn(layerRectangle, updatedList);
+            int prevSplitListSize = workArea.splitTempList.size();
+
+            final OverlapType overlap = updated.splitFromIntersectingButNotIn(layerRectangle, workArea.splitTempList);
 
 			switch (overlap) {
 			case NONE:
-				if (updatedList.size() != numUpdated) {
+				if (workArea.splitTempList.size() != prevSplitListSize) {
 					throw new IllegalStateException();
 				}
 				break;
 				
 			case INTERSECTION:
-				if (updatedList.size() == numUpdated) {
+                if (workArea.splitTempList.size() == prevSplitListSize) {
 					throw new IllegalStateException();
 				}
 				break;
 				
-			case OBSCURED_BY:
-				if (updatedList.size() != numUpdated) {
+			case THIS_WITHIN:
+                if (workArea.splitTempList.size() != prevSplitListSize) {
 					throw new IllegalStateException();
 				}
 				
-				updatedList.remove(updated);
+				workArea.splitRemoveList.add(updated);
 				break;
 			
-			case OBSCURING:
-				if (updatedList.size() == numUpdated) {
-					throw new IllegalStateException();
+			case OTHER_WITHIN:
+                if (workArea.splitTempList.size() == prevSplitListSize) {
+					throw new IllegalStateException("## " + workArea.splitTempList + "/" + prevSplitListSize);
 				}
+                workArea.splitRemoveList.add(updated);
 				break;
 				
 			case EQUALS:
                 throw new UnsupportedOperationException();
 			}
-
-			
-			updatedList.add(updated);
 		}
+
+		workArea.intersectList.removeAll(workArea.splitRemoveList);
+		workArea.intersectList.addAll(workArea.splitTempList);
 	}
 
 	LayerRegion intersectLayer(Layer layer) {
 		
 		Objects.requireNonNull(layer);
 		
-		final List<LayerRectangle> updated = new ArrayList<>(visibleRectangles.size());
+		final LayerComputeWorkArea workArea = new LayerComputeWorkArea();
 		
-		intersectLayerOntoList(layer, updated);
+		intersectFrontLayerOntoList(layer, workArea);
 		
-		return new LayerRegion(updated);
+		return new LayerRegion(workArea.intersectList);
 	}
 	
 	List<LayerRectangle> updateVisibleRectangles(List<LayerRectangle> updatedRectangles) {
 		
 		final List<LayerRectangle> newlyVisible = new ArrayList<>(updatedRectangles.size());
 		
-		for (LayerRectangle updated : updatedRectangles) {
-			
-			for (LayerRectangle previous : visibleRectangles) {
+		if (visibleRectangles.isEmpty()) {
+		    newlyVisible.addAll(updatedRectangles);
+		}
+		else {
+		
+    		for (LayerRectangle updated : updatedRectangles) {
+    			
+    			for (LayerRectangle previous : visibleRectangles) {
+    
+    				final int numUpdated = updatedRectangles.size();
+    				
+    				final OverlapType overlap = updated.splitFromIntersectingButNotIn(previous, newlyVisible);
+    				
+    				switch (overlap) {
+    				case NONE:
+    					if (updatedRectangles.size() != numUpdated) {
+    						throw new IllegalStateException();
+    					}
+    
+    					newlyVisible.add(updated);
+    					break;
+    					
+    				case INTERSECTION:
+    					if (updatedRectangles.size() == numUpdated) {
+    						throw new IllegalStateException();
+    					}
+    					break;
+    					
+    				case THIS_WITHIN:
+    					if (updatedRectangles.size() != numUpdated) {
+    						throw new IllegalStateException();
+    					}
+    					break;
+    					
+    				case OTHER_WITHIN:
+    					if (updatedRectangles.size() == numUpdated) {
+    						throw new IllegalStateException();
+    					}
+    					break;
+    					
+    				case EQUALS:
+    				    throw new UnsupportedOperationException();
+    				}
+    			}
+    		}
 
-				final int numUpdated = updatedRectangles.size();
-				
-				final OverlapType overlap = updated.splitFromIntersectingButNotIn(previous, newlyVisible);
-				
-				switch (overlap) {
-				case NONE:
-					if (updatedRectangles.size() != numUpdated) {
-						throw new IllegalStateException();
-					}
-
-					newlyVisible.add(updated);
-					break;
-					
-				case INTERSECTION:
-					if (updatedRectangles.size() == numUpdated) {
-						throw new IllegalStateException();
-					}
-					break;
-					
-				case OBSCURED_BY:
-					if (updatedRectangles.size() != numUpdated) {
-						throw new IllegalStateException();
-					}
-					break;
-					
-				case OBSCURING:
-					if (updatedRectangles.size() == numUpdated) {
-						throw new IllegalStateException();
-					}
-					break;
-					
-				case EQUALS:
-				    throw new UnsupportedOperationException();
-				}
-			}
+            visibleRectangles.clear();
 		}
 		
-		visibleRectangles.clear();
 		visibleRectangles.addAll(updatedRectangles);
 		
 		return newlyVisible;
@@ -321,7 +354,10 @@ public final class Layer {
 
     @Override
     public String toString() {
-        return "Layer [layerDescriptor=" + layerDescriptor + ", position=" + position + ", size=" + size + ", visible="
-                + visible + "]";
+        
+        return String.format("%d (%d,%d,%d,%d)",
+                layerDescriptor,
+                position.getLeft(), position.getTop(),
+                size.getWidth(), size.getHeight());
     }
 }

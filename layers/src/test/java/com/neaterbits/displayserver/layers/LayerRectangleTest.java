@@ -239,10 +239,10 @@ public class LayerRectangleTest {
                 rectangle.getWidth() - rectangle.getWidth() / 4,
                 rectangle.getHeight() - rectangle.getHeight() / 4);
         
-        assertThat(rectangle.splitFromIntersectingButNotIn(obscured, list)).isEqualTo(OverlapType.OBSCURING);
+        assertThat(rectangle.splitFromIntersectingButNotIn(obscured, list)).isEqualTo(OverlapType.OTHER_WITHIN);
         assertThat(list.isEmpty()).isTrue();
         
-        assertThat(obscured.splitFromIntersectingButNotIn(rectangle, list)).isEqualTo(OverlapType.OBSCURED_BY);
+        assertThat(obscured.splitFromIntersectingButNotIn(rectangle, list)).isEqualTo(OverlapType.THIS_WITHIN);
         assertThat(list.isEmpty()).isTrue();
     }
 }

@@ -52,10 +52,10 @@ public final class LayerRectangle extends LayerRectangleIntersection {
 		final OverlapType overlap;
 		
 		if (this.obscurs(intersectsWith)) {
-			overlap = OverlapType.OBSCURING;
+			overlap = OverlapType.OTHER_WITHIN;
 		}
 		else if (intersectsWith.obscurs(this)) {
-			overlap = OverlapType.OBSCURED_BY;
+			overlap = OverlapType.THIS_WITHIN;
 		}
 		else if (this.intersects(intersectsWith)) {
 			overlap = OverlapType.INTERSECTION;
@@ -64,6 +64,8 @@ public final class LayerRectangle extends LayerRectangleIntersection {
 			overlap = OverlapType.NONE;
 		}
 
+		intersect(intersectsWith, list);
+		
 		return overlap;
 	}
 }
