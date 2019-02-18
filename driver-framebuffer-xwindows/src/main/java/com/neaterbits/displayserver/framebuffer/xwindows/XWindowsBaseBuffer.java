@@ -210,6 +210,9 @@ abstract class XWindowsBaseBuffer implements BufferOperations {
                 
             case 32:
                 if (isPixelFormat(visualType, PixelFormat.RGBA32)) {
+                    pixelFormat = PixelFormat.RGBA32;
+                }
+                else if (isPixelFormat(visualType, PixelFormat.ARGB32)) {
                     pixelFormat = PixelFormat.RGB32;
                 }
                 else {

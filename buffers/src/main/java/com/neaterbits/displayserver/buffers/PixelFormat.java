@@ -2,7 +2,8 @@ package com.neaterbits.displayserver.buffers;
 
 public enum PixelFormat implements PixelConversion {
 
-	RGBA32(24, 32, 4, 8, 1 << 24, 0xFF000000, 0x00FF0000, 0x0000FF00, 16, 8, 0),
+	RGBA32(24, 32, 4, 8, 1 << 24, 0xFF000000, 0x00FF0000, 0x0000FF00, 24, 16, 8),
+    ARGB32(24, 32, 4, 8, 1 << 24, 0x00FF0000, 0x0000FF00, 0x000000FF, 16, 8, 0),
 	
 	RGB24(24, 24, 3, 8, 1 << 24, 0x00FF0000, 0x0000FF00, 0x000000FF, 16, 8, 0),
     RGB32(24, 32, 4, 8, 1 << 24, 0x00FF0000, 0x0000FF00, 0x000000FF, 16, 8, 0);
