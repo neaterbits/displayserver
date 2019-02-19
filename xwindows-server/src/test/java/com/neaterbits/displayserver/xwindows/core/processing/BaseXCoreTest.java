@@ -107,7 +107,7 @@ public abstract class BaseXCoreTest {
         
         final XConfig config = new XConfig(
                 new DisplayAreaConfig(0, Collections.emptyList()),
-                new FontLoaderConfig(Collections.emptyList()),
+                new FontLoaderConfig(Arrays.asList("/usr/share/fonts/X11/misc")),
                 "/usr/share/X11/rgb.txt");
     
         this.displaySize = new Size(1280, 1024);
