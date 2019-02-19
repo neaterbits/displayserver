@@ -13,56 +13,14 @@ public abstract class LayerRectangleIntersection extends LayerRectangleBase {
     }
     
     final Pos getHPos(int x) {
-        
-        final Pos pos;
-        
-        if (x < left) {
-            pos = Pos.BEFORE;
-        }
-        else if (x >= left + width) {
-            pos = Pos.AFTER;
-        }
-        else if (x > left && x < left + width - 1) {
-            pos = Pos.WITHIN;
-        }
-        else if (x == left) {
-            pos = Pos.AT_START;
-        }
-        else if (x == left + width - 1) {
-            pos = Pos.AT_END;
-        }
-        else {
-            throw new IllegalStateException();
-        }
-        
-        return pos;
+        return Pos.getHPos(left, width, x);
     }
+    
 
     final Pos getVPos(int y) {
-        
-        final Pos pos;
-        
-        if (y < top) {
-            pos = Pos.BEFORE;
-        }
-        else if (y > top && y < top + height - 1) {
-            pos = Pos.WITHIN;
-        }
-        else if (y >= top + height) {
-            pos = Pos.AFTER;
-        }
-        else if (y == top) {
-            pos = Pos.AT_START;
-        }
-        else if (y == top + height - 1) {
-            pos = Pos.AT_END;
-        }
-        else {
-            throw new IllegalStateException();
-        }
-        
-        return pos;
+        return Pos.getVPos(top, height, y);
     }
+        
 
     private IntersectionType intersectLeftBeforeOrAtStartRightAtStartOrWithin(LayerRectangle inFront) {
         
