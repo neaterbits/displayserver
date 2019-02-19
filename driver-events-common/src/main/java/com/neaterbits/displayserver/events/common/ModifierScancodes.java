@@ -6,13 +6,13 @@ import java.util.List;
 public final class ModifierScancodes {
 
     private final int codesPerModifier;
-    private final List<Modifier> modifiers;
+    private final List<ModifierMapping> modifiers;
     
-    public ModifierScancodes(int codesPerModifier, List<Modifier> modifiers) {
+    public ModifierScancodes(int codesPerModifier, List<ModifierMapping> modifiers) {
         this.codesPerModifier = codesPerModifier;
         this.modifiers = Collections.unmodifiableList(modifiers);
         
-        for (Modifier modifier : modifiers) {
+        for (ModifierMapping modifier : modifiers) {
             if (modifier.getScancodes().length != codesPerModifier) {
                 throw new IllegalArgumentException();
             }
@@ -23,7 +23,7 @@ public final class ModifierScancodes {
         return codesPerModifier;
     }
 
-    public List<Modifier> getModifiers() {
+    public List<ModifierMapping> getModifiers() {
         return modifiers;
     }
 }

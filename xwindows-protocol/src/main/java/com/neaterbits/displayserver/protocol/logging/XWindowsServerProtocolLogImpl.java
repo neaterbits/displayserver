@@ -3,6 +3,7 @@ package com.neaterbits.displayserver.protocol.logging;
 import com.neaterbits.displayserver.protocol.messages.XEvent;
 import com.neaterbits.displayserver.protocol.messages.XReply;
 import com.neaterbits.displayserver.protocol.messages.XRequest;
+import com.neaterbits.displayserver.protocol.messages.events.MotionNotify;
 import com.neaterbits.displayserver.protocol.types.CARD16;
 import com.neaterbits.displayserver.util.logging.BaseLogImpl;
 import com.neaterbits.displayserver.util.logging.DebugLevel;
@@ -25,7 +26,10 @@ public final class XWindowsServerProtocolLogImpl extends BaseLogImpl implements 
     
     @Override
     public void onSendEvent(XEvent event) {
-        debug("sendEvent", "event", event.toDebugString());
+        
+        if (!(event instanceof MotionNotify)) {
+            debug("sendEvent", "event", event.toDebugString());
+        }
     }
 
     @Override

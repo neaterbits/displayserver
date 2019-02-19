@@ -1,13 +1,18 @@
 package com.neaterbits.displayserver.driver.xwindows.common;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
+import com.neaterbits.displayserver.driver.common.DisplayDeviceId;
 import com.neaterbits.displayserver.driver.common.Listeners;
 import com.neaterbits.displayserver.driver.xwindows.common.messaging.XWindowsDriverMessageSending;
 import com.neaterbits.displayserver.protocol.logging.XWindowsClientProtocolLog;
+import com.neaterbits.displayserver.protocol.messages.XEvent;
 import com.neaterbits.displayserver.protocol.messages.XRequest;
 import com.neaterbits.displayserver.protocol.messages.protocolsetup.ServerMessage;
+import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.render.cairo.xcb.XCBConnection;
 import com.neaterbits.displayserver.render.cairo.xcb.XCBVisual;
 
@@ -19,10 +24,12 @@ public final class XWindowsDriverConnection
 	private final XWindowsMessaging messaging;
 	
 	private final Listeners<XWindowsReplyListener> replyListeners;
-	private final Listeners<XWindowsMessageListener> eventListeners;
+	private final Listeners<XWindowsEventListener> eventListeners;
 	
 	private final XCBConnection xcbConnection;
 	private final XCBVisual xcbVisual;
+	
+	private final Map<WINDOW, DisplayDeviceId> windowToDisplayDeviceId;
 	
 	public XWindowsDriverConnection(
 	        int connectDisplay,
@@ -44,9 +51,18 @@ public final class XWindowsDriverConnection
             }
         };
         
+        final XWindowsEventListener eventListener = new XWindowsEventListener() {
+            
+            @Override
+            public void onEvent(XEvent event) {
+                eventListeners.triggerEvent(event, XWindowsEventListener::onEvent);
+            }
+        };
+        
         this.messaging = new XWindowsDriverMessageSending(
 	            networkFactory,
 	            messageListener,
+	            eventListener,
 	            protocolLog);
 	    
 		this.replyListeners = new Listeners<>();
@@ -61,8 +77,31 @@ public final class XWindowsDriverConnection
 	            .get()
 	            .getVisuals()
 	            .get(0);
+		
+		this.windowToDisplayDeviceId = new HashMap<>();
 	}
 
+	public void addWindowToDisplayDevice(WINDOW window, DisplayDeviceId displayDeviceId) {
+	    
+	    Objects.requireNonNull(window);
+	    Objects.requireNonNull(displayDeviceId);
+	
+	    if (windowToDisplayDeviceId.containsKey(window)) {
+	        throw new IllegalArgumentException();
+	    }
+	    
+	    if (windowToDisplayDeviceId.containsValue(displayDeviceId)) {
+	        throw new IllegalArgumentException();
+	    }
+	    
+	    windowToDisplayDeviceId.put(window, displayDeviceId);
+	}
+	
+	public DisplayDeviceId getDisplayDeviceId(WINDOW window) {
+	    return windowToDisplayDeviceId.get(window);
+	}
+	
+	
 	public boolean isPolling() {
 	    return messaging.isPolling();
 	}
@@ -117,11 +156,11 @@ public final class XWindowsDriverConnection
         replyListeners.deregisterListener(replyListener);
     }
 	
-    public void registerEventListener(XWindowsMessageListener eventListener) {
+    public void registerEventListener(XWindowsEventListener eventListener) {
         eventListeners.registerListener(eventListener);
     }
 
-    public void deregisterEventListener(XWindowsMessageListener eventListener) {
+    public void deregisterEventListener(XWindowsEventListener eventListener) {
         eventListeners.deregisterListener(eventListener);
     }
 

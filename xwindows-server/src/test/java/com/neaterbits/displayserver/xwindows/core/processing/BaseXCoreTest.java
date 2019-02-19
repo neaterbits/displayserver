@@ -26,6 +26,8 @@ import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.server.XClientWindows;
 import com.neaterbits.displayserver.server.XConfig;
 import com.neaterbits.displayserver.server.XEventSubscriptions;
+import com.neaterbits.displayserver.server.XFocusState;
+import com.neaterbits.displayserver.server.XInputEventHandlerConstAccess;
 import com.neaterbits.displayserver.server.XTimestampGenerator;
 import com.neaterbits.displayserver.types.Position;
 import com.neaterbits.displayserver.types.Size;
@@ -205,6 +207,8 @@ public abstract class BaseXCoreTest {
                 colormaps,
                 cursors,
                 new XEventSubscriptions(),
+                mock(XInputEventHandlerConstAccess.class),
+                new XFocusState(),
                 new HashSet<>(),
                 compositor,
                 rendererFactory,

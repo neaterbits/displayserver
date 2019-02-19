@@ -70,7 +70,7 @@ public final class ClientMessage extends XEvent {
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 
-        writeEventCode(stream, Events.CLIENT_MESSAGE);
+        writeEventCode(stream);
         
         stream.writeCARD8(format);
         
@@ -80,5 +80,10 @@ public final class ClientMessage extends XEvent {
         stream.writeATOM(type);
         
         stream.writeData(data);
+    }
+
+    @Override
+    public int getEventCode() {
+        return Events.CLIENT_MESSAGE;
     }
 }

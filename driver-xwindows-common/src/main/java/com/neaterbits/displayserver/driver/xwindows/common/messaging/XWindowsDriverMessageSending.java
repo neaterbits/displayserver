@@ -11,17 +11,18 @@ import java.util.function.Function;
 
 import com.neaterbits.displayserver.driver.xwindows.common.ReplyListener;
 import com.neaterbits.displayserver.driver.xwindows.common.SentRequest;
+import com.neaterbits.displayserver.driver.xwindows.common.XWindowsEventListener;
 import com.neaterbits.displayserver.driver.xwindows.common.XWindowsMessageListener;
 import com.neaterbits.displayserver.driver.xwindows.common.XWindowsMessaging;
 import com.neaterbits.displayserver.driver.xwindows.common.XWindowsNetwork;
 import com.neaterbits.displayserver.driver.xwindows.common.XWindowsNetworkFactory;
 import com.neaterbits.displayserver.io.common.MessageProcessor;
 import com.neaterbits.displayserver.protocol.ByteBufferXWindowsProtocolInputStream;
-import com.neaterbits.displayserver.protocol.Events;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
 import com.neaterbits.displayserver.protocol.logging.XWindowsClientProtocolLog;
 import com.neaterbits.displayserver.protocol.messages.XError;
+import com.neaterbits.displayserver.protocol.messages.XEvent;
 import com.neaterbits.displayserver.protocol.messages.XReply;
 import com.neaterbits.displayserver.protocol.messages.XRequest;
 import com.neaterbits.displayserver.protocol.messages.XServerToClientMessage;
@@ -42,6 +43,8 @@ public class XWindowsDriverMessageSending implements XWindowsMessaging {
 
     private final List<RequestWithReply> requestsWithReply;
 
+    private final XWindowsEventListener eventListener;
+    
     private final XWindowsClientProtocolLog protocolLog;
     
     private final MessageProcessor messageProcessor;
@@ -49,10 +52,14 @@ public class XWindowsDriverMessageSending implements XWindowsMessaging {
     public XWindowsDriverMessageSending(
             XWindowsNetworkFactory networkFactory,
             XWindowsMessageListener messageListener,
+            XWindowsEventListener eventListener,
             XWindowsClientProtocolLog protocolLog) throws IOException {
         
         Objects.requireNonNull(networkFactory);
         Objects.requireNonNull(messageListener);
+        Objects.requireNonNull(eventListener);
+        
+        this.eventListener = eventListener;
         
         this.messageProcessor = new MessageProcessor() {
             
@@ -351,22 +358,21 @@ public class XWindowsDriverMessageSending implements XWindowsMessaging {
     @Override
     public void pollForEvents() {
 
-        final ByteBuffer byteBuffer = network.pollForEvent();
-
-        // System.out.println("## received event " + byteBuffer);
+        ByteBuffer byteBuffer;
         
-        if (byteBuffer != null) {
-            // final XWindowsProtocolInputStream stream = new ByteBufferXWindowsProtocolInputStream(byteBuffer);
+        while (null != (byteBuffer = network.pollForEvent())) {
             
             final int eventCode = byteBuffer.get();
             
-            switch (eventCode) {
-            case Events.EXPOSE:
-                System.out.println("## received expose event");
-                break;
+            final XWindowsProtocolInputStream stream = new ByteBufferXWindowsProtocolInputStream(byteBuffer);
+            
+            try {
+                final XEvent event = XEvent.decode(stream, eventCode);
+
+                eventListener.onEvent(event);
                 
-            default:
-                throw new UnsupportedOperationException("Unknown event code " + eventCode);
+            } catch (IOException ex) {
+                ex.printStackTrace();
             }
         }
     }

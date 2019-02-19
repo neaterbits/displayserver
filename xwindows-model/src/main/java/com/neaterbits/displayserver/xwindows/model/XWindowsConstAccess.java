@@ -13,7 +13,9 @@ public interface XWindowsConstAccess<T extends XWindow> {
     XWindow getClientOrRootWindow(WINDOW windowResource);
 
     XWindow findRootWindowOf(WINDOW windowResource);
-    
+
+    T getClientOrRootWindow(Window window);
+
     T getClientWindow(Window window);
 
     Collection<XWindow> getAllSubWindows(WINDOW windowResource) throws WindowException;

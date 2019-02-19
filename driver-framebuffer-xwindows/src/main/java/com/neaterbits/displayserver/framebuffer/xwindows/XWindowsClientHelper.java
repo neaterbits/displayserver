@@ -45,7 +45,7 @@ class XWindowsClientHelper {
                 new XWindowAttributes(
                         new BITMASK(
                                   XWindowAttributes.BACKING_STORE
-                        //        | WindowAttributes.EVENT_MASK
+                                | XWindowAttributes.EVENT_MASK
                         ),
                         null,
                         null,

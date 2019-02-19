@@ -114,7 +114,7 @@ public final class CreateNotify extends XEvent {
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 
-        writeEventCode(stream, Events.CREATE_NOTIFY);
+        writeEventCode(stream);
         
         writeUnusedByte(stream);
         
@@ -134,5 +134,10 @@ public final class CreateNotify extends XEvent {
         stream.writeBOOL(overrideRedirect);
         
         stream.pad(9);
+    }
+
+    @Override
+    public int getEventCode() {
+        return Events.CREATE_NOTIFY;
     }
 }

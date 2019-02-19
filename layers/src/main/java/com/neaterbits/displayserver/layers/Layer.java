@@ -59,7 +59,7 @@ public final class Layer {
         return subLayers != null && subLayers.length != 0;
     }
 
-    int getAbsoluteLeft() {
+    public int getAbsoluteLeft() {
         
         int left = position.getLeft();
         
@@ -70,7 +70,7 @@ public final class Layer {
         return left;
     }
 
-    int getAbsoluteTop() {
+    public int getAbsoluteTop() {
         
         int top = position.getTop();
         

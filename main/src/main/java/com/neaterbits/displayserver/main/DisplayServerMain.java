@@ -12,7 +12,6 @@ import com.neaterbits.displayserver.driver.xwindows.common.XWindowsNetworkFactor
 import com.neaterbits.displayserver.driver.xwindows.common.messaging.XCBXWindowsNetwork;
 import com.neaterbits.displayserver.events.xwindows.XWindowsInputDriver;
 import com.neaterbits.displayserver.framebuffer.common.Alignment;
-import com.neaterbits.displayserver.framebuffer.common.DisplayDeviceId;
 import com.neaterbits.displayserver.framebuffer.xwindows.XWindowsGraphicsDriver;
 import com.neaterbits.displayserver.io.common.AsyncServers;
 import com.neaterbits.displayserver.io.common.AsyncServersLog;
@@ -125,11 +124,10 @@ public class DisplayServerMain {
 
 	             System.out.println("## start check for IO");
 
-	             final DisplayDeviceId displayDeviceId = new DisplayDeviceId("XWindows", Alignment.CENTER);
 
-	             final XHardware hardware = initDriver(asyncServers, driverConnection, displayDeviceId);
+	             final XHardware hardware = initDriver(asyncServers, driverConnection, "XWindows");
 			    
-	             initXWindows(display, asyncServers, displayDeviceId, driverConnection, hardware);
+	             initXWindows(display, asyncServers, driverConnection, hardware);
 			}
 		}
 	}
@@ -138,7 +136,7 @@ public class DisplayServerMain {
 	private static XHardware initDriver(
 	        AsyncServers asyncServers,
 	        XWindowsDriverConnection driverConnection,
-	        DisplayDeviceId displayDeviceId) throws IOException {
+	        String displayDeviceIdBase) throws IOException {
 
         while (driverConnection.getServerMessage() == null) {
             asyncServers.checkForIO(-1L);
@@ -147,7 +145,7 @@ public class DisplayServerMain {
         System.out.println("## done check for IO");
 
         final XWindowsInputDriver inputDriver = new XWindowsInputDriver(driverConnection);
-        final XWindowsGraphicsDriver graphicsDriver = new XWindowsGraphicsDriver(driverConnection, displayDeviceId);
+        final XWindowsGraphicsDriver graphicsDriver = new XWindowsGraphicsDriver(driverConnection, displayDeviceIdBase);
 	 
         while (!inputDriver.isInitialized() || !graphicsDriver.isInitialized()) {
             asyncServers.checkForIO(-1L);
@@ -161,11 +159,13 @@ public class DisplayServerMain {
 	private static void initXWindows(
 	        int display,
 	        AsyncServers asyncServers,
-	        DisplayDeviceId displayDeviceId,
 	        XWindowsDriverConnection driverConnection,
 	        XHardware hardware) throws Exception {
 
-        final DisplayConfig displayConfig = new DisplayConfig(displayDeviceId, Alignment.CENTER);
+        final DisplayConfig displayConfig = new DisplayConfig(
+                hardware.getGraphicsDriver().getDisplayDevices().get(0).getDisplayDeviceId(),
+                Alignment.CENTER);
+        
         final DisplayAreaConfig displayAreaConfig = new DisplayAreaConfig(
                 1, Arrays.asList(displayConfig));
 

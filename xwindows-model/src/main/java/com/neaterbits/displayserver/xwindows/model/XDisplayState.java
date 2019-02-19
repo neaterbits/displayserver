@@ -78,6 +78,11 @@ public class XDisplayState<W extends XWindow, WINDOWS extends XWindows<W>>
     }
 
     @Override
+    public final W getClientOrRootWindow(Window window) {
+        return windows.getClientOrRootWindow(window);
+    }
+
+    @Override
     public final W getClientWindow(Window window) {
         return windows.getClientWindow(window);
     }

@@ -2,8 +2,8 @@ package com.neaterbits.displayserver.windows.config;
 
 import java.util.Objects;
 
+import com.neaterbits.displayserver.driver.common.DisplayDeviceId;
 import com.neaterbits.displayserver.framebuffer.common.Alignment;
-import com.neaterbits.displayserver.framebuffer.common.DisplayDeviceId;
 
 public final class DisplayConfig {
 

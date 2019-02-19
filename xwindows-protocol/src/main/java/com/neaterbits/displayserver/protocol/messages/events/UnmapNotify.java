@@ -56,7 +56,7 @@ public final class UnmapNotify extends XEvent {
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 
-        writeEventCode(stream, Events.UNMAP_NOTIFY);
+        writeEventCode(stream);
         
         writeUnusedByte(stream);
         
@@ -67,5 +67,10 @@ public final class UnmapNotify extends XEvent {
         stream.writeBOOL(fromConfigure);
         
         stream.pad(19);
+    }
+
+    @Override
+    public int getEventCode() {
+        return Events.UNMAP_NOTIFY;
     }
 }

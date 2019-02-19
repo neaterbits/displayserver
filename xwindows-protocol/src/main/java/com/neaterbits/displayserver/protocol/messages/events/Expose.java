@@ -77,7 +77,7 @@ public final class Expose extends XEvent {
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 
-        writeEventCode(stream, Events.EXPOSE);
+        writeEventCode(stream);
         
         writeUnusedByte(stream);
         
@@ -93,5 +93,10 @@ public final class Expose extends XEvent {
         stream.writeCARD16(count);
         
         stream.pad(14);
+    }
+
+    @Override
+    public int getEventCode() {
+        return Events.EXPOSE;
     }
 }

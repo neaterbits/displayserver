@@ -5,9 +5,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import com.neaterbits.displayserver.driver.common.DisplayDeviceId;
 import com.neaterbits.displayserver.driver.xwindows.common.XWindowsDriverConnection;
 import com.neaterbits.displayserver.framebuffer.common.DisplayDevice;
-import com.neaterbits.displayserver.framebuffer.common.DisplayDeviceId;
 import com.neaterbits.displayserver.framebuffer.common.DisplayMode;
 import com.neaterbits.displayserver.framebuffer.common.Encoder;
 import com.neaterbits.displayserver.framebuffer.common.OutputConnector;

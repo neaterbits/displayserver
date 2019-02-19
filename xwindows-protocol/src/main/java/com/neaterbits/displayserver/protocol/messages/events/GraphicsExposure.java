@@ -42,7 +42,39 @@ public final class GraphicsExposure extends XEvent {
 		this.minorOpcode = minorOpcode;
 	}
 
-	@Override
+    public DRAWABLE getDrawable() {
+        return drawable;
+    }
+
+    public CARD16 getX() {
+        return x;
+    }
+
+    public CARD16 getY() {
+        return y;
+    }
+
+    public CARD16 getWidth() {
+        return width;
+    }
+
+    public CARD16 getHeight() {
+        return height;
+    }
+
+    public CARD16 getCount() {
+        return count;
+    }
+
+    public CARD8 getMajorOpcode() {
+        return majorOpcode;
+    }
+
+    public CARD16 getMinorOpcode() {
+        return minorOpcode;
+    }
+
+    @Override
     protected Object[] getServerToClientDebugParams() {
         return wrap(
                 "drawable", drawable,
@@ -61,7 +93,7 @@ public final class GraphicsExposure extends XEvent {
     @Override
 	public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 		
-	    writeEventCode(stream, Events.GRAPHICS_EXPOSURE);
+	    writeEventCode(stream);
 	    writeUnusedByte(stream);
 	    writeSequenceNumber(stream);
 	    
@@ -77,35 +109,8 @@ public final class GraphicsExposure extends XEvent {
         stream.pad(11);
 	}
 
-	public DRAWABLE getDrawable() {
-		return drawable;
-	}
-
-	public CARD16 getX() {
-		return x;
-	}
-
-	public CARD16 getY() {
-		return y;
-	}
-
-	public CARD16 getWidth() {
-		return width;
-	}
-
-	public CARD16 getHeight() {
-		return height;
-	}
-
-	public CARD16 getCount() {
-		return count;
-	}
-
-	public CARD8 getMajorOpcode() {
-		return majorOpcode;
-	}
-
-	public CARD16 getMinorOpcode() {
-		return minorOpcode;
-	}
+    @Override
+    public int getEventCode() {
+        return Events.GRAPHICS_EXPOSURE;
+    }
 }

@@ -69,7 +69,7 @@ public final class MapNotify extends XEvent {
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 
-        writeEventCode(stream, Events.MAP_NOTIFY);
+        writeEventCode(stream);
         
         writeUnusedByte(stream);
         
@@ -81,5 +81,10 @@ public final class MapNotify extends XEvent {
         stream.writeBOOL(overrideRedirect);
         
         stream.pad(19);
+    }
+
+    @Override
+    public int getEventCode() {
+        return Events.MAP_NOTIFY;
     }
 }

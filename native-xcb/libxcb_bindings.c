@@ -664,7 +664,9 @@ JNIEXPORT jbyteArray JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_
 	}
 	else {
 
-		printf("## got event %d\n", event->response_type);
+		if (event->response_type != XCB_MOTION_NOTIFY) {
+			printf("## got event %d\n", event->response_type);
+		}
 
 		if (event->response_type == 0) {
 			xcb_generic_error_t *error = (xcb_generic_error_t *)event;
@@ -683,6 +685,14 @@ JNIEXPORT jbyteArray JNICALL Java_com_neaterbits_displayserver_render_cairo_xcb_
 		switch (response_type) {
 		case XCB_EXPOSE:
 			size = sizeof(xcb_expose_event_t);
+			break;
+
+		case XCB_KEY_PRESS:
+			size = sizeof(xcb_key_press_event_t);
+			break;
+
+		case XCB_KEY_RELEASE:
+			size = sizeof(xcb_key_release_event_t);
 			break;
 
 		case XCB_BUTTON_PRESS:

@@ -108,10 +108,7 @@ public class XCBXWindowsNetwork implements XWindowsNetwork {
         final ByteBuffer byteBuffer;
         
         if (event != null) {
-            
             byteBuffer = getByteBuffer(event);
-            
-            System.out.println("## event length " + event.length);
         }
         else {
             byteBuffer = null;

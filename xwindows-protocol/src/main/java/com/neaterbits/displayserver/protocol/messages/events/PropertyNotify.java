@@ -64,7 +64,7 @@ public final class PropertyNotify extends XEvent {
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 
-        writeEventCode(stream, Events.PROPERTY_NOTIFY);
+        writeEventCode(stream);
         writeUnusedByte(stream);
         writeSequenceNumber(stream);
 
@@ -74,5 +74,10 @@ public final class PropertyNotify extends XEvent {
         stream.writeBYTE(state);
         
         stream.pad(15);
+    }
+
+    @Override
+    public int getEventCode() {
+        return Events.PROPERTY_NOTIFY;
     }
 }

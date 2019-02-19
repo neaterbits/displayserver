@@ -106,6 +106,18 @@ public class XServer implements AutoCloseable {
             imageBufferFormats.add(imageBufferFormat);
         }
         
+        final XFocusState xFocusState = new XFocusState();
+
+        final XInputEventHandler xInputEventHandler = new XInputEventHandler(
+                hardware.getInputDriver(),
+                windowsDisplayAreas,
+                state.getWindows(),
+                display,
+                state.getEventSubscriptions(),
+                xFocusState,
+                timestampGenerator,
+                protocolLog);
+
         this.messageDispatcher = new XCoreModule(
                 protocolLog,
                 display,
@@ -116,6 +128,8 @@ public class XServer implements AutoCloseable {
                 state.getColormaps(),
                 state.getCursors(),
                 state.getEventSubscriptions(),
+                xInputEventHandler,
+                xFocusState,
                 Collections.unmodifiableSet(imageBufferFormats),
                 rendering.getCompositor(),
                 rendering.getRendererFactory(),
@@ -123,6 +137,7 @@ public class XServer implements AutoCloseable {
                 timestampGenerator,
                 hardware.getInputDriver(),
                 config);
+	
 	}
 	
 	XClientWindowsConstAccess getWindows() {

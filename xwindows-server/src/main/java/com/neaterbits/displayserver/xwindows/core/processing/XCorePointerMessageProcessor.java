@@ -6,13 +6,13 @@ import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.enums.Errors;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
 import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLog;
+import com.neaterbits.displayserver.protocol.messages.events.types.EventState;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryPointerReply;
 import com.neaterbits.displayserver.protocol.messages.requests.QueryPointer;
 import com.neaterbits.displayserver.protocol.types.BOOL;
 import com.neaterbits.displayserver.protocol.types.CARD16;
-import com.neaterbits.displayserver.protocol.types.INT16;
-import com.neaterbits.displayserver.protocol.types.SETofKEYBUTMASK;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
+import com.neaterbits.displayserver.server.XInputEventHandlerConstAccess;
 import com.neaterbits.displayserver.xwindows.model.XWindow;
 import com.neaterbits.displayserver.xwindows.model.XWindowsConstAccess;
 import com.neaterbits.displayserver.xwindows.processing.XClientOps;
@@ -21,11 +21,13 @@ import com.neaterbits.displayserver.xwindows.processing.XOpCodeProcessor;
 public final class XCorePointerMessageProcessor extends XOpCodeProcessor {
 
     private final XWindowsConstAccess<?> xWindows;
+    private final XInputEventHandlerConstAccess xInputEventHandler;
     
-    public XCorePointerMessageProcessor(XWindowsServerProtocolLog protocolLog, XWindowsConstAccess<?> xWindows) {
+    public XCorePointerMessageProcessor(XWindowsServerProtocolLog protocolLog, XWindowsConstAccess<?> xWindows, XInputEventHandlerConstAccess xInputEventHandler) {
         super(protocolLog);
 
         this.xWindows = xWindows;
+        this.xInputEventHandler = xInputEventHandler;
     }
 
     @Override
@@ -56,14 +58,17 @@ public final class XCorePointerMessageProcessor extends XOpCodeProcessor {
                 sendError(client, Errors.Window, sequenceNumber, queryPointer.getWindow().getValue(), opcode);
             }
             else {
+                
+                final EventState eventState = xInputEventHandler.getEventState(window.getWINDOW());
+                
                 final QueryPointerReply reply = new QueryPointerReply(
                         sequenceNumber,
                         new BOOL(true),
                         window.isRootWindow() ? window.getWINDOW() : window.getRootWINDOW(),
                         WINDOW.None,
-                        new INT16((short)0), new INT16((short)0),
-                        new INT16((short)0), new INT16((short)0),
-                        new SETofKEYBUTMASK((short)0));
+                        eventState.getRootX(), eventState.getRootY(),
+                        eventState.getEventX(), eventState.getEventY(),
+                        eventState.getState());
                 
                 sendReply(client, reply);
             }

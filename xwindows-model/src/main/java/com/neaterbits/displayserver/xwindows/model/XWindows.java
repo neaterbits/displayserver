@@ -113,11 +113,22 @@ public class XWindows<T extends XWindow> extends XResources<XWindow> implements 
 
     @SuppressWarnings("unchecked")
     @Override
+    public T getClientOrRootWindow(Window window) {
+
+        Objects.requireNonNull(window);
+
+        return (T)xWindowByWindow.get(window);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
     public final T getClientWindow(Window window) {
         
         Objects.requireNonNull(window);
         
-        return (T)xWindowByWindow.get(window);
+        final T xWindow = (T)xWindowByWindow.get(window);
+        
+        return xWindow.isRootWindow() ? null : xWindow;
     }
 
     @Override

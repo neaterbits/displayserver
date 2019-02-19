@@ -19,6 +19,8 @@ public interface WindowManagement {
 
     List<Window> getSubWindowsInOrder(Window window);
 
+    Window findWindowAt(WindowsDisplayArea displayArea, int x, int y);
+    
     TranslatedCoordinates translateCoordinates(Window window, int x, int y);
 }
 

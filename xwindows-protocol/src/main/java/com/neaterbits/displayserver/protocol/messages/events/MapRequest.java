@@ -59,7 +59,7 @@ public final class MapRequest extends XEvent {
     @Override
     public void encode(XWindowsProtocolOutputStream stream) throws IOException {
 
-        writeEventCode(stream, Events.MAP_REQUEST);
+        writeEventCode(stream);
         
         writeUnusedByte(stream);
         
@@ -69,5 +69,10 @@ public final class MapRequest extends XEvent {
         stream.writeWINDOW(window);
         
         stream.pad(20);
+    }
+
+    @Override
+    public int getEventCode() {
+        return Events.MAP_REQUEST;
     }
 }

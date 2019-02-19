@@ -70,6 +70,14 @@ public final class Window {
         layer.setPosition(position);
     }
 
+    public int getAbsoluteLeft() {
+        return layer.getAbsoluteLeft();
+    }
+    
+    public int getAbsoluteTop() {
+        return layer.getAbsoluteTop();
+    }
+
     public Size getSize() {
 	    return layer.getSize();
 	}

@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 import com.neaterbits.displayserver.events.common.InputDriver;
 import com.neaterbits.displayserver.events.common.KeyboardMapping;
-import com.neaterbits.displayserver.events.common.Modifier;
+import com.neaterbits.displayserver.events.common.ModifierMapping;
 import com.neaterbits.displayserver.events.common.ModifierScancodes;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolInputStream;
 import com.neaterbits.displayserver.protocol.enums.Errors;
@@ -123,7 +123,7 @@ public final class XCoreKeyboardMessageProcessor extends XOpCodeProcessor {
             
             int dstIdx = 0;
             
-            for (Modifier modifier : modifierScancodes.getModifiers()) {
+            for (ModifierMapping modifier : modifierScancodes.getModifiers()) {
                 for (short scancode : modifier.getScancodes()) {
                     keycodes[dstIdx ++] = new CARD8(scancode);
                 }

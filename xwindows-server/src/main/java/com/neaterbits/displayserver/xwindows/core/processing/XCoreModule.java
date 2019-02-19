@@ -12,6 +12,8 @@ import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLog;
 import com.neaterbits.displayserver.server.XClientWindows;
 import com.neaterbits.displayserver.server.XConfig;
 import com.neaterbits.displayserver.server.XEventSubscriptions;
+import com.neaterbits.displayserver.server.XFocusState;
+import com.neaterbits.displayserver.server.XInputEventHandlerConstAccess;
 import com.neaterbits.displayserver.server.XTimestampGenerator;
 import com.neaterbits.displayserver.windows.WindowManagement;
 import com.neaterbits.displayserver.windows.compositor.Compositor;
@@ -37,6 +39,8 @@ public class XCoreModule extends XModule {
             XColormaps colormaps,
             XCursors cursors,
             XEventSubscriptions eventSubscriptions,
+            XInputEventHandlerConstAccess inputEventHandler,
+            XFocusState focusState,
             Set<ImageBufferFormat> imageBufferFormats,
             Compositor compositor,
             XLibRendererFactory rendererFactory,
@@ -55,6 +59,8 @@ public class XCoreModule extends XModule {
                 colormaps,
                 cursors,
                 eventSubscriptions,
+                inputEventHandler,
+                focusState,
                 imageBufferFormats,
                 compositor,
                 rendererFactory,
@@ -74,6 +80,8 @@ public class XCoreModule extends XModule {
             XColormaps colormaps,
             XCursors cursors,
             XEventSubscriptions eventSubscriptions,
+            XInputEventHandlerConstAccess xInputEventHandler,
+            XFocusState focusState,
             Set<ImageBufferFormat> imageBufferFormats,
             Compositor compositor,
             XLibRendererFactory rendererFactory,
@@ -111,9 +119,9 @@ public class XCoreModule extends XModule {
                 
                 new XCoreGrabMessageProcessor(protocolLog),
                 
-                new XCorePointerMessageProcessor(protocolLog, windows),
+                new XCorePointerMessageProcessor(protocolLog, windows, xInputEventHandler),
                 
-                new XCoreFocusMessageProcessor(protocolLog),
+                new XCoreFocusMessageProcessor(protocolLog, focusState),
                 
                 new XCoreFontMessageProcessor(protocolLog, config.getFontConfig(), fontBufferFactory),
                 

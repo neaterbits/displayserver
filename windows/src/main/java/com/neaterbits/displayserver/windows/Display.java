@@ -61,6 +61,11 @@ public class Display implements WindowManagement {
     }
 
     @Override
+    public Window findWindowAt(WindowsDisplayArea displayArea, int x, int y) {
+        return displayArea.findWindowAt(displayArea, x, y);
+    }
+
+    @Override
     public TranslatedCoordinates translateCoordinates(Window window, int x, int y) {
         return window.getDisplayArea().translateCoordinates(window, x, y);
     }

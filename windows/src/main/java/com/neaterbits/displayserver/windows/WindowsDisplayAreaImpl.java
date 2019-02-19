@@ -100,6 +100,25 @@ public final class WindowsDisplayAreaImpl implements WindowsDisplayArea {
     }
 
     @Override
+    public Window findWindowAt(WindowsDisplayArea displayArea, int x, int y) {
+
+        if (displayArea != this) {
+            throw new IllegalArgumentException();
+        }
+        
+        final Window window;
+        
+        if (x >= displayArea.getSize().getWidth() || y >= displayArea.getSize().getHeight()) {
+            window = null;
+        }
+        else {
+            window = windows.findWindowAt(x, y);
+        }
+        
+        return window;
+    }
+
+    @Override
     public TranslatedCoordinates translateCoordinates(Window window, int x, int y) {
         return windows.translateCoordinates(window, x, y);
     }

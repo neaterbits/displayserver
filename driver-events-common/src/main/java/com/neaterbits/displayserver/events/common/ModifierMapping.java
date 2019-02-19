@@ -1,10 +1,10 @@
 package com.neaterbits.displayserver.events.common;
 
-public final class Modifier {
+public final class ModifierMapping {
 
     private final short [] scancodes;
 
-    public Modifier(short[] scancodes) {
+    public ModifierMapping(short[] scancodes) {
         this.scancodes = scancodes;
     }
 
