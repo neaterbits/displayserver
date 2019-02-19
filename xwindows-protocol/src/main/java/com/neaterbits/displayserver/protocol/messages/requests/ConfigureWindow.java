@@ -21,7 +21,11 @@ public final class ConfigureWindow extends XRequest {
         
         readRequestLength(stream);
         
-        return new ConfigureWindow(stream.readWINDOW(), XWindowConfiguration.decode(stream));
+        final WINDOW window = stream.readWINDOW();
+        
+        final XWindowConfiguration configuration = XWindowConfiguration.decode(stream);
+        
+        return new ConfigureWindow(window, configuration);
     }
     
     public ConfigureWindow(WINDOW window, XWindowConfiguration configuration) {
@@ -54,6 +58,10 @@ public final class ConfigureWindow extends XRequest {
         
         writeRequestLength(stream, 3 + configuration.getCount());
     
+        stream.writeWINDOW(window);
+        
+        writeUnusedCARD16(stream);
+        
         configuration.encode(stream);
     }
 

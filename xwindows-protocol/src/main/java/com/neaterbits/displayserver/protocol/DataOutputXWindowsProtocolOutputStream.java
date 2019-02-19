@@ -216,6 +216,8 @@ public final class DataOutputXWindowsProtocolOutputStream implements XWindowsPro
             throw new IllegalArgumentException();
         }
         
+        System.out.println("### write bitmask " + intValue);
+        
         dataOutput.writeShort((short)intValue);
     }
 
