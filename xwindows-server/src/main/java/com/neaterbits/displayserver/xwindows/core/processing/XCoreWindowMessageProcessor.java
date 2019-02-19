@@ -381,7 +381,7 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
                             
                             for (XWindow parentXWindow = xWindows.getClientOrRootWindow(foundXWindow.getParentWINDOW());
                                     parentXWindow != null;
-                                    parentXWindow = xWindows.getClientOrRootWindow(foundXWindow.getParentWINDOW())) {
+                                    parentXWindow = xWindows.getClientOrRootWindow(parentXWindow.getParentWINDOW())) {
                                 
                                 if (translateCoordinates.getDstWindow().equals(foundXWindow.getWINDOW())) {
 
