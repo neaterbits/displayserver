@@ -98,5 +98,7 @@ public class OpCodes {
 	
 	public static final int SET_CLOSE_DOWN_MODE = 112;
 	
+	public static final int GET_POINTER_MAPPING = 117;
+	
 	public static final int GET_MODIFIER_MAPPING = 119;
 }

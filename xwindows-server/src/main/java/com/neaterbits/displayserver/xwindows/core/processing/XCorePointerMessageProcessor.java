@@ -7,10 +7,13 @@ import com.neaterbits.displayserver.protocol.enums.Errors;
 import com.neaterbits.displayserver.protocol.enums.OpCodes;
 import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLog;
 import com.neaterbits.displayserver.protocol.messages.events.types.EventState;
+import com.neaterbits.displayserver.protocol.messages.replies.GetPointerMappingReply;
 import com.neaterbits.displayserver.protocol.messages.replies.QueryPointerReply;
+import com.neaterbits.displayserver.protocol.messages.requests.GetPointerMapping;
 import com.neaterbits.displayserver.protocol.messages.requests.QueryPointer;
 import com.neaterbits.displayserver.protocol.types.BOOL;
 import com.neaterbits.displayserver.protocol.types.CARD16;
+import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
 import com.neaterbits.displayserver.server.XInputEventHandlerConstAccess;
 import com.neaterbits.displayserver.xwindows.model.XWindow;
@@ -34,7 +37,9 @@ public final class XCorePointerMessageProcessor extends XOpCodeProcessor {
     protected int[] getOpCodes() {
 
         return new int [] {
-                OpCodes.QUERY_POINTER
+                OpCodes.QUERY_POINTER,
+                
+                OpCodes.GET_POINTER_MAPPING
         };
     }
 
@@ -72,6 +77,22 @@ public final class XCorePointerMessageProcessor extends XOpCodeProcessor {
                 
                 sendReply(client, reply);
             }
+            break;
+        }
+        
+        case OpCodes.GET_POINTER_MAPPING: {
+            
+            log(messageLength, opcode, sequenceNumber, GetPointerMapping.decode(stream));
+            
+            final CARD8 [] map = new CARD8[5];
+            
+            for (int i = 0; i < map.length; ++ i) {
+                map[i] = new CARD8((short)(i + 1));
+            }
+            
+            final GetPointerMappingReply reply = new GetPointerMappingReply(sequenceNumber, map);
+            
+            sendReply(client, reply);
             break;
         }
         }
