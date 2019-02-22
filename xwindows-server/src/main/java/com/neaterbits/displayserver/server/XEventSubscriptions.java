@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import com.neaterbits.displayserver.protocol.exception.AccessException;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
@@ -109,6 +110,17 @@ public final class XEventSubscriptions implements XEventSubscriptionsConstAccess
         }
     }
 
+    public void removeEventMappings(WINDOW window) {
+        
+        Objects.requireNonNull(window);
+
+        final List<Key> keys = eventToClients.keySet().stream()
+                .filter(key -> key.window.equals(window))
+                .collect(Collectors.toList());
+        
+        keys.forEach(eventToClients::remove);
+    }
+    
     @Override
     public Iterable<XClientOps> getClientsInterestedInEvent(WINDOW window, int event) {
         

@@ -51,6 +51,7 @@ import com.neaterbits.displayserver.protocol.types.INT16;
 import com.neaterbits.displayserver.protocol.types.PIXMAP;
 import com.neaterbits.displayserver.protocol.types.SETofEVENT;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
+import com.neaterbits.displayserver.server.XClientCloseHandler;
 import com.neaterbits.displayserver.server.XClientWindow;
 import com.neaterbits.displayserver.server.XClientWindows;
 import com.neaterbits.displayserver.server.XEventSubscriptions;
@@ -80,6 +81,7 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
     private final XColormapsConstAccess xColormaps;
     private final XCursorsConstAccess xCursors;
     private final XEventSubscriptions eventSubscriptions;
+    private final XClientCloseHandler clientCloseHandler;
     private final Compositor compositor;
     private final XLibRendererFactory rendererFactory;
     
@@ -91,6 +93,7 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
             XColormapsConstAccess xColormaps,
             XCursorsConstAccess xCursors,
             XEventSubscriptions eventSubscriptions,
+            XClientCloseHandler clientCloseHandler,
             Compositor compositor,
             XLibRendererFactory rendererFactory) {
         
@@ -102,6 +105,7 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
         this.xColormaps = xColormaps;
         this.xCursors = xCursors;
         this.eventSubscriptions = eventSubscriptions;
+        this.clientCloseHandler = clientCloseHandler;
         this.compositor = compositor;
         this.rendererFactory = rendererFactory;
     }
@@ -664,6 +668,8 @@ public class XCoreWindowMessageProcessor extends BaseXCorePixmapRenderProcessor 
                     unmapWindow(xWindow);
                 }
 
+                clientCloseHandler.onDestroyWindow(xWindow);
+                
                 windowManagement.disposeWindow(xWindow.getWindow());
                 
                 xWindow.dispose();

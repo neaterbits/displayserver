@@ -9,6 +9,7 @@ import java.util.Set;
 import com.neaterbits.displayserver.buffers.ImageBufferFormat;
 import com.neaterbits.displayserver.events.common.InputDriver;
 import com.neaterbits.displayserver.protocol.logging.XWindowsServerProtocolLog;
+import com.neaterbits.displayserver.server.XClientCloseHandler;
 import com.neaterbits.displayserver.server.XClientWindows;
 import com.neaterbits.displayserver.server.XConfig;
 import com.neaterbits.displayserver.server.XEventSubscriptions;
@@ -39,6 +40,7 @@ public class XCoreModule extends XModule {
             XColormaps colormaps,
             XCursors cursors,
             XEventSubscriptions eventSubscriptions,
+            XClientCloseHandler clientCloseHandler,
             XInputEventHandlerConstAccess inputEventHandler,
             XFocusState focusState,
             Set<ImageBufferFormat> imageBufferFormats,
@@ -59,6 +61,7 @@ public class XCoreModule extends XModule {
                 colormaps,
                 cursors,
                 eventSubscriptions,
+                clientCloseHandler,
                 inputEventHandler,
                 focusState,
                 imageBufferFormats,
@@ -80,6 +83,7 @@ public class XCoreModule extends XModule {
             XColormaps colormaps,
             XCursors cursors,
             XEventSubscriptions eventSubscriptions,
+            XClientCloseHandler clientCloseHandler,
             XInputEventHandlerConstAccess xInputEventHandler,
             XFocusState focusState,
             Set<ImageBufferFormat> imageBufferFormats,
@@ -100,6 +104,7 @@ public class XCoreModule extends XModule {
                         colormaps,
                         cursors,
                         eventSubscriptions,
+                        clientCloseHandler,
                         compositor,
                         rendererFactory),
                 

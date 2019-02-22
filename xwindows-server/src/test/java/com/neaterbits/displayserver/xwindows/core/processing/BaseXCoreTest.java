@@ -23,6 +23,7 @@ import com.neaterbits.displayserver.protocol.types.CARD8;
 import com.neaterbits.displayserver.protocol.types.INT16;
 import com.neaterbits.displayserver.protocol.types.VISUALID;
 import com.neaterbits.displayserver.protocol.types.WINDOW;
+import com.neaterbits.displayserver.server.XClientCloseHandler;
 import com.neaterbits.displayserver.server.XClientWindows;
 import com.neaterbits.displayserver.server.XConfig;
 import com.neaterbits.displayserver.server.XEventSubscriptions;
@@ -207,6 +208,7 @@ public abstract class BaseXCoreTest {
                 colormaps,
                 cursors,
                 new XEventSubscriptions(),
+                mock(XClientCloseHandler.class),
                 mock(XInputEventHandlerConstAccess.class),
                 new XFocusState(),
                 new HashSet<>(),

@@ -108,6 +108,8 @@ public class XServer implements AutoCloseable {
         
         final XFocusState xFocusState = new XFocusState();
 
+        final XClientCloseHandler xClientCloseHandler = new XClientCloseHandler(xFocusState, state.getEventSubscriptions());
+        
         final XInputEventHandler xInputEventHandler = new XInputEventHandler(
                 hardware.getInputDriver(),
                 windowsDisplayAreas,
@@ -128,6 +130,7 @@ public class XServer implements AutoCloseable {
                 state.getColormaps(),
                 state.getCursors(),
                 state.getEventSubscriptions(),
+                xClientCloseHandler,
                 xInputEventHandler,
                 xFocusState,
                 Collections.unmodifiableSet(imageBufferFormats),
