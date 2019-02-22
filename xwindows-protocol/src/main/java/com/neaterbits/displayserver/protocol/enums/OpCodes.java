@@ -24,6 +24,7 @@ public class OpCodes {
 	public static final int GET_PROPERTY = 20;
 	public static final int LIST_PROPERTIES = 21;
 	
+	public static final int SET_SELECTION_OWNER = 22;
 	public static final int GET_SELECTION_OWNER = 23;
 	public static final int CONVERT_SELECTION = 24;
 	
