@@ -106,8 +106,8 @@ public final class XWindowsInputDriver extends BaseInputDriver implements InputD
             final DisplayDeviceId displayDeviceId = driverConnection.getDisplayDeviceId(motionNotify.getEvent());
             
             inputEvent = new PointerMotionEvent(
-                    motionNotify.getRootX().getValue(),
-                    motionNotify.getRootY().getValue(),
+                    motionNotify.getEventX().getValue(),
+                    motionNotify.getEventY().getValue(),
                     displayDeviceId);
             break;
             
