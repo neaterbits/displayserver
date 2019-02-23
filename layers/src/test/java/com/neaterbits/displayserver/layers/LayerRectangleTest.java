@@ -152,7 +152,7 @@ public class LayerRectangleTest {
         final LayerRectangle rectangle = new LayerRectangle(50, 150, 200, 250);
 
         try {
-            rectangle.splitFromIntersectingButNotIn(null, null);
+            rectangle.splitFromInFront(null, null);
         
             fail("Expected exception");
         }
@@ -160,7 +160,7 @@ public class LayerRectangleTest {
         }
 
         try {
-            rectangle.splitFromIntersectingButNotIn(rectangle, null);
+            rectangle.splitFromInFront(rectangle, null);
         
             fail("Expected exception");
         }
@@ -170,79 +170,118 @@ public class LayerRectangleTest {
         final List<LayerRectangle> list = new ArrayList<>();
         
         // above
-        assertThat(rectangle.splitFromIntersectingButNotIn(new LayerRectangle(0, 0, 400, rectangle.getTop()    ), list))
+        assertThat(rectangle.splitFromInFront(new LayerRectangle(0, 0, 400, rectangle.getTop()    ), list))
             .isEqualTo(OverlapType.NONE);
         
         assertThat(list.isEmpty()).isTrue();
         
-        assertThat(rectangle.splitFromIntersectingButNotIn(new LayerRectangle(0, 0, 400, rectangle.getTop() + 1), list))
+        assertThat(rectangle.splitFromInFront(new LayerRectangle(0, 0, 400, rectangle.getTop() + 1), list))
             .isEqualTo(OverlapType.INTERSECTION);
 
         assertThat(list.size()).isEqualTo(1);
-        assertThat(list.get(0)).isEqualTo(new LayerRectangle(rectangle.getLeft(), rectangle.getTop(), rectangle.getWidth(), 1));
+        assertThat(list.get(0)).isEqualTo(new LayerRectangle(
+                    rectangle.getLeft(),
+                    rectangle.getTop() + 1,
+                    rectangle.getWidth(),
+                    rectangle.getHeight() - 1));
         
         list.clear();
         
         // left of
-        assertThat(rectangle.splitFromIntersectingButNotIn(new LayerRectangle(0, 0, rectangle.getLeft(),     400), list))
+        assertThat(rectangle.splitFromInFront(new LayerRectangle(0, 0, rectangle.getLeft(),     400), list))
             .isEqualTo(OverlapType.NONE);
         assertThat(list.isEmpty()).isTrue();
 
-        assertThat(rectangle.splitFromIntersectingButNotIn(new LayerRectangle(0, 0, rectangle.getLeft() + 1, 400), list))
+        assertThat(rectangle.splitFromInFront(new LayerRectangle(0, 0, rectangle.getLeft() + 1, 400), list))
             .isEqualTo(OverlapType.INTERSECTION);
         
         assertThat(list.size()).isEqualTo(1);
-        assertThat(list.get(0)).isEqualTo(new LayerRectangle(rectangle.getLeft(), rectangle.getTop(), 1, rectangle.getHeight()));
+        assertThat(list.get(0)).isEqualTo(new LayerRectangle(
+                rectangle.getLeft() + 1,
+                rectangle.getTop(),
+                rectangle.getWidth() - 1,
+                rectangle.getHeight()));
 
         list.clear();
         
         // below
-        assertThat(rectangle.splitFromIntersectingButNotIn(new LayerRectangle(0, rectangle.getTop() + rectangle.getHeight(),     400, 50), list))
+        assertThat(rectangle.splitFromInFront(new LayerRectangle(0, rectangle.getTop() + rectangle.getHeight(),     400, 50), list))
             .isEqualTo(OverlapType.NONE);
         assertThat(list.isEmpty()).isTrue();
 
-        assertThat(rectangle.splitFromIntersectingButNotIn(new LayerRectangle(0, rectangle.getTop() + rectangle.getHeight() - 1, 400, 50), list))
+        assertThat(rectangle.splitFromInFront(new LayerRectangle(0, rectangle.getTop() + rectangle.getHeight() - 1, 400, 50), list))
             .isEqualTo(OverlapType.INTERSECTION);
         
         assertThat(list.size()).isEqualTo(1);
         assertThat(list.get(0)).isEqualTo(new LayerRectangle(
                 rectangle.getLeft(),
-                rectangle.getTop() + rectangle.getHeight() - 1,
-                rectangle.getWidth(), 1));
+                rectangle.getTop(),
+                rectangle.getWidth(),
+                rectangle.getHeight() - 1));
 
         list.clear();
 
         // right of
-        assertThat(rectangle.splitFromIntersectingButNotIn(new LayerRectangle(rectangle.getLeft() + rectangle.getWidth(),     0, 50, 400), list))
+        assertThat(rectangle.splitFromInFront(new LayerRectangle(rectangle.getLeft() + rectangle.getWidth(),     0, 50, 400), list))
             .isEqualTo(OverlapType.NONE);
         assertThat(list.isEmpty()).isTrue();
 
-        assertThat(rectangle.splitFromIntersectingButNotIn(new LayerRectangle(rectangle.getLeft() + rectangle.getWidth() - 1, 0, 50, 400), list))
+        assertThat(rectangle.splitFromInFront(new LayerRectangle(rectangle.getLeft() + rectangle.getWidth() - 1, 0, 50, 400), list))
             .isEqualTo(OverlapType.INTERSECTION);
 
         assertThat(list.size()).isEqualTo(1);
         assertThat(list.get(0)).isEqualTo(new LayerRectangle(
-                rectangle.getLeft() + rectangle.getWidth() - 1,
+                rectangle.getLeft(),
                 rectangle.getTop(),
-                1,
+                rectangle.getWidth() - 1,
                 rectangle.getHeight()));
 
         list.clear();
         
         // obscured by
-        assertThat(rectangle.splitFromIntersectingButNotIn(new LayerRectangle(rectangle), list))
+        assertThat(rectangle.splitFromInFront(new LayerRectangle(rectangle), list))
             .isEqualTo(OverlapType.EQUALS);
         
-        final LayerRectangle obscured = new LayerRectangle(
-                rectangle.getLeft() + rectangle.getWidth() / 4,
-                rectangle.getTop() + rectangle.getHeight() / 4,
-                rectangle.getWidth() - rectangle.getWidth() / 4,
-                rectangle.getHeight() - rectangle.getHeight() / 4);
-        
-        assertThat(rectangle.splitFromIntersectingButNotIn(obscured, list)).isEqualTo(OverlapType.OTHER_WITHIN);
         assertThat(list.isEmpty()).isTrue();
         
-        assertThat(obscured.splitFromIntersectingButNotIn(rectangle, list)).isEqualTo(OverlapType.THIS_WITHIN);
+        final LayerRectangle within = new LayerRectangle(
+                rectangle.getLeft() + rectangle.getWidth() / 4,
+                rectangle.getTop() + rectangle.getHeight() / 4,
+                rectangle.getWidth() - rectangle.getWidth() / 2,
+                rectangle.getHeight() - rectangle.getHeight() / 2);
+
+        System.out.println("## split within " + within);
+        
+        assertThat(rectangle.splitFromInFront(within, list)).isEqualTo(OverlapType.OTHER_WITHIN);
+        assertThat(list.size()).isEqualTo(4);
+
+        assertThat(list.get(0)).isEqualTo(new LayerRectangle(
+                rectangle.getLeft(),
+                rectangle.getTop(),
+                rectangle.getWidth(),
+                within.getTop() - rectangle.getTop()));
+
+        assertThat(list.get(1)).isEqualTo(new LayerRectangle(
+                within.getLeft() + within.getWidth(),
+                within.getTop(),
+                rectangle.getWidth() - (within.getLeft() - rectangle.getLeft() + within.getWidth()),
+                within.getHeight()));
+
+        assertThat(list.get(2)).isEqualTo(new LayerRectangle(
+                rectangle.getLeft(),
+                within.getTop() + within.getHeight(),
+                rectangle.getWidth(),
+                rectangle.getHeight() - (within.getTop() - rectangle.getTop() + within.getHeight())));
+
+        assertThat(list.get(3)).isEqualTo(new LayerRectangle(
+                rectangle.getLeft(),
+                within.getTop(),
+                within.getLeft() - rectangle.getLeft(),
+                within.getHeight()));
+
+        list.clear();
+        
+        assertThat(within.splitFromInFront(rectangle, list)).isEqualTo(OverlapType.THIS_WITHIN);
         assertThat(list.isEmpty()).isTrue();
     }
 }

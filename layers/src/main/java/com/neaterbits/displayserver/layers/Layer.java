@@ -222,7 +222,7 @@ public final class Layer {
 			
             int prevSplitListSize = workArea.splitTempList.size();
 
-            final OverlapType overlap = updated.splitFromIntersectingButNotIn(layerRectangle, workArea.splitTempList);
+            final OverlapType overlap = updated.splitFromInFront(layerRectangle, workArea.splitTempList);
 
 			switch (overlap) {
 			case NONE:
@@ -287,7 +287,7 @@ public final class Layer {
     
     				final int numUpdated = updatedRectangles.size();
     				
-    				final OverlapType overlap = updated.splitFromIntersectingButNotIn(previous, newlyVisible);
+    				final OverlapType overlap = updated.splitFromInFront(previous, newlyVisible);
     				
     				switch (overlap) {
     				case NONE:

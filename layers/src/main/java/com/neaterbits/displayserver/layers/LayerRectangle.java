@@ -53,24 +53,31 @@ public final class LayerRectangle extends LayerRectangleIntersection {
 	}
 	
 	
-	public OverlapType splitFromIntersectingButNotIn(LayerRectangle intersectsWith, List<LayerRectangle> list) {
+	public OverlapType splitFromInFront(LayerRectangle inFront, List<LayerRectangle> list) {
 		
 		final OverlapType overlap;
 		
-		if (this.obscurs(intersectsWith)) {
+		if (this == inFront) {
+		    throw new IllegalArgumentException();
+		}
+		
+		if (this.equals(inFront)) {
+		    overlap = OverlapType.EQUALS;
+		}
+		else if (this.obscurs(inFront)) {
 			overlap = OverlapType.OTHER_WITHIN;
 		}
-		else if (intersectsWith.obscurs(this)) {
+		else if (inFront.obscurs(this)) {
 			overlap = OverlapType.THIS_WITHIN;
 		}
-		else if (this.intersects(intersectsWith)) {
+		else if (this.intersects(inFront)) {
 			overlap = OverlapType.INTERSECTION;
 		}
 		else {
 			overlap = OverlapType.NONE;
 		}
 
-		intersect(intersectsWith, list);
+		intersect(inFront, list);
 		
 		return overlap;
 	}

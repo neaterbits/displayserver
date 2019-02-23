@@ -532,6 +532,9 @@ public abstract class LayerRectangleIntersection extends LayerRectangleBase {
             throw new UnsupportedOperationException();
         }
         
+        System.out.println("## intersection " + intersection);
+        
+        
         return intersection;
     }
 
@@ -574,35 +577,67 @@ public abstract class LayerRectangleIntersection extends LayerRectangleBase {
                     width,
                     height - (inFront.top + inFront.height - top)));
             break;
+
+        case RIGHT:
+            splitList.add(new LayerRectangle(
+                    left,
+                    top,
+                    inFront.left - left,
+                    height));
+            break;
+
+        case LOWER:
+            splitList.add(new LayerRectangle(
+                    left,
+                    top,
+                    width,
+                    inFront.top - top));
+            break;
+
+        case LEFT:
+            splitList.add(new LayerRectangle(
+                    inFront.left + inFront.width,
+                    top,
+                    width - (inFront.left + inFront.width - left),
+                    height));
+            break;
+            
             
         case WITHIN:
+            // upper
             splitList.add(new LayerRectangle(
                     left,
                     top,
                     width,
                     inFront.top - top));
             
-            splitList.add(new LayerRectangle(
-                    left,
-                    inFront.top,
-                    inFront.left - left,
-                    inFront.height));
-
+            // right
             splitList.add(new LayerRectangle(
                     inFront.left + inFront.width,
                     inFront.top,
                     width - inFront.width - (inFront.left - left),
-                    inFront.top + inFront.height - top));
+                    inFront.height));
             
+            // lower
             splitList.add(new LayerRectangle(
                     left,
                     inFront.top + inFront.height,
                     width,
                     height - inFront.height - (inFront.top - top)));
+
+            // left
+            splitList.add(new LayerRectangle(
+                    left,
+                    inFront.top,
+                    inFront.left - left,
+                    inFront.height));
             break;
             
+        case OBSCURED:
+            break;
+        
         default:
-            throw new UnsupportedOperationException();
+            throw new UnsupportedOperationException(inFrontIntersection.toString());
         }
         
     }
