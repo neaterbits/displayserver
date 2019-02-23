@@ -28,21 +28,27 @@ public final class LayerRectangle extends LayerRectangleIntersection {
 
 		Objects.requireNonNull(other);
 		
+		if (this == other) {
+		    throw new IllegalArgumentException();
+		}
+
 		return 
-			   (left <= other.left               && left + width >  other.left)
-			|| (left <  other.left + other.width && left + width >= other.left + other.width)
-			|| (top  <= other.top                && top + height >  other.top)
-			|| (top  <  other.top + other.height && top + height >= other.top + other.height);
+			    (left  <  other.left + other.width && left + width > other.left)
+			&&  (top   <  other.top + other.height && top + height > other.top);
 		
 	}
 	
 	public boolean obscurs(LayerRectangle other) {
 
 		Objects.requireNonNull(other);
-		
+
+		if (this == other) {
+		    throw new IllegalArgumentException();
+		}
+
 		return 
 			   (left <= other.left               && left + width >=  other.left + other.width)
-			&& (top  <= other.top                && top + height >   other.top  + other.height);
+			&& (top  <= other.top                && top + height >=  other.top  + other.height);
 		
 	}
 	
