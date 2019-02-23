@@ -563,6 +563,26 @@ public abstract class LayerRectangleIntersection extends LayerRectangleBase {
                     width,
                     height - (inFront.top + inFront.height - top)));
             break;
+
+        case UPPER_PART:
+            splitList.add(new LayerRectangle(
+                    left,
+                    inFront.top + inFront.height,
+                    inFront.left - left,
+                    height - (inFront.top + inFront.height - top)));
+            
+            splitList.add(new LayerRectangle(
+                    left,
+                    inFront.top + inFront.height,
+                    inFront.width,
+                    height - (inFront.top + inFront.height - top)));
+
+            splitList.add(new LayerRectangle(
+                    left,
+                    inFront.top + inFront.height,
+                    width - (inFront.left - left) - inFront.width,
+                    height - (inFront.top + inFront.height - top)));
+            break;
             
         case UPPER_RIGHT:
             splitList.add(new LayerRectangle(
@@ -591,6 +611,26 @@ public abstract class LayerRectangleIntersection extends LayerRectangleBase {
                     left,
                     top,
                     width,
+                    inFront.top - top));
+            break;
+
+        case LOWER_PART:
+            splitList.add(new LayerRectangle(
+                    left,
+                    top,
+                    inFront.left - left,
+                    inFront.top - top));
+
+            splitList.add(new LayerRectangle(
+                    left,
+                    top,
+                    inFront.width,
+                    inFront.top - top));
+            
+            splitList.add(new LayerRectangle(
+                    left,
+                    top,
+                    width - (inFront.left - left) - inFront.width,
                     inFront.top - top));
             break;
 

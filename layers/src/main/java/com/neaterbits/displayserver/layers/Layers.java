@@ -181,7 +181,7 @@ public class Layers {
 	    
         workArea.intersectList.clear();
         
-        workArea.intersectList.add(layer.getRectangle());
+        workArea.intersectList.add(new LayerRectangle(layer.getRectangle())); // TODO avoid instantiation?
         
         recomputeOneLayer(layer, layerRegions, stack, workArea);
         
@@ -244,7 +244,7 @@ public class Layers {
 		// Intersect sublayers that could possibly hide part of this layer
 		intersectAllSubLayers(stack.size(), layer, layer, workArea);
 
-        exit(stack.size(), "recomputeOneLayer intersected layer=" + layer + ", region=" + workArea.intersectList);
+        debug(stack.size(), "recomputeOneLayer intersected layer=" + layer + ", region=" + workArea.intersectList);
 
 		final List<LayerRectangle> newlyVisibleRectangles = layer.updateVisibleRectangles(workArea.intersectList);
 		
@@ -258,7 +258,7 @@ public class Layers {
 		
 		final LayerRegion newlyVisibleRegion = new LayerRegion(relativeToLayer);
 		
-        exit(stack.size(), "recomputeOneLayer add region layer=" + layer + ", region=" + newlyVisibleRectangles);
+        debug(stack.size(), "recomputeOneLayer add region layer=" + layer + ", region=" + newlyVisibleRectangles);
 		
 		layerRegions.put(layer, newlyVisibleRegion);
 

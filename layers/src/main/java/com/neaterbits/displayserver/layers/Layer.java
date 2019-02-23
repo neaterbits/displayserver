@@ -285,13 +285,13 @@ public final class Layer {
     			
     			for (LayerRectangle previous : visibleRectangles) {
     
-    				final int numUpdated = updatedRectangles.size();
+    				final int numVisible = newlyVisible.size();
     				
     				final OverlapType overlap = updated.splitFromInFront(previous, newlyVisible);
     				
     				switch (overlap) {
     				case NONE:
-    					if (updatedRectangles.size() != numUpdated) {
+    					if (newlyVisible.size() != numVisible) {
     						throw new IllegalStateException();
     					}
     
@@ -299,25 +299,28 @@ public final class Layer {
     					break;
     					
     				case INTERSECTION:
-    					if (updatedRectangles.size() == numUpdated) {
+    					if (newlyVisible.size() == numVisible) {
     						throw new IllegalStateException();
     					}
     					break;
     					
     				case THIS_WITHIN:
-    					if (updatedRectangles.size() != numUpdated) {
+    					if (newlyVisible.size() != numVisible) {
     						throw new IllegalStateException();
     					}
     					break;
     					
     				case OTHER_WITHIN:
-    					if (updatedRectangles.size() == numUpdated) {
+    					if (newlyVisible.size() == numVisible) {
     						throw new IllegalStateException();
     					}
     					break;
     					
     				case EQUALS:
-    				    throw new UnsupportedOperationException();
+                        if (newlyVisible.size() != numVisible) {
+                            throw new IllegalStateException();
+                        }
+                        break;
     				}
     			}
     		}
