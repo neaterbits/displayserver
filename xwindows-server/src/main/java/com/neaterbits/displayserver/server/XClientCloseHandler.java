@@ -9,7 +9,7 @@ public final class XClientCloseHandler {
     private final XFocusState xFocusState;
     private final XEventSubscriptions xEventSubscriptions;
 
-    XClientCloseHandler(XFocusState xFocusState, XEventSubscriptions xEventSubscriptions) {
+    public XClientCloseHandler(XFocusState xFocusState, XEventSubscriptions xEventSubscriptions) {
         this.xFocusState = xFocusState;
         this.xEventSubscriptions = xEventSubscriptions;
     }

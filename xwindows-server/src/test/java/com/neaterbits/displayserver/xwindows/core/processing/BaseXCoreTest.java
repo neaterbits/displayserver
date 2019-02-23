@@ -198,6 +198,10 @@ public abstract class BaseXCoreTest {
         this.client = mock(XClientOps.class);
         
         try {
+            
+            final XEventSubscriptions xEventSubscriptions = new XEventSubscriptions();
+            final XFocusState xFocusState = new XFocusState();
+            
             this.coreModule = new XCoreModule(
                 new XWindowsServerProtocolLogImpl("test", DebugLevel.TRACE),
                 windowManagement,
@@ -207,10 +211,10 @@ public abstract class BaseXCoreTest {
                 pixmaps,
                 colormaps,
                 cursors,
-                new XEventSubscriptions(),
-                mock(XClientCloseHandler.class),
+                xEventSubscriptions,
+                new XClientCloseHandler(xFocusState, xEventSubscriptions),
                 mock(XInputEventHandlerConstAccess.class),
-                new XFocusState(),
+                xFocusState,
                 new HashSet<>(),
                 compositor,
                 rendererFactory,
