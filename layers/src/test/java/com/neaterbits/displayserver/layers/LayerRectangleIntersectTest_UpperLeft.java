@@ -14,6 +14,8 @@ public class LayerRectangleIntersectTest_UpperLeft extends BaseLayerRectangleInt
         
         final LayerRectangle rectangle = new LayerRectangle(0, 0, RECTANGLE.getLeft() + 1, RECTANGLE.getTop() + 1);
 
+        checkPos(rectangle, Pos.BEFORE, Pos.AT_START, Pos.BEFORE, Pos.AT_START);
+
         final List<LayerRectangle> list = new ArrayList<>();
         
         assertThat(RECTANGLE.intersect(rectangle, list)).isEqualTo(IntersectionType.UPPER_LEFT);
@@ -27,6 +29,8 @@ public class LayerRectangleIntersectTest_UpperLeft extends BaseLayerRectangleInt
     public void test_LeftAtStart_RightAtStart_TopBefore_LowerAtStart() {
 
         final LayerRectangle rectangle = new LayerRectangle(RECTANGLE.getLeft(), 0, 1, RECTANGLE.getTop() + 1);
+
+        checkPos(rectangle, Pos.AT_START, Pos.AT_START, Pos.BEFORE, Pos.AT_START);
 
         final List<LayerRectangle> list = new ArrayList<>();
         
@@ -42,6 +46,8 @@ public class LayerRectangleIntersectTest_UpperLeft extends BaseLayerRectangleInt
 
         final LayerRectangle rectangle = new LayerRectangle(0, 0, RECTANGLE.getLeft() + 10, RECTANGLE.getTop() + 1);
 
+        checkPos(rectangle, Pos.BEFORE, Pos.WITHIN, Pos.BEFORE, Pos.AT_START);
+
         final List<LayerRectangle> list = new ArrayList<>();
         
         assertThat(RECTANGLE.intersect(rectangle, list)).isEqualTo(IntersectionType.UPPER_LEFT);
@@ -55,6 +61,8 @@ public class LayerRectangleIntersectTest_UpperLeft extends BaseLayerRectangleInt
     public void test_LeftAtStart_RightWithin_TopBefore_LowerAtStart() {
 
         final LayerRectangle rectangle = new LayerRectangle(RECTANGLE.getLeft(), 0, 10, RECTANGLE.getTop() + 1);
+
+        checkPos(rectangle, Pos.AT_START, Pos.WITHIN, Pos.BEFORE, Pos.AT_START);
 
         final List<LayerRectangle> list = new ArrayList<>();
         
@@ -71,6 +79,8 @@ public class LayerRectangleIntersectTest_UpperLeft extends BaseLayerRectangleInt
 
         final LayerRectangle rectangle = new LayerRectangle(0, 0, RECTANGLE.getLeft() + 10, RECTANGLE.getTop() + 20);
 
+        checkPos(rectangle, Pos.BEFORE, Pos.WITHIN, Pos.BEFORE, Pos.WITHIN);
+
         final List<LayerRectangle> list = new ArrayList<>();
         
         assertThat(RECTANGLE.intersect(rectangle, list)).isEqualTo(IntersectionType.UPPER_LEFT);
@@ -84,6 +94,8 @@ public class LayerRectangleIntersectTest_UpperLeft extends BaseLayerRectangleInt
     public void test_LeftAtStart_RightWithin_TopAtStart_LowerWithin() {
 
         final LayerRectangle rectangle = new LayerRectangle(RECTANGLE.getLeft(), RECTANGLE.getTop(), 10, 20);
+
+        checkPos(rectangle, Pos.AT_START, Pos.WITHIN, Pos.AT_START, Pos.WITHIN);
 
         final List<LayerRectangle> list = new ArrayList<>();
         
