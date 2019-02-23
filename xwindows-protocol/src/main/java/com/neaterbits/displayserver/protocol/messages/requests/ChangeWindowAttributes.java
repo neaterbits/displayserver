@@ -22,7 +22,9 @@ public final class ChangeWindowAttributes extends XRequest {
         
         readRequestLength(stream);
         
-        return new ChangeWindowAttributes(stream.readWINDOW(), XWindowAttributes.decode(stream));
+        final ChangeWindowAttributes changeWindowAttributes = new ChangeWindowAttributes(stream.readWINDOW(), XWindowAttributes.decode(stream));
+        
+        return changeWindowAttributes;
     }
     
     public ChangeWindowAttributes(WINDOW window, XWindowAttributes attributes) {

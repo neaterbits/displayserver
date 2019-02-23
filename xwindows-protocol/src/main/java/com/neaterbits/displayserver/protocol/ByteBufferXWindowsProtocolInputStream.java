@@ -49,7 +49,7 @@ public class ByteBufferXWindowsProtocolInputStream implements XWindowsProtocolIn
 		
 		this.buffer = buffer;
 	}
-	
+
 	@Override
 	public INT8 readINT8() {
 		return new INT8(buffer.get());
@@ -238,10 +238,15 @@ public class ByteBufferXWindowsProtocolInputStream implements XWindowsProtocolIn
     }
 
     @Override
-    public SETofDEVICEEVENT readSETofDEVICEEVENT() throws IOException {
+    public SETofDEVICEEVENT readSETofDEVICEEVENT16() throws IOException {
         return new SETofDEVICEEVENT(buffer.getShort());
     }
     
+    @Override
+    public SETofDEVICEEVENT readSETofDEVICEEVENT32() throws IOException {
+        return new SETofDEVICEEVENT(buffer.getInt());
+    }
+
     @Override
     public SETofPOINTEREVENT readSETofPOINTEREVENT() throws IOException {
         return new SETofPOINTEREVENT(buffer.getShort());

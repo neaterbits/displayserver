@@ -90,7 +90,8 @@ public interface XWindowsProtocolOutputStream {
     void writeBITMASK16(BITMASK value) throws IOException;
 	void writeSET32(SET32 value) throws IOException;
 	void writeSETofEVENT(SETofEVENT value) throws IOException;
-	void writeSETofDEVICEEVENT(SETofDEVICEEVENT value) throws IOException;
+	void writeSETofDEVICEEVENT16(SETofDEVICEEVENT value) throws IOException;
+    void writeSETofDEVICEEVENT32(SETofDEVICEEVENT value) throws IOException;
     void writeSETofPOINTEREVENT(SETofPOINTEREVENT value) throws IOException;
 	void writeSETofKEYBUTMASK(SETofKEYBUTMASK value) throws IOException;
 

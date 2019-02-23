@@ -182,7 +182,7 @@ public final class GetWindowAttributesReply extends XReply {
         stream.writeSETofEVENT(allEventMasks);
         stream.writeSETofEVENT(yourEventMasks);
         
-        stream.writeSETofDEVICEEVENT(doNotPropagateMask);
+        stream.writeSETofDEVICEEVENT16(doNotPropagateMask);
         
         writeUnusedCARD16(stream);
     }

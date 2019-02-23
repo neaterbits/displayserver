@@ -207,8 +207,13 @@ public class IntPadXWindowsProtocolOutputStream implements XWindowsProtocolOutpu
     }
 
     @Override
-    public void writeSETofDEVICEEVENT(SETofDEVICEEVENT value) throws IOException {
-        delegate.writeSETofDEVICEEVENT(value);
+    public void writeSETofDEVICEEVENT16(SETofDEVICEEVENT value) throws IOException {
+        writeWithPadding(value.getValue());
+    }
+
+    @Override
+    public void writeSETofDEVICEEVENT32(SETofDEVICEEVENT value) throws IOException {
+        delegate.writeSETofDEVICEEVENT32(value);
     }
     
     @Override

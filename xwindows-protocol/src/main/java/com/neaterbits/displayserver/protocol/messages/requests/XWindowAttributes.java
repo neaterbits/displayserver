@@ -161,7 +161,7 @@ public final class XWindowAttributes extends XAttributes {
                 readIfSet(bitmask, OVERRIDE_REDIRECT,   padStream::readBOOL),
                 readIfSet(bitmask, SAVE_UNDER,          padStream::readBOOL),
                 readIfSet(bitmask, EVENT_MASK,          padStream::readSETofEVENT),
-                readIfSet(bitmask, DO_NOT_PROPAGATE_MASK, padStream::readSETofDEVICEEVENT),
+                readIfSet(bitmask, DO_NOT_PROPAGATE_MASK, padStream::readSETofDEVICEEVENT32),
                 readIfSet(bitmask, COLOR_MAP,           padStream::readCOLORMAP),
                 readIfSet(bitmask, CURSOR,              padStream::readCURSOR));
         
@@ -217,7 +217,7 @@ public final class XWindowAttributes extends XAttributes {
         writeIfSet(overrideRedirect,    OVERRIDE_REDIRECT,  padStream::writeBOOL);
         writeIfSet(saveUnder,           SAVE_UNDER,         padStream::writeBOOL);
         writeIfSet(eventMask,           EVENT_MASK,         padStream::writeSETofEVENT);
-        writeIfSet(doNotPropagateMask,  DO_NOT_PROPAGATE_MASK, padStream::writeSETofDEVICEEVENT);
+        writeIfSet(doNotPropagateMask,  DO_NOT_PROPAGATE_MASK, padStream::writeSETofDEVICEEVENT32);
         writeIfSet(colormap,            COLOR_MAP,          padStream::writeCOLORMAP);
         writeIfSet(cursor,              CURSOR,             padStream::writeCURSOR);
     }

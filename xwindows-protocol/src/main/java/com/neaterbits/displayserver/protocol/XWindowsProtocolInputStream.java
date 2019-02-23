@@ -83,7 +83,8 @@ public interface XWindowsProtocolInputStream {
 	SET32 readSET32() throws IOException;
 
 	SETofEVENT readSETofEVENT() throws IOException;
-	SETofDEVICEEVENT readSETofDEVICEEVENT() throws IOException;
+	SETofDEVICEEVENT readSETofDEVICEEVENT16() throws IOException;
+    SETofDEVICEEVENT readSETofDEVICEEVENT32() throws IOException;
 	SETofPOINTEREVENT readSETofPOINTEREVENT() throws IOException;
 	SETofKEYBUTMASK readSETofKEYBUTMASK() throws IOException;
 	SETofKEYMASK readSETofKEYMASK() throws IOException;

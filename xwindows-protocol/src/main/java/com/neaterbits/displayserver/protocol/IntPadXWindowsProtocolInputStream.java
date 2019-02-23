@@ -201,10 +201,15 @@ public class IntPadXWindowsProtocolInputStream implements XWindowsProtocolInputS
     }
 
     @Override
-    public SETofDEVICEEVENT readSETofDEVICEEVENT() throws IOException {
-        return delegate.readSETofDEVICEEVENT();
+    public SETofDEVICEEVENT readSETofDEVICEEVENT16() throws IOException {
+        return new SETofDEVICEEVENT((short)readWithPadding());
     }
 
+    @Override
+    public SETofDEVICEEVENT readSETofDEVICEEVENT32() throws IOException {
+        return delegate.readSETofDEVICEEVENT32();
+    }
+    
     @Override
     public SETofPOINTEREVENT readSETofPOINTEREVENT() throws IOException {
         return new SETofPOINTEREVENT(readWithPadding());
