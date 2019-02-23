@@ -10,6 +10,10 @@ public final class XClientCloseHandler {
     private final XEventSubscriptions xEventSubscriptions;
 
     public XClientCloseHandler(XFocusState xFocusState, XEventSubscriptions xEventSubscriptions) {
+
+        Objects.requireNonNull(xFocusState);
+        Objects.requireNonNull(xEventSubscriptions);
+        
         this.xFocusState = xFocusState;
         this.xEventSubscriptions = xEventSubscriptions;
     }
@@ -18,7 +22,7 @@ public final class XClientCloseHandler {
 
         Objects.requireNonNull(xWindow);
     
-        if (xFocusState.getInputFocus().equals(xWindow.getWINDOW())) {
+        if (xWindow.getWINDOW().equals(xFocusState.getInputFocus())) {
             xFocusState.setInputFocus(null, null);
         }
 

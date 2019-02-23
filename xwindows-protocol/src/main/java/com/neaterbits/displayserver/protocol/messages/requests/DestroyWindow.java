@@ -44,9 +44,11 @@ public final class DestroyWindow extends XRequest {
 
 	    writeOpCode(stream);
 	    
-	    stream.writeWINDOW(window);
+	    writeUnusedByte(stream);
 	    
 	    writeRequestLength(stream, 2);
+
+	    stream.writeWINDOW(window);
 	}
 
     @Override

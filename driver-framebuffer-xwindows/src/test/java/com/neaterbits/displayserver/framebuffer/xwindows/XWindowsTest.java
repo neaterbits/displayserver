@@ -35,7 +35,7 @@ import com.neaterbits.displayserver.xwindows.util.JNIBindings;
 
 public class XWindowsTest {
 
-    @Test
+    // @Test
     public void testOpenWindow() throws Exception {
         
         JNIBindings.load();

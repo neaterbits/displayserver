@@ -262,7 +262,7 @@ public class XCoreWindowMapWindowTest extends BaseXCorePixmapTest {
         assertThat(expose.getWidth().getValue()).isEqualTo(45);
         assertThat(expose.getHeight().getValue()).isEqualTo(35);
         
-        assertThat(expose.getCount().getValue()).isEqualTo(1);
+        assertThat(expose.getCount().getValue()).isEqualTo(0);
         
         verifyNoMoreInteractions(subWindow);
     }
@@ -309,7 +309,7 @@ public class XCoreWindowMapWindowTest extends BaseXCorePixmapTest {
         assertThat(expose.getWidth().getValue()).isEqualTo(450);
         assertThat(expose.getHeight().getValue()).isEqualTo(350);
         
-        assertThat(expose.getCount().getValue()).isEqualTo(1);
+        assertThat(expose.getCount().getValue()).isEqualTo(0);
         
         verifyNoMoreInteractions(window);
     }

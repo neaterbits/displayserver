@@ -1,5 +1,6 @@
 package com.neaterbits.displayserver.xwindows.core.processing;
 
+import com.neaterbits.displayserver.buffers.ImageBufferFormat;
 import com.neaterbits.displayserver.buffers.PixelFormat;
 import com.neaterbits.displayserver.events.common.InputDriver;
 import com.neaterbits.displayserver.io.common.DataWriter;
@@ -69,6 +70,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public abstract class BaseXCoreTest {
 
@@ -202,6 +204,10 @@ public abstract class BaseXCoreTest {
             final XEventSubscriptions xEventSubscriptions = new XEventSubscriptions();
             final XFocusState xFocusState = new XFocusState();
             
+            final Set<ImageBufferFormat> imageBufferFormats = new HashSet<>();
+            
+            imageBufferFormats.add(new ImageBufferFormat(rootPixelFormat, 32));
+            
             this.coreModule = new XCoreModule(
                 new XWindowsServerProtocolLogImpl("test", DebugLevel.TRACE),
                 windowManagement,
@@ -215,7 +221,7 @@ public abstract class BaseXCoreTest {
                 new XClientCloseHandler(xFocusState, xEventSubscriptions),
                 mock(XInputEventHandlerConstAccess.class),
                 xFocusState,
-                new HashSet<>(),
+                imageBufferFormats,
                 compositor,
                 rendererFactory,
                 fontBufferFactory,

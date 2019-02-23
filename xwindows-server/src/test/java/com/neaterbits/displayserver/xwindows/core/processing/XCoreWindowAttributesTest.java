@@ -168,8 +168,8 @@ public class XCoreWindowAttributesTest extends BaseXCorePixmapTest {
         assertThat(reply.getAllEventMasks()).isEqualTo(attributes.getEventMask());
         assertThat(reply.getYourEventMasks()).isEqualTo(attributes.getEventMask());
         assertThat(reply.getDoNotPropagateMask()).isEqualTo(attributes.getDoNotPropagateMask());
-        assertThat(reply.getMapIsInstalled()).isEqualTo(BOOL.False);
-        assertThat(reply.getMapState()).isEqualTo(MapState.Unmapped);
+        assertThat(reply.getMapIsInstalled()).isEqualTo(BOOL.True);
+        assertThat(reply.getMapState()).isEqualTo(MapState.Viewable);
 
         verifyNoMoreInteractions(window);
     }

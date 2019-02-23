@@ -48,6 +48,10 @@ public final class XCoreImageMessageProcessor extends XOpCodeProcessor {
         this.xPixmaps = xPixmaps;
         this.imageBufferFormats = imageBufferFormats;
         
+        if (imageBufferFormats.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+        
         final List<Integer> depths = imageBufferFormats.stream()
                 .map(f -> f.getPixelFormat().getDepth())
                 .collect(Collectors.toList());
@@ -156,8 +160,10 @@ public final class XCoreImageMessageProcessor extends XOpCodeProcessor {
 
         case ImageFormat.ZPIXMAP:
             
+            final int bufferDepth = bufferOperations.getDepth();
+            
             final ImageBufferFormat imageBufferFormat = imageBufferFormats.stream()
-                .filter(f -> f.getPixelFormat().getDepth() == bufferOperations.getDepth())
+                .filter(f -> f.getPixelFormat().getDepth() == bufferDepth)
                 .findFirst()
                 .orElse(null);
             

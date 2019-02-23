@@ -60,8 +60,6 @@ public final class ConfigureWindow extends XRequest {
     
         stream.writeWINDOW(window);
         
-        writeUnusedCARD16(stream);
-        
         configuration.encode(stream);
     }
 

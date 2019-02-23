@@ -2,6 +2,7 @@ package com.neaterbits.displayserver.xwindows.core.processing;
 
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 
 import com.neaterbits.displayserver.buffers.GetImageListener;
 import com.neaterbits.displayserver.protocol.XWindowsProtocolUtil;
@@ -111,6 +112,7 @@ public class XCoreImageTest extends BaseXCoreGCTest {
 
         when(surface.getWidth()).thenReturn(drawableSize.getWidth());
         when(surface.getHeight()).thenReturn(drawableSize.getHeight());
+        when(surface.getDepth()).thenReturn(rootPixelFormat.getDepth());
 
         final ArgumentCaptor<GetImageListener> getImageListener = ArgumentCaptor.forClass(GetImageListener.class);
         
@@ -118,6 +120,7 @@ public class XCoreImageTest extends BaseXCoreGCTest {
         
         verify(surface).getWidth();
         verify(surface).getHeight();
+        verify(surface).getDepth();
 
         verify(surface).getImage(
                 eq(position.getLeft()),
@@ -128,6 +131,9 @@ public class XCoreImageTest extends BaseXCoreGCTest {
                 getImageListener.capture());
 
         verify(renderer).flush();
+
+        Mockito.verifyZeroInteractions(surface);
+        Mockito.reset(surface);
         
         when(surface.getDepth()).thenReturn(rootPixelFormat.getDepth());
         
